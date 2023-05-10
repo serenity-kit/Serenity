@@ -125,24 +125,42 @@ type ProcessQueueData = {
   documentWasLoaded: boolean;
 };
 
-export type Context = SyncMachineConfig & {
+export type InternalContextReset = {
   _latestServerVersion: null | number;
   _activeSnapshotInfo: null | ActiveSnapshotInfo;
-  _websocketActor?: AnyActorRef;
   _incomingQueue: any[];
   _customMessageQueue: any[];
-  _pendingChangesQueue: any[];
   _activeSendingSnapshotInfo: ActiveSnapshotInfo | null;
-  _shouldReconnect: boolean;
-  _websocketRetries: number;
   _updatesInFlight: UpdateInFlight[];
   _confirmedUpdatesClock: number | null;
   _sendingUpdatesClock: number;
   _updateClocks: UpdateClocks;
   _mostRecentEphemeralUpdateDatePerPublicSigningKey: MostRecentEphemeralUpdateDatePerPublicSigningKey;
-  _errorTrace: Error[];
-  _ephemeralUpdateErrors: Error[];
   _documentWasLoaded: boolean;
+};
+
+export type Context = SyncMachineConfig &
+  InternalContextReset & {
+    _websocketRetries: number;
+    _websocketActor?: AnyActorRef;
+    _pendingChangesQueue: any[];
+    _shouldReconnect: boolean;
+    _errorTrace: Error[];
+    _ephemeralUpdateErrors: Error[];
+  };
+
+const disconnectionContextReset: InternalContextReset = {
+  _activeSnapshotInfo: null,
+  _latestServerVersion: null,
+  _incomingQueue: [],
+  _customMessageQueue: [],
+  _activeSendingSnapshotInfo: null,
+  _updatesInFlight: [],
+  _confirmedUpdatesClock: null,
+  _sendingUpdatesClock: -1,
+  _updateClocks: {},
+  _mostRecentEphemeralUpdateDatePerPublicSigningKey: {},
+  _documentWasLoaded: false,
 };
 
 export const createSyncMachine = () =>
@@ -243,8 +261,8 @@ export const createSyncMachine = () =>
             },
             waiting: {
               invoke: {
-                id: "sheduleRetry",
-                src: "sheduleRetry",
+                id: "scheduleRetry",
+                src: "scheduleRetry",
               },
               on: {
                 WEBSOCKET_RETRY: {
@@ -337,7 +355,7 @@ export const createSyncMachine = () =>
         },
 
         disconnected: {
-          entry: ["updateShouldReconnect", "stopWebsocketActor"],
+          entry: ["resetContext", "stopWebsocketActor"],
           always: {
             target: "connecting",
             cond: "shouldReconnect",
@@ -378,8 +396,11 @@ export const createSyncMachine = () =>
             _websocketActor: undefined,
           };
         }),
-        updateShouldReconnect: assign((context, event) => {
+        resetContext: assign((context, event) => {
           return {
+            // reset the context and make sure there are no stale references
+            // using JSON.parse(JSON.stringify()) to make sure we have a clean copy
+            ...JSON.parse(JSON.stringify(disconnectionContextReset)),
             _shouldReconnect: event.type !== "DISCONNECT",
           };
         }),
@@ -456,12 +477,12 @@ export const createSyncMachine = () =>
         }),
       },
       services: {
-        sheduleRetry: (context) => (callback) => {
+        scheduleRetry: (context) => (callback) => {
           const delay = 100 * 1.8 ** context._websocketRetries;
           console.log("schedule websocket connection in ", delay);
           setTimeout(() => {
             callback("WEBSOCKET_RETRY");
-            // calculating slow exponential backoff
+            // calculating slow exponential back-off
           }, delay);
         },
         processQueues: (context, event) => async (send) => {
@@ -858,7 +879,6 @@ export const createSyncMachine = () =>
 
                   break;
                 case "ephemeralUpdate":
-                  console.log("NEW EPHEMERAL UPDATE", event);
                   try {
                     const ephemeralUpdate = parseEphemeralUpdateWithServerData(
                       event,

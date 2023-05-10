@@ -9,8 +9,8 @@ export interface Typegen0 {
       data: unknown;
       __tip: "See the XState TS docs to learn how to strongly type this.";
     };
-    "done.invoke.sheduleRetry": {
-      type: "done.invoke.sheduleRetry";
+    "done.invoke.scheduleRetry": {
+      type: "done.invoke.scheduleRetry";
       data: unknown;
       __tip: "See the XState TS docs to learn how to strongly type this.";
     };
@@ -18,8 +18,8 @@ export interface Typegen0 {
       type: "error.platform.processQueues";
       data: unknown;
     };
-    "error.platform.sheduleRetry": {
-      type: "error.platform.sheduleRetry";
+    "error.platform.scheduleRetry": {
+      type: "error.platform.scheduleRetry";
       data: unknown;
     };
     "xstate.after(0)#syncMachine.connected.checkingForMoreQueueItems": {
@@ -29,7 +29,7 @@ export interface Typegen0 {
   };
   invokeSrcNameMap: {
     processQueues: "done.invoke.processQueues";
-    sheduleRetry: "done.invoke.sheduleRetry";
+    scheduleRetry: "done.invoke.scheduleRetry";
   };
   missingImplementations: {
     actions: never;
@@ -43,6 +43,7 @@ export interface Typegen0 {
     addToPendingUpdatesQueue: "ADD_CHANGE";
     increaseWebsocketRetry: "WEBSOCKET_RETRY";
     removeOldestItemFromQueueAndUpdateContext: "done.invoke.processQueues";
+    resetContext: "DISCONNECT" | "WEBSOCKET_DISCONNECTED";
     resetWebsocketRetries: "WEBSOCKET_CONNECTED";
     spawnWebsocketActor: "WEBSOCKET_RETRY";
     stopWebsocketActor:
@@ -52,7 +53,6 @@ export interface Typegen0 {
       | "WEBSOCKET_UNAUTHORIZED"
       | "error.platform.processQueues";
     storeErrorInErrorTrace: "error.platform.processQueues";
-    updateShouldReconnect: "DISCONNECT" | "WEBSOCKET_DISCONNECTED";
   };
   eventsCausingDelays: {};
   eventsCausingGuards: {
@@ -65,7 +65,7 @@ export interface Typegen0 {
       | "WEBSOCKET_ADD_TO_CUSTOM_MESSAGE_QUEUE"
       | "WEBSOCKET_ADD_TO_INCOMING_QUEUE"
       | "xstate.after(0)#syncMachine.connected.checkingForMoreQueueItems";
-    sheduleRetry: "" | "DISCONNECT" | "WEBSOCKET_DISCONNECTED" | "xstate.init";
+    scheduleRetry: "" | "DISCONNECT" | "WEBSOCKET_DISCONNECTED" | "xstate.init";
   };
   matchesStates:
     | "connected"

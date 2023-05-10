@@ -31,6 +31,7 @@ import { deriveExistingSnapshotKey } from "../../utils/deriveExistingSnapshotKey
 import { useDocumentTitleStore } from "../../utils/document/documentTitleStore";
 import { getDocument } from "../../utils/document/getDocument";
 import { updateDocumentName } from "../../utils/document/updateDocumentName";
+import { useEditorStore } from "../../utils/editorStore/editorStore";
 import { getUserFromWorkspaceQueryResultByDeviceInfo } from "../../utils/getUserFromWorkspaceQueryResultByDeviceInfo/getUserFromWorkspaceQueryResultByDeviceInfo";
 import {
   getLocalDocument,
@@ -68,12 +69,15 @@ export default function Page({
   const yAwarenessRef = useRef<Awareness>(new Awareness(yDocRef.current));
   const [documentLoadedFromLocalStorage, setDocumentLoadedFromLocalStorage] =
     useState(false);
+  const [documentLoadedOnceFromRemote, setDocumentLoadedOnceFromRemote] =
+    useState(false);
   const [passedDocumentLoadingTimeout, setPassedDocumentLoadingTimeout] =
     useState(false);
   const [userInfo, setUserInfo] = useState<AwarenessUserInfo>({
     name: "Unknown user",
     color: "#000000",
   });
+  const setIsOffline = useEditorStore((state) => state.setIsOffline);
 
   const setActiveDocumentId = useDocumentTitleStore(
     (state) => state.setActiveDocumentId
@@ -91,7 +95,7 @@ export default function Page({
   }
   const { workspaceQueryResult } = useWorkspace();
 
-  const [state, send] = useYjsSyncMachine({
+  const [state] = useYjsSyncMachine({
     yDoc: yDocRef.current,
     yAwareness: yAwarenessRef.current,
     documentId: docId,
@@ -130,7 +134,6 @@ export default function Page({
         throw new Error("Workspace or workspaceKeys not found");
       }
 
-      console.log("workspace", workspace);
       const documentTitle = decryptDocumentTitleBasedOnSnapshotKey({
         snapshotKey: sodium.to_base64(snapshotKeyRef.current!.key),
         ciphertext: document.nameCiphertext,
@@ -303,6 +306,24 @@ export default function Page({
     return () => {};
   }, []);
 
+  useEffect(() => {
+    if (state.context._documentWasLoaded) {
+      setDocumentLoadedOnceFromRemote(true);
+    }
+  }, [state.context._documentWasLoaded]);
+
+  useEffect(() => {
+    if (
+      state.matches("disconnected") ||
+      (state.matches("connecting") && state.context._websocketRetries > 1)
+    ) {
+      setIsOffline(true);
+    } else {
+      setIsOffline(false);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [state.value, state.context._websocketRetries]);
+
   const updateTitle = async (title: string) => {
     const document = await getDocument({
       documentId: docId,
@@ -335,7 +356,9 @@ export default function Page({
       updateTitle={updateTitle}
       isNew={isNew}
       documentLoaded={
-        documentLoadedFromLocalStorage || state.context._documentWasLoaded
+        documentLoadedFromLocalStorage ||
+        state.context._documentWasLoaded ||
+        documentLoadedOnceFromRemote
       }
       passedDocumentLoadingTimeout={passedDocumentLoadingTimeout}
       userInfo={userInfo}
