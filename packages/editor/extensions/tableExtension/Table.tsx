@@ -278,6 +278,34 @@ export const Table = (props: any) => {
           editor.view.dispatch(state.tr.setSelection(selection));
         }}
       ></div>
+      {tableCellDimension.rowHeights.map((height, index) => {
+        return (
+          <div
+            style={{
+              width: 16,
+              height,
+              background: rowSelected === index ? "yellow" : "",
+            }}
+            onClick={() => {
+              const editor = props.editor.storage.tableCell.currentEditor;
+              const state = editor.view.state;
+
+              const resolvedPos = state.doc.resolve(props.getPos());
+              const table = props.node;
+              const tableStart = resolvedPos.start(1);
+              const tableMap = TableMap.get(table);
+
+              const cellPos = tableMap.positionAt(index, 0, table);
+              const resolvedCellPos = state.doc.resolve(tableStart + cellPos);
+
+              const rowSelection = CellSelection.rowSelection(resolvedCellPos);
+              editor.view.dispatch(state.tr.setSelection(rowSelection));
+            }}
+          >
+            r{index}
+          </div>
+        );
+      })}
       {tableCellDimension.columnWidths.map((width, index) => {
         return (
           <div
