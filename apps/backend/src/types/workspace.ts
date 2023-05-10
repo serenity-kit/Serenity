@@ -1,10 +1,10 @@
 import {
   CreatorDevice as PrismaCreatorDevice,
-  Role,
-  UsersToWorkspaces,
   Workspace as PrismaWorkspace,
   WorkspaceKey as PrismaWorkspaceKey,
   WorkspaceKeyBox as PrismaWorkspaceKeyBox,
+  Role,
+  UsersToWorkspaces,
 } from "../../prisma/generated/output";
 import { CreatorDevice, Device, MinimalDevice } from "./device";
 

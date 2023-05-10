@@ -26,7 +26,7 @@ export const rotateWorkspaceKey = async ({
   if (!user) {
     throw new ForbiddenError("Unauthorized");
   }
-  const verifedUserWorkspace = await prisma.usersToWorkspaces.findMany({
+  const verifiedUserWorkspace = await prisma.usersToWorkspaces.findMany({
     where: {
       userId,
       role: Role.ADMIN,
@@ -35,7 +35,7 @@ export const rotateWorkspaceKey = async ({
     },
     select: { workspaceId: true },
   });
-  if (!verifedUserWorkspace) {
+  if (!verifiedUserWorkspace) {
     throw new ForbiddenError("Unauthorized");
   }
 
@@ -92,7 +92,7 @@ export const rotateWorkspaceKey = async ({
   const createdWorkspaceKeyBoxes = await prisma.workspaceKeyBox.findMany({
     where: { workspaceKeyId: newWorkspaceKey.id },
   });
-  const returnedWorskpaceKey: WorkspaceKey = newWorkspaceKey;
-  returnedWorskpaceKey.workspaceKeyBoxes = createdWorkspaceKeyBoxes;
-  return returnedWorskpaceKey;
+  const returnedWorkspaceKey: WorkspaceKey = newWorkspaceKey;
+  returnedWorkspaceKey.workspaceKeyBoxes = createdWorkspaceKeyBoxes;
+  return returnedWorkspaceKey;
 };

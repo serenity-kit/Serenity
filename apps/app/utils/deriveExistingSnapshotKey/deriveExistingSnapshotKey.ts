@@ -31,7 +31,7 @@ export const deriveExistingSnapshotKey = async (
       encryptionPrivateKey: activeDevice.encryptionPrivateKey!,
       encryptionPublicKeySignature: activeDevice.encryptionPublicKeySignature!,
     },
-    workspaceKeyBox: workspace?.currentWorkspaceKey.workspaceKeyBox!,
+    workspaceKeyBox: workspace.currentWorkspaceKey.workspaceKeyBox,
   });
   const folderChainItem =
     folderKeyChainData.trace[folderKeyChainData.trace.length - 2];
