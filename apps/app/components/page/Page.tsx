@@ -8,6 +8,11 @@ import {
 import { decryptDocumentTitleBasedOnSnapshotKey } from "@serenity-tools/common/src/decryptDocumentTitleBasedOnSnapshotKey/decryptDocumentTitleBasedOnSnapshotKey";
 import { AwarenessUserInfo } from "@serenity-tools/editor";
 import {
+  Button,
+  Description,
+  Modal,
+  ModalButtonFooter,
+  ModalHeader,
   collaboratorColorToHex,
   hashToCollaboratorColor,
 } from "@serenity-tools/ui";
@@ -80,13 +85,13 @@ export default function Page({
     color: "#000000",
   });
   const setOfflineState = useEditorStore((state) => state.setOfflineState);
-
   const setActiveDocumentId = useDocumentTitleStore(
     (state) => state.setActiveDocumentId
   );
   const updateDocumentTitle = useDocumentTitleStore(
     (state) => state.updateDocumentTitle
   );
+  const [isClosedErrorModal, setIsClosedErrorModal] = useState(false);
 
   let websocketHost = `wss://serenity-dev.fly.dev`;
   if (process.env.NODE_ENV === "development") {
@@ -367,19 +372,61 @@ export default function Page({
     return <PageDecryptError reloadPage={reloadPage} />;
   }
 
+  // TODO Update the badge with style and useful error message
+  // TODO make sure partial document is loaded
+  // TODO only have PageDecryptError in case snapshot of document could not be loaded
+  // TODO make editor non-editable in case of error
+
   return (
-    <Editor
-      documentId={docId}
-      workspaceId={workspaceId}
-      yDocRef={yDocRef}
-      yAwarenessRef={yAwarenessRef}
-      openDrawer={navigation.openDrawer}
-      updateTitle={updateTitle}
-      isNew={isNew}
-      documentLoaded={documentLoaded}
-      passedDocumentLoadingTimeout={passedDocumentLoadingTimeout}
-      userInfo={userInfo}
-      reloadPage={reloadPage}
-    />
+    <>
+      <Modal
+        isVisible={!isClosedErrorModal && state.matches("failed")}
+        onBackdropPress={() => {
+          setIsClosedErrorModal(true);
+        }}
+      >
+        <ModalHeader>Failed to decrypt</ModalHeader>
+        <Description variant="modal">
+          {documentLoaded
+            ? "Incoming page updates couldn't be decrypted. Please save your recent changes and try to reload the page. If the problem persists please contact support."
+            : "The page could not be decrypted. As much content as possible has been loaded, but some content may be missing. Please try to reload the page. If the problem persists please contact support."}
+        </Description>
+        <ModalButtonFooter
+          confirm={
+            <Button
+              onPress={() => {
+                setIsClosedErrorModal(true);
+              }}
+              variant="primary"
+            >
+              Close dialog
+            </Button>
+          }
+          cancel={
+            <Button
+              onPress={() => {
+                reloadPage();
+              }}
+              variant="secondary"
+            >
+              Reload page
+            </Button>
+          }
+        />
+      </Modal>
+      <Editor
+        documentId={docId}
+        workspaceId={workspaceId}
+        yDocRef={yDocRef}
+        yAwarenessRef={yAwarenessRef}
+        openDrawer={navigation.openDrawer}
+        updateTitle={updateTitle}
+        isNew={isNew}
+        documentLoaded={documentLoaded}
+        passedDocumentLoadingTimeout={passedDocumentLoadingTimeout}
+        userInfo={userInfo}
+        reloadPage={reloadPage}
+      />
+    </>
   );
 }
