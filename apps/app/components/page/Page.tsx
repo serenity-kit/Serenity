@@ -43,7 +43,7 @@ import {
   setLocalDocument,
 } from "../../utils/localSqliteApi/localSqliteApi";
 import { getWorkspace } from "../../utils/workspace/getWorkspace";
-import { PageDecryptError } from "./PageDecryptError";
+import { PageLoadingError } from "./PageLoadingError";
 import { PageNoAccessError } from "./PageNoAccessError";
 
 type Props = WorkspaceDrawerScreenProps<"Page"> & {
@@ -241,8 +241,6 @@ export default function Page({
     sodium,
   });
 
-  // console.log("state", state.value);
-
   useEffect(() => {
     setTimeout(() => {
       setPassedDocumentLoadingTimeout(true);
@@ -368,14 +366,18 @@ export default function Page({
     return <PageNoAccessError />;
   }
 
-  if (!documentLoaded && state.matches("failed")) {
-    return <PageDecryptError reloadPage={reloadPage} />;
+  if (passedDocumentLoadingTimeout && !documentLoaded && false) {
+    return <PageLoadingError reloadPage={reloadPage} />;
   }
 
   // TODO Update the badge with style and useful error message
-  // TODO make sure partial document is loaded
-  // TODO only have PageDecryptError in case snapshot of document could not be loaded
-  // TODO make editor non-editable in case of error
+  // TODO bring back PageLoadingError
+  // TODO add partiallyLoadedDocument to createSyncMachine and test for it
+  // TODO create tests for partially loading a document (content should be there, but not all updates)
+  // TODO add editable updates to mobile editor
+  // TODO add mobile editor error hint
+  // TODO add tooltip for going online/offline & ephemeral update errors
+  // TODO disable bars if editors is not set to editable
 
   return (
     <>
@@ -415,6 +417,7 @@ export default function Page({
         />
       </Modal>
       <Editor
+        editable={!state.matches("failed")}
         documentId={docId}
         workspaceId={workspaceId}
         yDocRef={yDocRef}
@@ -422,10 +425,8 @@ export default function Page({
         openDrawer={navigation.openDrawer}
         updateTitle={updateTitle}
         isNew={isNew}
-        documentLoaded={documentLoaded}
-        passedDocumentLoadingTimeout={passedDocumentLoadingTimeout}
+        documentLoaded={documentLoaded || state.matches("failed")}
         userInfo={userInfo}
-        reloadPage={reloadPage}
       />
     </>
   );

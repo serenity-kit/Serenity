@@ -593,7 +593,11 @@ export const createSyncMachine = () =>
                 clock: sendingUpdatesClock,
                 changes,
               });
-              send({ type: "SEND", message: JSON.stringify(message) });
+              send({
+                type: "SEND",
+                message: JSON.stringify({ ...message, ciphertext: "lala" }),
+                // message: JSON.stringify(message),
+              });
             };
 
             const processSnapshot = async (
@@ -662,61 +666,67 @@ export const createSyncMachine = () =>
               );
               let changes: unknown[] = [];
 
-              for (let update of updates) {
-                const key = await context.getUpdateKey(update);
-                // console.log("processUpdates key", key);
-                if (activeSnapshotInfo === null) {
-                  throw new Error("No active snapshot");
-                }
+              try {
+                for (let update of updates) {
+                  const key = await context.getUpdateKey(update);
+                  // console.log("processUpdates key", key);
+                  if (activeSnapshotInfo === null) {
+                    throw new Error("No active snapshot");
+                  }
 
-                const isValidCollaborator = await context.isValidCollaborator(
-                  update.publicData.pubKey
-                );
-                if (!isValidCollaborator) {
-                  throw new Error("Invalid collaborator");
-                }
+                  const isValidCollaborator = await context.isValidCollaborator(
+                    update.publicData.pubKey
+                  );
+                  if (!isValidCollaborator) {
+                    throw new Error("Invalid collaborator");
+                  }
 
-                const currentClock =
-                  updateClocks[activeSnapshotInfo.id] &&
-                  Number.isInteger(
-                    updateClocks[activeSnapshotInfo.id][
-                      update.publicData.pubKey
-                    ]
-                  )
-                    ? updateClocks[activeSnapshotInfo.id][
+                  const currentClock =
+                    updateClocks[activeSnapshotInfo.id] &&
+                    Number.isInteger(
+                      updateClocks[activeSnapshotInfo.id][
                         update.publicData.pubKey
                       ]
-                    : -1;
+                    )
+                      ? updateClocks[activeSnapshotInfo.id][
+                          update.publicData.pubKey
+                        ]
+                      : -1;
 
-                const { content, clock } = verifyAndDecryptUpdate(
-                  update,
-                  key,
-                  context.sodium.from_base64(update.publicData.pubKey),
-                  currentClock
-                );
+                  const { content, clock } = verifyAndDecryptUpdate(
+                    update,
+                    key,
+                    context.sodium.from_base64(update.publicData.pubKey),
+                    currentClock
+                  );
 
-                const existingClocks =
-                  updateClocks[activeSnapshotInfo.id] || {};
-                updateClocks[activeSnapshotInfo.id] = {
-                  ...existingClocks,
-                  [update.publicData.pubKey]: clock,
-                };
+                  const existingClocks =
+                    updateClocks[activeSnapshotInfo.id] || {};
+                  updateClocks[activeSnapshotInfo.id] = {
+                    ...existingClocks,
+                    [update.publicData.pubKey]: clock,
+                  };
 
-                latestServerVersion = update.serverData.version;
-                if (
-                  update.publicData.pubKey ===
-                  context.sodium.to_base64(context.signatureKeyPair.publicKey)
-                ) {
-                  confirmedUpdatesClock = update.publicData.clock;
-                  sendingUpdatesClock = update.publicData.clock;
+                  latestServerVersion = update.serverData.version;
+                  if (
+                    update.publicData.pubKey ===
+                    context.sodium.to_base64(context.signatureKeyPair.publicKey)
+                  ) {
+                    confirmedUpdatesClock = update.publicData.clock;
+                    sendingUpdatesClock = update.publicData.clock;
+                  }
+
+                  const additionalChanges = context.deserializeChanges(
+                    context.sodium.to_string(content)
+                  );
+                  changes = changes.concat(additionalChanges);
                 }
-
-                const additionalChanges = context.deserializeChanges(
-                  context.sodium.to_string(content)
-                );
-                changes = changes.concat(additionalChanges);
+                context.applyChanges(changes);
+              } catch (error) {
+                // still try to apply all existing changes
+                context.applyChanges(changes);
+                throw error;
               }
-              context.applyChanges(changes);
             };
 
             if (context._customMessageQueue.length > 0) {
@@ -754,6 +764,7 @@ export const createSyncMachine = () =>
                   };
 
                   await processSnapshot(event.snapshot);
+                  // documentWasPartiallyLoaded = true;
 
                   if (event.updates) {
                     await processUpdates(event.updates);

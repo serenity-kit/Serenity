@@ -31,7 +31,6 @@ import {
   EditorBottombarProps,
 } from "../editorBottombar/EditorBottombar";
 import { EditorPageLoading } from "./EditorPageLoading";
-import { EditorPageLoadingError } from "./EditorPageLoadingError";
 import { initialEditorBottombarState } from "./initialEditorBottombarState";
 import { EditorProps } from "./types";
 
@@ -86,10 +85,9 @@ export default function Editor({
   isNew,
   documentId,
   documentLoaded,
-  passedDocumentLoadingTimeout,
   workspaceId,
   userInfo,
-  reloadPage,
+  editable,
 }: EditorProps) {
   const webViewRef = useRef<WebView>(null);
   // leveraging a ref here since the injectedJavaScriptBeforeContentLoaded
@@ -251,10 +249,6 @@ export default function Editor({
       `);
     }
   );
-
-  if (passedDocumentLoadingTimeout && !documentLoaded) {
-    return <EditorPageLoadingError reloadPage={reloadPage} />;
-  }
 
   if (!documentLoaded) {
     return <EditorPageLoading />;

@@ -20,7 +20,6 @@ import {
   editorBottombarHeight,
 } from "../editorBottombar/EditorBottombar";
 import { EditorPageLoading } from "./EditorPageLoading";
-import { EditorPageLoadingError } from "./EditorPageLoadingError";
 import { initialEditorBottombarState } from "./initialEditorBottombarState";
 import { EditorProps } from "./types";
 
@@ -30,12 +29,11 @@ export default function Editor({
   openDrawer,
   documentId,
   documentLoaded,
-  passedDocumentLoadingTimeout,
   workspaceId,
   isNew,
   updateTitle,
   userInfo,
-  reloadPage,
+  editable,
 }: EditorProps) {
   const [editorBottombarState, setEditorBottombarState] =
     useState<EditorBottombarState>(initialEditorBottombarState);
@@ -131,10 +129,6 @@ export default function Editor({
     });
   }, [workspaceId, documentId]);
 
-  if (passedDocumentLoadingTimeout && !documentLoaded) {
-    return <EditorPageLoadingError reloadPage={reloadPage} />;
-  }
-
   if (!documentLoaded) {
     return <EditorPageLoading />;
   }
@@ -143,6 +137,7 @@ export default function Editor({
     // overflow-hidden needed so hidden elements with borders don't trigger scrolling behaviour
     <View style={tw`h-full overflow-hidden`}>
       <SerenityEditor
+        editable={editable}
         documentId={documentId}
         yDocRef={yDocRef}
         yAwarenessRef={yAwarenessRef}
