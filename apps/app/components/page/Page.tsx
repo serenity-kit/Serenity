@@ -424,10 +424,8 @@ export default function Page({
     return <PageLoadingError reloadPage={reloadPage} />;
   }
 
-  // TODO add editable updates to mobile editor
   // TODO add mobile editor error hint
   // TODO disable bars if editors is not set to editable
-  // TODO check resync after being offline
 
   return (
     <>

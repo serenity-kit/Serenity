@@ -225,7 +225,6 @@ export const Editor = (props: EditorProps) => {
   }, [props.comments, props.highlightedComment, editor]);
 
   useEffect(() => {
-    console.log("UPDATE EDITABLE");
     if (editor) {
       editor.setEditable(props.editable);
     }
