@@ -95,40 +95,6 @@ export const TableCell = (props: any) => {
           }}
         />
       </div>
-
-      <div className="mark-row">
-        <TableHandle
-          variant="row"
-          onPress={() => {
-            const editor = props.editor.storage.tableCell.currentEditor;
-
-            editor.storage.table.setTableActive(true);
-
-            const state = editor.view.state;
-            const resolvedPos = state.doc.resolve(props.getPos());
-            const rowSelection = CellSelection.rowSelection(resolvedPos);
-
-            editor.view.dispatch(state.tr.setSelection(rowSelection));
-          }}
-        />
-      </div>
-
-      <div className="mark-column">
-        <TableHandle
-          variant="column"
-          onPress={() => {
-            const editor = props.editor.storage.tableCell.currentEditor;
-
-            editor.storage.table.setTableActive(true);
-
-            const state = editor.view.state;
-            const resolvedPos = state.doc.resolve(props.getPos());
-            const colSelection = CellSelection.colSelection(resolvedPos);
-            editor.view.dispatch(state.tr.setSelection(colSelection));
-          }}
-        />
-      </div>
-
       <NodeViewContent className="content" />
     </NodeViewWrapper>
   );

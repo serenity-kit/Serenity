@@ -63,6 +63,16 @@ export const Table = (props: any) => {
   console.log("ROW SELECTED", rowSelected);
   console.log("COLUMN SELECTED", columnSelected);
 
+  const getColWidth = (index: number) => {
+    if (!tableWrapperRef.current) return 0;
+    const table = tableWrapperRef.current.children[0] as HTMLTableElement;
+
+    const firstRow = table.rows[0];
+    const activeCell = firstRow.cells[index];
+
+    return activeCell.getBoundingClientRect().width;
+  };
+
   const getTableInfo = () => {
     const editor = props.editor.storage.tableCell.currentEditor;
     const state = editor.view.state;
@@ -98,6 +108,11 @@ export const Table = (props: any) => {
   };
 
   const tableWrapperRef = useRef<HTMLDivElement>(null);
+
+  // set to accumulate absolute position of marking elements
+  let markRowTop = 0;
+  let markColumnLeft = 0;
+
   useResizeObserver({
     onResize: (params) => {
       if (!tableWrapperRef.current) return;
@@ -289,12 +304,14 @@ export const Table = (props: any) => {
         }}
       ></div>
       {tableCellDimension.rowHeights.map((height, index) => {
+        markRowTop += index > 0 ? tableCellDimension.rowHeights[index - 1] : 0;
+
         return (
           <div
+            className={`drag-row ${rowSelected === index && "active"}`}
             style={{
-              width: 16,
-              height,
-              background: rowSelected === index ? "yellow" : "",
+              top: markRowTop,
+              height: index === 0 ? height : height - 1, // minus one border-width
             }}
             onClick={() => {
               const editor = props.editor.storage.tableCell.currentEditor;
@@ -308,17 +325,22 @@ export const Table = (props: any) => {
               const rowSelection = CellSelection.rowSelection(resolvedCellPos);
               editor.view.dispatch(state.tr.setSelection(rowSelection));
             }}
-          >
-            r{index}
-          </div>
+          ></div>
         );
       })}
       {tableCellDimension.columnWidths.map((width, index) => {
+        markColumnLeft += index > 0 ? getColWidth(index - 1) : 0;
+
+        // this represents the actual unrounded width of the <td> DOM element (needed as added columns will be calculated via division)
+        // using just the columnWidth of the tableCellDimensions isn't precise enough
+        const colWidth = getColWidth(index);
+
         return (
           <div
+            className={`drag-column ${columnSelected === index && "active"}`}
             style={{
-              width,
-              background: columnSelected === index ? "green" : "",
+              left: markColumnLeft,
+              width: index === 0 ? colWidth : colWidth - 1, // minus one border-width
             }}
             onClick={() => {
               const editor = props.editor.storage.tableCell.currentEditor;
@@ -332,9 +354,7 @@ export const Table = (props: any) => {
               const colSelection = CellSelection.colSelection(resolvedCellPos);
               editor.view.dispatch(state.tr.setSelection(colSelection));
             }}
-          >
-            column selector: {index}
-          </div>
+          ></div>
         );
       })}
     </NodeViewWrapper>
