@@ -308,7 +308,7 @@ export const Table = (props: any) => {
 
         return (
           <div
-            className={`drag-row ${rowSelected === index && "active"}`}
+            className={`mark-row ${rowSelected === index && "active"}`}
             style={{
               top: markRowTop,
               height: index === 0 ? height : height - 1, // minus one border-width
@@ -337,7 +337,7 @@ export const Table = (props: any) => {
 
         return (
           <div
-            className={`drag-column ${columnSelected === index && "active"}`}
+            className={`mark-column ${columnSelected === index && "active"}`}
             style={{
               left: markColumnLeft,
               width: index === 0 ? colWidth : colWidth - 1, // minus one border-width

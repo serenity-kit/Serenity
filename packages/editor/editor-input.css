@@ -444,12 +444,12 @@
 
   /* --- mark row / columns --- */
 
-  .drag-row {
+  .mark-row {
     box-sizing: content-box; /* needs to be here as there is no native equivalent for that */
   }
 
-  .drag-row,
-  .drag-column {
+  .mark-row,
+  .mark-column {
     --mark-size: 1rem;
     position: absolute;
     background-color: theme("colors.gray.120");
@@ -457,7 +457,7 @@
     box-sizing: content-box;
   }
 
-  .drag-row {
+  .mark-row {
     top: 0; /* default */
     left: calc(var(--mark-size) * -1);
     height: 3em; /* fallback value, will be set by js */
@@ -465,11 +465,11 @@
     border-bottom: 1px solid theme("colors.gray.300");
   }
 
-  .drag-row ~ .drag-row {
+  .mark-row ~ .mark-row {
     border-top: 1px solid theme("colors.gray.300");
   }
 
-  .drag-column {
+  .mark-column {
     top: calc(var(--mark-size) * -1);
     left: 0; /* default */
     height: var(--mark-size);
@@ -477,70 +477,30 @@
     border-right: 1px solid theme("colors.gray.300");
   }
 
-  .drag-column ~ .drag-column {
+  .mark-column ~ .mark-column {
     border-left: 1px solid theme("colors.gray.300");
   }
 
-  .drag-row:hover,
-  .drag-column:hover {
+  .mark-row:hover,
+  .mark-column:hover {
     background-color: theme("colors.gray.150");
   }
 
-  .drag-row.active,
-  .drag-column.active {
+  .mark-row.active,
+  .mark-column.active {
     background-color: theme("colors.primary.500");
     border-color: theme("colors.primary.500");
     z-index: 2;
   }
 
-  .drag-row.active {
+  .mark-row.active {
     width: calc(var(--mark-size) + 1px); /* to overlap the table border */
     border-radius: 2px 0 0 2px;
   }
 
-  .drag-column.active {
+  .mark-column.active {
     height: calc(var(--mark-size) + 1px); /* to overlap the table border */
     border-radius: 2px 2px 0 0;
-  }
-
-  .mark-row,
-  .mark-column {
-    --mark-size: 1rem;
-    position: absolute;
-  }
-
-  .mark-row [role="button"],
-  .mark-column [role="button"] {
-    box-sizing: content-box; /* needs to be here as there is no native equivalent for that */
-  }
-
-  .mark-row {
-    height: 100%;
-    top: 0px;
-    left: calc(
-      (var(--mark-size) + 1px) * (-1)
-    ); /* defined width + border-width */
-  }
-
-  .mark-column {
-    width: 100%;
-    top: calc(
-      (var(--mark-size) + 1px) * (-1)
-    ); /* defined height + border-width */
-    left: 0px;
-  }
-
-  /* adjust styling for first table cell--- */
-  tr:first-child th:first-child .mark-column,
-  tr:first-child td:first-child .mark-column {
-    left: -1px;
-    width: calc(100% + 1px);
-  }
-
-  tr:first-child th:first-child .mark-row,
-  tr:first-child td:first-child .mark-row {
-    top: -1px;
-    height: calc(100% + 1px);
   }
 
   /* --- table-selection */
