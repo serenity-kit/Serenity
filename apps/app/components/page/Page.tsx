@@ -427,7 +427,6 @@ export default function Page({
   // TODO add editable updates to mobile editor
   // TODO add mobile editor error hint
   // TODO disable bars if editors is not set to editable
-  // TODO editing disabled hint in error modal
   // TODO check resync after being offline
 
   return (
@@ -443,8 +442,18 @@ export default function Page({
         </ModalHeader>
         <Description variant="modal">
           {documentLoaded
-            ? "Incoming page updates couldn't be loaded or decrypted. Please save your recent changes and try to reload the page. If the problem persists, please contact support."
-            : "The entire page could not be loaded or decrypted, but as much content as possible has been restored. Please try to reload the page. If the problem persists, please contact support."}
+            ? "Incoming page updates couldn't be loaded or decrypted."
+            : "The entire page could not be loaded or decrypted, but as much content as possible has been restored."}
+        </Description>
+        <Description variant="modal">
+          {
+            "Editing has been disabled, but you still can select and copy the content."
+          }
+        </Description>
+        <Description variant="modal">
+          {documentLoaded
+            ? "Please save your recent changes and try to reload the page. If the problem persists, please contact support."
+            : "Please try to reload the page. If the problem persists, please contact support."}
         </Description>
         <ModalButtonFooter
           confirm={
