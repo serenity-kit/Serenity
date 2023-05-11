@@ -1,6 +1,6 @@
 import {
-  Badge,
   IconButton,
+  Tag,
   Text,
   Tooltip,
   View,
@@ -22,7 +22,7 @@ export const PageHeader: React.FC<Props> = ({
   hasNewComment,
 }) => {
   const isInEditingMode = useEditorStore((state) => state.isInEditingMode);
-  const offlineState = useEditorStore((state) => state.offlineState);
+  const syncState = useEditorStore((state) => state.syncState);
   const isDesktopDevice = useIsDesktopDevice();
 
   return (
@@ -33,20 +33,29 @@ export const PageHeader: React.FC<Props> = ({
         </Text>
       ) : null}
 
-      {offlineState ? (
+      {syncState.variant === "offline" ? (
         <Tooltip
-          label={`${offlineState.pendingChanges} edits will be synced the next time you are online`}
+          label={`${syncState.pendingChanges} edits will be synced the next time you are online`}
           placement="bottom"
           offset={8}
           openDelay={200}
         >
           {/* needs a view since the tooltip placement needs a block element */}
           <View>
-            <Badge variant="xs" style={tw`mr-4`}>
+            <Tag variant="xs" style={tw`mr-2`}>
               Offline
-            </Badge>
+            </Tag>
           </View>
         </Tooltip>
+      ) : null}
+
+      {syncState.variant === "error" ? (
+        <Tag purpose="error" variant="xs" style={tw`mr-2`}>
+          {syncState.documentDecryptionState === "complete" ||
+          syncState.documentLoadedFromLocalDb
+            ? "Failed to apply updates"
+            : "Failed to load the page"}
+        </Tag>
       ) : null}
 
       {isDesktopDevice ? (

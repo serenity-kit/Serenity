@@ -1,20 +1,28 @@
+import { DocumentDecryptionState } from "@naisho/core";
 import create from "zustand";
 
-type OfflineState = false | { pendingChanges: number };
+type SyncState =
+  | { variant: "online" }
+  | { variant: "offline"; pendingChanges: number }
+  | {
+      variant: "error";
+      documentDecryptionState: DocumentDecryptionState;
+      documentLoadedFromLocalDb: boolean;
+    };
 
 interface EditorState {
   isInEditingMode: boolean;
-  offlineState: OfflineState;
+  syncState: SyncState;
   subscriptions: (() => void)[];
   setIsInEditingMode: (isInEditingMode: boolean) => void;
-  setOfflineState: (offlineState: OfflineState) => void;
+  setSyncState: (offlineState: SyncState) => void;
   triggerBlur: () => void;
   subscribeToBlurTrigger: (callback: () => void) => void;
   removeAllSubscribers: () => void;
 }
 
 export const useEditorStore = create<EditorState>((set, get) => ({
-  offlineState: false,
+  syncState: { variant: "online" },
   subscriptions: [],
   subscribeToBlurTrigger: (callback) =>
     set((state) => ({
@@ -35,8 +43,8 @@ export const useEditorStore = create<EditorState>((set, get) => ({
     set((state) => ({
       isInEditingMode,
     })),
-  setOfflineState: (offlineState) =>
+  setSyncState: (syncState) =>
     set((state) => ({
-      offlineState,
+      syncState,
     })),
 }));

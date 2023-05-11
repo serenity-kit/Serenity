@@ -74,7 +74,7 @@ export default function Page({
     key: Uint8Array;
   } | null>(null);
   const yAwarenessRef = useRef<Awareness>(new Awareness(yDocRef.current));
-  const [documentLoadedFromLocalStorage, setDocumentLoadedFromLocalStorage] =
+  const [documentLoadedFromLocalDb, setDocumentLoadedFromLocalDb] =
     useState(false);
   const [documentLoadedOnceFromRemote, setDocumentLoadedOnceFromRemote] =
     useState(false);
@@ -84,7 +84,7 @@ export default function Page({
     name: "Unknown user",
     color: "#000000",
   });
-  const setOfflineState = useEditorStore((state) => state.setOfflineState);
+  const setSyncState = useEditorStore((state) => state.setSyncState);
   const setActiveDocumentId = useDocumentTitleStore(
     (state) => state.setActiveDocumentId
   );
@@ -256,7 +256,7 @@ export default function Page({
           localDocument.content,
           "serenity-local-sqlite"
         );
-        setDocumentLoadedFromLocalStorage(true);
+        setDocumentLoadedFromLocalDb(true);
       }
 
       const me = await runMeQuery({});
@@ -318,21 +318,30 @@ export default function Page({
   }, [state.context._documentDecryptionState]);
 
   useEffect(() => {
-    if (
+    if (state.matches("failed")) {
+      setSyncState({
+        variant: "error",
+        documentDecryptionState: state.context._documentDecryptionState,
+        documentLoadedFromLocalDb,
+      });
+    } else if (
       state.matches("disconnected") ||
       (state.matches("connecting") && state.context._websocketRetries > 1)
     ) {
-      setOfflineState({
+      setSyncState({
+        variant: "offline",
         pendingChanges: state.context._pendingChangesQueue.length,
       });
     } else {
-      setOfflineState(false);
+      setSyncState({ variant: "online" });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     state.value,
     state.context._websocketRetries,
     state.context._pendingChangesQueue.length,
+    documentLoadedFromLocalDb,
+    setSyncState,
   ]);
 
   const updateTitle = async (title: string) => {
@@ -358,7 +367,7 @@ export default function Page({
   };
 
   const documentLoaded =
-    documentLoadedFromLocalStorage ||
+    documentLoadedFromLocalDb ||
     state.context._documentDecryptionState === "complete" ||
     documentLoadedOnceFromRemote;
 
@@ -374,8 +383,6 @@ export default function Page({
     return <PageLoadingError reloadPage={reloadPage} />;
   }
 
-  // TODO Update the badge with style and useful error message
-  // TODO create tests for partially loading a document (content should be there, but not all updates)
   // TODO add editable updates to mobile editor
   // TODO add mobile editor error hint
   // TODO add tooltip for going online/offline & ephemeral update errors
@@ -389,11 +396,13 @@ export default function Page({
           setIsClosedErrorModal(true);
         }}
       >
-        <ModalHeader>Failed to load or decrypt</ModalHeader>
+        <ModalHeader>
+          Failed to load or decrypt {documentLoaded ? "update" : "the page"}
+        </ModalHeader>
         <Description variant="modal">
           {documentLoaded
-            ? "Incoming page updates couldn't be loaded or decrypted. Please save your recent changes and try to reload the page. If the problem persists please contact support."
-            : "The page could not be loaded or decrypted. As much content as possible has been loaded, but some content may be missing. Please try to reload the page. If the problem persists please contact support."}
+            ? "Incoming page updates couldn't be loaded or decrypted. Please save your recent changes and try to reload the page. If the problem persists, please contact support."
+            : "The entire page could not be loaded or decrypted, but as much content as possible has been restored. Please try to reload the page. If the problem persists, please contact support."}
         </Description>
         <ModalButtonFooter
           confirm={

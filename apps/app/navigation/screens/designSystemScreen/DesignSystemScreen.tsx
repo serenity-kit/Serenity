@@ -1,7 +1,6 @@
 import {
   Avatar,
   AvatarGroup,
-  Badge,
   Box,
   BoxShadow,
   BoxShadowLevels,
@@ -39,6 +38,7 @@ import {
   SidebarLink,
   SidebarText,
   Spinner,
+  Tag,
   Text,
   TextArea,
   ToggleButton,
@@ -268,19 +268,6 @@ export default function DesignSystemScreen(
           {collaborationColors.map((color) => {
             return <WorkspaceAvatar key={color} color={color} />;
           })}
-        </DSExampleArea>
-
-        <Heading lvl={1}>Badge</Heading>
-        <Text>
-          The{" "}
-          <DSMono variant="component" size="md">
-            Badge
-          </DSMono>{" "}
-          component can be used to indicate a state e.g. offline/online.
-        </Text>
-        <Heading lvl={3}>Basic</Heading>
-        <DSExampleArea>
-          <Badge>Badge</Badge>
         </DSExampleArea>
 
         <Heading lvl={1}>BoxShadow</Heading>
@@ -2150,6 +2137,20 @@ export default function DesignSystemScreen(
         <DSExampleArea>
           <Spinner size="sm" />
           <Spinner size="lg" />
+        </DSExampleArea>
+
+        <Heading lvl={1}>Tag</Heading>
+        <Text>
+          The{" "}
+          <DSMono variant="component" size="md">
+            Tag
+          </DSMono>{" "}
+          component can be used to indicate a state e.g. offline/online.
+        </Text>
+        <Heading lvl={3}>Basic</Heading>
+        <DSExampleArea>
+          <Tag>Offline</Tag>
+          <Tag purpose="error">Offline</Tag>
         </DSExampleArea>
 
         <Heading lvl={1}>Text</Heading>
