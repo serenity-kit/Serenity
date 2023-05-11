@@ -110,6 +110,8 @@ type ActiveSnapshotInfo = {
   parentSnapshotProof: string;
 };
 
+export type DocumentDecryptionState = "pending" | "partial" | "complete";
+
 type ProcessQueueData = {
   handledQueue: "customMessage" | "incoming" | "pending" | "none";
   activeSnapshotInfo: ActiveSnapshotInfo | null;
@@ -122,7 +124,7 @@ type ProcessQueueData = {
   updateClocks: UpdateClocks;
   mostRecentEphemeralUpdateDatePerPublicSigningKey: MostRecentEphemeralUpdateDatePerPublicSigningKey;
   ephemeralUpdateErrors: NaishoProcessingEphemeralUpdateError[];
-  documentWasLoaded: boolean;
+  documentDecryptionState: DocumentDecryptionState;
 };
 
 export type InternalContextReset = {
@@ -136,7 +138,7 @@ export type InternalContextReset = {
   _sendingUpdatesClock: number;
   _updateClocks: UpdateClocks;
   _mostRecentEphemeralUpdateDatePerPublicSigningKey: MostRecentEphemeralUpdateDatePerPublicSigningKey;
-  _documentWasLoaded: boolean;
+  _documentDecryptionState: DocumentDecryptionState;
 };
 
 export type Context = SyncMachineConfig &
@@ -160,7 +162,7 @@ const disconnectionContextReset: InternalContextReset = {
   _sendingUpdatesClock: -1,
   _updateClocks: {},
   _mostRecentEphemeralUpdateDatePerPublicSigningKey: {},
-  _documentWasLoaded: false,
+  _documentDecryptionState: "pending",
 };
 
 export const createSyncMachine = () =>
@@ -233,7 +235,7 @@ export const createSyncMachine = () =>
         _mostRecentEphemeralUpdateDatePerPublicSigningKey: {},
         _errorTrace: [],
         _ephemeralUpdateErrors: [],
-        _documentWasLoaded: false,
+        _documentDecryptionState: "pending",
       },
       initial: "connecting",
       on: {
@@ -442,7 +444,7 @@ export const createSyncMachine = () =>
               _mostRecentEphemeralUpdateDatePerPublicSigningKey:
                 event.data.mostRecentEphemeralUpdateDatePerPublicSigningKey,
               _ephemeralUpdateErrors: event.data.ephemeralUpdateErrors,
-              _documentWasLoaded: event.data.documentWasLoaded,
+              _documentDecryptionState: event.data.documentDecryptionState,
             };
           } else if (event.data.handledQueue === "customMessage") {
             return {
@@ -458,7 +460,7 @@ export const createSyncMachine = () =>
               _mostRecentEphemeralUpdateDatePerPublicSigningKey:
                 event.data.mostRecentEphemeralUpdateDatePerPublicSigningKey,
               _ephemeralUpdateErrors: event.data.ephemeralUpdateErrors,
-              _documentWasLoaded: event.data.documentWasLoaded,
+              _documentDecryptionState: event.data.documentDecryptionState,
             };
           } else {
             return {
@@ -473,13 +475,17 @@ export const createSyncMachine = () =>
               _mostRecentEphemeralUpdateDatePerPublicSigningKey:
                 event.data.mostRecentEphemeralUpdateDatePerPublicSigningKey,
               _ephemeralUpdateErrors: event.data.ephemeralUpdateErrors,
-              _documentWasLoaded: event.data.documentWasLoaded,
+              _documentDecryptionState: event.data.documentDecryptionState,
             };
           }
         }),
         // @ts-expect-error can't type the onError differently than onDone
         storeErrorInErrorTrace: assign((context, event) => {
           return {
+            _documentDecryptionState:
+              // @ts-expect-error documentDecryptionState is dynamically added to the error event
+              event.data?.documentDecryptionState ||
+              context._documentDecryptionState,
             _errorTrace: [event.data, ...context._errorTrace],
           };
         }),
@@ -518,7 +524,7 @@ export const createSyncMachine = () =>
           let updateClocks = context._updateClocks;
           let mostRecentEphemeralUpdateDatePerPublicSigningKey =
             context._mostRecentEphemeralUpdateDatePerPublicSigningKey;
-          let documentWasLoaded = context._documentWasLoaded;
+          let documentDecryptionState = context._documentDecryptionState;
 
           try {
             const createAndSendSnapshot = async () => {
@@ -595,8 +601,8 @@ export const createSyncMachine = () =>
               });
               send({
                 type: "SEND",
-                message: JSON.stringify({ ...message, ciphertext: "lala" }),
-                // message: JSON.stringify(message),
+                // message: JSON.stringify({ ...message, ciphertext: "lala" }),
+                message: JSON.stringify(message),
               });
             };
 
@@ -764,12 +770,12 @@ export const createSyncMachine = () =>
                   };
 
                   await processSnapshot(event.snapshot);
-                  // documentWasPartiallyLoaded = true;
+                  documentDecryptionState = "partial";
 
                   if (event.updates) {
                     await processUpdates(event.updates);
                   }
-                  documentWasLoaded = true;
+                  documentDecryptionState = "complete";
 
                   break;
 
@@ -985,7 +991,7 @@ export const createSyncMachine = () =>
               updateClocks,
               mostRecentEphemeralUpdateDatePerPublicSigningKey,
               ephemeralUpdateErrors: context._ephemeralUpdateErrors,
-              documentWasLoaded,
+              documentDecryptionState,
             };
           } catch (error) {
             console.error("Processing queue error:", error);
@@ -1006,9 +1012,10 @@ export const createSyncMachine = () =>
                 updateClocks,
                 mostRecentEphemeralUpdateDatePerPublicSigningKey,
                 ephemeralUpdateErrors: newEphemeralUpdateErrors.slice(0, 20), // avoid a memory leak by storing max 20 errors
-                documentWasLoaded,
+                documentDecryptionState,
               };
             } else {
+              error.documentDecryptionState = documentDecryptionState;
               throw error;
             }
           }

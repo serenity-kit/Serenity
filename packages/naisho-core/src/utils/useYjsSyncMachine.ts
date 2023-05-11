@@ -73,7 +73,7 @@ export const useYjsSyncMachine = (config: YjsSyncMachineConfig) => {
     yDoc.on("update", onUpdate);
 
     // only connect the awareness after the document loaded
-    if (!state.context._documentWasLoaded) {
+    if (state.context._documentDecryptionState !== "complete") {
       return;
     }
 
@@ -95,7 +95,7 @@ export const useYjsSyncMachine = (config: YjsSyncMachineConfig) => {
     };
     // causes issues if ran multiple times e.g. awareness sharing to not work anymore
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [state.context._documentWasLoaded]);
+  }, [state.context._documentDecryptionState]);
 
   return machine;
 };

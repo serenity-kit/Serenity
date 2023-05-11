@@ -139,7 +139,7 @@ it("should connect to the websocket", (done) => {
   syncService.send({ type: "WEBSOCKET_CONNECTED" });
 });
 
-it("should initially have _documentWasLoaded state", (done) => {
+it("should initially have _documentDecryptionState state", (done) => {
   const websocketServiceMock = (context) => () => {};
 
   let docValue = "";
@@ -175,7 +175,7 @@ it("should initially have _documentWasLoaded state", (done) => {
       })
   ).onTransition((state) => {
     if (state.matches("connected.idle")) {
-      expect(state.context._documentWasLoaded).toEqual(false);
+      expect(state.context._documentDecryptionState).toEqual("pending");
       expect(docValue).toEqual("");
       done();
     }
@@ -220,7 +220,10 @@ it("should load a document", (done) => {
         },
       })
   ).onTransition((state) => {
-    if (state.matches("connected.idle") && state.context._documentWasLoaded) {
+    if (
+      state.matches("connected.idle") &&
+      state.context._documentDecryptionState === "complete"
+    ) {
       expect(docValue).toEqual("Hello World");
       done();
     }
@@ -283,7 +286,10 @@ it("should load a document with updates", (done) => {
         },
       })
   ).onTransition((state) => {
-    if (state.matches("connected.idle") && state.context._documentWasLoaded) {
+    if (
+      state.matches("connected.idle") &&
+      state.context._documentDecryptionState === "complete"
+    ) {
       expect(docValue).toEqual("Hello Worlduu");
       done();
     }
@@ -351,7 +357,7 @@ it("should load a document and two additional updates", (done) => {
       })
   ).onTransition((state) => {
     if (docValue === "Hello Worlduu") {
-      expect(state.context._documentWasLoaded).toBe(true);
+      expect(state.context._documentDecryptionState).toBe("complete");
       done();
     }
   });
@@ -359,7 +365,9 @@ it("should load a document and two additional updates", (done) => {
   syncService.start();
   syncService.send({ type: "WEBSOCKET_CONNECTED" });
 
-  expect(syncService.getSnapshot().context._documentWasLoaded).toBe(false);
+  expect(syncService.getSnapshot().context._documentDecryptionState).toBe(
+    "pending"
+  );
 
   const { snapshot } = createSnapshotTestHelper();
   syncService.send({

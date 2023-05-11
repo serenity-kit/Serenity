@@ -312,10 +312,10 @@ export default function Page({
   }, []);
 
   useEffect(() => {
-    if (state.context._documentWasLoaded) {
+    if (state.context._documentDecryptionState === "complete") {
       setDocumentLoadedOnceFromRemote(true);
     }
-  }, [state.context._documentWasLoaded]);
+  }, [state.context._documentDecryptionState]);
 
   useEffect(() => {
     if (
@@ -359,7 +359,7 @@ export default function Page({
 
   const documentLoaded =
     documentLoadedFromLocalStorage ||
-    state.context._documentWasLoaded ||
+    state.context._documentDecryptionState === "complete" ||
     documentLoadedOnceFromRemote;
 
   if (state.matches("noAccess")) {
@@ -387,11 +387,11 @@ export default function Page({
           setIsClosedErrorModal(true);
         }}
       >
-        <ModalHeader>Failed to decrypt</ModalHeader>
+        <ModalHeader>Failed to load or decrypt</ModalHeader>
         <Description variant="modal">
           {documentLoaded
-            ? "Incoming page updates couldn't be decrypted. Please save your recent changes and try to reload the page. If the problem persists please contact support."
-            : "The page could not be decrypted. As much content as possible has been loaded, but some content may be missing. Please try to reload the page. If the problem persists please contact support."}
+            ? "Incoming page updates couldn't be loaded or decrypted. Please save your recent changes and try to reload the page. If the problem persists please contact support."
+            : "The page could not be loaded or decrypted. As much content as possible has been loaded, but some content may be missing. Please try to reload the page. If the problem persists please contact support."}
         </Description>
         <ModalButtonFooter
           confirm={
