@@ -366,13 +366,15 @@ export default function Page({
     return <PageNoAccessError />;
   }
 
-  if (passedDocumentLoadingTimeout && !documentLoaded && false) {
+  if (
+    passedDocumentLoadingTimeout &&
+    !documentLoaded &&
+    state.context._documentDecryptionState === "pending"
+  ) {
     return <PageLoadingError reloadPage={reloadPage} />;
   }
 
   // TODO Update the badge with style and useful error message
-  // TODO bring back PageLoadingError
-  // TODO add partiallyLoadedDocument to createSyncMachine and test for it
   // TODO create tests for partially loading a document (content should be there, but not all updates)
   // TODO add editable updates to mobile editor
   // TODO add mobile editor error hint
