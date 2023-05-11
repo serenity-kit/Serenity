@@ -5,6 +5,7 @@ import {
   Tooltip,
   View,
   tw,
+  useHasEditorSidebar,
   useIsDesktopDevice,
 } from "@serenity-tools/ui";
 import { HStack } from "native-base";
@@ -24,6 +25,7 @@ export const PageHeader: React.FC<Props> = ({
   const isInEditingMode = useEditorStore((state) => state.isInEditingMode);
   const syncState = useEditorStore((state) => state.syncState);
   const isDesktopDevice = useIsDesktopDevice();
+  const hasEditorSidebar = useHasEditorSidebar();
 
   return (
     <HStack alignItems={"center"}>
@@ -33,7 +35,7 @@ export const PageHeader: React.FC<Props> = ({
         </Text>
       ) : null}
 
-      {syncState.variant === "offline" ? (
+      {hasEditorSidebar && syncState.variant === "offline" ? (
         <Tooltip
           label={`${syncState.pendingChanges} edits will be synced the next time you are online`}
           placement="bottom"
@@ -49,7 +51,7 @@ export const PageHeader: React.FC<Props> = ({
         </Tooltip>
       ) : null}
 
-      {syncState.variant === "error" ? (
+      {hasEditorSidebar && syncState.variant === "error" ? (
         <Tag purpose="error" variant="xs" style={tw`mr-2`}>
           {syncState.documentDecryptionState === "complete" ||
           syncState.documentLoadedFromLocalDb

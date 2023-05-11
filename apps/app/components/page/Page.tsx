@@ -13,8 +13,12 @@ import {
   Modal,
   ModalButtonFooter,
   ModalHeader,
+  Text,
+  View,
   collaboratorColorToHex,
   hashToCollaboratorColor,
+  tw,
+  useHasEditorSidebar,
 } from "@serenity-tools/ui";
 import { useEffect, useRef, useState } from "react";
 import { Platform } from "react-native";
@@ -96,6 +100,7 @@ export default function Page({
   );
   const [isClosedErrorModal, setIsClosedErrorModal] = useState(false);
   const ephemeralUpdateErrorsChangedAt = useRef<Date | null>(null);
+  const hasEditorSidebar = useHasEditorSidebar();
 
   let websocketHost = `wss://serenity-dev.fly.dev`;
   if (process.env.NODE_ENV === "development") {
@@ -424,9 +429,6 @@ export default function Page({
     return <PageLoadingError reloadPage={reloadPage} />;
   }
 
-  // TODO add mobile editor error hint
-  // TODO disable bars if editors is not set to editable
-
   return (
     <>
       <Modal
@@ -476,6 +478,13 @@ export default function Page({
           }
         />
       </Modal>
+      {!hasEditorSidebar && syncState.variant === "offline" ? (
+        <View style={tw`bg-gray-200 py-2`}>
+          <Text variant="xs" style={tw`mx-auto`}>
+            You’re offline. Changes will sync next time you are online.
+          </Text>
+        </View>
+      ) : null}
       <Editor
         editable={!state.matches("failed")}
         documentId={docId}
