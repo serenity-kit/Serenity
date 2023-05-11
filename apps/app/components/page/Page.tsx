@@ -17,6 +17,7 @@ import {
   hashToCollaboratorColor,
 } from "@serenity-tools/ui";
 import { useEffect, useRef, useState } from "react";
+import { Platform } from "react-native";
 import sodium, { KeyPair } from "react-native-libsodium";
 import { Awareness } from "y-protocols/awareness";
 import * as Yjs from "yjs";
@@ -42,6 +43,7 @@ import {
   getLocalDocument,
   setLocalDocument,
 } from "../../utils/localSqliteApi/localSqliteApi";
+import { showToast } from "../../utils/toast/showToast";
 import { getWorkspace } from "../../utils/workspace/getWorkspace";
 import { PageLoadingError } from "./PageLoadingError";
 import { PageNoAccessError } from "./PageNoAccessError";
@@ -84,6 +86,7 @@ export default function Page({
     name: "Unknown user",
     color: "#000000",
   });
+  const syncState = useEditorStore((state) => state.syncState);
   const setSyncState = useEditorStore((state) => state.setSyncState);
   const setActiveDocumentId = useDocumentTitleStore(
     (state) => state.setActiveDocumentId
@@ -92,6 +95,7 @@ export default function Page({
     (state) => state.updateDocumentTitle
   );
   const [isClosedErrorModal, setIsClosedErrorModal] = useState(false);
+  const ephemeralUpdateErrorsChangedAt = useRef<Date | null>(null);
 
   let websocketHost = `wss://serenity-dev.fly.dev`;
   if (process.env.NODE_ENV === "development") {
@@ -196,7 +200,7 @@ export default function Page({
     },
     shouldSendSnapshot: ({ latestServerVersion }) => {
       // create a new snapshot if the active snapshot has more than 100 updates
-      return latestServerVersion !== null && latestServerVersion > 100;
+      return latestServerVersion !== null && latestServerVersion > 5;
     },
     getEphemeralUpdateKey: async () => {
       return snapshotKeyRef.current?.key as Uint8Array;
@@ -318,6 +322,27 @@ export default function Page({
   }, [state.context._documentDecryptionState]);
 
   useEffect(() => {
+    console.log(state.context._ephemeralUpdateErrors);
+    if (state.context._ephemeralUpdateErrors.length > 0) {
+      const now = new Date(); // Current date and time
+      const fiveMinInMs = 60000 * 5;
+      const fiveMinsAgo = new Date(now.getTime() - fiveMinInMs);
+
+      if (
+        ephemeralUpdateErrorsChangedAt.current === null ||
+        ephemeralUpdateErrorsChangedAt.current < fiveMinsAgo
+      ) {
+        showToast(
+          "Can't load or decrypt real-time data from collaborators",
+          "info",
+          { duration: 15000 }
+        );
+      }
+      ephemeralUpdateErrorsChangedAt.current = new Date();
+    }
+  }, [state.context._ephemeralUpdateErrors.length]);
+
+  useEffect(() => {
     if (state.matches("failed")) {
       setSyncState({
         variant: "error",
@@ -328,6 +353,22 @@ export default function Page({
       state.matches("disconnected") ||
       (state.matches("connecting") && state.context._websocketRetries > 1)
     ) {
+      if (syncState.variant === "online") {
+        // TODO check for desktop app since there changes will also be stored locally
+        if (Platform.OS === "web") {
+          showToast(
+            "You went offline. Your pending changes will be lost unless you reconnect.",
+            "error",
+            { duration: 30000 }
+          );
+        } else {
+          showToast(
+            "You went offline. Your pending changes will be stored locally and synced when you reconnect.",
+            "info",
+            { duration: 15000 }
+          );
+        }
+      }
       setSyncState({
         variant: "offline",
         pendingChanges: state.context._pendingChangesQueue.length,
@@ -385,8 +426,9 @@ export default function Page({
 
   // TODO add editable updates to mobile editor
   // TODO add mobile editor error hint
-  // TODO add tooltip for going online/offline & ephemeral update errors
   // TODO disable bars if editors is not set to editable
+  // TODO editing disabled hint in error modal
+  // TODO check resync after being offline
 
   return (
     <>

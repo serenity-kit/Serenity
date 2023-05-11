@@ -105,7 +105,7 @@ const createTestEphemeralUpdate = () => {
   return { ephemeralUpdate };
 };
 
-it("should set _documentDecryptionState at pending if document loading fails", (done) => {
+it("should set _documentDecryptionState to failed if not even the snapshot can be loaded", (done) => {
   const websocketServiceMock = (context) => () => {};
 
   let docValue = "";
@@ -152,7 +152,7 @@ it("should set _documentDecryptionState at pending if document loading fails", (
       })
   ).onTransition((state) => {
     if (state.value === "failed") {
-      expect(state.context._documentDecryptionState).toBe("pending");
+      expect(state.context._documentDecryptionState).toBe("failed");
       done();
     }
   });

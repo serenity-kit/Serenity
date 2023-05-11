@@ -110,7 +110,11 @@ type ActiveSnapshotInfo = {
   parentSnapshotProof: string;
 };
 
-export type DocumentDecryptionState = "pending" | "partial" | "complete";
+export type DocumentDecryptionState =
+  | "pending"
+  | "failed"
+  | "partial"
+  | "complete";
 
 type ProcessQueueData = {
   handledQueue: "customMessage" | "incoming" | "pending" | "none";
@@ -563,6 +567,8 @@ export const createSyncMachine = () =>
                 type: "SEND",
                 message: JSON.stringify({
                   ...snapshot,
+                  // Note: send a faulty message to test the error handling
+                  // ciphertext: "lala",
                   lastKnownSnapshotId: activeSnapshotInfo.id,
                   latestServerVersion,
                   additionalServerData: snapshotData.additionalServerData,
@@ -601,8 +607,9 @@ export const createSyncMachine = () =>
               });
               send({
                 type: "SEND",
-                // message: JSON.stringify({ ...message, ciphertext: "lala" }),
                 message: JSON.stringify(message),
+                // Note: send a faulty message to test the error handling
+                // message: JSON.stringify({ ...message, ciphertext: "lala" }),
               });
             };
 
@@ -746,6 +753,7 @@ export const createSyncMachine = () =>
               const event = context._incomingQueue[0];
               switch (event.type) {
                 case "document":
+                  documentDecryptionState = "failed";
                   if (context.knownSnapshotInfo) {
                     const isValid = isValidAncestorSnapshot({
                       knownSnapshotProofEntry: {
