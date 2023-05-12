@@ -12,16 +12,26 @@ export const deriveExistingSnapshotKey = async (
   snapshot: SerenitySnapshot,
   activeDevice: LocalDevice
 ) => {
+  const snapshotKeyDerivationTrace = snapshot.publicData.keyDerivationTrace;
   // derive existing key if snapshot exists
   const document = await getDocument({ documentId: docId });
   const workspace = await getWorkspace({
     workspaceId: document.workspaceId!,
     deviceSigningPublicKey: activeDevice.signingPublicKey,
   });
-  if (!workspace?.currentWorkspaceKey) {
-    throw new Error("No workspace key found for this device");
+  if (
+    !workspace ||
+    !workspace.workspaceKeys ||
+    workspace.workspaceKeys.length === 0
+  ) {
+    throw new Error("No workspace keys found");
   }
-  const snapshotKeyDerivationTrace = snapshot.publicData.keyDerivationTrace;
+  const workspaceKey = workspace.workspaceKeys.find((workspaceKey) => {
+    return workspaceKey.id === snapshotKeyDerivationTrace.workspaceKeyId;
+  });
+  if (!workspaceKey || !workspaceKey.workspaceKeyBox) {
+    throw new Error("No workspace key box found for this device");
+  }
   const folderKeyChainData = deriveKeysFromKeyDerivationTrace({
     keyDerivationTrace: snapshotKeyDerivationTrace,
     activeDevice: {
@@ -31,7 +41,7 @@ export const deriveExistingSnapshotKey = async (
       encryptionPrivateKey: activeDevice.encryptionPrivateKey!,
       encryptionPublicKeySignature: activeDevice.encryptionPublicKeySignature!,
     },
-    workspaceKeyBox: workspace?.currentWorkspaceKey.workspaceKeyBox!,
+    workspaceKeyBox: workspaceKey.workspaceKeyBox,
   });
   const folderChainItem =
     folderKeyChainData.trace[folderKeyChainData.trace.length - 2];
