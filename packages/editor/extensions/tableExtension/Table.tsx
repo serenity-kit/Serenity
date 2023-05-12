@@ -2,12 +2,12 @@ import { Icon } from "@serenity-tools/ui";
 import { CellSelection, TableMap, addColumn, addRow } from "@tiptap/pm/tables";
 import { NodeViewContent, NodeViewWrapper } from "@tiptap/react";
 import React, { useEffect, useRef } from "react";
-import useResizeObserver from "use-resize-observer";
 import {
   TableCellDimensions,
   getTableCellDimensions,
 } from "./getTableCellDimensions";
 import { isCellSelection } from "./isCellSelection";
+import { useMutationObserver } from "../../hooks/useMutationObserver";
 
 /*
  * get the cell-positions (relative to the parent-table) of every first cell of each row
@@ -103,24 +103,24 @@ export const Table = (props: any) => {
   let markRowTop = 0;
   let markColumnLeft = 0;
 
-  useResizeObserver({
-    onResize: (params) => {
+  useMutationObserver(
+    tableWrapperRef,
+    () => {
       if (!tableWrapperRef.current) return;
       const dimensions = getTableCellDimensions(
         tableWrapperRef.current.children[0] as HTMLTableElement
       );
       setTableCellDimension(dimensions);
     },
-    ref: tableWrapperRef,
-  });
+    {
+      childList: true,
+      subtree: true,
+      attributes: false,
+      characterData: false,
+    }
+  );
 
   useEffect(() => {
-    // props.editor.on('selectionUpdate', ({ editor }) => {
-    //   // The selection has changed.
-    // })
-    // const state = props.editor.view.state;
-    // console.log(isRowSelected(state, 1));
-    // console.log(props.editor);
     props.editor.on("selectionUpdate", (params: any) => {
       const updateRowSelection = () => {
         // get the current selection
