@@ -60,8 +60,8 @@ export const Table = (props: any) => {
 
   props.editor.storage.table.setTableActive = setActive;
 
-  console.log("ROW SELECTED", rowSelected);
-  console.log("COLUMN SELECTED", columnSelected);
+  // console.log("ROW SELECTED", rowSelected);
+  // console.log("COLUMN SELECTED", columnSelected);
 
   const getTableInfo = () => {
     const editor = props.editor.storage.tableCell.currentEditor;
@@ -148,14 +148,14 @@ export const Table = (props: any) => {
         const tableStart = $anchorCell.start(-1); // tableStart is one lvl higher than Cell => -1
 
         // e.g. 121
-        console.log("row test start: ", tableStart);
+        // console.log("row test start: ", tableStart);
         // map: [1, 5, 11, 15], height: 2, witdh: 2 (positions relative to table not in page context)
-        console.log("row test map: ", tableMap);
+        // console.log("row test map: ", tableMap);
         // [1, 11] - relative position of first cells of each row
-        console.log(
-          "row test restruct: ",
-          extractRowStartPoints(tableMap.map, tableMap.width)
-        );
+        // console.log(
+        //   "row test restruct: ",
+        //   extractRowStartPoints(tableMap.map, tableMap.width)
+        // );
 
         // get all startingPoints of each row inside the table but relative to the document
         const startingPoints = extractRowStartPoints(
@@ -164,9 +164,9 @@ export const Table = (props: any) => {
         ).map((value) => value + tableStart);
 
         // [122, 132] => because 1 and 11 where the first cells of each row
-        console.log("row test points: ", startingPoints);
+        // console.log("row test points: ", startingPoints);
         // resolved pos of the anchorCell, e.g. {pos: 122, path: Array(9), parentOffset: 0, depth: 2}
-        console.log("row test anchorCell: ", $anchorCell);
+        // console.log("row test anchorCell: ", $anchorCell);
 
         // check if the position of the anchorCell matches one of the row-starting points
         const rowNumber = startingPoints.indexOf($anchorCell.pos);
@@ -204,14 +204,14 @@ export const Table = (props: any) => {
         const tableStart = $anchorCell.start(-1);
 
         // e.g. 121
-        console.log("col test start: ", tableStart);
+        // console.log("col test start: ", tableStart);
         // map: [1, 5, 11, 15], height: 2, witdh: 2 (positions relative to table not in page context)
-        console.log("col test map: ", tableMap);
+        // console.log("col test map: ", tableMap);
         // [1, 5] - relative position of first cells of each column
-        console.log(
-          "col test extract: ",
-          extractColumnStartPoints(tableMap.map, tableMap.width)
-        );
+        // console.log(
+        //   "col test extract: ",
+        //   extractColumnStartPoints(tableMap.map, tableMap.width)
+        // );
 
         // get all startingPoints of each row inside the table but relative to the document
         const startingPoints = extractColumnStartPoints(
@@ -220,9 +220,9 @@ export const Table = (props: any) => {
         ).map((value) => value + tableStart);
 
         // [122, 126] => because 1 and 5 where the first cells of each col
-        console.log("col test points: ", startingPoints);
+        // console.log("col test points: ", startingPoints);
         // resolved pos of the anchorCell, e.g. {pos: 126, path: Array(9), parentOffset: 4, depth: 2}
-        console.log("col test anchorCell: ", $anchorCell);
+        // console.log("col test anchorCell: ", $anchorCell);
 
         const columnNumber = startingPoints.indexOf($anchorCell.pos);
         if (columnNumber === -1) {
