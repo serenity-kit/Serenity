@@ -16,8 +16,12 @@ import { updateEditor } from "./updateEditor";
 
 const ydoc = new Y.Doc();
 window.ydoc = ydoc;
+// must be initialized this way since injectedJavaScriptBeforeContentLoaded injects before these lines
 window.isNew = window.isNew === undefined ? false : window.isNew;
+window.editorEditable =
+  window.editorEditable === undefined ? false : window.editorEditable;
 window.userInfo = window.userInfo || { name: "Unknown user", color: "#000000" }; // should neber be an Unknown user
+
 if (window.initialContent) {
   const update = new Uint8Array(window.initialContent);
   Y.applyUpdateV2(window.ydoc, update, "react-native-bridge");
@@ -92,6 +96,11 @@ window.blurEditor = () => {
   window.editor.commands.blur();
 };
 
+window.setEditorEditable = (editable: boolean) => {
+  window.editorEditable = editable;
+  renderEditor();
+};
+
 window.resolveImageRequest = (fileId, base64) => {
   const fileRequest = fileRequests[fileId];
   if (fileRequest) {
@@ -111,70 +120,75 @@ window.updateHasOpenCommentsSidebar = (newHasOpenCommentsSidebar: boolean) => {
   hasOpenCommentsSidebar = newHasOpenCommentsSidebar;
 };
 
-const domContainer = document.querySelector("#editor");
-ReactDOM.render(
-  <NativeBaseProvider>
-    <Editor
-      scrollIntoViewOnEditModeDelay={50}
-      documentId={"dummyDocumentId"}
-      yDocRef={{ current: ydoc }}
-      yAwarenessRef={{ current: yAwareness }}
-      openDrawer={openDrawer}
-      updateTitle={updateTitle}
-      isNew={window.isNew}
-      onCreate={(params) => (window.editor = params.editor)}
-      comments={[]}
-      createComment={() => {}}
-      highlightComment={(commentId, openSidebar) => {
-        window.ReactNativeWebView.postMessage(
-          JSON.stringify({
-            type: "highlightComment",
-            content: { commentId, openSidebar },
-          })
-        );
-      }}
-      highlightedComment={null}
-      hasOpenCommentsSidebar={() => {
-        return hasOpenCommentsSidebar;
-      }}
-      encryptAndUploadFile={async () => {
-        // TODO: implement
-        return Promise.resolve({
-          fileId: "dummyFileId",
-          nonce: "dummynonce",
-          key: "dummykey",
-        });
-      }}
-      downloadAndDecryptFile={(params) => {
-        const promise = new Promise<string>((resolve, reject) => {
-          fileRequests[params.fileId] = { resolve, reject };
-        });
-        window.ReactNativeWebView.postMessage(
-          JSON.stringify({ type: "requestImage", ...params })
-        );
-        return promise;
-      }}
-      onTransaction={({ editor }) => {
-        window.ReactNativeWebView.postMessage(
-          JSON.stringify({
-            type: "update-editor-toolbar-state",
-            content: getEditorBottombarStateFromEditor(editor),
-          })
-        );
-      }}
-      shareOrSaveFile={({ contentAsBase64, mimeType, fileName }) => {
-        window.ReactNativeWebView.postMessage(
-          JSON.stringify({
-            type: "downloadFile",
-            content: {
-              contentAsBase64: contentAsBase64,
-              mimeType,
-              fileName,
-            },
-          })
-        );
-      }}
-    />
-  </NativeBaseProvider>,
-  domContainer
-);
+const renderEditor = () => {
+  const domContainer = document.querySelector("#editor");
+  ReactDOM.render(
+    <NativeBaseProvider>
+      <Editor
+        editable={window.editorEditable}
+        scrollIntoViewOnEditModeDelay={50}
+        documentId={"dummyDocumentId"}
+        yDocRef={{ current: ydoc }}
+        yAwarenessRef={{ current: yAwareness }}
+        openDrawer={openDrawer}
+        updateTitle={updateTitle}
+        isNew={window.isNew}
+        onCreate={(params) => (window.editor = params.editor)}
+        comments={[]}
+        createComment={() => {}}
+        highlightComment={(commentId, openSidebar) => {
+          window.ReactNativeWebView.postMessage(
+            JSON.stringify({
+              type: "highlightComment",
+              content: { commentId, openSidebar },
+            })
+          );
+        }}
+        highlightedComment={null}
+        hasOpenCommentsSidebar={() => {
+          return hasOpenCommentsSidebar;
+        }}
+        encryptAndUploadFile={async () => {
+          // TODO: implement
+          return Promise.resolve({
+            fileId: "dummyFileId",
+            nonce: "dummynonce",
+            key: "dummykey",
+          });
+        }}
+        downloadAndDecryptFile={(params) => {
+          const promise = new Promise<string>((resolve, reject) => {
+            fileRequests[params.fileId] = { resolve, reject };
+          });
+          window.ReactNativeWebView.postMessage(
+            JSON.stringify({ type: "requestImage", ...params })
+          );
+          return promise;
+        }}
+        onTransaction={({ editor }) => {
+          window.ReactNativeWebView.postMessage(
+            JSON.stringify({
+              type: "update-editor-toolbar-state",
+              content: getEditorBottombarStateFromEditor(editor),
+            })
+          );
+        }}
+        shareOrSaveFile={({ contentAsBase64, mimeType, fileName }) => {
+          window.ReactNativeWebView.postMessage(
+            JSON.stringify({
+              type: "downloadFile",
+              content: {
+                contentAsBase64: contentAsBase64,
+                mimeType,
+                fileName,
+              },
+            })
+          );
+        }}
+      />
+    </NativeBaseProvider>,
+    domContainer
+  );
+};
+
+renderEditor();

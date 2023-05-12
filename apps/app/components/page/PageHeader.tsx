@@ -1,7 +1,11 @@
 import {
   IconButton,
+  Tag,
   Text,
   Tooltip,
+  View,
+  tw,
+  useHasEditorSidebar,
   useIsDesktopDevice,
 } from "@serenity-tools/ui";
 import { HStack } from "native-base";
@@ -19,8 +23,9 @@ export const PageHeader: React.FC<Props> = ({
   hasNewComment,
 }) => {
   const isInEditingMode = useEditorStore((state) => state.isInEditingMode);
-  const isOffline = useEditorStore((state) => state.isOffline);
+  const syncState = useEditorStore((state) => state.syncState);
   const isDesktopDevice = useIsDesktopDevice();
+  const hasEditorSidebar = useHasEditorSidebar();
 
   return (
     <HStack alignItems={"center"}>
@@ -30,7 +35,30 @@ export const PageHeader: React.FC<Props> = ({
         </Text>
       ) : null}
 
-      {isOffline ? <Text variant="xs">Offline </Text> : null}
+      {hasEditorSidebar && syncState.variant === "offline" ? (
+        <Tooltip
+          label={`${syncState.pendingChanges} edits will be synced the next time you are online`}
+          placement="bottom"
+          offset={8}
+          openDelay={200}
+        >
+          {/* needs a view since the tooltip placement needs a block element */}
+          <View>
+            <Tag variant="xs" style={tw`mr-2`}>
+              Offline
+            </Tag>
+          </View>
+        </Tooltip>
+      ) : null}
+
+      {hasEditorSidebar && syncState.variant === "error" ? (
+        <Tag purpose="error" variant="xs" style={tw`mr-2`}>
+          {syncState.documentDecryptionState === "complete" ||
+          syncState.documentLoadedFromLocalDb
+            ? "Failed to apply updates"
+            : "Failed to load the page"}
+        </Tag>
+      ) : null}
 
       {isDesktopDevice ? (
         <Tooltip

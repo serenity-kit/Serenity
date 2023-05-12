@@ -91,7 +91,12 @@ export const websocketService =
             context.signatureKeyPair
           );
           console.log("send ephemeralUpdate");
-          send({ type: "SEND", message: JSON.stringify(ephemeralUpdate) });
+          send({
+            type: "SEND",
+            message: JSON.stringify(ephemeralUpdate),
+            // Note: send a faulty message to test the error handling
+            // message: JSON.stringify({ ...ephemeralUpdate, ciphertext: "lala" }),
+          });
         };
 
         try {

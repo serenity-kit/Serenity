@@ -8,10 +8,20 @@ import {
 import { decryptDocumentTitleBasedOnSnapshotKey } from "@serenity-tools/common/src/decryptDocumentTitleBasedOnSnapshotKey/decryptDocumentTitleBasedOnSnapshotKey";
 import { AwarenessUserInfo } from "@serenity-tools/editor";
 import {
+  Button,
+  Description,
+  Modal,
+  ModalButtonFooter,
+  ModalHeader,
+  Text,
+  View,
   collaboratorColorToHex,
   hashToCollaboratorColor,
+  tw,
+  useHasEditorSidebar,
 } from "@serenity-tools/ui";
 import { useEffect, useRef, useState } from "react";
+import { Platform } from "react-native";
 import sodium, { KeyPair } from "react-native-libsodium";
 import { Awareness } from "y-protocols/awareness";
 import * as Yjs from "yjs";
@@ -37,7 +47,10 @@ import {
   getLocalDocument,
   setLocalDocument,
 } from "../../utils/localSqliteApi/localSqliteApi";
+import { showToast } from "../../utils/toast/showToast";
 import { getWorkspace } from "../../utils/workspace/getWorkspace";
+import { PageLoadingError } from "./PageLoadingError";
+import { PageNoAccessError } from "./PageNoAccessError";
 
 type Props = WorkspaceDrawerScreenProps<"Page"> & {
   signatureKeyPair: KeyPair;
@@ -67,7 +80,7 @@ export default function Page({
     key: Uint8Array;
   } | null>(null);
   const yAwarenessRef = useRef<Awareness>(new Awareness(yDocRef.current));
-  const [documentLoadedFromLocalStorage, setDocumentLoadedFromLocalStorage] =
+  const [documentLoadedFromLocalDb, setDocumentLoadedFromLocalDb] =
     useState(false);
   const [documentLoadedOnceFromRemote, setDocumentLoadedOnceFromRemote] =
     useState(false);
@@ -77,14 +90,17 @@ export default function Page({
     name: "Unknown user",
     color: "#000000",
   });
-  const setIsOffline = useEditorStore((state) => state.setIsOffline);
-
+  const syncState = useEditorStore((state) => state.syncState);
+  const setSyncState = useEditorStore((state) => state.setSyncState);
   const setActiveDocumentId = useDocumentTitleStore(
     (state) => state.setActiveDocumentId
   );
   const updateDocumentTitle = useDocumentTitleStore(
     (state) => state.updateDocumentTitle
   );
+  const [isClosedErrorModal, setIsClosedErrorModal] = useState(false);
+  const ephemeralUpdateErrorsChangedAt = useRef<Date | null>(null);
+  const hasEditorSidebar = useHasEditorSidebar();
 
   let websocketHost = `wss://serenity-dev.fly.dev`;
   if (process.env.NODE_ENV === "development") {
@@ -234,8 +250,6 @@ export default function Page({
     sodium,
   });
 
-  // console.log("state", state.value);
-
   useEffect(() => {
     setTimeout(() => {
       setPassedDocumentLoadingTimeout(true);
@@ -251,7 +265,7 @@ export default function Page({
           localDocument.content,
           "serenity-local-sqlite"
         );
-        setDocumentLoadedFromLocalStorage(true);
+        setDocumentLoadedFromLocalDb(true);
       }
 
       const me = await runMeQuery({});
@@ -307,22 +321,74 @@ export default function Page({
   }, []);
 
   useEffect(() => {
-    if (state.context._documentWasLoaded) {
+    if (state.context._documentDecryptionState === "complete") {
       setDocumentLoadedOnceFromRemote(true);
     }
-  }, [state.context._documentWasLoaded]);
+  }, [state.context._documentDecryptionState]);
 
   useEffect(() => {
-    if (
+    console.log(state.context._ephemeralUpdateErrors);
+    if (state.context._ephemeralUpdateErrors.length > 0) {
+      const now = new Date(); // Current date and time
+      const fiveMinInMs = 60000 * 5;
+      const fiveMinsAgo = new Date(now.getTime() - fiveMinInMs);
+
+      if (
+        ephemeralUpdateErrorsChangedAt.current === null ||
+        ephemeralUpdateErrorsChangedAt.current < fiveMinsAgo
+      ) {
+        showToast(
+          "Can't load or decrypt real-time data from collaborators",
+          "info",
+          { duration: 15000 }
+        );
+      }
+      ephemeralUpdateErrorsChangedAt.current = new Date();
+    }
+  }, [state.context._ephemeralUpdateErrors.length]);
+
+  useEffect(() => {
+    if (state.matches("failed")) {
+      setSyncState({
+        variant: "error",
+        documentDecryptionState: state.context._documentDecryptionState,
+        documentLoadedFromLocalDb,
+      });
+    } else if (
       state.matches("disconnected") ||
       (state.matches("connecting") && state.context._websocketRetries > 1)
     ) {
-      setIsOffline(true);
+      if (syncState.variant === "online") {
+        // TODO check for desktop app since there changes will also be stored locally
+        if (Platform.OS === "web") {
+          showToast(
+            "You went offline. Your pending changes will be lost unless you reconnect.",
+            "error",
+            { duration: 30000 }
+          );
+        } else {
+          showToast(
+            "You went offline. Your pending changes will be stored locally and synced when you reconnect.",
+            "info",
+            { duration: 15000 }
+          );
+        }
+      }
+      setSyncState({
+        variant: "offline",
+        pendingChanges: state.context._pendingChangesQueue.length,
+      });
     } else {
-      setIsOffline(false);
+      setSyncState({ variant: "online" });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [state.value, state.context._websocketRetries]);
+  }, [
+    state.value,
+    state.context._websocketRetries,
+    state.context._pendingChangesQueue.length,
+    documentLoadedFromLocalDb,
+    setSyncState,
+  ]);
 
   const updateTitle = async (title: string) => {
     const document = await getDocument({
@@ -346,23 +412,91 @@ export default function Page({
     }
   };
 
+  const documentLoaded =
+    documentLoadedFromLocalDb ||
+    state.context._documentDecryptionState === "complete" ||
+    documentLoadedOnceFromRemote;
+
+  if (state.matches("noAccess")) {
+    return <PageNoAccessError />;
+  }
+
+  if (
+    passedDocumentLoadingTimeout &&
+    !documentLoaded &&
+    state.context._documentDecryptionState === "pending"
+  ) {
+    return <PageLoadingError reloadPage={reloadPage} />;
+  }
+
   return (
-    <Editor
-      documentId={docId}
-      workspaceId={workspaceId}
-      yDocRef={yDocRef}
-      yAwarenessRef={yAwarenessRef}
-      openDrawer={navigation.openDrawer}
-      updateTitle={updateTitle}
-      isNew={isNew}
-      documentLoaded={
-        documentLoadedFromLocalStorage ||
-        state.context._documentWasLoaded ||
-        documentLoadedOnceFromRemote
-      }
-      passedDocumentLoadingTimeout={passedDocumentLoadingTimeout}
-      userInfo={userInfo}
-      reloadPage={reloadPage}
-    />
+    <>
+      <Modal
+        isVisible={!isClosedErrorModal && state.matches("failed")}
+        onBackdropPress={() => {
+          setIsClosedErrorModal(true);
+        }}
+      >
+        <ModalHeader>
+          Failed to load or decrypt {documentLoaded ? "update" : "the page"}
+        </ModalHeader>
+        <Description variant="modal">
+          {documentLoaded
+            ? "Incoming page updates couldn't be loaded or decrypted."
+            : "The entire page could not be loaded or decrypted, but as much content as possible has been restored."}
+        </Description>
+        <Description variant="modal">
+          {
+            "Editing has been disabled, but you still can select and copy the content."
+          }
+        </Description>
+        <Description variant="modal">
+          {documentLoaded
+            ? "Please save your recent changes and try to reload the page. If the problem persists, please contact support."
+            : "Please try to reload the page. If the problem persists, please contact support."}
+        </Description>
+        <ModalButtonFooter
+          confirm={
+            <Button
+              onPress={() => {
+                setIsClosedErrorModal(true);
+              }}
+              variant="primary"
+            >
+              Close dialog
+            </Button>
+          }
+          cancel={
+            <Button
+              onPress={() => {
+                reloadPage();
+              }}
+              variant="secondary"
+            >
+              Reload page
+            </Button>
+          }
+        />
+      </Modal>
+      {!hasEditorSidebar && syncState.variant === "offline" ? (
+        <View style={tw`bg-gray-200 py-2`}>
+          <Text variant="xs" style={tw`mx-auto`}>
+            You’re offline. Changes will sync next time you are online.
+          </Text>
+        </View>
+      ) : null}
+      <Editor
+        editable={!state.matches("failed")}
+        documentId={docId}
+        workspaceId={workspaceId}
+        yDocRef={yDocRef}
+        yAwarenessRef={yAwarenessRef}
+        openDrawer={navigation.openDrawer}
+        updateTitle={updateTitle}
+        isNew={isNew}
+        documentLoaded={documentLoaded || state.matches("failed")}
+        userInfo={userInfo}
+      />
+    </>
   );
 }

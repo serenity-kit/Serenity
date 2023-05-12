@@ -105,7 +105,7 @@ const createTestEphemeralUpdate = () => {
   return { ephemeralUpdate };
 };
 
-it("should keep _documentWasLoaded at false in document loading fails", (done) => {
+it("should set _documentDecryptionState to failed if not even the snapshot can be loaded", (done) => {
   const websocketServiceMock = (context) => () => {};
 
   let docValue = "";
@@ -152,7 +152,7 @@ it("should keep _documentWasLoaded at false in document loading fails", (done) =
       })
   ).onTransition((state) => {
     if (state.value === "failed") {
-      expect(state.context._documentWasLoaded).toBe(false);
+      expect(state.context._documentDecryptionState).toBe("failed");
       done();
     }
   });
@@ -166,6 +166,139 @@ it("should keep _documentWasLoaded at false in document loading fails", (done) =
     data: {
       type: "document",
       snapshot,
+    },
+  });
+});
+
+it("should set _documentDecryptionState to partial and apply the first update, if document snapshot decrypts but the second update fails", (done) => {
+  const websocketServiceMock = (context) => () => {};
+
+  let docValue = "";
+
+  const syncMachine = createSyncMachine();
+  const syncService = interpret(
+    syncMachine
+      .withContext({
+        ...syncMachine.context,
+        websocketHost: url,
+        websocketSessionKey: "sessionKey",
+        isValidCollaborator: (signingPublicKey) =>
+          sodiumWrappers.to_base64(signatureKeyPair.publicKey) ===
+          signingPublicKey,
+        getSnapshotKey: () => key,
+        applySnapshot: (snapshot) => {
+          docValue = sodiumWrappers.to_string(snapshot);
+        },
+        getUpdateKey: () => key,
+        deserializeChanges: (changes) => {
+          return changes;
+        },
+        applyChanges: (changes) => {
+          changes.forEach((change) => {
+            docValue = docValue + change;
+          });
+        },
+        sodium: sodiumWrappers,
+        signatureKeyPair,
+      })
+      .withConfig({
+        actions: {
+          spawnWebsocketActor: assign((context) => {
+            return {
+              _websocketActor: spawn(
+                websocketServiceMock(context),
+                "websocketActor"
+              ),
+            };
+          }),
+        },
+      })
+  ).onTransition((state) => {
+    if (state.value === "failed") {
+      expect(state.context._documentDecryptionState).toBe("partial");
+      expect(docValue).toEqual("Hello Worldu");
+      done();
+    }
+  });
+
+  syncService.start();
+  syncService.send({ type: "WEBSOCKET_CONNECTED" });
+
+  const { snapshot } = createSnapshotTestHelper();
+  syncService.send({
+    type: "WEBSOCKET_ADD_TO_INCOMING_QUEUE",
+    data: {
+      type: "document",
+      snapshot,
+      updates: [
+        createUpdateHelper().update,
+        createUpdateHelper({ version: 1000 }).update,
+      ],
+    },
+  });
+});
+
+it("should set _documentDecryptionState to partial, if document snapshot decrypts but the first update fails", (done) => {
+  const websocketServiceMock = (context) => () => {};
+
+  let docValue = "";
+
+  const syncMachine = createSyncMachine();
+  const syncService = interpret(
+    syncMachine
+      .withContext({
+        ...syncMachine.context,
+        websocketHost: url,
+        websocketSessionKey: "sessionKey",
+        isValidCollaborator: (signingPublicKey) =>
+          sodiumWrappers.to_base64(signatureKeyPair.publicKey) ===
+          signingPublicKey,
+        getSnapshotKey: () => key,
+        applySnapshot: (snapshot) => {
+          docValue = sodiumWrappers.to_string(snapshot);
+        },
+        getUpdateKey: () => key,
+        deserializeChanges: (changes) => {
+          return changes;
+        },
+        applyChanges: (changes) => {
+          changes.forEach((change) => {
+            docValue = docValue + change;
+          });
+        },
+        sodium: sodiumWrappers,
+        signatureKeyPair,
+      })
+      .withConfig({
+        actions: {
+          spawnWebsocketActor: assign((context) => {
+            return {
+              _websocketActor: spawn(
+                websocketServiceMock(context),
+                "websocketActor"
+              ),
+            };
+          }),
+        },
+      })
+  ).onTransition((state) => {
+    if (state.value === "failed") {
+      expect(state.context._documentDecryptionState).toBe("partial");
+      expect(docValue).toEqual("Hello World");
+      done();
+    }
+  });
+
+  syncService.start();
+  syncService.send({ type: "WEBSOCKET_CONNECTED" });
+
+  const { snapshot } = createSnapshotTestHelper();
+  syncService.send({
+    type: "WEBSOCKET_ADD_TO_INCOMING_QUEUE",
+    data: {
+      type: "document",
+      snapshot,
+      updates: [createUpdateHelper({ version: 1000 }).update],
     },
   });
 });
@@ -424,7 +557,7 @@ it("should reset the context entries after websocket disconnect", (done) => {
       })
   ).onTransition((state) => {
     if (state.matches("connecting.retrying")) {
-      expect(state.context._documentWasLoaded).toEqual(false);
+      expect(state.context._documentDecryptionState).toEqual("pending");
       expect(state.context._activeSnapshotInfo).toEqual(null);
       expect(state.context._latestServerVersion).toEqual(null);
       expect(state.context._incomingQueue).toEqual([]);
@@ -518,10 +651,10 @@ it("should reconnect and reload the document", (done) => {
     if (
       reconnected &&
       state.matches("connected.idle") &&
-      state.context._documentWasLoaded
+      state.context._documentDecryptionState
     ) {
       expect(docValue).toEqual("Hello Worlduu");
-      expect(state.context._documentWasLoaded).toEqual(true);
+      expect(state.context._documentDecryptionState).toEqual("complete");
       done();
     }
   });

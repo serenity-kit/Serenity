@@ -63,8 +63,17 @@ export const useYjsSyncMachine = (config: YjsSyncMachineConfig) => {
   const [state, send] = machine;
 
   useEffect(() => {
-    // only connect after the document loaded
-    if (!state.context._documentWasLoaded) {
+    // always listen to updates from the document itself
+    const onUpdate = (update, origin) => {
+      if (origin?.key === "y-sync$" || origin === "mobile-webview") {
+        send({ type: "ADD_CHANGE", data: update });
+      }
+    };
+    // TODO switch to v2 updates
+    yDoc.on("update", onUpdate);
+
+    // only connect the awareness after the document loaded
+    if (state.context._documentDecryptionState !== "complete") {
       return;
     }
 
@@ -76,15 +85,8 @@ export const useYjsSyncMachine = (config: YjsSyncMachineConfig) => {
       );
       send({ type: "ADD_EPHEMERAL_UPDATE", data: yAwarenessUpdate });
     };
-    const onUpdate = (update, origin) => {
-      if (origin?.key === "y-sync$" || origin === "mobile-webview") {
-        send({ type: "ADD_CHANGE", data: update });
-      }
-    };
 
     yAwareness.on("update", onAwarenessUpdate);
-    // TODO switch to v2 updates
-    yDoc.on("update", onUpdate);
 
     return () => {
       removeAwarenessStates(yAwareness, [yDoc.clientID], "document unmount");
@@ -93,7 +95,7 @@ export const useYjsSyncMachine = (config: YjsSyncMachineConfig) => {
     };
     // causes issues if ran multiple times e.g. awareness sharing to not work anymore
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [state.context._documentWasLoaded]);
+  }, [state.context._documentDecryptionState]);
 
   return machine;
 };

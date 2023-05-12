@@ -4,7 +4,7 @@ type Props = {
   reloadPage: () => void;
 };
 
-export const EditorPageLoadingError: React.FC<Props> = ({ reloadPage }) => {
+export const PageLoadingError: React.FC<Props> = ({ reloadPage }) => {
   return (
     <CenterContent style={tw`mx-8 md:mx-34`}>
       <Heading lvl={2}>Couldn't load the page.</Heading>

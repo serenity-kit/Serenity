@@ -14,7 +14,6 @@ import { WorkspaceDrawerScreenProps } from "../../../types/navigationProps";
 import { LocalDevice } from "@serenity-tools/common";
 import {
   CenterContent,
-  InfoMessage,
   Spinner,
   tw,
   useIsPermanentLeftSidebar,
@@ -24,6 +23,7 @@ import { Drawer } from "react-native-drawer-layout";
 import sodium, { KeyPair } from "react-native-libsodium";
 import CommentsSidebar from "../../../components/commentsSidebar/CommentsSidebar";
 import { PageHeader } from "../../../components/page/PageHeader";
+import { PageNoAccessError } from "../../../components/page/PageNoAccessError";
 import { PageHeaderRight } from "../../../components/pageHeaderRight/PageHeaderRight";
 import { PageProvider } from "../../../context/PageContext";
 import { commentsMachine } from "../../../machines/commentsMachine";
@@ -125,13 +125,7 @@ const ActualPageScreen = (
   }, [activeDevice]);
 
   if (state.matches("hasNoAccess")) {
-    return (
-      <CenterContent>
-        <InfoMessage variant="error">
-          This page does not exist or you don't have access anymore.
-        </InfoMessage>
-      </CenterContent>
-    );
+    return <PageNoAccessError />;
   } else if (state.matches("loadDocument")) {
     return (
       <PageProvider

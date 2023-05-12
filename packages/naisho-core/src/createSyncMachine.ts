@@ -110,6 +110,12 @@ type ActiveSnapshotInfo = {
   parentSnapshotProof: string;
 };
 
+export type DocumentDecryptionState =
+  | "pending"
+  | "failed"
+  | "partial"
+  | "complete";
+
 type ProcessQueueData = {
   handledQueue: "customMessage" | "incoming" | "pending" | "none";
   activeSnapshotInfo: ActiveSnapshotInfo | null;
@@ -122,7 +128,7 @@ type ProcessQueueData = {
   updateClocks: UpdateClocks;
   mostRecentEphemeralUpdateDatePerPublicSigningKey: MostRecentEphemeralUpdateDatePerPublicSigningKey;
   ephemeralUpdateErrors: NaishoProcessingEphemeralUpdateError[];
-  documentWasLoaded: boolean;
+  documentDecryptionState: DocumentDecryptionState;
 };
 
 export type InternalContextReset = {
@@ -136,7 +142,7 @@ export type InternalContextReset = {
   _sendingUpdatesClock: number;
   _updateClocks: UpdateClocks;
   _mostRecentEphemeralUpdateDatePerPublicSigningKey: MostRecentEphemeralUpdateDatePerPublicSigningKey;
-  _documentWasLoaded: boolean;
+  _documentDecryptionState: DocumentDecryptionState;
 };
 
 export type Context = SyncMachineConfig &
@@ -160,11 +166,11 @@ const disconnectionContextReset: InternalContextReset = {
   _sendingUpdatesClock: -1,
   _updateClocks: {},
   _mostRecentEphemeralUpdateDatePerPublicSigningKey: {},
-  _documentWasLoaded: false,
+  _documentDecryptionState: "pending",
 };
 
 export const createSyncMachine = () =>
-  /** @xstate-layout N4IgpgJg5mDOIC5SwJ4DsDGBZAhhgFgJZpgDEAygKIByAIgNoAMAuoqAA4D2shALoZzRsQAD0QBGcY3EA6AMwAOBdPEKAbAoCcjTQBYANCBQSATAF8zh1JlwFiZAIK1aAfUoAFABKUslAEoOADIuAKrutA4AKpRMrEggXDz8gsJiCFImAOwymZoZAKy6CplquiaahsbpJuKa8gr5ebqZDZpyauaWINbYeEQkpADqlABC5ADyAMIA0pSRLrQAkuST49TUlJPRDCzCiXwCQvFp+ZmViCYKJjlymbWZiia6hbq6FlbovXYDSytrG1tYntuAcUsdEKdzggTHJrk8SllNE9GK93t1PrZ+mAZBhBCQMPw0FAhqMJjM5i5VutNtsgfF9skjqA0mozkYJIwFHIZNpWYw1HkauJ8mo0T1MfYcXiwATiFAZAB3HAHIkksZTWbzPxzPwATTpHBBjNSEnEulk7Rq7RRuQecihl25-MyjHyZs0JRRYoxfUluLQ+N4kDVZM1CymIV81Hm1HG8wAYuMQnQDQkjYcTelMrkebokbo1I0ueI5PkoZJ2jItGo5FIFHnGCZRV1xb6SFKAzKgxAQxqKcmHCFIp5xn5FgAtSg7OKGpIZ8FZrS5-OFzTF0vlzlqGS6Z38wWSEXemxt7H+wOQGQAG04OAgctonAwAFcALZgNC8Xvk+ZOVyRcYXEWahViwYCAHEXAARRCShYNTBl52ZRBGChRhjy+LEOwvCBr1ve8iUfF930-b8wz-FwAMpEJyAArAXF8chyAccDKGg2D4N2el0zBZCEFQ9l+IwiV23PLtLxvO8HyfN8Py-CjJk8BxqFYhCeKZUQLg6GRTmkRpGzkaRDLLQS1DUWRajzD1anaWoFGE09sPE3DCAgK8yGGdUfxcCiqOA0CIPYuCYi42dQQ0k58kYGQS2FOQCxhJsPU3WEZDUFFXWafJ8iUPIHO+M9pQJS9XPcsiKV8wDJhouiGMoJiWLYmDgrUudeM0hBsui2L8nijpYQFNkqkkXcq3KWsm3KMpdDkfKsLE4qXLcxxnEpJSVJCmc0zaiLEALfIYtrfITEbDpToUKF83kFpcg0K5SzkTQ5r9IruxkdgACcnzgHgiSg58wAB2BSAgQRsWIAA3TgAGtsU+77YFgf7AbgVrwszKQPR5LlMtKF1tCGxAGm3EUNEyKKFEkYpntE17L3hjAfrlZGgdIMAPq+j73qvHBeAAM04D7X3er7GcRlnUdC7b0YXcQWjqPQVyLWsN0EqRFB5VRHt6vI10YWaWx9AqnMWkWEd+qAJeBzzQwq1a-JA8YwJUoLOK2xD2rSKnZHNXcTCyQt9aKKFlAUHSzOKCmqcyGnCs7U2GaZv6AdZm2+1-e2qpqp26oa1jXc24Edox1QfbNRsA6i+KLsEzRzJybQri5S4TFON5DZPY2FrexPEeZlO4FIBT1tUqWPd2hBcmuQoNDXQstD0GuqnumRORdRhyauTIm1jk23oIGVobleNBawQWwAlxYg1fa3SXTnzM6Ax3ncg5q3aLmXQGXrkciFV4TruAKe0HVVCXFXpccyLpTh12Orvbul4D4YCPkSE+H0z4fQvgPK+YAb7lQzv+LOtEc6MWYvnN+hduLF1lk3cB6g5aulusdEOpZf4jTKBvcQQC4F01wog5BUBUHoMwSjbBuDh7KVHu7dSGNmi6BisKZujZJAlgMKZdQOlS41EjtIB43D4773wIfY+p9z6X2vsDEQsBeC82xDgPmQYPoAApGAAEpSCti7jwnEhikHGLQaYrB5i0bGmoWAxsdCoGMJMJdPIuZSiNk5BvFE+Q9E4W8UYlBJiMFmJwRYqxNiZB2Icc4txHj5peL4X4oROSb70HEFIqhfFQFh3CZAhhMDomCRuqws07DAFtF3veWA8CezBKQh1cydQCyY39g8D0G8HSFh0iUXIbQtCcKKBYLoaBOAQDgMIMp9gP4hL4gAWlUAdLQrc9DmgaLuEyVRTn+1kHXUseZboaGygbD4ndyn6LlMc8ZaQWjbjkIZBoVoRSGUJukRoOlihPByrWNonCUkd0wi9f5RIZAYN4B9FAALKGfxAW83MjoYRdWkA6Zoq9t5IkUJoQo6tmw-IxbTLF8olQqigICz2RN4ryHBcdEsUKFmCSbNFJJSIkWAJLKk5yvKJ7nNuFWaVNyLn3KhMquRzQbpyzBSdO68rTaSQIlAIislPyKszKcpcVzGivA1a6YBVQrp8l3M0PSqJ0UiTjmk0qYBrULnaNuZoTYriaEjQ8Z4KVrh5EUOlVkxQGjGp7qLJOlsB7wCJScjq5NshtFuDlRlWROSdNdTCNKSgBRlEtA8NFrLfV7wQT4-hgiAkiPMUGppCUYowlZCix4BYQ4-23mwgBnCBk+sckMkZ3aOrxVkLkLeNZ-YnTng6LIgrGAb3SnLaZWRd582IDgK8860hWgsjUDex1SjxvLOIMBRRTgnUkHcRl3z0S-MlHzZU7kIDnouBvORpxlCMKUOIFK25WRSGmrWMoHotlmCAA */
+  /** @xstate-layout N4IgpgJg5mDOIC5SwJ4DsDGBZAhhgFgJZpgDEAygKIByAIgNoAMAuoqAA4D2shALoZzRsQAD0QBGcQE4A7ADpxMgKwA2JQBYlAJnEAOTeoA0IFIgC0i9XPU29M9Vq0rdMlSoC+746ky4CxMgBBWloAfUoABQAJSixKACVAgBlQgFUI2kCAFUomViQQLh5+QWExBEkleUZHGRd1XS1GRhljUwqGqQV9RgBmFXVewd1erU9vdGw8IhJSAHVKACFyAHkAYQBpSizQ2gBJcjWV6mpKNZyGFmEivgEhAvKqtsRR3WslPS0pVQcNdRlxiAfFN-LN9odjqdznlrtxbqUHogniZEFoZPIpCpHEpGFIWiopNJAcC-DMwHIMIISBh+GgoPMlqtNttQkcTmcLjCCjcSvdQOVxGolAoZH1enoaupxFojCiEP0rDYqippSpGDj1cTJqSAhSqWAacR6cEwmsooFqABxXJXblw3llCTON6DKTi77K3oaZ4VDRyfpY3S6bTiAO9KRa3zTXWUtDU2lQOQAdxwtzpDOW6y2O3i23iAE0uRx7XdHRVQ1o5KKpK63MHxP8fb19N1gzX-uoVKMqpGQWS9XGDbxIBmmdndutUnFqDtqCsdgAxFapOhFwolhH8iR44XiHHfNX2Qk+6XNOSMRpfLTBztKJS9nUkAfxkcLTPMnYrwKpLJRFbxPYAC1KEufJi2KUtEQqQld33VQWnUY85VDKRK1dLQPi0XpensNEH2jJ9YxfCA5EICAABsyDfMcWRNUIshWUI9moI4sGYy1QgARVSSgeLXHlIK3BAmkYOQ1CDJQgywlx+l6E91RUKshgwtQvkkXp8NBckiKHSBSIoqjGSzWiQnoxi1lScgGKwUI4nIchAmtLieL421wPhPlRFRM9xODKTmxkWSTz3SsRmVDD1D6O8AS8IFtQI7T9RpPSyMo0g6LNC1rX4jdPPKESxMkvzGgCoLkJlN43RkJxgw+JQpBcTT+x05KSPYAAnTgMDgHg6U4gBXMBBtgUgIEEcliAAN04ABrckOq6nqBqGuAcogzcvIqFpRN0N1xBaPEamUJRgpkcRz2+f4QrUbCmpjJLhzazrutgXqoGW4bSDAdrOvauR2HInBeAAM04dqAFt-uepbBuGtaPLLaQ9wUODD0Q8QTww0Sqj0LsMPq-o7sIh69IWl63o+uBR2MnY6IYpiWJWNirWc3ibTA9d1ryxAVHsORGg0XQu1FXRJGC5s5Hq+x0RcZocXUInEsHVqocW16jUpkbqJp0I6fMyzrNsyh7McyhWdcjmBI28oBlE9E1XVHCVUkk7kMYBxrG+Q7xV6PpO0V59dKetWKdhqmMvNK12dhLmy0C3prFVZxMQaaRWjlGtFPDQZangvR71ikkEsDlWCANGajQXMGsDBsBKb2Ydwa1oyP110z6eY1j2PN6O7VjqCGz5i93QbJRmykGtgvquQZU0SSsSlIWNML+KtJLx6KXwcvK+r2v68b5v33HPXWQNpmjZNpzuLZ+GHQHmxRLFaqGzca8pHkrsFAcBr9t5xRNRXlGNeLUN5lwwBXOkVd2o13anXMODcwBN3SqZTKUdb6CU2nuUYYlRSaH2rIJojgfSYmqFKGwTQhi6EYHuAOIC9JgIgVAKBMC4ErQQUgkQsBeBA3JDgYGw52oAApGAAEpSBF2ASTEiDCd7QL3vAg+6DrYSGlGhKSahFA4XqpjAYChvjVXdriO8QtaFSM3tvSBu9YH70QSNTh3DhxyD4QI4RYiJHNTMTIyxcjrEKNsfQcQltcqIyaOdaSOhsI1moT6Ro8g9w1DloKRC14A4QEILAOhEBkGmkjtlNynMEZQQcAnaqeIsKYjRG2FQ8lKw1gqW4BJuJdCpPSZk0gSjuYIHqopL4UUZRemvHUJsvsqzu0GDYQKrhRieFimgTgEA4DCHcQEGOhShLVOQsKTs4Z8YVSGBPcQpjlYJlWXfISUyFAO1cH0SQ0hXbtCcHbC8ygArYlQgXCYQCPHHKNHIWBvB2ooCNKcjBAohg9LxA2C80hgzuybA0PRSpELIqGH0I58ZfkpjTFAEFyiECi3OoKZo1zxSSG+E2FUeiZQ1lcFUKoYxAF9nuscyAuLOnejlASSsvMsKIWqrLNQ6Kg76UomyxGNRTqiSvOibC6omj6CFSrMmPUNZh3gH3NZm1nDyEaNQqh7suySUxuGMSDUGrNlFl8W6jLHxK2IuY8BsiWE2KbmKge2hRK81iUGXEDgMblTVP6TsoYVSWslC0jJUi3VCSGOdGQP86iDJ+OSuUV53jomoQappAc5mBAwOTaNm1sRZ1qAMbQl45LIS9FYfo15BhnSGPGjwNri7A1TJRCAhb8oqX9KWzQ15HCVvaNKBFQZ1KClFovZenggA */
   createMachine(
     {
       schema: {
@@ -233,7 +239,7 @@ export const createSyncMachine = () =>
         _mostRecentEphemeralUpdateDatePerPublicSigningKey: {},
         _errorTrace: [],
         _ephemeralUpdateErrors: [],
-        _documentWasLoaded: false,
+        _documentDecryptionState: "pending",
       },
       initial: "connecting",
       on: {
@@ -274,6 +280,9 @@ export const createSyncMachine = () =>
           on: {
             WEBSOCKET_CONNECTED: {
               target: "connected",
+            },
+            ADD_CHANGE: {
+              actions: ["addToPendingUpdatesQueue"],
             },
           },
         },
@@ -347,8 +356,8 @@ export const createSyncMachine = () =>
             },
           },
           on: {
-            WEBSOCKET_DOCUMENT_NOT_FOUND: { target: "final" },
-            WEBSOCKET_UNAUTHORIZED: { target: "final" },
+            WEBSOCKET_DOCUMENT_NOT_FOUND: { target: "noAccess" },
+            WEBSOCKET_UNAUTHORIZED: { target: "noAccess" },
           },
 
           initial: "idle",
@@ -360,9 +369,13 @@ export const createSyncMachine = () =>
             target: "connecting",
             cond: "shouldReconnect",
           },
+          on: {
+            ADD_CHANGE: {
+              actions: ["addToPendingUpdatesQueue"],
+            },
+          },
         },
-
-        final: {
+        noAccess: {
           entry: ["stopWebsocketActor"],
         },
         failed: {
@@ -415,6 +428,7 @@ export const createSyncMachine = () =>
           };
         }),
         addToPendingUpdatesQueue: assign((context, event) => {
+          console.log("addToPendingUpdatesQueue", event.data);
           return {
             _pendingChangesQueue: [...context._pendingChangesQueue, event.data],
           };
@@ -434,7 +448,7 @@ export const createSyncMachine = () =>
               _mostRecentEphemeralUpdateDatePerPublicSigningKey:
                 event.data.mostRecentEphemeralUpdateDatePerPublicSigningKey,
               _ephemeralUpdateErrors: event.data.ephemeralUpdateErrors,
-              _documentWasLoaded: event.data.documentWasLoaded,
+              _documentDecryptionState: event.data.documentDecryptionState,
             };
           } else if (event.data.handledQueue === "customMessage") {
             return {
@@ -450,7 +464,7 @@ export const createSyncMachine = () =>
               _mostRecentEphemeralUpdateDatePerPublicSigningKey:
                 event.data.mostRecentEphemeralUpdateDatePerPublicSigningKey,
               _ephemeralUpdateErrors: event.data.ephemeralUpdateErrors,
-              _documentWasLoaded: event.data.documentWasLoaded,
+              _documentDecryptionState: event.data.documentDecryptionState,
             };
           } else {
             return {
@@ -465,13 +479,17 @@ export const createSyncMachine = () =>
               _mostRecentEphemeralUpdateDatePerPublicSigningKey:
                 event.data.mostRecentEphemeralUpdateDatePerPublicSigningKey,
               _ephemeralUpdateErrors: event.data.ephemeralUpdateErrors,
-              _documentWasLoaded: event.data.documentWasLoaded,
+              _documentDecryptionState: event.data.documentDecryptionState,
             };
           }
         }),
         // @ts-expect-error can't type the onError differently than onDone
         storeErrorInErrorTrace: assign((context, event) => {
           return {
+            _documentDecryptionState:
+              // @ts-expect-error documentDecryptionState is dynamically added to the error event
+              event.data?.documentDecryptionState ||
+              context._documentDecryptionState,
             _errorTrace: [event.data, ...context._errorTrace],
           };
         }),
@@ -510,7 +528,7 @@ export const createSyncMachine = () =>
           let updateClocks = context._updateClocks;
           let mostRecentEphemeralUpdateDatePerPublicSigningKey =
             context._mostRecentEphemeralUpdateDatePerPublicSigningKey;
-          let documentWasLoaded = context._documentWasLoaded;
+          let documentDecryptionState = context._documentDecryptionState;
 
           try {
             const createAndSendSnapshot = async () => {
@@ -549,6 +567,8 @@ export const createSyncMachine = () =>
                 type: "SEND",
                 message: JSON.stringify({
                   ...snapshot,
+                  // Note: send a faulty message to test the error handling
+                  // ciphertext: "lala",
                   lastKnownSnapshotId: activeSnapshotInfo.id,
                   latestServerVersion,
                   additionalServerData: snapshotData.additionalServerData,
@@ -585,7 +605,12 @@ export const createSyncMachine = () =>
                 clock: sendingUpdatesClock,
                 changes,
               });
-              send({ type: "SEND", message: JSON.stringify(message) });
+              send({
+                type: "SEND",
+                message: JSON.stringify(message),
+                // Note: send a faulty message to test the error handling
+                // message: JSON.stringify({ ...message, ciphertext: "lala" }),
+              });
             };
 
             const processSnapshot = async (
@@ -654,61 +679,67 @@ export const createSyncMachine = () =>
               );
               let changes: unknown[] = [];
 
-              for (let update of updates) {
-                const key = await context.getUpdateKey(update);
-                // console.log("processUpdates key", key);
-                if (activeSnapshotInfo === null) {
-                  throw new Error("No active snapshot");
-                }
+              try {
+                for (let update of updates) {
+                  const key = await context.getUpdateKey(update);
+                  // console.log("processUpdates key", key);
+                  if (activeSnapshotInfo === null) {
+                    throw new Error("No active snapshot");
+                  }
 
-                const isValidCollaborator = await context.isValidCollaborator(
-                  update.publicData.pubKey
-                );
-                if (!isValidCollaborator) {
-                  throw new Error("Invalid collaborator");
-                }
+                  const isValidCollaborator = await context.isValidCollaborator(
+                    update.publicData.pubKey
+                  );
+                  if (!isValidCollaborator) {
+                    throw new Error("Invalid collaborator");
+                  }
 
-                const currentClock =
-                  updateClocks[activeSnapshotInfo.id] &&
-                  Number.isInteger(
-                    updateClocks[activeSnapshotInfo.id][
-                      update.publicData.pubKey
-                    ]
-                  )
-                    ? updateClocks[activeSnapshotInfo.id][
+                  const currentClock =
+                    updateClocks[activeSnapshotInfo.id] &&
+                    Number.isInteger(
+                      updateClocks[activeSnapshotInfo.id][
                         update.publicData.pubKey
                       ]
-                    : -1;
+                    )
+                      ? updateClocks[activeSnapshotInfo.id][
+                          update.publicData.pubKey
+                        ]
+                      : -1;
 
-                const { content, clock } = verifyAndDecryptUpdate(
-                  update,
-                  key,
-                  context.sodium.from_base64(update.publicData.pubKey),
-                  currentClock
-                );
+                  const { content, clock } = verifyAndDecryptUpdate(
+                    update,
+                    key,
+                    context.sodium.from_base64(update.publicData.pubKey),
+                    currentClock
+                  );
 
-                const existingClocks =
-                  updateClocks[activeSnapshotInfo.id] || {};
-                updateClocks[activeSnapshotInfo.id] = {
-                  ...existingClocks,
-                  [update.publicData.pubKey]: clock,
-                };
+                  const existingClocks =
+                    updateClocks[activeSnapshotInfo.id] || {};
+                  updateClocks[activeSnapshotInfo.id] = {
+                    ...existingClocks,
+                    [update.publicData.pubKey]: clock,
+                  };
 
-                latestServerVersion = update.serverData.version;
-                if (
-                  update.publicData.pubKey ===
-                  context.sodium.to_base64(context.signatureKeyPair.publicKey)
-                ) {
-                  confirmedUpdatesClock = update.publicData.clock;
-                  sendingUpdatesClock = update.publicData.clock;
+                  latestServerVersion = update.serverData.version;
+                  if (
+                    update.publicData.pubKey ===
+                    context.sodium.to_base64(context.signatureKeyPair.publicKey)
+                  ) {
+                    confirmedUpdatesClock = update.publicData.clock;
+                    sendingUpdatesClock = update.publicData.clock;
+                  }
+
+                  const additionalChanges = context.deserializeChanges(
+                    context.sodium.to_string(content)
+                  );
+                  changes = changes.concat(additionalChanges);
                 }
-
-                const additionalChanges = context.deserializeChanges(
-                  context.sodium.to_string(content)
-                );
-                changes = changes.concat(additionalChanges);
+                context.applyChanges(changes);
+              } catch (error) {
+                // still try to apply all existing changes
+                context.applyChanges(changes);
+                throw error;
               }
-              context.applyChanges(changes);
             };
 
             if (context._customMessageQueue.length > 0) {
@@ -722,6 +753,7 @@ export const createSyncMachine = () =>
               const event = context._incomingQueue[0];
               switch (event.type) {
                 case "document":
+                  documentDecryptionState = "failed";
                   if (context.knownSnapshotInfo) {
                     const isValid = isValidAncestorSnapshot({
                       knownSnapshotProofEntry: {
@@ -746,11 +778,12 @@ export const createSyncMachine = () =>
                   };
 
                   await processSnapshot(event.snapshot);
+                  documentDecryptionState = "partial";
 
                   if (event.updates) {
                     await processUpdates(event.updates);
                   }
-                  documentWasLoaded = true;
+                  documentDecryptionState = "complete";
 
                   break;
 
@@ -966,7 +999,7 @@ export const createSyncMachine = () =>
               updateClocks,
               mostRecentEphemeralUpdateDatePerPublicSigningKey,
               ephemeralUpdateErrors: context._ephemeralUpdateErrors,
-              documentWasLoaded,
+              documentDecryptionState,
             };
           } catch (error) {
             console.error("Processing queue error:", error);
@@ -987,9 +1020,10 @@ export const createSyncMachine = () =>
                 updateClocks,
                 mostRecentEphemeralUpdateDatePerPublicSigningKey,
                 ephemeralUpdateErrors: newEphemeralUpdateErrors.slice(0, 20), // avoid a memory leak by storing max 20 errors
-                documentWasLoaded,
+                documentDecryptionState,
               };
             } else {
+              error.documentDecryptionState = documentDecryptionState;
               throw error;
             }
           }

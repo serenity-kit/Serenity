@@ -119,6 +119,7 @@ declare global {
     ReactNativeWebView: ReactNativeWebView;
     ydoc: any;
     editor: any;
+    editorEditable: boolean;
     isNew: boolean;
     initialContent: any;
     userInfo: AwarenessUserInfo;
@@ -130,5 +131,6 @@ declare global {
     rejectImageRequest: (fileId: string, reason: string) => void;
     updateUsername: (username: string) => void;
     updateHasOpenCommentsSidebar: (hasOpenCommentsSidebar: boolean) => void;
+    setEditorEditable(editable: boolean): void;
   }
 }
