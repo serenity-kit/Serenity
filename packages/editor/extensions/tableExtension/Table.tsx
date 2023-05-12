@@ -63,16 +63,6 @@ export const Table = (props: any) => {
   console.log("ROW SELECTED", rowSelected);
   console.log("COLUMN SELECTED", columnSelected);
 
-  const getColWidth = (index: number) => {
-    if (!tableWrapperRef.current) return 0;
-    const table = tableWrapperRef.current.children[0] as HTMLTableElement;
-
-    const firstRow = table.rows[0];
-    const activeCell = firstRow.cells[index];
-
-    return activeCell.getBoundingClientRect().width;
-  };
-
   const getTableInfo = () => {
     const editor = props.editor.storage.tableCell.currentEditor;
     const state = editor.view.state;
@@ -329,18 +319,15 @@ export const Table = (props: any) => {
         );
       })}
       {tableCellDimension.columnWidths.map((width, index) => {
-        markColumnLeft += index > 0 ? getColWidth(index - 1) : 0;
-
-        // this represents the actual unrounded width of the <td> DOM element (needed as added columns will be calculated via division)
-        // using just the columnWidth of the tableCellDimensions isn't precise enough
-        const colWidth = getColWidth(index);
+        markColumnLeft +=
+          index > 0 ? tableCellDimension.columnWidths[index - 1] : 0;
 
         return (
           <div
             className={`mark-column ${columnSelected === index && "active"}`}
             style={{
               left: markColumnLeft,
-              width: index === 0 ? colWidth : colWidth - 1, // minus one border-width
+              width: index === 0 ? width : width - 1, // minus one border-width
             }}
             onClick={() => {
               const editor = props.editor.storage.tableCell.currentEditor;

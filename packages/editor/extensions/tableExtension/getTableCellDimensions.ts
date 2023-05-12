@@ -5,14 +5,11 @@ export type TableCellDimensions = {
 
 export const getTableCellDimensions = (table: HTMLTableElement) => {
   const rows = Array.from(table.rows);
-  const rowHeights = rows.map((row) => row.offsetHeight);
-  const columnWidths = rows.reduce((widths: number[], row, rowIndex) => {
-    const cells = Array.from(row.cells);
-    if (rowIndex === 0) {
-      return cells.map((cell) => cell.offsetWidth);
-    }
-    return widths;
-  }, []);
+  const rowHeights = rows.map((row) => row.getBoundingClientRect().height);
+
+  // get cells from first row (as they will all have the same width in every row anyways)
+  const cells = Array.from(rows[0].cells);
+  const columnWidths = cells.map((cell) => cell.getBoundingClientRect().width);
 
   return {
     columnWidths,
