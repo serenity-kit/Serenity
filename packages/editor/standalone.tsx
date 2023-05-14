@@ -125,6 +125,9 @@ const renderEditor = () => {
   ReactDOM.render(
     <NativeBaseProvider>
       <Editor
+        // TODO currently set to active all the time, would need a proper
+        // setup for the error case on mobile
+        documentState="active"
         editable={window.editorEditable}
         scrollIntoViewOnEditModeDelay={50}
         documentId={"dummyDocumentId"}

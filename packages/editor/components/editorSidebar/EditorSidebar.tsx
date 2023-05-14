@@ -26,20 +26,26 @@ import React from "react";
 import { Platform } from "react-native";
 import TableOfContents from "../tableOfContents/TableOfContents";
 
+type DocumentState = "active" | "loading" | "error";
+
 type EditorSidebarProps = {
   editor: Editor | null;
   headingLevels: Level[];
   encryptAndUploadFile: EncryptAndUploadFunctionFile;
+  documentState: DocumentState;
 };
 
 export default function EditorSidebar({
   editor,
   headingLevels,
   encryptAndUploadFile,
+  documentState,
 }: EditorSidebarProps) {
   const [activeTab, setActiveTab] = React.useState<
     "editing" | "tableOfContents"
   >("editing");
+
+  const isDisabledAction = documentState !== "active";
 
   return (
     <>
@@ -59,6 +65,7 @@ export default function EditorSidebar({
           onPress={() => {
             setActiveTab("tableOfContents");
           }}
+          isDisabled={isDisabledAction}
         >
           Table of Contents
         </Tab>
@@ -78,6 +85,7 @@ export default function EditorSidebar({
             return (
               <SidebarButton
                 key={lvl}
+                isDisabled={isDisabledAction}
                 onPress={() =>
                   editor?.chain().focus().toggleHeading({ level: lvl }).run()
                 }
@@ -100,6 +108,7 @@ export default function EditorSidebar({
 
           <SidebarButton
             onPress={() => editor?.chain().focus().toggleCodeBlock().run()}
+            isDisabled={isDisabledAction}
           >
             <EditorSidebarIcon
               isActive={editor?.isActive("codeBlock") || false}
@@ -112,6 +121,7 @@ export default function EditorSidebar({
 
           <SidebarButton
             onPress={() => editor?.chain().focus().toggleBlockquote().run()}
+            isDisabled={isDisabledAction}
           >
             <EditorSidebarIcon
               isActive={editor?.isActive("blockquote") || false}
@@ -130,6 +140,7 @@ export default function EditorSidebar({
 
           <SidebarButton
             onPress={() => editor?.chain().focus().toggleBulletList().run()}
+            isDisabled={isDisabledAction}
           >
             <EditorSidebarIcon
               isActive={editor?.isActive("bulletList") || false}
@@ -142,6 +153,7 @@ export default function EditorSidebar({
 
           <SidebarButton
             onPress={() => editor?.chain().focus().toggleOrderedList().run()}
+            isDisabled={isDisabledAction}
           >
             <EditorSidebarIcon
               isActive={editor?.isActive("orderedList") || false}
@@ -154,6 +166,7 @@ export default function EditorSidebar({
 
           <SidebarButton
             onPress={() => editor?.chain().focus().toggleTaskList().run()}
+            isDisabled={isDisabledAction}
           >
             <EditorSidebarIcon
               isActive={editor?.isActive("taskList") || false}
@@ -205,6 +218,7 @@ export default function EditorSidebar({
                 },
               });
             }}
+            isDisabled={isDisabledAction}
           >
             <EditorSidebarIcon isActive={false} name="image-line" />
             <Text variant="xs" bold={false}>
@@ -322,6 +336,7 @@ export default function EditorSidebar({
                 };
                 input.click();
               }}
+              isDisabled={isDisabledAction}
             >
               <EditorSidebarIcon isActive={false} name="attachment-2" />
               <Text variant="xs" bold={false}>
@@ -344,6 +359,7 @@ export default function EditorSidebar({
                 .insertTable({ rows: 2, cols: 2, withHeaderRow: false })
                 .run()
             }
+            isDisabled={isDisabledAction}
           >
             <EditorSidebarIcon isActive={false} name="table-2" />
             <Text variant="xs" bold={false}>

@@ -20,6 +20,7 @@ import {
 import * as Y from "yjs";
 import { usePage } from "../../context/PageContext";
 import { editorToolbarService } from "../../machines/editorToolbarMachine";
+import { DocumentState } from "../../types/documentState";
 import { useEditorStore } from "../../utils/editorStore/editorStore";
 import { createDownloadAndDecryptFileFunction } from "../../utils/file/createDownloadAndDecryptFileFunction";
 import { createEncryptAndUploadFileFunction } from "../../utils/file/createEncryptAndUploadFileFunction";
@@ -30,7 +31,7 @@ import {
   EditorBottombar,
   EditorBottombarProps,
 } from "../editorBottombar/EditorBottombar";
-import { EditorPageLoading } from "./EditorPageLoading";
+import { EditorLoading } from "../editorLoading/EditorLoading";
 import { initialEditorBottombarState } from "./initialEditorBottombarState";
 import { EditorProps } from "./types";
 
@@ -46,6 +47,7 @@ import { EditorProps } from "./types";
 type BottombarWrapperProps = EditorBottombarProps & {
   keyboardHeight: number;
   keyboardAnimationDuration: number;
+  documentState: DocumentState;
 };
 
 const BottombarWrapper = ({
@@ -54,6 +56,7 @@ const BottombarWrapper = ({
   editorBottombarState,
   onUpdate,
   encryptAndUploadFile,
+  documentState,
 }: BottombarWrapperProps) => {
   const [bottom] = useState(new Animated.Value(0));
 
@@ -72,6 +75,7 @@ const BottombarWrapper = ({
         editorBottombarState={editorBottombarState}
         onUpdate={onUpdate}
         encryptAndUploadFile={encryptAndUploadFile}
+        documentState={documentState}
       />
     </Animated.View>
   );
@@ -88,6 +92,7 @@ export default function Editor({
   workspaceId,
   userInfo,
   editable,
+  documentState,
 }: EditorProps) {
   const webViewRef = useRef<WebView>(null);
   // leveraging a ref here since the injectedJavaScriptBeforeContentLoaded
@@ -265,7 +270,7 @@ export default function Editor({
   );
 
   if (!documentLoaded) {
-    return <EditorPageLoading />;
+    return <EditorLoading />;
   }
 
   return (
@@ -391,6 +396,7 @@ export default function Editor({
             `);
           }}
           encryptAndUploadFile={encryptAndUploadFile}
+          documentState={documentState}
         />
       ) : null}
     </>

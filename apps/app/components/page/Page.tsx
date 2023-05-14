@@ -36,6 +36,7 @@ import {
   runMeQuery,
 } from "../../generated/graphql";
 import { useAuthenticatedAppContext } from "../../hooks/useAuthenticatedAppContext";
+import { DocumentState } from "../../types/documentState";
 import { WorkspaceDrawerScreenProps } from "../../types/navigationProps";
 import { createNewSnapshotKey } from "../../utils/createNewSnapshotKey/createNewSnapshotKey";
 import { deriveExistingSnapshotKey } from "../../utils/deriveExistingSnapshotKey/deriveExistingSnapshotKey";
@@ -430,6 +431,13 @@ export default function Page({
     return <PageLoadingError reloadPage={reloadPage} />;
   }
 
+  let documentState: DocumentState = "loading";
+  if (state.matches("failed")) {
+    documentState = "error";
+  } else if (documentLoaded) {
+    documentState = "active";
+  }
+
   return (
     <>
       <Modal
@@ -497,6 +505,7 @@ export default function Page({
         isNew={isNew}
         documentLoaded={documentLoaded || state.matches("failed")}
         userInfo={userInfo}
+        documentState={documentState}
       />
     </>
   );
