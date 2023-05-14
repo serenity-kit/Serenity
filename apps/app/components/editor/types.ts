@@ -1,10 +1,11 @@
 import { AwarenessUserInfo } from "@serenity-tools/editor";
 import { Awareness } from "y-protocols/awareness";
 import * as Y from "yjs";
+import { DocumentState } from "../../types/documentState";
 
 export type EditorProps = {
   documentId: string;
-  documentLoaded: boolean;
+  documentLoaded: boolean; // TODO move into documentState
   workspaceId: string;
   yDocRef: React.MutableRefObject<Y.Doc>;
   yAwarenessRef: React.MutableRefObject<Awareness>;
@@ -13,4 +14,5 @@ export type EditorProps = {
   openDrawer: () => void;
   updateTitle: (title: string) => void;
   editable: boolean;
+  documentState: DocumentState;
 };

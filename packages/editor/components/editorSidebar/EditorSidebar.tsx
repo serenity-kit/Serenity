@@ -26,28 +26,28 @@ import React from "react";
 import { Platform } from "react-native";
 import TableOfContents from "../tableOfContents/TableOfContents";
 
+type DocumentState = "active" | "loading" | "error";
+
 type EditorSidebarProps = {
   editor: Editor | null;
   headingLevels: Level[];
   encryptAndUploadFile: EncryptAndUploadFunctionFile;
+  documentState: DocumentState;
 };
 
 export default function EditorSidebar({
   editor,
   headingLevels,
   encryptAndUploadFile,
+  documentState,
 }: EditorSidebarProps) {
   const [activeTab, setActiveTab] = React.useState<
     "editing" | "tableOfContents"
   >("editing");
 
-  // TODO
-  const isLoading = false;
-  const hasError = false;
-
-  const muteHeading = isLoading || hasError; // and || !isEditable ?
-  const disableButton = isLoading || hasError; // and || !isEditable ?
-  const disableTab = isLoading;
+  const muteHeading = documentState !== "active";
+  const disableButton = documentState !== "active";
+  const disableTab = documentState === "loading";
 
   return (
     <>

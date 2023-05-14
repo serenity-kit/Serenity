@@ -19,7 +19,7 @@ import {
   EditorBottombar,
   editorBottombarHeight,
 } from "../editorBottombar/EditorBottombar";
-import { EditorPageLoading } from "./EditorPageLoading";
+import { EditorLoading } from "../editorLoading/EditorLoading";
 import { initialEditorBottombarState } from "./initialEditorBottombarState";
 import { EditorProps } from "./types";
 
@@ -34,6 +34,7 @@ export default function Editor({
   updateTitle,
   userInfo,
   editable,
+  documentState,
 }: EditorProps) {
   const [editorBottombarState, setEditorBottombarState] =
     useState<EditorBottombarState>(initialEditorBottombarState);
@@ -130,7 +131,7 @@ export default function Editor({
   }, [workspaceId, documentId]);
 
   if (!documentLoaded) {
-    return <EditorPageLoading />;
+    return <EditorLoading />;
   }
 
   return (
@@ -216,6 +217,7 @@ export default function Editor({
           element.click();
           document.body.removeChild(element);
         }}
+        documentState={documentState}
       />
       {!hasEditorSidebar && (
         <View
@@ -235,6 +237,7 @@ export default function Editor({
               }
             }}
             encryptAndUploadFile={encryptAndUploadFile}
+            documentState={documentState}
           />
         </View>
       )}

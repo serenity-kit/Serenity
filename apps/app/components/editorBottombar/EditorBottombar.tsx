@@ -1,23 +1,25 @@
 import { EditorBottombarState, UpdateEditor } from "@serenity-tools/editor";
 import {
   EncryptAndUploadFunctionFile,
-  initiateImagePicker,
   InsertImageParams,
   UpdateFileAttributesParams,
+  initiateImagePicker,
 } from "@serenity-tools/editor-file-extension";
 import {
   EditorBottombarButton,
-  VerticalDivider,
   ScrollView,
+  VerticalDivider,
   tw,
 } from "@serenity-tools/ui";
 import { HStack } from "native-base";
 import { forwardRef } from "react";
+import { DocumentState } from "../../types/documentState";
 
 export type EditorBottombarProps = {
   onUpdate: UpdateEditor;
   editorBottombarState: EditorBottombarState;
   encryptAndUploadFile: EncryptAndUploadFunctionFile;
+  documentState: DocumentState;
 };
 
 export const editorBottombarHeight = 48;
@@ -28,9 +30,12 @@ export const EditorBottombar = forwardRef(
       onUpdate,
       editorBottombarState,
       encryptAndUploadFile,
+      documentState,
     }: EditorBottombarProps,
     ref
   ) => {
+    const isDisabledAction = documentState !== "active";
+
     return (
       <ScrollView
         horizontal={true}
@@ -45,6 +50,7 @@ export const EditorBottombar = forwardRef(
             }}
             name="bold"
             isActive={editorBottombarState.isBold}
+            isDisabled={isDisabledAction}
           />
           <EditorBottombarButton
             onPress={(event) => {
@@ -52,6 +58,7 @@ export const EditorBottombar = forwardRef(
             }}
             name="italic"
             isActive={editorBottombarState.isItalic}
+            isDisabled={isDisabledAction}
           />
           <EditorBottombarButton
             onPress={(event) => {
@@ -59,6 +66,7 @@ export const EditorBottombar = forwardRef(
             }}
             name="code-view"
             isActive={editorBottombarState.isCode}
+            isDisabled={isDisabledAction}
           />
           <EditorBottombarButton
             onPress={(event) => {
@@ -66,6 +74,7 @@ export const EditorBottombar = forwardRef(
             }}
             name="link"
             isActive={editorBottombarState.isLink}
+            isDisabled={isDisabledAction}
           />
 
           <VerticalDivider />
@@ -76,6 +85,7 @@ export const EditorBottombar = forwardRef(
             }}
             name="h-1"
             isActive={editorBottombarState.isHeading1}
+            isDisabled={isDisabledAction}
           />
           <EditorBottombarButton
             onPress={(event) => {
@@ -83,6 +93,7 @@ export const EditorBottombar = forwardRef(
             }}
             name="h-2"
             isActive={editorBottombarState.isHeading2}
+            isDisabled={isDisabledAction}
           />
           <EditorBottombarButton
             onPress={(event) => {
@@ -90,6 +101,7 @@ export const EditorBottombar = forwardRef(
             }}
             name="h-3"
             isActive={editorBottombarState.isHeading3}
+            isDisabled={isDisabledAction}
           />
           <EditorBottombarButton
             onPress={(event) => {
@@ -97,6 +109,7 @@ export const EditorBottombar = forwardRef(
             }}
             name="code-s-slash-line"
             isActive={editorBottombarState.isCodeBlock}
+            isDisabled={isDisabledAction}
           />
           <EditorBottombarButton
             onPress={(event) => {
@@ -104,6 +117,7 @@ export const EditorBottombar = forwardRef(
             }}
             name="double-quotes-l"
             isActive={editorBottombarState.isBlockquote}
+            isDisabled={isDisabledAction}
           />
 
           <VerticalDivider />
@@ -114,6 +128,7 @@ export const EditorBottombar = forwardRef(
             }}
             name="list-unordered"
             isActive={editorBottombarState.isBulletList}
+            isDisabled={isDisabledAction}
           />
           <EditorBottombarButton
             onPress={(event) => {
@@ -121,6 +136,7 @@ export const EditorBottombar = forwardRef(
             }}
             name="list-ordered"
             isActive={editorBottombarState.isOrderedList}
+            isDisabled={isDisabledAction}
           />
           <EditorBottombarButton
             onPress={(event) => {
@@ -128,6 +144,7 @@ export const EditorBottombar = forwardRef(
             }}
             name="list-check-2"
             isActive={editorBottombarState.isTaskList}
+            isDisabled={isDisabledAction}
           />
 
           <VerticalDivider />
@@ -146,6 +163,7 @@ export const EditorBottombar = forwardRef(
             }}
             name="image-line"
             isActive={false}
+            isDisabled={isDisabledAction}
           />
         </HStack>
       </ScrollView>
