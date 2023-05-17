@@ -409,13 +409,21 @@
 
     height: 1rem;
     width: 1rem;
+
+    cursor: pointer;
+
     border: 1px solid theme("colors.gray.300");
     border-radius: 9999px;
   }
 
-  .mark-table.selected {
+  .mark-table.active {
     background-color: theme("colors.primary.500");
     border-color: theme("colors.primary.500");
+  }
+
+  .mark-tanle.danger {
+    background-color: theme("colors.error.500");
+    border-color: theme("colors.error.500");
   }
 
   /* --- mark row / columns --- */
