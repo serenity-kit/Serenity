@@ -410,8 +410,9 @@
   }
 
   .insert-row {
-    top: -0.5625rem;
+    top: 0; /* fallback value, will be set by js */
     left: -2.25rem;
+    transform: translatey(-50%);
   }
 
   .insert-column {

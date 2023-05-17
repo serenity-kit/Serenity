@@ -1,5 +1,11 @@
-import { Icon } from "@serenity-tools/ui";
-import { CellSelection, TableMap, addColumn, addRow } from "@tiptap/pm/tables";
+import { Icon, TableInsert } from "@serenity-tools/ui";
+import {
+  CellSelection,
+  TableMap,
+  addColumn,
+  addRow,
+  findCell,
+} from "@tiptap/pm/tables";
 import { NodeViewContent, NodeViewWrapper } from "@tiptap/react";
 import React, { useEffect, useRef } from "react";
 import {
@@ -60,6 +66,12 @@ export const Table = (props: any) => {
 
   props.editor.storage.table.setTableActive = setActive;
 
+  const tableWrapperRef = useRef<HTMLDivElement>(null);
+
+  // set to accumulate absolute position of marking elements
+  let markRowTop = 0;
+  let markColumnLeft = 0;
+
   // console.log("ROW SELECTED", rowSelected);
   // console.log("COLUMN SELECTED", columnSelected);
 
@@ -75,12 +87,31 @@ export const Table = (props: any) => {
     return { table, tableMap, tableStart };
   };
 
-  const getTableInsertInfo = () => {
+  const getTableInsertInfo = (index: number) => {
     const editor = props.editor.storage.tableCell.currentEditor;
     const state = editor.view.state;
+    const resolvedPos = state.doc.resolve(props.getPos());
 
-    // needs to be named map for TableRect
-    const { table, tableMap: map, tableStart } = getTableInfo();
+    const table = props.node;
+    const tableStart = resolvedPos.start(1);
+    const map = TableMap.get(table);
+
+    const cellPos = map.positionAt(index, 0, table);
+    const resolvedCellPos = state.doc.resolve(tableStart + cellPos);
+
+    const cellPositionInfo = findCell(resolvedCellPos);
+    const tableRect = { ...cellPositionInfo, table, tableStart, map };
+    return { tr: state.tr, tableRect, cellPositionInfo };
+  };
+
+  const getTableAddInfo = () => {
+    const editor = props.editor.storage.tableCell.currentEditor;
+    const state = editor.view.state;
+    const resolvedPos = state.doc.resolve(props.getPos());
+
+    const table = props.node;
+    const tableStart = resolvedPos.start(1);
+    const map = TableMap.get(table);
 
     const rowCount = map.height;
     const colCount = map.width;
@@ -96,12 +127,6 @@ export const Table = (props: any) => {
     const tableRect = { ...cellPositionInfo, table, tableStart, map };
     return { tr: state.tr, tableRect, cellPositionInfo };
   };
-
-  const tableWrapperRef = useRef<HTMLDivElement>(null);
-
-  // set to accumulate absolute position of marking elements
-  let markRowTop = 0;
-  let markColumnLeft = 0;
 
   useMutationObserver(
     tableWrapperRef,
@@ -254,7 +279,7 @@ export const Table = (props: any) => {
         className="add add-column"
         onClick={() => {
           const editor = props.editor.storage.tableCell.currentEditor;
-          const { tr, tableRect, cellPositionInfo } = getTableInsertInfo();
+          const { tr, tableRect, cellPositionInfo } = getTableAddInfo();
           editor.view.dispatch(
             addColumn(tr, tableRect, cellPositionInfo.right)
           );
@@ -266,15 +291,12 @@ export const Table = (props: any) => {
         className="add add-row"
         onClick={() => {
           const editor = props.editor.storage.tableCell.currentEditor;
-          const { tr, tableRect, cellPositionInfo } = getTableInsertInfo();
+          const { tr, tableRect, cellPositionInfo } = getTableAddInfo();
           editor.view.dispatch(addRow(tr, tableRect, cellPositionInfo.bottom));
         }}
       >
         <Icon name="add-line" color="gray-600" />
       </div>
-      <div className="row-line hidden"></div>
-      <div className="column-line hidden"></div>
-      <div className="table-selection hidden"></div>
       <div
         className="mark-table"
         onClick={() => {
@@ -293,38 +315,86 @@ export const Table = (props: any) => {
           editor.view.dispatch(state.tr.setSelection(selection));
         }}
       ></div>
+
+      {/* insert and mark rows */}
       {tableCellDimension.rowHeights.map((height, index) => {
         markRowTop += index > 0 ? tableCellDimension.rowHeights[index - 1] : 0;
 
         return (
-          <div
-            className={`mark-row ${rowSelected === index && "active"}`}
-            style={{
-              top: markRowTop,
-              height: index === 0 ? height : height - 1, // minus one border-width
-            }}
-            onClick={() => {
-              const editor = props.editor.storage.tableCell.currentEditor;
-              const state = editor.view.state;
+          <>
+            <div
+              className="insert-row table-insert-row-thingie"
+              style={{
+                top: markRowTop,
+              }}
+              onMouseEnter={(event) => {
+                let target = event.target;
+                // @ts-expect-error
+                let wrapper = target.closest(".table-wrapper");
+                let row_line = wrapper.querySelector(".row-line");
+                let offset =
+                  // @ts-expect-error
+                  target.getBoundingClientRect().top -
+                  wrapper.getBoundingClientRect().top;
 
-              const { table, tableMap, tableStart } = getTableInfo();
+                let targetHeight = event.currentTarget.offsetHeight;
 
-              const cellPos = tableMap.positionAt(index, 0, table);
-              const resolvedCellPos = state.doc.resolve(tableStart + cellPos);
+                // offset of dot + half a dot-height (16/2) - 1px as it needs to overlap the border
+                row_line.style.top = `${offset + (targetHeight / 2 - 1)}px`;
+                row_line.classList.remove("hidden");
+              }}
+              onMouseLeave={(event) => {
+                let target = event.target;
+                // @ts-expect-error
+                let wrapper = target.closest(".table-wrapper");
+                let row_line = wrapper.querySelector(".row-line");
+                row_line.classList.add("hidden");
+              }}
+            >
+              <TableInsert
+                onPress={() => {
+                  const editor = props.editor.storage.tableCell.currentEditor;
+                  const { tr, tableRect, cellPositionInfo } =
+                    getTableInsertInfo(index);
+                  editor.view.dispatch(
+                    addRow(tr, tableRect, cellPositionInfo.top)
+                  );
+                }}
+              />
+            </div>
+            <div
+              className={`mark-row ${rowSelected === index ? "active" : ""}`}
+              style={{
+                top: markRowTop,
+                height: index === 0 ? height : height - 1, // minus one border-width
+              }}
+              onClick={() => {
+                const editor = props.editor.storage.tableCell.currentEditor;
+                const state = editor.view.state;
 
-              const rowSelection = CellSelection.rowSelection(resolvedCellPos);
-              editor.view.dispatch(state.tr.setSelection(rowSelection));
-            }}
-          ></div>
+                const { table, tableMap, tableStart } = getTableInfo();
+
+                const cellPos = tableMap.positionAt(index, 0, table);
+                const resolvedCellPos = state.doc.resolve(tableStart + cellPos);
+
+                const rowSelection =
+                  CellSelection.rowSelection(resolvedCellPos);
+                editor.view.dispatch(state.tr.setSelection(rowSelection));
+              }}
+            ></div>
+          </>
         );
       })}
+      {/* mark columns */}
       {tableCellDimension.columnWidths.map((width, index) => {
         markColumnLeft +=
           index > 0 ? tableCellDimension.columnWidths[index - 1] : 0;
 
         return (
           <div
-            className={`mark-column ${columnSelected === index && "active"}`}
+            className={`mark-column ${
+              columnSelected === index ? "active" : ""
+            }`}
             style={{
               left: markColumnLeft,
               width: index === 0 ? width : width - 1, // minus one border-width
@@ -344,6 +414,9 @@ export const Table = (props: any) => {
           ></div>
         );
       })}
+      <div className="row-line hidden"></div>
+      <div className="column-line hidden"></div>
+      <div className="table-selection hidden"></div>
     </NodeViewWrapper>
   );
 };

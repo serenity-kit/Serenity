@@ -25,41 +25,6 @@ export const TableCell = (props: any) => {
   return (
     <NodeViewWrapper>
       <div
-        className="insert-row"
-        onMouseEnter={(event) => {
-          let target = event.target;
-          // @ts-expect-error
-          let wrapper = target.closest(".table-wrapper");
-          let row_line = wrapper.querySelector(".row-line");
-          let offset =
-            // @ts-expect-error
-            target.getBoundingClientRect().top -
-            wrapper.getBoundingClientRect().top;
-
-          let targetHeight = event.currentTarget.offsetHeight;
-
-          // offset of dot + half a dot-height (16/2) - 1px as it needs to overlap the border
-          row_line.style.top = `${offset + (targetHeight / 2 - 1)}px`;
-          row_line.classList.remove("hidden");
-        }}
-        onMouseLeave={(event) => {
-          let target = event.target;
-          // @ts-expect-error
-          let wrapper = target.closest(".table-wrapper");
-          let row_line = wrapper.querySelector(".row-line");
-          row_line.classList.add("hidden");
-        }}
-      >
-        <TableInsert
-          onPress={() => {
-            const editor = props.editor.storage.tableCell.currentEditor;
-            const { tr, tableRect, cellPositionInfo } = getTableInsertInfo();
-            editor.view.dispatch(addRow(tr, tableRect, cellPositionInfo.top));
-          }}
-        />
-      </div>
-
-      <div
         className="insert-column"
         onMouseEnter={(event) => {
           let target = event.target;
