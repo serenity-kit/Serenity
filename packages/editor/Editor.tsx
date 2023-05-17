@@ -83,6 +83,7 @@ export const Editor = (props: EditorProps) => {
   const [isNew] = useState(props.isNew ?? false);
   const [hasCreateCommentBubble, setHasCreateCommentBubble] = useState(false);
   const [commentText, setCommentText] = useState("");
+  const [selectionType, setSelectionType] = useState<null | string>(null);
 
   const newTitleRef = useRef("");
   const shouldCommitNewTitleRef = useRef(isNew);
@@ -209,6 +210,21 @@ export const Editor = (props: EditorProps) => {
           props.onBlur(params);
         }
       },
+      onSelectionUpdate: (params) => {
+        const selection = params.editor.view.state.selection;
+
+        if (selection && isCellSelection(selection)) {
+          if (selection.isRowSelection() && selection.isColSelection()) {
+            setSelectionType("table");
+          } else if (selection.isRowSelection()) {
+            setSelectionType("row");
+          } else if (selection.isColSelection()) {
+            setSelectionType("column");
+          }
+        } else {
+          setSelectionType(null);
+        }
+      },
     },
     [props.documentId]
   );
@@ -222,10 +238,6 @@ export const Editor = (props: EditorProps) => {
       );
     }
   }, [props.comments, props.highlightedComment, editor]);
-
-  const selection = editor?.view.state.selection;
-  const isRowSelection =
-    selection && isCellSelection(selection) && selection.isRowSelection();
 
   return (
     <div className="flex h-full flex-auto flex-row">
@@ -455,15 +467,17 @@ export const Editor = (props: EditorProps) => {
           >
             <BubbleMenuContentWrapper padded={false}>
               <Tooltip
-                label={`Delete ${isRowSelection ? "row" : "column"}`}
+                label={`Delete ${selectionType}`}
                 placement={"top"}
                 hasArrow={false}
               >
                 <ToggleButton
                   onPress={() => {
-                    if (isRowSelection) {
+                    if (selectionType === "table") {
+                      editor.chain().focus().deleteTable().run();
+                    } else if (selectionType === "row") {
                       editor.chain().focus().deleteRow().run();
-                    } else {
+                    } else if (selectionType === "column") {
                       editor.chain().focus().deleteColumn().run();
                     }
                   }}
