@@ -87,7 +87,7 @@ export const Table = (props: any) => {
     return { table, tableMap, tableStart };
   };
 
-  const getTableInsertInfo = (index: number) => {
+  const getTableInsertInfo = (index: number, type: "row" | "column") => {
     const editor = props.editor.storage.tableCell.currentEditor;
     const state = editor.view.state;
     const resolvedPos = state.doc.resolve(props.getPos());
@@ -96,7 +96,10 @@ export const Table = (props: any) => {
     const tableStart = resolvedPos.start(1);
     const map = TableMap.get(table);
 
-    const cellPos = map.positionAt(index, 0, table);
+    const cellPos =
+      type === "row"
+        ? map.positionAt(index, 0, table)
+        : map.positionAt(0, index, table);
     const resolvedCellPos = state.doc.resolve(tableStart + cellPos);
 
     const cellPositionInfo = findCell(resolvedCellPos);
@@ -323,7 +326,7 @@ export const Table = (props: any) => {
         return (
           <>
             <div
-              className="insert-row table-insert-row-thingie"
+              className="insert-row"
               style={{
                 top: markRowTop,
               }}
@@ -355,7 +358,7 @@ export const Table = (props: any) => {
                 onPress={() => {
                   const editor = props.editor.storage.tableCell.currentEditor;
                   const { tr, tableRect, cellPositionInfo } =
-                    getTableInsertInfo(index);
+                    getTableInsertInfo(index, "row");
                   editor.view.dispatch(
                     addRow(tr, tableRect, cellPositionInfo.top)
                   );
@@ -391,27 +394,70 @@ export const Table = (props: any) => {
           index > 0 ? tableCellDimension.columnWidths[index - 1] : 0;
 
         return (
-          <div
-            className={`mark-column ${
-              columnSelected === index ? "active" : ""
-            }`}
-            style={{
-              left: markColumnLeft,
-              width: index === 0 ? width : width - 1, // minus one border-width
-            }}
-            onClick={() => {
-              const editor = props.editor.storage.tableCell.currentEditor;
-              const state = editor.view.state;
+          <>
+            <div
+              className="insert-column"
+              style={{
+                left: markColumnLeft,
+              }}
+              onMouseEnter={(event) => {
+                let target = event.target;
+                // @ts-expect-error
+                let wrapper = target.closest(".table-wrapper");
+                let column_line = wrapper.querySelector(".column-line");
+                let offset =
+                  // @ts-expect-error
+                  target.getBoundingClientRect().left -
+                  wrapper.getBoundingClientRect().left;
 
-              const { table, tableMap, tableStart } = getTableInfo();
+                let targetWidth = event.currentTarget.offsetWidth;
 
-              const cellPos = tableMap.positionAt(0, index, table);
-              const resolvedCellPos = state.doc.resolve(tableStart + cellPos);
+                // offset of dot + half a dot-width (16/2) - 1px as it needs to overlap the border
+                column_line.style.left = `${offset + (targetWidth / 2 - 1)}px`;
+                column_line.classList.remove("hidden");
+              }}
+              onMouseLeave={(event) => {
+                let target = event.target;
+                // @ts-expect-error
+                let wrapper = target.closest(".table-wrapper");
+                let column_line = wrapper.querySelector(".column-line");
+                column_line.classList.add("hidden");
+              }}
+            >
+              <TableInsert
+                onPress={() => {
+                  const editor = props.editor.storage.tableCell.currentEditor;
+                  const { tr, tableRect, cellPositionInfo } =
+                    getTableInsertInfo(index, "column");
+                  editor.view.dispatch(
+                    addColumn(tr, tableRect, cellPositionInfo.left)
+                  );
+                }}
+              />
+            </div>
+            <div
+              className={`mark-column ${
+                columnSelected === index ? "active" : ""
+              }`}
+              style={{
+                left: markColumnLeft,
+                width: index === 0 ? width : width - 1, // minus one border-width
+              }}
+              onClick={() => {
+                const editor = props.editor.storage.tableCell.currentEditor;
+                const state = editor.view.state;
 
-              const colSelection = CellSelection.colSelection(resolvedCellPos);
-              editor.view.dispatch(state.tr.setSelection(colSelection));
-            }}
-          ></div>
+                const { table, tableMap, tableStart } = getTableInfo();
+
+                const cellPos = tableMap.positionAt(0, index, table);
+                const resolvedCellPos = state.doc.resolve(tableStart + cellPos);
+
+                const colSelection =
+                  CellSelection.colSelection(resolvedCellPos);
+                editor.view.dispatch(state.tr.setSelection(colSelection));
+              }}
+            ></div>
+          </>
         );
       })}
       <div className="row-line hidden"></div>

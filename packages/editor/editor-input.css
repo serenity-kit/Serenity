@@ -412,12 +412,13 @@
   .insert-row {
     top: 0; /* fallback value, will be set by js */
     left: -2.25rem;
-    transform: translatey(-50%);
+    transform: translateY(-50%);
   }
 
   .insert-column {
     top: -2.25rem;
-    left: -0.5rem;
+    left: -0.5rem; /* fallback value, will be set by js */
+    transform: translateX(calc((50% - 0.5px) * -1));
   }
 
   /* first child dot needs to be higher to match with line */
