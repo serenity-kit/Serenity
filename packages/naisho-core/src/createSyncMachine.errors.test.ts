@@ -1,9 +1,9 @@
 import sodiumWrappers from "libsodium-wrappers";
 import sodium, { KeyPair } from "react-native-libsodium";
 import { assign, interpret, spawn } from "xstate";
+import { createSyncMachine } from "./createSyncMachine";
 import { createEphemeralUpdate } from "./ephemeralUpdate";
 import { createSnapshot } from "./snapshot";
-import { syncMachine } from "./syncMachine";
 import {
   EphemeralUpdatePublicData,
   SnapshotPublicData,
@@ -105,161 +105,12 @@ const createTestEphemeralUpdate = () => {
   return { ephemeralUpdate };
 };
 
-it("should connect to the websocket", (done) => {
-  const websocketServiceMock = (context) => () => {};
-
-  const syncService = interpret(
-    syncMachine
-      .withContext({
-        ...syncMachine.context,
-        websocketHost: url,
-        websocketSessionKey: "sessionKey",
-        signatureKeyPair,
-      })
-      .withConfig({
-        actions: {
-          spawnWebsocketActor: assign((context) => {
-            return {
-              _websocketActor: spawn(
-                websocketServiceMock(context),
-                "websocketActor"
-              ),
-            };
-          }),
-        },
-      })
-  ).onTransition((state) => {
-    if (state.matches("connected")) {
-      done();
-    }
-  });
-
-  syncService.start();
-  syncService.send({ type: "WEBSOCKET_CONNECTED" });
-});
-
-it("should load a document", (done) => {
+it("should set _documentDecryptionState to failed if not even the snapshot can be loaded", (done) => {
   const websocketServiceMock = (context) => () => {};
 
   let docValue = "";
 
-  const syncService = interpret(
-    syncMachine
-      .withContext({
-        ...syncMachine.context,
-        websocketHost: url,
-        websocketSessionKey: "sessionKey",
-        onDocumentLoaded: () => {
-          expect(docValue).toEqual("Hello World");
-          done();
-        },
-        isValidCollaborator: (signingPublicKey) =>
-          sodiumWrappers.to_base64(signatureKeyPair.publicKey) ===
-          signingPublicKey,
-        getSnapshotKey: () => key,
-        applySnapshot: (snapshot) => {
-          docValue = sodiumWrappers.to_string(snapshot);
-        },
-        sodium: sodiumWrappers,
-        signatureKeyPair,
-      })
-      .withConfig({
-        actions: {
-          spawnWebsocketActor: assign((context) => {
-            return {
-              _websocketActor: spawn(
-                websocketServiceMock(context),
-                "websocketActor"
-              ),
-            };
-          }),
-        },
-      })
-  );
-
-  syncService.start();
-  syncService.send({ type: "WEBSOCKET_CONNECTED" });
-
-  const { snapshot } = createSnapshotTestHelper();
-  syncService.send({
-    type: "WEBSOCKET_ADD_TO_INCOMING_QUEUE",
-    data: {
-      type: "document",
-      snapshot,
-    },
-  });
-});
-
-it("should load a document with updates", (done) => {
-  const websocketServiceMock = (context) => () => {};
-
-  let docValue = "";
-
-  const syncService = interpret(
-    syncMachine
-      .withContext({
-        ...syncMachine.context,
-        websocketHost: url,
-        websocketSessionKey: "sessionKey",
-        onDocumentLoaded: () => {
-          expect(docValue).toEqual("Hello Worlduu");
-          done();
-        },
-        isValidCollaborator: (signingPublicKey) =>
-          sodiumWrappers.to_base64(signatureKeyPair.publicKey) ===
-          signingPublicKey,
-        getSnapshotKey: () => key,
-        applySnapshot: (snapshot) => {
-          docValue = sodiumWrappers.to_string(snapshot);
-        },
-        getUpdateKey: () => key,
-        deserializeChanges: (changes) => {
-          return changes;
-        },
-        applyChanges: (changes) => {
-          changes.forEach((change) => {
-            docValue = docValue + change;
-          });
-        },
-        sodium: sodiumWrappers,
-        signatureKeyPair,
-      })
-      .withConfig({
-        actions: {
-          spawnWebsocketActor: assign((context) => {
-            return {
-              _websocketActor: spawn(
-                websocketServiceMock(context),
-                "websocketActor"
-              ),
-            };
-          }),
-        },
-      })
-  );
-
-  syncService.start();
-  syncService.send({ type: "WEBSOCKET_CONNECTED" });
-
-  const { snapshot } = createSnapshotTestHelper();
-  syncService.send({
-    type: "WEBSOCKET_ADD_TO_INCOMING_QUEUE",
-    data: {
-      type: "document",
-      snapshot,
-      updates: [
-        createUpdateHelper().update,
-        createUpdateHelper({ version: 1 }).update,
-      ],
-    },
-  });
-});
-
-it("should load a document and two additional updates", (done) => {
-  const websocketServiceMock = (context) => () => {};
-
-  let docValue = "";
-
+  const syncMachine = createSyncMachine();
   const syncService = interpret(
     syncMachine
       .withContext({
@@ -269,7 +120,9 @@ it("should load a document and two additional updates", (done) => {
         isValidCollaborator: (signingPublicKey) =>
           sodiumWrappers.to_base64(signatureKeyPair.publicKey) ===
           signingPublicKey,
-        getSnapshotKey: () => key,
+        getSnapshotKey: () => {
+          throw new Error("INVALID");
+        },
         applySnapshot: (snapshot) => {
           docValue = sodiumWrappers.to_string(snapshot);
         },
@@ -298,7 +151,8 @@ it("should load a document and two additional updates", (done) => {
         },
       })
   ).onTransition((state) => {
-    if (docValue === "Hello Worlduu") {
+    if (state.value === "failed") {
+      expect(state.context._documentDecryptionState).toBe("failed");
       done();
     }
   });
@@ -314,31 +168,14 @@ it("should load a document and two additional updates", (done) => {
       snapshot,
     },
   });
-
-  const { update } = createUpdateHelper();
-  syncService.send({
-    type: "WEBSOCKET_ADD_TO_INCOMING_QUEUE",
-    data: {
-      ...update,
-      type: "update",
-    },
-  });
-
-  const { update: update2 } = createUpdateHelper({ version: 1 });
-  syncService.send({
-    type: "WEBSOCKET_ADD_TO_INCOMING_QUEUE",
-    data: {
-      ...update2,
-      type: "update",
-    },
-  });
 });
 
-it("should load a document and an additional snapshot", (done) => {
+it("should set _documentDecryptionState to partial and apply the first update, if document snapshot decrypts but the second update fails", (done) => {
   const websocketServiceMock = (context) => () => {};
 
   let docValue = "";
 
+  const syncMachine = createSyncMachine();
   const syncService = interpret(
     syncMachine
       .withContext({
@@ -377,81 +214,9 @@ it("should load a document and an additional snapshot", (done) => {
         },
       })
   ).onTransition((state) => {
-    if (docValue === "Hello World again") {
-      done();
-    }
-  });
-
-  syncService.start();
-  syncService.send({ type: "WEBSOCKET_CONNECTED" });
-
-  const { snapshot } = createSnapshotTestHelper();
-  syncService.send({
-    type: "WEBSOCKET_ADD_TO_INCOMING_QUEUE",
-    data: {
-      type: "document",
-      snapshot,
-    },
-  });
-
-  const { snapshot: snapshot2 } = createSnapshotTestHelper({
-    parentSnapshotCiphertext: snapshot.ciphertext,
-    grandParentSnapshotProof: snapshot.publicData.parentSnapshotProof,
-    content: "Hello World again",
-  });
-  syncService.send({
-    type: "WEBSOCKET_ADD_TO_INCOMING_QUEUE",
-    data: {
-      type: "snapshot",
-      snapshot: snapshot2,
-    },
-  });
-});
-
-it("should load a document with updates and two additional updates", (done) => {
-  const websocketServiceMock = (context) => () => {};
-
-  let docValue = "";
-
-  const syncService = interpret(
-    syncMachine
-      .withContext({
-        ...syncMachine.context,
-        websocketHost: url,
-        websocketSessionKey: "sessionKey",
-        isValidCollaborator: (signingPublicKey) =>
-          sodiumWrappers.to_base64(signatureKeyPair.publicKey) ===
-          signingPublicKey,
-        getSnapshotKey: () => key,
-        applySnapshot: (snapshot) => {
-          docValue = sodiumWrappers.to_string(snapshot);
-        },
-        getUpdateKey: () => key,
-        deserializeChanges: (changes) => {
-          return changes;
-        },
-        applyChanges: (changes) => {
-          changes.forEach((change) => {
-            docValue = docValue + change;
-          });
-        },
-        sodium: sodiumWrappers,
-        signatureKeyPair,
-      })
-      .withConfig({
-        actions: {
-          spawnWebsocketActor: assign((context) => {
-            return {
-              _websocketActor: spawn(
-                websocketServiceMock(context),
-                "websocketActor"
-              ),
-            };
-          }),
-        },
-      })
-  ).onTransition((state) => {
-    if (docValue === "Hello Worlduuuu") {
+    if (state.value === "failed") {
+      expect(state.context._documentDecryptionState).toBe("partial");
+      expect(docValue).toEqual("Hello Worldu");
       done();
     }
   });
@@ -467,35 +232,18 @@ it("should load a document with updates and two additional updates", (done) => {
       snapshot,
       updates: [
         createUpdateHelper().update,
-        createUpdateHelper({ version: 1 }).update,
+        createUpdateHelper({ version: 1000 }).update,
       ],
-    },
-  });
-
-  const { update } = createUpdateHelper({ version: 2 });
-  syncService.send({
-    type: "WEBSOCKET_ADD_TO_INCOMING_QUEUE",
-    data: {
-      ...update,
-      type: "update",
-    },
-  });
-
-  const { update: update2 } = createUpdateHelper({ version: 3 });
-  syncService.send({
-    type: "WEBSOCKET_ADD_TO_INCOMING_QUEUE",
-    data: {
-      ...update2,
-      type: "update",
     },
   });
 });
 
-it("should load a document with updates and two two additional snapshots", (done) => {
+it("should set _documentDecryptionState to partial, if document snapshot decrypts but the first update fails", (done) => {
   const websocketServiceMock = (context) => () => {};
 
   let docValue = "";
 
+  const syncMachine = createSyncMachine();
   const syncService = interpret(
     syncMachine
       .withContext({
@@ -534,7 +282,9 @@ it("should load a document with updates and two two additional snapshots", (done
         },
       })
   ).onTransition((state) => {
-    if (docValue === "Hello World again and again") {
+    if (state.value === "failed") {
+      expect(state.context._documentDecryptionState).toBe("partial");
+      expect(docValue).toEqual("Hello World");
       done();
     }
   });
@@ -548,46 +298,18 @@ it("should load a document with updates and two two additional snapshots", (done
     data: {
       type: "document",
       snapshot,
-      updates: [
-        createUpdateHelper().update,
-        createUpdateHelper({ version: 1 }).update,
-      ],
-    },
-  });
-
-  const { snapshot: snapshot2 } = createSnapshotTestHelper({
-    parentSnapshotCiphertext: snapshot.ciphertext,
-    grandParentSnapshotProof: snapshot.publicData.parentSnapshotProof,
-    content: "Hello World again",
-  });
-  syncService.send({
-    type: "WEBSOCKET_ADD_TO_INCOMING_QUEUE",
-    data: {
-      type: "snapshot",
-      snapshot: snapshot2,
-    },
-  });
-
-  const { snapshot: snapshot3 } = createSnapshotTestHelper({
-    parentSnapshotCiphertext: snapshot2.ciphertext,
-    grandParentSnapshotProof: snapshot2.publicData.parentSnapshotProof,
-    content: "Hello World again and again",
-  });
-  syncService.send({
-    type: "WEBSOCKET_ADD_TO_INCOMING_QUEUE",
-    data: {
-      type: "snapshot",
-      snapshot: snapshot3,
+      updates: [createUpdateHelper({ version: 1000 }).update],
     },
   });
 });
 
-it("should load a document and process three additional ephemeral updates", (done) => {
+it("should process three additional ephemeral updates where the second one fails", (done) => {
   const websocketServiceMock = (context) => () => {};
 
   let docValue = "";
   let ephemeralUpdatesValue = new Uint8Array();
 
+  const syncMachine = createSyncMachine();
   const syncService = interpret(
     syncMachine
       .withContext({
@@ -633,10 +355,10 @@ it("should load a document and process three additional ephemeral updates", (don
         },
       })
   ).onTransition((state) => {
-    if (ephemeralUpdatesValue.length === 3) {
+    if (ephemeralUpdatesValue.length === 2 && state.matches("connected.idle")) {
+      expect(state.context._ephemeralUpdateErrors.length).toEqual(1);
       expect(ephemeralUpdatesValue[0]).toEqual(42);
       expect(ephemeralUpdatesValue[1]).toEqual(42);
-      expect(ephemeralUpdatesValue[2]).toEqual(42);
       done();
     }
   });
@@ -667,6 +389,10 @@ it("should load a document and process three additional ephemeral updates", (don
       type: "WEBSOCKET_ADD_TO_INCOMING_QUEUE",
       data: {
         ...ephemeralUpdate2,
+        publicData: {
+          ...ephemeralUpdate2.publicData,
+          docId: "wrongDocId",
+        },
         type: "ephemeralUpdate",
       },
     });
@@ -682,3 +408,289 @@ it("should load a document and process three additional ephemeral updates", (don
     }, 1);
   }, 1);
 });
+
+it("should store not more than 20 failed ephemeral update errors", (done) => {
+  const websocketServiceMock = (context) => () => {};
+
+  let docValue = "";
+  let ephemeralUpdatesValue = new Uint8Array();
+
+  const syncMachine = createSyncMachine();
+  const syncService = interpret(
+    syncMachine
+      .withContext({
+        ...syncMachine.context,
+        websocketHost: url,
+        websocketSessionKey: "sessionKey",
+        isValidCollaborator: (signingPublicKey) =>
+          sodiumWrappers.to_base64(signatureKeyPair.publicKey) ===
+          signingPublicKey,
+        getSnapshotKey: () => key,
+        applySnapshot: (snapshot) => {
+          docValue = sodiumWrappers.to_string(snapshot);
+        },
+        getUpdateKey: () => key,
+        deserializeChanges: (changes) => {
+          return changes;
+        },
+        applyChanges: (changes) => {
+          changes.forEach((change) => {
+            docValue = docValue + change;
+          });
+        },
+        getEphemeralUpdateKey: () => key,
+        applyEphemeralUpdates: (ephemeralUpdates) => {
+          ephemeralUpdatesValue = new Uint8Array([
+            ...ephemeralUpdatesValue,
+            ...ephemeralUpdates,
+          ]);
+        },
+        sodium: sodiumWrappers,
+        signatureKeyPair,
+      })
+      .withConfig({
+        actions: {
+          spawnWebsocketActor: assign((context) => {
+            return {
+              _websocketActor: spawn(
+                websocketServiceMock(context),
+                "websocketActor"
+              ),
+            };
+          }),
+        },
+      })
+  ).onTransition((state) => {
+    if (ephemeralUpdatesValue.length === 2 && state.matches("connected.idle")) {
+      expect(state.context._ephemeralUpdateErrors.length).toEqual(20);
+      expect(ephemeralUpdatesValue[0]).toEqual(42);
+      expect(ephemeralUpdatesValue[1]).toEqual(42);
+      done();
+    }
+  });
+
+  syncService.start();
+  syncService.send({ type: "WEBSOCKET_CONNECTED" });
+
+  const { snapshot } = createSnapshotTestHelper();
+  syncService.send({
+    type: "WEBSOCKET_ADD_TO_INCOMING_QUEUE",
+    data: {
+      type: "document",
+      snapshot,
+    },
+  });
+
+  const { ephemeralUpdate } = createTestEphemeralUpdate();
+  for (let step = 0; step < 25; step++) {
+    syncService.send({
+      type: "WEBSOCKET_ADD_TO_INCOMING_QUEUE",
+      data: {
+        ...ephemeralUpdate,
+        type: "ephemeralUpdate",
+      },
+    });
+  }
+
+  setTimeout(() => {
+    const { ephemeralUpdate: ephemeralUpdate2 } = createTestEphemeralUpdate();
+    syncService.send({
+      type: "WEBSOCKET_ADD_TO_INCOMING_QUEUE",
+      data: {
+        ...ephemeralUpdate2,
+        type: "ephemeralUpdate",
+      },
+    });
+  }, 1);
+});
+
+it("should reset the context entries after websocket disconnect", (done) => {
+  const websocketServiceMock = (context) => () => {};
+
+  let docValue = "";
+  let ephemeralUpdatesValue = new Uint8Array();
+
+  const syncMachine = createSyncMachine();
+  const syncService = interpret(
+    syncMachine
+      .withContext({
+        ...syncMachine.context,
+        websocketHost: url,
+        websocketSessionKey: "sessionKey",
+        isValidCollaborator: (signingPublicKey) =>
+          sodiumWrappers.to_base64(signatureKeyPair.publicKey) ===
+          signingPublicKey,
+        getSnapshotKey: () => key,
+        applySnapshot: (snapshot) => {
+          docValue = sodiumWrappers.to_string(snapshot);
+        },
+        getUpdateKey: () => key,
+        deserializeChanges: (changes) => {
+          return changes;
+        },
+        applyChanges: (changes) => {
+          changes.forEach((change) => {
+            docValue = docValue + change;
+          });
+        },
+        getEphemeralUpdateKey: () => key,
+        applyEphemeralUpdates: (ephemeralUpdates) => {
+          ephemeralUpdatesValue = new Uint8Array([
+            ...ephemeralUpdatesValue,
+            ...ephemeralUpdates,
+          ]);
+        },
+        sodium: sodiumWrappers,
+        signatureKeyPair,
+      })
+      .withConfig({
+        actions: {
+          spawnWebsocketActor: assign((context) => {
+            return {
+              _websocketActor: spawn(
+                websocketServiceMock(context),
+                "websocketActor"
+              ),
+            };
+          }),
+        },
+      })
+  ).onTransition((state) => {
+    if (state.matches("connecting.retrying")) {
+      expect(state.context._documentDecryptionState).toEqual("pending");
+      expect(state.context._activeSnapshotInfo).toEqual(null);
+      expect(state.context._latestServerVersion).toEqual(null);
+      expect(state.context._incomingQueue).toEqual([]);
+      expect(state.context._customMessageQueue).toEqual([]);
+      expect(state.context._activeSendingSnapshotInfo).toEqual(null);
+      expect(state.context._updatesInFlight).toEqual([]);
+      expect(state.context._confirmedUpdatesClock).toEqual(null);
+      expect(state.context._sendingUpdatesClock).toEqual(-1);
+      expect(state.context._updateClocks).toEqual({});
+      expect(
+        state.context._mostRecentEphemeralUpdateDatePerPublicSigningKey
+      ).toEqual({});
+      done();
+    }
+  });
+
+  syncService.start();
+  syncService.send({ type: "WEBSOCKET_CONNECTED" });
+
+  const { snapshot } = createSnapshotTestHelper();
+  syncService.send({
+    type: "WEBSOCKET_ADD_TO_INCOMING_QUEUE",
+    data: {
+      type: "document",
+      snapshot,
+      updates: [
+        createUpdateHelper().update,
+        createUpdateHelper({ version: 1 }).update,
+      ],
+    },
+  });
+
+  syncService.send({
+    type: "WEBSOCKET_DISCONNECTED",
+  });
+});
+
+it("should reconnect and reload the document", (done) => {
+  const websocketServiceMock = (context) => () => {};
+
+  let docValue = "";
+  let ephemeralUpdatesValue = new Uint8Array();
+  let reconnected = false;
+
+  const syncMachine = createSyncMachine();
+  const syncService = interpret(
+    syncMachine
+      .withContext({
+        ...syncMachine.context,
+        websocketHost: url,
+        websocketSessionKey: "sessionKey",
+        isValidCollaborator: (signingPublicKey) =>
+          sodiumWrappers.to_base64(signatureKeyPair.publicKey) ===
+          signingPublicKey,
+        getSnapshotKey: () => key,
+        applySnapshot: (snapshot) => {
+          docValue = sodiumWrappers.to_string(snapshot);
+        },
+        getUpdateKey: () => key,
+        deserializeChanges: (changes) => {
+          return changes;
+        },
+        applyChanges: (changes) => {
+          changes.forEach((change) => {
+            docValue = docValue + change;
+          });
+        },
+        getEphemeralUpdateKey: () => key,
+        applyEphemeralUpdates: (ephemeralUpdates) => {
+          ephemeralUpdatesValue = new Uint8Array([
+            ...ephemeralUpdatesValue,
+            ...ephemeralUpdates,
+          ]);
+        },
+        sodium: sodiumWrappers,
+        signatureKeyPair,
+      })
+      .withConfig({
+        actions: {
+          spawnWebsocketActor: assign((context) => {
+            return {
+              _websocketActor: spawn(
+                websocketServiceMock(context),
+                "websocketActor"
+              ),
+            };
+          }),
+        },
+      })
+  ).onTransition((state) => {
+    if (
+      reconnected &&
+      state.matches("connected.idle") &&
+      state.context._documentDecryptionState
+    ) {
+      expect(docValue).toEqual("Hello Worlduu");
+      expect(state.context._documentDecryptionState).toEqual("complete");
+      done();
+    }
+  });
+
+  syncService.start();
+  syncService.send({ type: "WEBSOCKET_CONNECTED" });
+
+  const { snapshot } = createSnapshotTestHelper();
+  const document = {
+    type: "document",
+    snapshot,
+    updates: [
+      createUpdateHelper().update,
+      createUpdateHelper({ version: 1 }).update,
+    ],
+  };
+  syncService.send({
+    type: "WEBSOCKET_ADD_TO_INCOMING_QUEUE",
+    data: document,
+  });
+
+  syncService.send({
+    type: "WEBSOCKET_DISCONNECTED",
+  });
+  setTimeout(() => {
+    syncService.send({ type: "WEBSOCKET_CONNECTED" });
+    syncService.send({
+      type: "WEBSOCKET_ADD_TO_INCOMING_QUEUE",
+      data: document,
+    });
+    reconnected = true;
+  }, 1);
+});
+
+// TODO
+// test sending the same update twice
+// testing sending the same ephemeral update twice
+// tests for a broken snapshot key
+// test for a invalid contributor

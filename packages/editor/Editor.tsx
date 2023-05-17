@@ -73,6 +73,7 @@ type EditorProps = {
   highlightComment: (commentId: string | null, openSidebar: boolean) => void;
   highlightedComment: HighlightedComment | null;
   hasOpenCommentsSidebar: () => boolean;
+  editable: boolean;
 };
 
 const headingLevels: Level[] = [1, 2, 3];
@@ -93,6 +94,7 @@ export const Editor = (props: EditorProps) => {
 
   const editor = useEditor(
     {
+      editable: props.editable,
       extensions: [
         StarterKit.configure({
           // the Collaboration extension comes with its own history handling
@@ -238,6 +240,12 @@ export const Editor = (props: EditorProps) => {
       );
     }
   }, [props.comments, props.highlightedComment, editor]);
+
+  useEffect(() => {
+    if (editor) {
+      editor.setEditable(props.editable);
+    }
+  }, [props.editable, editor]);
 
   return (
     <div className="flex h-full flex-auto flex-row">

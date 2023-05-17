@@ -1,17 +1,11 @@
 import {
-  Editor as SerenityEditor,
   EditorBottombarState,
+  Editor as SerenityEditor,
+  UpdateEditorParams,
   getEditorBottombarStateFromEditor,
   updateEditor,
-  UpdateEditorParams,
 } from "@serenity-tools/editor";
-import {
-  CenterContent,
-  Spinner,
-  tw,
-  useHasEditorSidebar,
-  View,
-} from "@serenity-tools/ui";
+import { View, tw, useHasEditorSidebar } from "@serenity-tools/ui";
 import { Editor as TipTapEditor } from "@tiptap/core";
 import { useActor } from "@xstate/react";
 import { useEffect, useMemo, useRef, useState } from "react";
@@ -25,6 +19,7 @@ import {
   EditorBottombar,
   editorBottombarHeight,
 } from "../editorBottombar/EditorBottombar";
+import { EditorPageLoading } from "./EditorPageLoading";
 import { initialEditorBottombarState } from "./initialEditorBottombarState";
 import { EditorProps } from "./types";
 
@@ -38,6 +33,7 @@ export default function Editor({
   isNew,
   updateTitle,
   userInfo,
+  editable,
 }: EditorProps) {
   const [editorBottombarState, setEditorBottombarState] =
     useState<EditorBottombarState>(initialEditorBottombarState);
@@ -134,17 +130,14 @@ export default function Editor({
   }, [workspaceId, documentId]);
 
   if (!documentLoaded) {
-    return (
-      <CenterContent>
-        <Spinner fadeIn />
-      </CenterContent>
-    );
+    return <EditorPageLoading />;
   }
 
   return (
     // overflow-hidden needed so hidden elements with borders don't trigger scrolling behaviour
     <View style={tw`h-full overflow-hidden`}>
       <SerenityEditor
+        editable={editable}
         documentId={documentId}
         yDocRef={yDocRef}
         yAwarenessRef={yAwarenessRef}

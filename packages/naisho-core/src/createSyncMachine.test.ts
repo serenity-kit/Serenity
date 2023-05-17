@@ -1,6 +1,6 @@
 import { Server } from "mock-socket";
 import { interpret } from "xstate";
-import { syncMachine } from "./syncMachine";
+import { createSyncMachine } from "./createSyncMachine";
 
 const url = "wss://www.example.com";
 let mockServer: Server;
@@ -16,6 +16,7 @@ afterEach((done) => {
 });
 
 it("should start with connecting", (done) => {
+  const syncMachine = createSyncMachine();
   const syncService = interpret(
     syncMachine.withContext({
       ...syncMachine.context,
@@ -34,6 +35,7 @@ it("should start with connecting", (done) => {
 it("should connect", (done) => {
   const url = "wss://www.example.com";
 
+  const syncMachine = createSyncMachine();
   const syncService = interpret(
     syncMachine.withContext({
       ...syncMachine.context,

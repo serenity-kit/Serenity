@@ -110,6 +110,12 @@ type ActiveSnapshotInfo = {
   parentSnapshotProof: string;
 };
 
+export type DocumentDecryptionState =
+  | "pending"
+  | "failed"
+  | "partial"
+  | "complete";
+
 type ProcessQueueData = {
   handledQueue: "customMessage" | "incoming" | "pending" | "none";
   activeSnapshotInfo: ActiveSnapshotInfo | null;
@@ -122,29 +128,49 @@ type ProcessQueueData = {
   updateClocks: UpdateClocks;
   mostRecentEphemeralUpdateDatePerPublicSigningKey: MostRecentEphemeralUpdateDatePerPublicSigningKey;
   ephemeralUpdateErrors: NaishoProcessingEphemeralUpdateError[];
+  documentDecryptionState: DocumentDecryptionState;
 };
 
-export type Context = SyncMachineConfig & {
+export type InternalContextReset = {
   _latestServerVersion: null | number;
   _activeSnapshotInfo: null | ActiveSnapshotInfo;
-  _websocketActor?: AnyActorRef;
   _incomingQueue: any[];
   _customMessageQueue: any[];
-  _pendingChangesQueue: any[];
   _activeSendingSnapshotInfo: ActiveSnapshotInfo | null;
-  _shouldReconnect: boolean;
-  _websocketRetries: number;
   _updatesInFlight: UpdateInFlight[];
   _confirmedUpdatesClock: number | null;
   _sendingUpdatesClock: number;
   _updateClocks: UpdateClocks;
   _mostRecentEphemeralUpdateDatePerPublicSigningKey: MostRecentEphemeralUpdateDatePerPublicSigningKey;
-  _errorTrace: Error[];
-  _ephemeralUpdateErrors: Error[];
+  _documentDecryptionState: DocumentDecryptionState;
 };
 
-export const syncMachine =
-  /** @xstate-layout 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 */
+export type Context = SyncMachineConfig &
+  InternalContextReset & {
+    _websocketRetries: number;
+    _websocketActor?: AnyActorRef;
+    _pendingChangesQueue: any[];
+    _shouldReconnect: boolean;
+    _errorTrace: Error[];
+    _ephemeralUpdateErrors: Error[];
+  };
+
+const disconnectionContextReset: InternalContextReset = {
+  _activeSnapshotInfo: null,
+  _latestServerVersion: null,
+  _incomingQueue: [],
+  _customMessageQueue: [],
+  _activeSendingSnapshotInfo: null,
+  _updatesInFlight: [],
+  _confirmedUpdatesClock: null,
+  _sendingUpdatesClock: -1,
+  _updateClocks: {},
+  _mostRecentEphemeralUpdateDatePerPublicSigningKey: {},
+  _documentDecryptionState: "pending",
+};
+
+export const createSyncMachine = () =>
+  /** @xstate-layout N4IgpgJg5mDOIC5SwJ4DsDGBZAhhgFgJZpgDEAygKIByAIgNoAMAuoqAA4D2shALoZzRsQAD0QBGcQE4A7ADpxMgKwA2JQBYlAJnEAOTeoA0IFIgC0i9XPU29M9Vq0rdMlSoC+746ky4CxMgBBWloAfUoABQAJSixKACVAgBlQgFUI2kCAFUomViQQLh5+QWExBEkleUZHGRd1XS1GRhljUwqGqQV9RgBmFXVewd1erU9vdGw8IhJSAHVKACFyAHkAYQBpSizQ2gBJcjWV6mpKNZyGFmEivgEhAvKqtsRR3WslPS0pVQcNdRlxiAfFN-LN9odjqdznlrtxbqUHogniZEFoZPIpCpHEpGFIWiopNJAcC-DMwHIMIISBh+GgoPMlqtNttQkcTmcLjCCjcSvdQOVxGolAoZH1enoaupxFojCiEP0rDYqippSpGDj1cTJqSAhSqWAacR6cEwmsooFqABxXJXblw3llCTON6DKTi77K3oaZ4VDRyfpY3S6bTiAO9KRa3zTXWUtDU2lQOQAdxwtzpDOW6y2O3i23iAE0uRx7XdHRVQ1o5KKpK63MHxP8fb19N1gzX-uoVKMqpGQWS9XGDbxIBmmdndutUnFqDtqCsdgAxFapOhFwolhH8iR44XiHHfNX2Qk+6XNOSMRpfLTBztKJS9nUkAfxkcLTPMnYrwKpLJRFbxPYAC1KEufJi2KUtEQqQld33VQWnUY85VDKRK1dLQPi0XpensNEH2jJ9YxfCA5EICAABsyDfMcWRNUIshWUI9moI4sGYy1QgARVSSgeLXHlIK3BAmkYOQ1CDJQgywlx+l6E91RUKshgwtQvkkXp8NBckiKHSBSIoqjGSzWiQnoxi1lScgGKwUI4nIchAmtLieL421wPhPlRFRM9xODKTmxkWSTz3SsRmVDD1D6O8AS8IFtQI7T9RpPSyMo0g6LNC1rX4jdPPKESxMkvzGgCoLkJlN43RkJxgw+JQpBcTT+x05KSPYAAnTgMDgHg6U4gBXMBBtgUgIEEcliAAN04ABrckOq6nqBqGuAcogzcvIqFpRN0N1xBaPEamUJRgpkcRz2+f4QrUbCmpjJLhzazrutgXqoGW4bSDAdrOvauR2HInBeAAM04dqAFt-uepbBuGtaPLLaQ9wUODD0Q8QTww0Sqj0LsMPq-o7sIh69IWl63o+uBR2MnY6IYpiWJWNirWc3ibTA9d1ryxAVHsORGg0XQu1FXRJGC5s5Hq+x0RcZocXUInEsHVqocW16jUpkbqJp0I6fMyzrNsyh7McyhWdcjmBI28oBlE9E1XVHCVUkk7kMYBxrG+Q7xV6PpO0V59dKetWKdhqmMvNK12dhLmy0C3prFVZxMQaaRWjlGtFPDQZangvR71ikkEsDlWCANGajQXMGsDBsBKb2Ydwa1oyP110z6eY1j2PN6O7VjqCGz5i93QbJRmykGtgvquQZU0SSsSlIWNML+KtJLx6KXwcvK+r2v68b5v33HPXWQNpmjZNpzuLZ+GHQHmxRLFaqGzca8pHkrsFAcBr9t5xRNRXlGNeLUN5lwwBXOkVd2o13anXMODcwBN3SqZTKUdb6CU2nuUYYlRSaH2rIJojgfSYmqFKGwTQhi6EYHuAOIC9JgIgVAKBMC4ErQQUgkQsBeBA3JDgYGw52oAApGAAEpSBF2ASTEiDCd7QL3vAg+6DrYSGlGhKSahFA4XqpjAYChvjVXdriO8QtaFSM3tvSBu9YH70QSNTh3DhxyD4QI4RYiJHNTMTIyxcjrEKNsfQcQltcqIyaOdaSOhsI1moT6Ro8g9w1DloKRC14A4QEILAOhEBkGmkjtlNynMEZQQcAnaqeIsKYjRG2FQ8lKw1gqW4BJuJdCpPSZk0gSjuYIHqopL4UUZRemvHUJsvsqzu0GDYQKrhRieFimgTgEA4DCHcQEGOhShLVOQsKTs4Z8YVSGBPcQpjlYJlWXfISUyFAO1cH0SQ0hXbtCcHbC8ygArYlQgXCYQCPHHKNHIWBvB2ooCNKcjBAohg9LxA2C80hgzuybA0PRSpELIqGH0I58ZfkpjTFAEFyiECi3OoKZo1zxSSG+E2FUeiZQ1lcFUKoYxAF9nuscyAuLOnejlASSsvMsKIWqrLNQ6Kg76UomyxGNRTqiSvOibC6omj6CFSrMmPUNZh3gH3NZm1nDyEaNQqh7suySUxuGMSDUGrNlFl8W6jLHxK2IuY8BsiWE2KbmKge2hRK81iUGXEDgMblTVP6TsoYVSWslC0jJUi3VCSGOdGQP86iDJ+OSuUV53jomoQappAc5mBAwOTaNm1sRZ1qAMbQl45LIS9FYfo15BhnSGPGjwNri7A1TJRCAhb8oqX9KWzQ15HCVvaNKBFQZ1KClFovZenggA */
   createMachine(
     {
       schema: {
@@ -170,8 +196,9 @@ export const syncMachine =
           processQueues: { data: ProcessQueueData };
         },
       },
-      tsTypes: {} as import("./syncMachine.typegen").Typegen0,
+      tsTypes: {} as import("./createSyncMachine.typegen").Typegen0,
       predictableActionArguments: true,
+      // context: JSON.parse(JSON.stringify(initialContext)),
       context: {
         documentId: "",
         signatureKeyPair: {} as KeyPair,
@@ -194,7 +221,6 @@ export const syncMachine =
         sodium: {},
         serializeChanges: () => "",
         deserializeChanges: () => [],
-        onDocumentLoaded: () => undefined,
         onSnapshotSaved: () => undefined,
         isValidCollaborator: async () => false,
         additionalAuthenticationDataValidations: undefined,
@@ -213,6 +239,7 @@ export const syncMachine =
         _mostRecentEphemeralUpdateDatePerPublicSigningKey: {},
         _errorTrace: [],
         _ephemeralUpdateErrors: [],
+        _documentDecryptionState: "pending",
       },
       initial: "connecting",
       on: {
@@ -240,8 +267,8 @@ export const syncMachine =
             },
             waiting: {
               invoke: {
-                id: "sheduleRetry",
-                src: "sheduleRetry",
+                id: "scheduleRetry",
+                src: "scheduleRetry",
               },
               on: {
                 WEBSOCKET_RETRY: {
@@ -254,9 +281,11 @@ export const syncMachine =
             WEBSOCKET_CONNECTED: {
               target: "connected",
             },
+            ADD_CHANGE: {
+              actions: ["addToPendingUpdatesQueue"],
+            },
           },
         },
-
         connected: {
           entry: ["resetWebsocketRetries"],
           states: {
@@ -276,7 +305,6 @@ export const syncMachine =
                 },
               },
             },
-
             processingQueues: {
               on: {
                 WEBSOCKET_ADD_TO_INCOMING_QUEUE: {
@@ -328,23 +356,31 @@ export const syncMachine =
             },
           },
           on: {
-            WEBSOCKET_DOCUMENT_NOT_FOUND: { target: "final" },
-            WEBSOCKET_UNAUTHORIZED: { target: "final" },
+            WEBSOCKET_DOCUMENT_NOT_FOUND: { target: "noAccess" },
+            WEBSOCKET_UNAUTHORIZED: { target: "noAccess" },
           },
 
           initial: "idle",
         },
 
         disconnected: {
-          entry: ["updateShouldReconnect", "stopWebsocketActor"],
+          entry: ["resetContext", "stopWebsocketActor"],
           always: {
             target: "connecting",
             cond: "shouldReconnect",
           },
+          on: {
+            ADD_CHANGE: {
+              actions: ["addToPendingUpdatesQueue"],
+            },
+          },
         },
-
-        final: { type: "final" },
-        failed: { type: "final" },
+        noAccess: {
+          entry: ["stopWebsocketActor"],
+        },
+        failed: {
+          entry: ["stopWebsocketActor"],
+        },
       },
       id: "syncMachine",
     },
@@ -373,8 +409,11 @@ export const syncMachine =
             _websocketActor: undefined,
           };
         }),
-        updateShouldReconnect: assign((context, event) => {
+        resetContext: assign((context, event) => {
           return {
+            // reset the context and make sure there are no stale references
+            // using JSON.parse(JSON.stringify()) to make sure we have a clean copy
+            ...JSON.parse(JSON.stringify(disconnectionContextReset)),
             _shouldReconnect: event.type !== "DISCONNECT",
           };
         }),
@@ -389,6 +428,7 @@ export const syncMachine =
           };
         }),
         addToPendingUpdatesQueue: assign((context, event) => {
+          console.log("addToPendingUpdatesQueue", event.data);
           return {
             _pendingChangesQueue: [...context._pendingChangesQueue, event.data],
           };
@@ -408,6 +448,7 @@ export const syncMachine =
               _mostRecentEphemeralUpdateDatePerPublicSigningKey:
                 event.data.mostRecentEphemeralUpdateDatePerPublicSigningKey,
               _ephemeralUpdateErrors: event.data.ephemeralUpdateErrors,
+              _documentDecryptionState: event.data.documentDecryptionState,
             };
           } else if (event.data.handledQueue === "customMessage") {
             return {
@@ -423,6 +464,7 @@ export const syncMachine =
               _mostRecentEphemeralUpdateDatePerPublicSigningKey:
                 event.data.mostRecentEphemeralUpdateDatePerPublicSigningKey,
               _ephemeralUpdateErrors: event.data.ephemeralUpdateErrors,
+              _documentDecryptionState: event.data.documentDecryptionState,
             };
           } else {
             return {
@@ -437,23 +479,28 @@ export const syncMachine =
               _mostRecentEphemeralUpdateDatePerPublicSigningKey:
                 event.data.mostRecentEphemeralUpdateDatePerPublicSigningKey,
               _ephemeralUpdateErrors: event.data.ephemeralUpdateErrors,
+              _documentDecryptionState: event.data.documentDecryptionState,
             };
           }
         }),
         // @ts-expect-error can't type the onError differently than onDone
         storeErrorInErrorTrace: assign((context, event) => {
           return {
+            _documentDecryptionState:
+              // @ts-expect-error documentDecryptionState is dynamically added to the error event
+              event.data?.documentDecryptionState ||
+              context._documentDecryptionState,
             _errorTrace: [event.data, ...context._errorTrace],
           };
         }),
       },
       services: {
-        sheduleRetry: (context) => (callback) => {
+        scheduleRetry: (context) => (callback) => {
           const delay = 100 * 1.8 ** context._websocketRetries;
           console.log("schedule websocket connection in ", delay);
           setTimeout(() => {
             callback("WEBSOCKET_RETRY");
-            // calculating slow exponential backoff
+            // calculating slow exponential back-off
           }, delay);
         },
         processQueues: (context, event) => async (send) => {
@@ -481,6 +528,7 @@ export const syncMachine =
           let updateClocks = context._updateClocks;
           let mostRecentEphemeralUpdateDatePerPublicSigningKey =
             context._mostRecentEphemeralUpdateDatePerPublicSigningKey;
+          let documentDecryptionState = context._documentDecryptionState;
 
           try {
             const createAndSendSnapshot = async () => {
@@ -519,6 +567,8 @@ export const syncMachine =
                 type: "SEND",
                 message: JSON.stringify({
                   ...snapshot,
+                  // Note: send a faulty message to test the error handling
+                  // ciphertext: "lala",
                   lastKnownSnapshotId: activeSnapshotInfo.id,
                   latestServerVersion,
                   additionalServerData: snapshotData.additionalServerData,
@@ -555,7 +605,12 @@ export const syncMachine =
                 clock: sendingUpdatesClock,
                 changes,
               });
-              send({ type: "SEND", message: JSON.stringify(message) });
+              send({
+                type: "SEND",
+                message: JSON.stringify(message),
+                // Note: send a faulty message to test the error handling
+                // message: JSON.stringify({ ...message, ciphertext: "lala" }),
+              });
             };
 
             const processSnapshot = async (
@@ -624,61 +679,67 @@ export const syncMachine =
               );
               let changes: unknown[] = [];
 
-              for (let update of updates) {
-                const key = await context.getUpdateKey(update);
-                // console.log("processUpdates key", key);
-                if (activeSnapshotInfo === null) {
-                  throw new Error("No active snapshot");
-                }
+              try {
+                for (let update of updates) {
+                  const key = await context.getUpdateKey(update);
+                  // console.log("processUpdates key", key);
+                  if (activeSnapshotInfo === null) {
+                    throw new Error("No active snapshot");
+                  }
 
-                const isValidCollaborator = await context.isValidCollaborator(
-                  update.publicData.pubKey
-                );
-                if (!isValidCollaborator) {
-                  throw new Error("Invalid collaborator");
-                }
+                  const isValidCollaborator = await context.isValidCollaborator(
+                    update.publicData.pubKey
+                  );
+                  if (!isValidCollaborator) {
+                    throw new Error("Invalid collaborator");
+                  }
 
-                const currentClock =
-                  updateClocks[activeSnapshotInfo.id] &&
-                  Number.isInteger(
-                    updateClocks[activeSnapshotInfo.id][
-                      update.publicData.pubKey
-                    ]
-                  )
-                    ? updateClocks[activeSnapshotInfo.id][
+                  const currentClock =
+                    updateClocks[activeSnapshotInfo.id] &&
+                    Number.isInteger(
+                      updateClocks[activeSnapshotInfo.id][
                         update.publicData.pubKey
                       ]
-                    : -1;
+                    )
+                      ? updateClocks[activeSnapshotInfo.id][
+                          update.publicData.pubKey
+                        ]
+                      : -1;
 
-                const { content, clock } = verifyAndDecryptUpdate(
-                  update,
-                  key,
-                  context.sodium.from_base64(update.publicData.pubKey),
-                  currentClock
-                );
+                  const { content, clock } = verifyAndDecryptUpdate(
+                    update,
+                    key,
+                    context.sodium.from_base64(update.publicData.pubKey),
+                    currentClock
+                  );
 
-                const existingClocks =
-                  updateClocks[activeSnapshotInfo.id] || {};
-                updateClocks[activeSnapshotInfo.id] = {
-                  ...existingClocks,
-                  [update.publicData.pubKey]: clock,
-                };
+                  const existingClocks =
+                    updateClocks[activeSnapshotInfo.id] || {};
+                  updateClocks[activeSnapshotInfo.id] = {
+                    ...existingClocks,
+                    [update.publicData.pubKey]: clock,
+                  };
 
-                latestServerVersion = update.serverData.version;
-                if (
-                  update.publicData.pubKey ===
-                  context.sodium.to_base64(context.signatureKeyPair.publicKey)
-                ) {
-                  confirmedUpdatesClock = update.publicData.clock;
-                  sendingUpdatesClock = update.publicData.clock;
+                  latestServerVersion = update.serverData.version;
+                  if (
+                    update.publicData.pubKey ===
+                    context.sodium.to_base64(context.signatureKeyPair.publicKey)
+                  ) {
+                    confirmedUpdatesClock = update.publicData.clock;
+                    sendingUpdatesClock = update.publicData.clock;
+                  }
+
+                  const additionalChanges = context.deserializeChanges(
+                    context.sodium.to_string(content)
+                  );
+                  changes = changes.concat(additionalChanges);
                 }
-
-                const additionalChanges = context.deserializeChanges(
-                  context.sodium.to_string(content)
-                );
-                changes = changes.concat(additionalChanges);
+                context.applyChanges(changes);
+              } catch (error) {
+                // still try to apply all existing changes
+                context.applyChanges(changes);
+                throw error;
               }
-              context.applyChanges(changes);
             };
 
             if (context._customMessageQueue.length > 0) {
@@ -692,62 +753,46 @@ export const syncMachine =
               const event = context._incomingQueue[0];
               switch (event.type) {
                 case "document":
-                  try {
-                    if (context.knownSnapshotInfo) {
-                      const isValid = isValidAncestorSnapshot({
-                        knownSnapshotProofEntry: {
-                          parentSnapshotProof:
-                            context.knownSnapshotInfo.parentSnapshotProof,
-                          snapshotCiphertextHash:
-                            context.knownSnapshotInfo.snapshotCiphertextHash,
-                        },
-                        snapshotProofChain: event.snapshotProofChain,
-                        currentSnapshot: event.snapshot,
-                      });
-                      if (!isValid) {
-                        throw new Error("Invalid ancestor snapshot");
-                      }
+                  documentDecryptionState = "failed";
+                  if (context.knownSnapshotInfo) {
+                    const isValid = isValidAncestorSnapshot({
+                      knownSnapshotProofEntry: {
+                        parentSnapshotProof:
+                          context.knownSnapshotInfo.parentSnapshotProof,
+                        snapshotCiphertextHash:
+                          context.knownSnapshotInfo.snapshotCiphertextHash,
+                      },
+                      snapshotProofChain: event.snapshotProofChain,
+                      currentSnapshot: event.snapshot,
+                    });
+                    if (!isValid) {
+                      throw new Error("Invalid ancestor snapshot");
                     }
-
-                    activeSnapshotInfo = {
-                      id: event.snapshot.publicData.snapshotId,
-                      ciphertext: event.snapshot.ciphertext,
-                      parentSnapshotProof:
-                        event.snapshot.publicData.parentSnapshotProof,
-                    };
-
-                    await processSnapshot(event.snapshot);
-
-                    if (event.updates) {
-                      await processUpdates(event.updates);
-                    }
-                    if (context.onDocumentLoaded) {
-                      context.onDocumentLoaded();
-                    }
-                  } catch (err) {
-                    // TODO
-                    console.log("Apply document failed. TODO handle error");
-                    console.error(err);
-                    throw err;
                   }
+
+                  activeSnapshotInfo = {
+                    id: event.snapshot.publicData.snapshotId,
+                    ciphertext: event.snapshot.ciphertext,
+                    parentSnapshotProof:
+                      event.snapshot.publicData.parentSnapshotProof,
+                  };
+
+                  await processSnapshot(event.snapshot);
+                  documentDecryptionState = "partial";
+
+                  if (event.updates) {
+                    await processUpdates(event.updates);
+                  }
+                  documentDecryptionState = "complete";
 
                   break;
 
                 case "snapshot":
                   console.log("snapshot", event);
-                  try {
-                    await processSnapshot(
-                      event.snapshot,
-                      activeSnapshotInfo ? activeSnapshotInfo : undefined
-                    );
-                  } catch (err) {
-                    console.log(
-                      "Apply snapshot failed. TODO handle error",
-                      err
-                    );
-                    throw err;
-                    // TODO
-                  }
+                  await processSnapshot(
+                    event.snapshot,
+                    activeSnapshotInfo ? activeSnapshotInfo : undefined
+                  );
 
                   break;
 
@@ -954,9 +999,10 @@ export const syncMachine =
               updateClocks,
               mostRecentEphemeralUpdateDatePerPublicSigningKey,
               ephemeralUpdateErrors: context._ephemeralUpdateErrors,
+              documentDecryptionState,
             };
           } catch (error) {
-            console.log("error", error);
+            console.error("Processing queue error:", error);
             if (error instanceof NaishoProcessingEphemeralUpdateError) {
               const newEphemeralUpdateErrors = [
                 ...context._ephemeralUpdateErrors,
@@ -974,8 +1020,10 @@ export const syncMachine =
                 updateClocks,
                 mostRecentEphemeralUpdateDatePerPublicSigningKey,
                 ephemeralUpdateErrors: newEphemeralUpdateErrors.slice(0, 20), // avoid a memory leak by storing max 20 errors
+                documentDecryptionState,
               };
             } else {
+              error.documentDecryptionState = documentDecryptionState;
               throw error;
             }
           }

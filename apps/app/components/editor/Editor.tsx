@@ -30,6 +30,7 @@ import {
   EditorBottombar,
   EditorBottombarProps,
 } from "../editorBottombar/EditorBottombar";
+import { EditorPageLoading } from "./EditorPageLoading";
 import { initialEditorBottombarState } from "./initialEditorBottombarState";
 import { EditorProps } from "./types";
 
@@ -86,6 +87,7 @@ export default function Editor({
   documentLoaded,
   workspaceId,
   userInfo,
+  editable,
 }: EditorProps) {
   const webViewRef = useRef<WebView>(null);
   // leveraging a ref here since the injectedJavaScriptBeforeContentLoaded
@@ -103,6 +105,8 @@ export default function Editor({
   );
   const { commentsService } = usePage();
 
+  const [webviewLoaded, setWebviewLoaded] = useState(false);
+
   const encryptAndUploadFile = useMemo(() => {
     return createEncryptAndUploadFileFunction({
       workspaceId,
@@ -118,6 +122,10 @@ export default function Editor({
   }, [workspaceId, documentId]);
 
   useEffect(() => {
+    if (!webviewLoaded) {
+      return;
+    }
+
     const showSubscription = Keyboard.addListener(
       "keyboardWillShow",
       (event) => {
@@ -187,7 +195,15 @@ export default function Editor({
       store.removeAllSubscribers();
       editorToolbarService.off(onEventListener);
     };
-  }, []);
+  }, [webviewLoaded]);
+
+  useEffect(() => {
+    console.log("editable: ", editable);
+    webViewRef.current?.injectJavaScript(`
+      window.setEditorEditable(${editable});
+      true;
+    `);
+  }, [editable]);
 
   const [editorBottombarState, setEditorBottombarState] =
     useState<EditorBottombarState>(initialEditorBottombarState);
@@ -249,11 +265,7 @@ export default function Editor({
   );
 
   if (!documentLoaded) {
-    return (
-      <CenterContent>
-        <Spinner fadeIn />
-      </CenterContent>
-    );
+    return <EditorPageLoading />;
   }
 
   return (
@@ -344,9 +356,11 @@ export default function Editor({
             name: "${userInfo.name}",
             color: "${userInfo.color}"
           };
+          window.editorEditable = ${editable};
           true; // this is required, or you'll sometimes get silent failures
         `}
         onLoad={() => {
+          setWebviewLoaded(true);
           // debug for the editor
           // console.log(JSON.stringify(Array.apply([], contentRef.current)));
           // if (isNew) {

@@ -12,4 +12,5 @@ export type EditorProps = {
   userInfo: AwarenessUserInfo;
   openDrawer: () => void;
   updateTitle: (title: string) => void;
+  editable: boolean;
 };
