@@ -300,7 +300,8 @@ export const Table = (props: any) => {
       >
         <Icon name="add-line" color="gray-600" />
       </div>
-      <div
+
+      {/* <div
         className="mark-table"
         onClick={() => {
           const editor = props.editor.storage.tableCell.currentEditor;
@@ -317,7 +318,7 @@ export const Table = (props: any) => {
           );
           editor.view.dispatch(state.tr.setSelection(selection));
         }}
-      ></div>
+      ></div> */}
 
       {/* insert and mark rows */}
       {tableCellDimension.rowHeights.map((height, index) => {
