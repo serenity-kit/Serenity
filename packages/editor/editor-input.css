@@ -331,8 +331,8 @@
     }
 
     .table-wrapper .add,
-    .table-extension .insert-row,
-    .table-extension .insert-column {
+    .table-wrapper .insert-row,
+    .table-wrapper .insert-column {
       /* needs to be important as other declarations need to be very specific as we can't add custom classes */
       display: none !important;
     }
@@ -381,27 +381,6 @@
     margin: 0;
   }
 
-  /* initially hide all elements */
-  .table-extension .insert-row,
-  .table-extension .insert-column,
-  .table-extension .mark-row,
-  .table-extension .mark-column {
-    display: none;
-  }
-
-  /* then only show the ones we need */
-  /* info: we tried doing this is js but had a hard time getting enough information about the table 
-  from within the cell context so decided to do it via css */
-  .table-extension tr > *:first-child .insert-row,
-  .table-extension tr > *:first-child .mark-row {
-    display: block;
-  }
-
-  .table-extension tr:first-child > * .insert-column,
-  .table-extension tr:first-child > * .mark-column {
-    display: block;
-  }
-
   /* --- insert row / columns --- */
 
   .insert-row,
@@ -417,13 +396,8 @@
 
   .insert-column {
     top: -2.25rem;
-    left: -0.5rem; /* fallback value, will be set by js */
+    left: 0; /* fallback value, will be set by js */
     transform: translateX(calc((50% - 0.5px) * -1));
-  }
-
-  /* first child dot needs to be higher to match with line */
-  tr:first-child .insert-row {
-    top: -0.5rem;
   }
 
   /* --- mark table --- */
@@ -514,35 +488,6 @@
 
     box-sizing: border-box;
     border: 2px solid theme("colors.primary.500");
-  }
-
-  .table-selection.selected {
-  }
-
-  /* add border for row, color mark element */
-  .mark-row.selected,
-  .mark-column.selected {
-    background-color: theme("colors.primary.500");
-  }
-
-  .mark-row.selected {
-    top: -1px;
-
-    height: calc(100% + 1px);
-    width: calc(var(--mark-size) + 1px);
-
-    border-radius: 2px 0 0 2px;
-    border-color: theme("colors.primary.500");
-  }
-
-  .mark-column.selected {
-    left: -1px;
-
-    height: calc(var(--mark-size) + 1px);
-    width: calc(100% + 1px);
-
-    border-radius: 2px 2px 0 0;
-    border-color: theme("colors.primary.500");
   }
 
   /* --- lines for insert-row/column element ---- */
