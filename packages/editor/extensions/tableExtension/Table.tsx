@@ -8,12 +8,12 @@ import {
 } from "@tiptap/pm/tables";
 import { NodeViewContent, NodeViewWrapper } from "@tiptap/react";
 import React, { useEffect, useRef } from "react";
+import { useMutationObserver } from "../../hooks/useMutationObserver";
 import {
   TableCellDimensions,
   getTableCellDimensions,
 } from "./getTableCellDimensions";
 import { isCellSelection } from "./isCellSelection";
-import { useMutationObserver } from "../../hooks/useMutationObserver";
 
 /*
  * get the cell-positions (relative to the parent-table) of every first cell of each row
@@ -56,7 +56,6 @@ function extractColumnStartPoints(tableMap: number[], width: number) {
 }
 
 export const Table = (props: any) => {
-  const [active, setActive] = React.useState(false);
   const [rowSelected, setRowSelected] = React.useState<null | number>(null);
   const [columnSelected, setColumnSelected] = React.useState<null | number>(
     null
@@ -64,7 +63,8 @@ export const Table = (props: any) => {
   const [tableCellDimension, setTableCellDimension] =
     React.useState<TableCellDimensions>({ columnWidths: [], rowHeights: [] });
 
-  props.editor.storage.table.setTableActive = setActive;
+  // example on how to expose utility functions to child components via the storage
+  // props.editor.storage.table.setTableActive = setActive;
 
   const tableWrapperRef = useRef<HTMLDivElement>(null);
 
