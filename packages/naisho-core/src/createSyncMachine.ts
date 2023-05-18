@@ -428,7 +428,7 @@ export const createSyncMachine = () =>
           };
         }),
         addToPendingUpdatesQueue: assign((context, event) => {
-          console.log("addToPendingUpdatesQueue", event.data);
+          console.debug("addToPendingUpdatesQueue", event.data);
           return {
             _pendingChangesQueue: [...context._pendingChangesQueue, event.data],
           };
@@ -497,20 +497,20 @@ export const createSyncMachine = () =>
       services: {
         scheduleRetry: (context) => (callback) => {
           const delay = 100 * 1.8 ** context._websocketRetries;
-          console.log("schedule websocket connection in ", delay);
+          console.debug("schedule websocket connection in ", delay);
           setTimeout(() => {
             callback("WEBSOCKET_RETRY");
             // calculating slow exponential back-off
           }, delay);
         },
         processQueues: (context, event) => async (send) => {
-          console.log("processQueues event", event);
-          console.log("_incomingQueue", context._incomingQueue.length);
-          console.log(
+          console.debug("processQueues event", event);
+          console.debug("_incomingQueue", context._incomingQueue.length);
+          console.debug(
             "_customMessageQueue",
             context._customMessageQueue.length
           );
-          console.log(
+          console.debug(
             "_pendingChangesQueue",
             context._pendingChangesQueue.length
           );
@@ -617,7 +617,7 @@ export const createSyncMachine = () =>
               rawSnapshot: SnapshotWithServerData,
               parentSnapshotProofInfo?: ParentSnapshotProofInfo
             ) => {
-              console.log("processSnapshot", rawSnapshot);
+              console.debug("processSnapshot", rawSnapshot);
               const snapshot = parseSnapshotWithServerData(
                 rawSnapshot,
                 context.additionalAuthenticationDataValidations?.snapshot ??
@@ -860,7 +860,7 @@ export const createSyncMachine = () =>
                   await processUpdates([event]);
                   break;
                 case "updateSaved":
-                  console.log("update saved", event);
+                  console.debug("update saved", event);
                   latestServerVersion = event.serverVersion;
                   confirmedUpdatesClock = event.clock;
                   updatesInFlight = updatesInFlight.filter(
@@ -968,10 +968,10 @@ export const createSyncMachine = () =>
                   latestServerVersion,
                 })
               ) {
-                console.log("send snapshot");
+                console.debug("send snapshot");
                 await createAndSendSnapshot();
               } else {
-                console.log("send update");
+                console.debug("send update");
                 const key = await context.getUpdateKey(event);
                 const rawChanges = context._pendingChangesQueue;
                 pendingChangesQueue = [];
