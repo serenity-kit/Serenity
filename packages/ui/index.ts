@@ -59,6 +59,8 @@ export * from "./components/submitButton/SubmitButton";
 export * from "./components/tab/Tab";
 export * from "./components/tabList/TabList";
 export * from "./components/tabPanel/TabPanel";
+export * from "./components/tableHandle/TableHandle";
+export * from "./components/tableInsert/TableInsert";
 export * from "./components/tableOfContentButton/TableOfContentButton";
 export * from "./components/tag/Tag";
 export * from "./components/text/Text";

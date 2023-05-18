@@ -22,6 +22,8 @@
     "eslint": "^8.23.0",
     "husky": "^8.0.1",
     "lint-staged": "^13.0.3",
+    "patch-package": "^7.0.0",
+    "postinstall-postinstall": "^2.1.0",
     "prettier": "2.7.1",
     "prettier-plugin-tailwindcss": "^0.1.13"
   },
@@ -31,7 +33,8 @@
     "test": "yarn workspaces run test",
     "lint": "yarn workspaces run lint",
     "prettier:write": "yarn prettier --write '**/*.{ts,tsx,js,jsx,json,md,yml,yaml,css,html,graphql,gql}'",
-    "prettier:check": "yarn prettier --check '**/*.{ts,tsx,js,jsx,json,md,yml,yaml,css,html,graphql,gql}'"
+    "prettier:check": "yarn prettier --check '**/*.{ts,tsx,js,jsx,json,md,yml,yaml,css,html,graphql,gql}'",
+    "postinstall": "patch-package"
   },
   "lint-staged": {
     "**/*": "prettier --write --ignore-unknown"

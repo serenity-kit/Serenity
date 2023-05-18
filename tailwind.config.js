@@ -1,6 +1,8 @@
 const defaultTheme = require("tailwindcss/defaultTheme");
 const plugin = require("tailwindcss/plugin");
 
+const editorContentWidth = "44rem";
+
 // custom colors extracted so we can export them seperately for typing
 const customColors = {
   transparent: "transparent",
@@ -21,6 +23,7 @@ const customColors = {
   },
   primary: {
     100: "#ECEEFF",
+    150: "#DDE1FE",
     200: "#CDD3FC",
     300: "#9DAAFD",
     400: "#7083FA",
@@ -49,7 +52,13 @@ const customColors = {
   error: {
     100: "#FFEDEF",
     200: "#FFCED4",
+    300: "#FD97A2",
+    400: "#F8656F",
     500: "#F84A56",
+    600: "#E03E49",
+    700: "#CC343E",
+    800: "#AD2B34",
+    900: "#862229",
   },
   warning: {
     500: "#F09334",
@@ -136,8 +145,11 @@ const customTheme = {
     },
     maxWidth: {
       "prose-rem": "36.5rem", // editor specific .. needed as representation of a 65ch content-width as the "ch"-unit would only work on text-elements
-      "editor-content": "44rem",
+      "editor-content": editorContentWidth,
       "navigation-drawer-modal": "61rem",
+    },
+    minWidth: {
+      "editor-content": editorContentWidth,
     },
     width: {
       sidebar: "15rem",

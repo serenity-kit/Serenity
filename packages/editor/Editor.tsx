@@ -16,7 +16,6 @@ import Collaboration from "@tiptap/extension-collaboration";
 import { Level } from "@tiptap/extension-heading";
 import Link from "@tiptap/extension-link";
 import Placeholder from "@tiptap/extension-placeholder";
-import Table from "@tiptap/extension-table";
 import TableRow from "@tiptap/extension-table-row";
 import TaskItem from "@tiptap/extension-task-item";
 import TaskList from "@tiptap/extension-task-list";
@@ -45,6 +44,8 @@ import { updateCommentsDataAndScrollToHighlighted } from "./extensions/commentsE
 import { AwarnessExtension } from "./extensions/naishoAwarnessExtension/naishoAwarenessExtension";
 import { SerenityScrollIntoViewForEditModeExtension } from "./extensions/scrollIntoViewForEditModeExtensions/scrollIntoViewForEditModeExtensions";
 import { TableCellExtension } from "./extensions/tableCellExtension/tableCellExtension";
+import { isCellSelection } from "./extensions/tableExtension/isCellSelection";
+import { TableExtension } from "./extensions/tableExtension/tableExtension";
 import { TableHeaderExtension } from "./extensions/tableHeaderExtension/tableHeaderExtension";
 import { EditorComment } from "./types";
 
@@ -83,6 +84,7 @@ export const Editor = (props: EditorProps) => {
   const [isNew] = useState(props.isNew ?? false);
   const [hasCreateCommentBubble, setHasCreateCommentBubble] = useState(false);
   const [commentText, setCommentText] = useState("");
+  const [selectionType, setSelectionType] = useState<null | string>(null);
 
   const newTitleRef = useRef("");
   const shouldCommitNewTitleRef = useRef(isNew);
@@ -153,7 +155,7 @@ export const Editor = (props: EditorProps) => {
           highlightComment: props.highlightComment,
           highlightedComment: props.highlightedComment,
         }),
-        Table.configure({
+        TableExtension.configure({
           HTMLAttributes: {
             class: "table-extension",
           },
@@ -210,6 +212,21 @@ export const Editor = (props: EditorProps) => {
           props.onBlur(params);
         }
       },
+      onSelectionUpdate: (params) => {
+        const selection = params.editor.view.state.selection;
+
+        if (selection && isCellSelection(selection)) {
+          if (selection.isRowSelection() && selection.isColSelection()) {
+            setSelectionType("table");
+          } else if (selection.isRowSelection()) {
+            setSelectionType("row");
+          } else if (selection.isColSelection()) {
+            setSelectionType("column");
+          }
+        } else {
+          setSelectionType(null);
+        }
+      },
     },
     [props.documentId]
   );
@@ -255,8 +272,9 @@ export const Editor = (props: EditorProps) => {
         // or the other way around
         //
         // grow-0 overrides default of ScrollView to keep the assigned width
+        // shrink-0 needed so Editor doesn't squish the Sidebar and it keeps the fixed width
         <ScrollView
-          style={tw`w-sidebar grow-0 border-l border-gray-200 bg-gray-100`}
+          style={tw`w-sidebar grow-0 shrink-0 border-l border-gray-200 bg-gray-100`}
         >
           <EditorSidebar
             editor={editor}
@@ -296,7 +314,8 @@ export const Editor = (props: EditorProps) => {
                 empty ||
                 isEmptyTextBlock ||
                 !editor.isEditable ||
-                editor.isActive("file")
+                editor.isActive("file") ||
+                isCellSelection(state.selection)
               ) {
                 // hide the create comment bubble and clear the text when the bubble menu is blured
                 setCommentText("");
@@ -414,6 +433,66 @@ export const Editor = (props: EditorProps) => {
                   </Tooltip>
                 </>
               )}
+            </BubbleMenuContentWrapper>
+          </BubbleMenu>
+
+          <BubbleMenu
+            editor={editor}
+            tippyOptions={{ duration: 100, placement: "bottom" }}
+            shouldShow={({ state, from, to, view, editor }) => {
+              const { doc, selection } = state;
+              const { empty } = selection;
+
+              // When clicking on a element inside the bubble menu the editor "blur" event
+              // is called and the bubble menu item is focussed. In this case we should
+              // consider the menu as part of the editor and keep showing the menu
+              let isChildOfMenu = false;
+              if (bubbleMenuRef.current) {
+                isChildOfMenu = bubbleMenuRef.current.contains(
+                  document.activeElement
+                );
+              }
+
+              const hasEditorFocus = view.hasFocus() || isChildOfMenu;
+              const isColSelection =
+                isCellSelection(selection) && selection.isColSelection();
+              const isRowSelection =
+                isCellSelection(selection) && selection.isRowSelection();
+
+              if (
+                !hasEditorFocus ||
+                empty ||
+                !isCellSelection(state.selection) ||
+                // check if neither row or col-selection, as otherwise will also show on random cell-selection
+                (!isRowSelection && !isColSelection) ||
+                !editor.isEditable
+              ) {
+                return false;
+              }
+
+              return true;
+            }}
+          >
+            <BubbleMenuContentWrapper padded={false}>
+              <Tooltip
+                label={`Delete ${selectionType}`}
+                placement={"top"}
+                hasArrow={false}
+              >
+                <ToggleButton
+                  onPress={() => {
+                    if (selectionType === "table") {
+                      editor.chain().focus().deleteTable().run();
+                    } else if (selectionType === "row") {
+                      editor.chain().focus().deleteRow().run();
+                    } else if (selectionType === "column") {
+                      editor.chain().focus().deleteColumn().run();
+                    }
+                  }}
+                  name="delete-bin-line"
+                  isActive={false}
+                />
+              </Tooltip>
             </BubbleMenuContentWrapper>
           </BubbleMenu>
 

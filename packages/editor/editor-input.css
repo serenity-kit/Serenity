@@ -91,7 +91,7 @@
     @apply my-4 border-l-4 border-solid border-primary-400 pl-4;
   }
 
-  /* --- code --- */
+  /* ------------- code ------------- */
 
   /* used for inline- and blockcode */
   code {
@@ -107,7 +107,7 @@
     @apply my-4 rounded border border-solid border-gray-200 bg-gray-100 p-4;
   }
 
-  /* --- lists --- */
+  /* ------------- lists ------------- */
   .ProseMirror > ol,
   .ProseMirror > ul {
     @apply my-4;
@@ -229,7 +229,7 @@
     position: absolute;
   }
 
-  /* - css checkbox - */
+  /* ------------- css checkbox ------------- */
   .task-item-extension input + span {
     position: relative;
     display: block;
@@ -293,21 +293,57 @@
     /* --- */
   }
 
-  /* --- table-extension --- */
+  /*---------------- table-extension ------------- */
+
+  .table-wrapper {
+    position: relative;
+    margin-top: 2.5rem; /* needed to avoid overlapping with table-function elements */
+    margin-bottom: 1.75rem;
+  }
+
   .table-extension {
     border-collapse: collapse;
     margin: 0;
-    overflow: hidden;
     table-layout: fixed;
     width: 100%;
   }
 
+  /* works but hides marking elements as they are no longer overflow: visible */
+  @media screen and (max-width: theme("screens[md]")) {
+    .table-wrapper {
+      overflow-x: scroll;
+      border-left: 1px solid theme("colors.gray.300");
+      border-right: 1px solid theme("colors.gray.300");
+    }
+
+    .table-extension td:first-child,
+    .table-extension th:first-child {
+      border-left: none;
+    }
+
+    .table-extension td:last-child,
+    .table-extension th:last-child {
+      border-right: none;
+    }
+
+    .table-extension {
+      @apply min-w-editor-content;
+    }
+
+    .table-wrapper .add,
+    .table-wrapper .insert-row,
+    .table-wrapper .insert-column {
+      /* needs to be important as other declarations need to be very specific as we can't add custom classes */
+      display: none !important;
+    }
+  }
+
   .table-extension td,
   .table-extension th {
-    border: 2px solid #ced4da;
+    border: 1px solid theme("colors.gray.300");
     box-sizing: border-box;
     min-width: 1em;
-    padding: 3px 5px;
+    padding: 0.6875rem 0.5rem;
     position: relative;
     vertical-align: top;
   }
@@ -318,25 +354,21 @@
   }
 
   .table-extension th {
-    background-color: #f1f3f5;
+    background-color: theme("colors.gray.150");
     font-weight: bold;
     text-align: left;
   }
 
-  .table-extension .selectedCell:after {
-    background: rgba(200, 200, 255, 0.4);
-    content: "";
-    left: 0;
-    right: 0;
-    top: 0;
-    bottom: 0;
-    pointer-events: none;
-    position: absolute;
-    z-index: 2;
+  .table-extension th.selectedCell {
+    background-color: theme("colors.primary.150");
+  }
+
+  .table-extension td.selectedCell {
+    background-color: theme("colors.primary.100");
   }
 
   .table-extension .column-resize-handle {
-    background-color: #adf;
+    background-color: theme("colors.primary.400");
     bottom: -2px;
     position: absolute;
     right: -2px;
@@ -348,6 +380,217 @@
   .table-extension p {
     margin: 0;
   }
+
+  /* --- insert row / columns --- */
+
+  .insert-row,
+  .insert-column {
+    position: absolute;
+  }
+
+  .insert-row {
+    top: 0; /* fallback value, will be set by js */
+    left: -2.25rem;
+    transform: translateY(-50%);
+  }
+
+  .insert-column {
+    top: -2.25rem;
+    left: 0; /* fallback value, will be set by js */
+    transform: translateX(calc((50% - 0.5px) * -1));
+  }
+
+  /* --- mark table --- */
+
+  .mark-table {
+    position: absolute;
+    top: -1.625rem;
+    left: -1.625rem;
+
+    height: 1rem;
+    width: 1rem;
+
+    cursor: pointer;
+
+    border: 1px solid theme("colors.gray.300");
+    border-radius: 9999px;
+  }
+
+  .mark-table.active {
+    background-color: theme("colors.primary.500");
+    border-color: theme("colors.primary.500");
+  }
+
+  .mark-tanle.danger {
+    background-color: theme("colors.error.500");
+    border-color: theme("colors.error.500");
+  }
+
+  /* --- mark row / columns --- */
+
+  .mark-row {
+    box-sizing: content-box; /* needs to be here as there is no native equivalent for that */
+  }
+
+  .mark-row,
+  .mark-column {
+    --mark-size: 1rem;
+    position: absolute;
+    background-color: theme("colors.gray.120");
+    cursor: pointer;
+    box-sizing: content-box;
+  }
+
+  .mark-row {
+    top: 0; /* default */
+    left: calc(var(--mark-size) * -1);
+    height: 3em; /* fallback value, will be set by js */
+    width: var(--mark-size);
+    border-bottom: 1px solid theme("colors.gray.300");
+  }
+
+  .mark-row ~ .mark-row {
+    border-top: 1px solid theme("colors.gray.300");
+  }
+
+  .mark-column {
+    top: calc(var(--mark-size) * -1);
+    left: 0; /* default */
+    height: var(--mark-size);
+    width: 19.5rem; /* fallback value, will be set by js */
+    border-right: 1px solid theme("colors.gray.300");
+  }
+
+  .mark-column ~ .mark-column {
+    border-left: 1px solid theme("colors.gray.300");
+  }
+
+  .mark-row:hover,
+  .mark-column:hover {
+    background-color: theme("colors.gray.150");
+  }
+
+  .mark-row.active,
+  .mark-column.active {
+    background-color: theme("colors.primary.500");
+    border-color: theme("colors.primary.500");
+    z-index: 2;
+  }
+
+  .mark-row.active {
+    width: calc(var(--mark-size) + 1px); /* to overlap the table border */
+    border-radius: 2px 0 0 2px;
+  }
+
+  .mark-column.active {
+    height: calc(var(--mark-size) + 1px); /* to overlap the table border */
+    border-radius: 2px 2px 0 0;
+  }
+
+  /* --- table-selection */
+
+  .table-selection {
+    position: absolute;
+    top: 0;
+    left: 0;
+
+    box-sizing: border-box;
+    border: 2px solid theme("colors.primary.500");
+  }
+
+  /* --- lines for insert-row/column element ---- */
+
+  .row-line,
+  .column-line {
+    position: absolute;
+    background-color: theme("colors.primary.500");
+  }
+
+  .row-line {
+    top: 0px;
+    left: -1rem; /* mark-row-width */
+
+    height: 2px;
+    width: calc(100% + 1rem);
+  }
+
+  .column-line {
+    top: -1rem; /* mark-column-height */
+    left: 0px;
+
+    height: calc(100% + 1rem);
+    width: 2px;
+  }
+
+  /* --- add rows / columns --- */
+
+  .add {
+    /* then height / width are implicitly from the table */
+    position: absolute;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    cursor: pointer;
+    background-color: theme("colors.gray.120");
+  }
+
+  .add:hover {
+    background-color: theme("colors.gray.150");
+    z-index: 2;
+  }
+
+  .add-row {
+    bottom: -1rem;
+    left: -1rem;
+
+    height: 1rem;
+    width: calc(100% + 2rem); /* + mark-row & add-column width */
+
+    border-radius: 0px 0px 0.5rem 0.5rem;
+  }
+
+  .add-row:after {
+    display: none;
+    content: "";
+    position: absolute;
+    top: -1px;
+    right: 0px;
+
+    width: 1rem;
+    border-top: 1px solid theme("colors.gray.300");
+  }
+
+  .add-row:hover:after {
+    display: block;
+  }
+
+  .add-column {
+    top: -1rem;
+    right: -1rem;
+
+    height: calc(100% + 2rem); /* + mark-column & add-row height */
+    width: 1rem;
+
+    border-radius: 0px 0.5rem 0.5rem 0px;
+  }
+
+  .add-column:after {
+    display: none;
+    content: "";
+    position: absolute;
+    bottom: 0;
+    left: -1px;
+
+    height: 1rem;
+    border-left: 1px solid theme("colors.gray.300");
+  }
+
+  .add-column:hover:after {
+    display: block;
+  }
+
+  /* ------------- comment-extension ------------- */
 
   .editor-comment {
     position: relative;

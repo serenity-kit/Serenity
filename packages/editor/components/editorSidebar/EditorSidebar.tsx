@@ -12,8 +12,8 @@ import {
 import {
   EditorSidebarIcon,
   Heading,
-  SidebarButton,
   HorizontalDivider,
+  SidebarButton,
   Tab,
   TabList,
   TabPanel,
@@ -337,7 +337,13 @@ export default function EditorSidebar({
           </Heading>
 
           <SidebarButton
-            onPress={() => editor?.chain().focus().insertTable().run()}
+            onPress={() =>
+              editor
+                ?.chain()
+                .focus()
+                .insertTable({ rows: 2, cols: 2, withHeaderRow: false })
+                .run()
+            }
           >
             <EditorSidebarIcon isActive={false} name="table-2" />
             <Text variant="xs" bold={false}>
