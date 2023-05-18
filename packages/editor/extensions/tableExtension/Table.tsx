@@ -469,13 +469,20 @@ export const Table = (props: any) => {
               }}
             >
               <TableInsert
-                onPress={() => {
+                onPress={(event) => {
                   const editor = props.editor.storage.tableCell.currentEditor;
                   const { tr, tableRect, cellPositionInfo } =
                     getTableInsertInfo(index, "column");
                   editor.view.dispatch(
                     addColumn(tr, tableRect, cellPositionInfo.left)
                   );
+                  // manually remove the column line since onMouseLeave doesn't fire
+                  // due a a re-render removing the elements due fresh Ids
+                  let target = event.target;
+                  // @ts-expect-error
+                  let wrapper = target.closest(".table-wrapper");
+                  let column_line = wrapper.querySelector(".column-line");
+                  column_line.classList.add("hidden");
                 }}
               />
             </div>
