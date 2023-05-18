@@ -90,7 +90,7 @@ export const websocketService =
             ephemeralUpdateKey,
             context.signatureKeyPair
           );
-          console.log("send ephemeralUpdate");
+          console.debug("send ephemeralUpdate");
           send({
             type: "SEND",
             message: JSON.stringify(ephemeralUpdate),
