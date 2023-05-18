@@ -7,13 +7,33 @@ import {
   findCell,
 } from "@tiptap/pm/tables";
 import { NodeViewContent, NodeViewWrapper } from "@tiptap/react";
-import React, { useEffect, useRef } from "react";
+import fastDeepEqual from "fast-deep-equal";
+import React, { Fragment, useEffect, useRef } from "react";
 import { useMutationObserver } from "../../hooks/useMutationObserver";
+import { counterId } from "../../utils/counterId";
 import {
   TableCellDimensions,
   getTableCellDimensions,
 } from "./getTableCellDimensions";
 import { isCellSelection } from "./isCellSelection";
+
+type TableColumnEntry = {
+  id: string;
+  width: number;
+};
+
+type TableRowEntry = {
+  id: string;
+  height: number;
+};
+
+type TableDimensions = {
+  structure: {
+    columns: TableColumnEntry[];
+    rows: TableRowEntry[];
+  };
+  tableCellDimensions: TableCellDimensions;
+};
 
 /*
  * get the cell-positions (relative to the parent-table) of every first cell of each row
@@ -60,8 +80,13 @@ export const Table = (props: any) => {
   const [columnSelected, setColumnSelected] = React.useState<null | number>(
     null
   );
-  const [tableCellDimension, setTableCellDimension] =
-    React.useState<TableCellDimensions>({ columnWidths: [], rowHeights: [] });
+
+  const [tableDimensions, setTableDimensions] = React.useState<TableDimensions>(
+    {
+      structure: { columns: [], rows: [] },
+      tableCellDimensions: { columnWidths: [], rowHeights: [] },
+    }
+  );
 
   // example on how to expose utility functions to child components via the storage
   // props.editor.storage.table.setTableActive = setActive;
@@ -138,7 +163,22 @@ export const Table = (props: any) => {
       const dimensions = getTableCellDimensions(
         tableWrapperRef.current.children[0] as HTMLTableElement
       );
-      setTableCellDimension(dimensions);
+      // prevent unnecessary rerenders in case the table dimensions did not change
+      if (fastDeepEqual(dimensions, tableDimensions.tableCellDimensions))
+        return;
+      setTableDimensions({
+        tableCellDimensions: dimensions,
+        structure: {
+          columns: dimensions.columnWidths.map((width) => ({
+            id: counterId().toString(),
+            width,
+          })),
+          rows: dimensions.rowHeights.map((height) => ({
+            id: counterId().toString(),
+            height,
+          })),
+        },
+      });
     },
     {
       childList: true,
@@ -323,11 +363,12 @@ export const Table = (props: any) => {
       ></div>
 
       {/* insert and mark rows */}
-      {tableCellDimension.rowHeights.map((height, index) => {
-        markRowTop += index > 0 ? tableCellDimension.rowHeights[index - 1] : 0;
+      {tableDimensions.structure.rows.map(({ id, height }, index) => {
+        markRowTop +=
+          index > 0 ? tableDimensions.structure.rows[index - 1].height : 0;
 
         return (
-          <>
+          <Fragment key={id}>
             <div
               className="insert-row"
               style={{
@@ -388,16 +429,16 @@ export const Table = (props: any) => {
                 editor.view.dispatch(state.tr.setSelection(rowSelection));
               }}
             ></div>
-          </>
+          </Fragment>
         );
       })}
       {/* mark columns */}
-      {tableCellDimension.columnWidths.map((width, index) => {
+      {tableDimensions.structure.columns.map(({ id, width }, index) => {
         markColumnLeft +=
-          index > 0 ? tableCellDimension.columnWidths[index - 1] : 0;
+          index > 0 ? tableDimensions.structure.columns[index - 1].width : 0;
 
         return (
-          <>
+          <Fragment key={id}>
             <div
               className="insert-column"
               style={{
@@ -460,7 +501,7 @@ export const Table = (props: any) => {
                 editor.view.dispatch(state.tr.setSelection(colSelection));
               }}
             ></div>
-          </>
+          </Fragment>
         );
       })}
       <div className="row-line hidden"></div>
