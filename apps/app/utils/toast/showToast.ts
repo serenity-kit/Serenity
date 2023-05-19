@@ -14,16 +14,10 @@ export const showToast = (
     hideOnPress: true,
     delay: 0,
     backgroundColor:
-      variant === "info" ? tw.color("gray-900") : tw.color("error-100"),
+      variant === "info" ? tw.color("gray-900") : tw.color("error-500"),
     opacity: 1,
-    containerStyle: [
-      tw`py-3 px-8 `,
-      variant === "info" ? {} : tw`border-error-200 border`,
-    ],
-    textStyle: [
-      tw`text-xs inter-regular`,
-      variant === "info" ? {} : tw`text-error-500`,
-    ],
+    containerStyle: tw`py-3 px-8 `,
+    textStyle: tw`text-xs inter-regular`,
     ...options,
   });
 };
