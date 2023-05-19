@@ -27,6 +27,9 @@ export const PageHeader: React.FC<Props> = ({
   const isDesktopDevice = useIsDesktopDevice();
   const hasEditorSidebar = useHasEditorSidebar();
 
+  // TODO
+  const isLoading = false;
+
   return (
     <HStack alignItems={"center"}>
       {isInEditingMode && !isDesktopDevice ? (
@@ -75,6 +78,7 @@ export const PageHeader: React.FC<Props> = ({
             name={hasNewComment ? "chat-4-line-dot" : "chat-4-line"}
             size={"lg"}
             testID="open-comments-drawer-button"
+            disabled={isLoading}
           />
         </Tooltip>
       ) : null}

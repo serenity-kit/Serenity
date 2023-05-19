@@ -19,6 +19,7 @@ import {
   useIsDesktopDevice,
   View,
 } from "@serenity-tools/ui";
+import { HStack } from "native-base";
 import * as Clipboard from "expo-clipboard";
 import { useMemo, useState } from "react";
 import { StyleSheet } from "react-native";
@@ -35,12 +36,6 @@ import { notNull } from "../../utils/notNull/notNull";
 
 const styles = StyleSheet.create({
   createShareLinkButton: tw`self-start`,
-  shareLinkWrapperBase: tw`relative mb-2 py-4 px-5 border rounded`,
-  shareLinkWrapperActive: tw`bg-primary-100/40 border-primary-200`,
-  shareLinkWrapperInactive: tw`bg-gray-100 border-gray-200`,
-  shareLinkTextActive: tw`text-primary-900`,
-  shareLinkTextInactive: tw`text-gray-400`,
-  createShareLinkOptions: tw`flex-row justify-between items-center mb-4`,
 });
 
 const CLIPBOARD_NOTICE_TIMEOUT_SECONDS = 1;
@@ -141,6 +136,10 @@ export function PageShareModalContent() {
     }, CLIPBOARD_NOTICE_TIMEOUT_SECONDS * 1000);
   };
 
+  // TODO
+  const isLoading = false;
+  const hasError = false;
+
   return (
     <>
       {documentShareLinksResult.fetching ? (
@@ -165,7 +164,7 @@ export function PageShareModalContent() {
                     ? pageShareLink
                     : 'The share link will be generated here\nClick on "Create page link" to generate a new link'}
                 </SharetextBox>
-                <View style={styles.createShareLinkOptions}>
+                <HStack alignItems={"center"} style={tw`mb-4`} space={2}>
                   <Select
                     onValueChange={(value: Role) => {
                       setSharingRole(value);
@@ -184,10 +183,12 @@ export function PageShareModalContent() {
                     }}
                     style={styles.createShareLinkButton}
                     testID="document-share-modal__create-share-link-button"
+                    disabled={isLoading || hasError}
+                    isLoading={isLoading}
                   >
                     Create page link
                   </Button>
-                </View>
+                </HStack>
               </View>
               <View>
                 <Heading lvl={3} padded>

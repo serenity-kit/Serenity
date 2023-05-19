@@ -54,6 +54,10 @@ export default function Comment({ comment, meId, meName }: Props) {
     submit: tw`absolute h-${submitButtonHeight} w-${submitButtonHeight} bottom-0.5 right-0.5`,
   });
 
+  // TODO
+  const isLoading = false;
+  const hasError = false;
+
   return (
     <Pressable
       key={comment.id}
@@ -127,7 +131,7 @@ export default function Comment({ comment, meId, meName }: Props) {
       </View>
       {isActiveComment ? (
         <>
-          <View style={tw`mt-2`}>
+          <View style={!hasError || replyLength > 0 ? tw`mt-2` : tw``}>
             {comment.replies.map((reply) => {
               if (!reply) return null;
 
@@ -142,33 +146,37 @@ export default function Comment({ comment, meId, meName }: Props) {
             })}
           </View>
 
-          <HStack space="1.5">
-            <Avatar color={hashToCollaboratorColor(meId)} size="xs">
-              {meName?.split("@")[0].substring(0, 1)}
-            </Avatar>
+          {!hasError ? (
+            <HStack space="1.5">
+              <Avatar color={hashToCollaboratorColor(meId)} size="xs">
+                {meName?.split("@")[0].substring(0, 1)}
+              </Avatar>
 
-            {/* negative margin to align ReplyArea centered with Avatar on default
+              {/* negative margin to align ReplyArea centered with Avatar on default
             without losing line-connection between replying Avatars */}
-            <View style={tw`relative -mt-1.5`}>
-              <ReplyArea
-                value={state.context.replyTexts[comment.id]}
-                onChangeText={(text) =>
-                  send({
-                    type: "UPDATE_REPLY_TEXT",
-                    commentId: comment.id,
-                    text,
-                  })
-                }
-                style={styles.textarea}
-                onSubmitPress={() =>
-                  send({ type: "CREATE_REPLY", commentId: comment.id })
-                }
-                testPrefix={`comment-${comment.id}`}
-              />
-            </View>
-          </HStack>
+              <View style={tw`relative -mt-1.5`}>
+                <ReplyArea
+                  value={state.context.replyTexts[comment.id]}
+                  onChangeText={(text) =>
+                    send({
+                      type: "UPDATE_REPLY_TEXT",
+                      commentId: comment.id,
+                      text,
+                    })
+                  }
+                  style={styles.textarea}
+                  onSubmitPress={() =>
+                    send({ type: "CREATE_REPLY", commentId: comment.id })
+                  }
+                  testPrefix={`comment-${comment.id}`}
+                />
+              </View>
+            </HStack>
+          ) : null}
         </>
-      ) : (
+      ) : null}
+
+      {!isActiveComment && !hasError ? (
         <Text
           variant="xxs"
           style={tw`pt-1 pl-0.5 ${
@@ -177,7 +185,7 @@ export default function Comment({ comment, meId, meName }: Props) {
         >
           {replyPlaceholder}
         </Text>
-      )}
+      ) : null}
     </Pressable>
   );
 }
