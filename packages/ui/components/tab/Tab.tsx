@@ -5,7 +5,11 @@ import { tw } from "../../tailwind";
 import { Pressable, PressableProps } from "../pressable/Pressable";
 import { Text } from "../text/Text";
 
-export type TabProps = PressableProps & { tabId: string; isActive: boolean };
+export type TabProps = PressableProps & {
+  tabId: string;
+  isActive: boolean;
+  disabled: boolean;
+};
 
 // Currently each Tab is focusable. The proper way would be to implement
 // navigation via arrow keys, but that also would require more research
@@ -28,14 +32,18 @@ export function Tab({ isActive, tabId, children, ...otherProps }: TabProps) {
       accessibilityControls={`${tabId}-panel`}
       accessibilitySelected={isActive}
       nativeID={`${tabId}-tab`}
-      style={pressableStyles}
+      style={[
+        pressableStyles,
+        // @ts-expect-error - native base style mismatch
+        { cursor: otherProps.disabled ? "default" : "pointer" },
+      ]}
       _focusVisible={{
         // @ts-expect-error - web only
         _web: { style: [pressableStyles, { outlineStyle: "none" }] },
       }}
       {...otherProps}
     >
-      <Text variant="xs" bold={isActive}>
+      <Text variant="xs" bold={isActive} muted={otherProps.disabled}>
         {children}
       </Text>
     </Pressable>
