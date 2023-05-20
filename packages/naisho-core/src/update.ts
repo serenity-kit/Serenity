@@ -1,5 +1,5 @@
 import canonicalize from "canonicalize";
-import { KeyPair } from "libsodium-wrappers";
+import type { KeyPair } from "libsodium-wrappers";
 import { decryptAead, encryptAead, sign, verifySignature } from "./crypto";
 import { Update, UpdatePublicData } from "./types";
 

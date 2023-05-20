@@ -1,5 +1,5 @@
 import canonicalize from "canonicalize";
-import { KeyPair } from "libsodium-wrappers";
+import type { KeyPair } from "libsodium-wrappers";
 import { decryptAead, encryptAead, sign, verifySignature } from "./crypto";
 import { createParentSnapshotProof } from "./snapshot/createParentSnapshotProof";
 import { isValidParentSnapshot } from "./snapshot/isValidParentSnapshot";
@@ -111,6 +111,7 @@ export function verifyAndDecryptSnapshot(
       snapshot,
       parentSnapshotCiphertext: parentSnapshotProofInfo.ciphertext,
       grandParentSnapshotProof: parentSnapshotProofInfo.parentSnapshotProof,
+      sodium,
     });
     if (!isValid) {
       throw new Error("Invalid parent snapshot verification");
