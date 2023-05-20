@@ -1,6 +1,5 @@
 import {
   createInitialSnapshot,
-  generateId,
   Snapshot,
   SnapshotPublicData,
 } from "@naisho/core";
@@ -9,6 +8,7 @@ import {
   createSnapshotKey,
   deriveKeysFromKeyDerivationTrace,
   encryptDocumentTitleByKey,
+  generateId,
   KeyDerivationTrace,
   LocalDevice,
   SerenitySnapshotPublicData,
@@ -184,7 +184,8 @@ export const createDocument = async ({
     sodium.from_base64(initialDocument),
     publicData,
     sodium.from_base64(snapshotKey.key),
-    signatureKeyPair
+    signatureKeyPair,
+    sodium
   );
 
   let useName = "Untitled";

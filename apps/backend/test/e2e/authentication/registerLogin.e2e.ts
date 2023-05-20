@@ -1,5 +1,5 @@
-import { generateId } from "@naisho/core";
 import { expect, Page, test } from "@playwright/test";
+import { generateId } from "@serenity-tools/common";
 import { User, Workspace } from "../../../prisma/generated/output";
 import { Document } from "../../../src/types/document";
 import { delayForSeconds } from "../../helpers/delayForSeconds";

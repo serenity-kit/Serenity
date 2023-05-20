@@ -553,7 +553,8 @@ export const createSyncMachine = () =>
                 snapshotData.key,
                 context.signatureKeyPair,
                 activeSnapshotInfo.ciphertext,
-                activeSnapshotInfo.parentSnapshotProof
+                activeSnapshotInfo.parentSnapshotProof,
+                context.sodium
               );
 
               activeSendingSnapshotInfo = {
@@ -598,7 +599,8 @@ export const createSyncMachine = () =>
                 publicData,
                 key,
                 context.signatureKeyPair,
-                sendingUpdatesClock
+                sendingUpdatesClock,
+                context.sodium
               );
 
               updatesInFlight.push({
@@ -653,6 +655,7 @@ export const createSyncMachine = () =>
                 snapshotKey,
                 context.sodium.from_base64(snapshot.publicData.pubKey),
                 context.signatureKeyPair.publicKey,
+                context.sodium,
                 parentSnapshotProofInfo,
                 parentSnapshotUpdateClock
               );
@@ -710,7 +713,8 @@ export const createSyncMachine = () =>
                     update,
                     key,
                     context.sodium.from_base64(update.publicData.pubKey),
-                    currentClock
+                    currentClock,
+                    context.sodium
                   );
 
                   const existingClocks =
@@ -764,6 +768,7 @@ export const createSyncMachine = () =>
                       },
                       snapshotProofChain: event.snapshotProofChain,
                       currentSnapshot: event.snapshot,
+                      sodium: context.sodium,
                     });
                     if (!isValid) {
                       throw new Error("Invalid ancestor snapshot");
@@ -830,11 +835,13 @@ export const createSyncMachine = () =>
                           parentSnapshotProof:
                             activeSnapshotInfo.parentSnapshotProof,
                           snapshotCiphertextHash: hash(
-                            activeSnapshotInfo.ciphertext
+                            activeSnapshotInfo.ciphertext,
+                            context.sodium
                           ),
                         },
                         snapshotProofChain: event.snapshotProofChain,
                         currentSnapshot: snapshot,
+                        sodium: context.sodium,
                       });
                       if (!isValid) {
                         throw new Error(
@@ -937,6 +944,7 @@ export const createSyncMachine = () =>
                         context.sodium.from_base64(
                           ephemeralUpdate.publicData.pubKey
                         ),
+                        context.sodium,
                         mostRecentEphemeralUpdateDatePerPublicSigningKey[
                           ephemeralUpdate.publicData.pubKey
                         ]

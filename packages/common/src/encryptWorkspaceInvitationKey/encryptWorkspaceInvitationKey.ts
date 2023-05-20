@@ -1,4 +1,4 @@
-import { encryptAead } from "@naisho/core";
+import { encryptAead } from "@serenity-tools/common";
 import sodium from "react-native-libsodium";
 import { createEncryptionKeyFromOpaqueExportKey } from "../createEncryptionKeyFromOpaqueExportKey/createEncryptionKeyFromOpaqueExportKey";
 import { kdfDeriveFromKey } from "../kdfDeriveFromKey/kdfDeriveFromKey";

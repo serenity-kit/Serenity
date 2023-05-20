@@ -1,4 +1,3 @@
-import { generateId } from "@naisho/core";
 import {
   LocalDevice,
   createDocumentTitleKey,
@@ -8,6 +7,7 @@ import {
   encryptFolderName,
   encryptWorkspaceKeyForDevice,
   folderDerivedKeyContext,
+  generateId,
   snapshotDerivedKeyContext,
 } from "@serenity-tools/common";
 import { gql } from "graphql-request";

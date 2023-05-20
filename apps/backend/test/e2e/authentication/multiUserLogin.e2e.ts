@@ -1,5 +1,5 @@
-import { generateId } from "@naisho/core";
 import { expect, Page, test } from "@playwright/test";
+import { generateId } from "@serenity-tools/common";
 import { User } from "../../../prisma/generated/output";
 import createUserWithWorkspace from "../../../src/database/testHelpers/createUserWithWorkspace";
 import { Document } from "../../../src/types/document";

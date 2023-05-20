@@ -1,5 +1,5 @@
 import canonicalize from "canonicalize";
-import sodium, { KeyPair } from "react-native-libsodium";
+import type { KeyPair } from "libsodium-wrappers";
 import { decryptAead, encryptAead, sign, verifySignature } from "./crypto";
 import { EphemeralUpdate, EphemeralUpdatePublicData } from "./types";
 import {
@@ -20,7 +20,8 @@ export function createEphemeralUpdate(
   content,
   publicData: EphemeralUpdatePublicData,
   key: Uint8Array,
-  signatureKeyPair: KeyPair
+  signatureKeyPair: KeyPair,
+  sodium: typeof import("libsodium-wrappers")
 ) {
   const publicDataAsBase64 = sodium.to_base64(
     canonicalize(publicData) as string
@@ -34,7 +35,8 @@ export function createEphemeralUpdate(
   const { ciphertext, publicNonce } = encryptAead(
     prefixedContent,
     publicDataAsBase64,
-    key
+    key,
+    sodium
   );
   const signature = sign(
     {
@@ -42,7 +44,8 @@ export function createEphemeralUpdate(
       ciphertext,
       publicData: publicDataAsBase64,
     },
-    signatureKeyPair.privateKey
+    signatureKeyPair.privateKey,
+    sodium
   );
   const ephemeralUpdate: EphemeralUpdate = {
     nonce: publicNonce,
@@ -58,6 +61,7 @@ export function verifyAndDecryptEphemeralUpdate(
   ephemeralUpdate: EphemeralUpdate,
   key,
   publicKey: Uint8Array,
+  sodium: typeof import("libsodium-wrappers"),
   mostRecentEphemeralUpdateDate?: Date
 ) {
   const publicDataAsBase64 = sodium.to_base64(
@@ -71,7 +75,8 @@ export function verifyAndDecryptEphemeralUpdate(
       publicData: publicDataAsBase64,
     },
     ephemeralUpdate.signature,
-    publicKey
+    publicKey,
+    sodium
   );
   if (!isValid) {
     throw new Error("Invalid ephemeral update");
@@ -80,7 +85,8 @@ export function verifyAndDecryptEphemeralUpdate(
     sodium.from_base64(ephemeralUpdate.ciphertext),
     sodium.to_base64(canonicalize(ephemeralUpdate.publicData) as string),
     key,
-    ephemeralUpdate.nonce
+    ephemeralUpdate.nonce,
+    sodium
   );
   const { prefix, value } = extractPrefixFromUint8Array(
     content,

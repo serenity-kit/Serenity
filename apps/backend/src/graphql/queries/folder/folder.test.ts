@@ -1,7 +1,7 @@
-import { generateId } from "@naisho/core";
 import {
   decryptWorkspaceKey,
   folderDerivedKeyContext,
+  generateId,
 } from "@serenity-tools/common";
 import { kdfDeriveFromKey } from "@serenity-tools/common/src/kdfDeriveFromKey/kdfDeriveFromKey";
 import deleteAllRecords from "../../../../test/helpers/deleteAllRecords";

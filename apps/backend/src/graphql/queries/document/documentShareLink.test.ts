@@ -1,7 +1,7 @@
-import { generateId } from "@naisho/core";
 import {
   createSnapshotKey,
   deriveKeysFromKeyDerivationTrace,
+  generateId,
 } from "@serenity-tools/common";
 import { Role } from "../../../../prisma/generated/output";
 import deleteAllRecords from "../../../../test/helpers/deleteAllRecords";

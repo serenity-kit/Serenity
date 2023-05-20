@@ -1,8 +1,5 @@
-import {
-  createInitialSnapshot,
-  generateId,
-  SnapshotPublicData,
-} from "@naisho/core";
+import { createInitialSnapshot, SnapshotPublicData } from "@naisho/core";
+import { generateId } from "@serenity-tools/common";
 import sodium, { KeyPair } from "react-native-libsodium";
 import { LocalDevice } from "../types";
 import { KeyDerivationTrace, SerenitySnapshotPublicData } from "../zodTypes";
@@ -44,6 +41,7 @@ export const createIntroductionDocumentSnapshot = ({
     sodium.from_base64(introductionDocument),
     publicData,
     snapshotEncryptionKey,
-    signatureKeyPair
+    signatureKeyPair,
+    sodium
   );
 };

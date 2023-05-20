@@ -1,16 +1,19 @@
 import canonicalize from "canonicalize";
-import sodium from "react-native-libsodium";
 import { extractPrefixFromUint8Array } from "./utils/extractPrefixFromUint8Array";
 import { prefixWithUint8Array } from "./utils/prefixWithUint8Array";
 
-export function hash(message: string | Uint8Array) {
+export function hash(
+  message: string | Uint8Array,
+  sodium: typeof import("libsodium-wrappers")
+) {
   return sodium.to_base64(sodium.crypto_generichash(32, message));
 }
 
 export function encryptAead(
   message: Uint8Array | string,
   additionalData: string,
-  key: Uint8Array
+  key: Uint8Array,
+  sodium: typeof import("libsodium-wrappers")
 ) {
   const publicNonce = sodium.randombytes_buf(
     sodium.crypto_aead_xchacha20poly1305_ietf_NPUBBYTES
@@ -38,7 +41,8 @@ export function decryptAead(
   ciphertext: Uint8Array,
   additionalData: string,
   key: Uint8Array,
-  publicNonce: string
+  publicNonce: string,
+  sodium: typeof import("libsodium-wrappers")
 ) {
   const content = sodium.crypto_aead_xchacha20poly1305_ietf_decrypt(
     null,
@@ -64,13 +68,16 @@ export function decryptAead(
   return value;
 }
 
-export function createSignatureKeyPair() {
+export function createSignatureKeyPair(
+  sodium: typeof import("libsodium-wrappers")
+) {
   return sodium.crypto_sign_keypair();
 }
 
 export function sign(
   content: { [key in string]: string },
-  privateKey: Uint8Array
+  privateKey: Uint8Array,
+  sodium: typeof import("libsodium-wrappers")
 ) {
   const message = canonicalize(content);
   if (typeof message !== "string") {
@@ -82,7 +89,8 @@ export function sign(
 export function verifySignature(
   content: { [key in string]: string },
   signature: string,
-  publicKey: Uint8Array
+  publicKey: Uint8Array,
+  sodium: typeof import("libsodium-wrappers")
 ) {
   const message = canonicalize(content);
   if (typeof message !== "string") {

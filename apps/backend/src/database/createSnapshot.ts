@@ -2,9 +2,12 @@ import {
   NaishoNewSnapshotRequiredError,
   NaishoSnapshotBasedOnOutdatedSnapshotError,
   NaishoSnapshotMissesUpdatesError,
-  hash,
 } from "@naisho/core";
-import { KeyDerivationTrace, SerenitySnapshot } from "@serenity-tools/common";
+import {
+  KeyDerivationTrace,
+  SerenitySnapshot,
+  hash,
+} from "@serenity-tools/common";
 import { prisma } from "./prisma";
 
 type ActiveSnapshotInfo = {

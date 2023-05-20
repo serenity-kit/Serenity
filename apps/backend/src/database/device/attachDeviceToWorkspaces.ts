@@ -1,4 +1,4 @@
-import { generateId } from "@naisho/core";
+import { generateId } from "@serenity-tools/common";
 import { ForbiddenError } from "apollo-server-express";
 import { WorkspaceKey, WorkspaceKeyBox } from "../../types/workspace";
 import { getOrCreateCreatorDevice } from "../../utils/device/getOrCreateCreatorDevice";

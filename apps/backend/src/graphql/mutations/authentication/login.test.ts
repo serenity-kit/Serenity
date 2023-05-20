@@ -1,5 +1,7 @@
-import { generateId } from "@naisho/core";
-import { createDevice as createdDeviceHelper } from "@serenity-tools/common";
+import {
+  createDevice as createdDeviceHelper,
+  generateId,
+} from "@serenity-tools/common";
 import { gql } from "graphql-request";
 import sodium from "react-native-libsodium";
 import { registerUser } from "../../../../test/helpers/authentication/registerUser";

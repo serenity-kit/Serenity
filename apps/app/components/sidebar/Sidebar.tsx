@@ -1,4 +1,3 @@
-import { generateId } from "@naisho/core";
 import {
   DrawerContentComponentProps,
   DrawerContentScrollView,
@@ -6,6 +5,7 @@ import {
 import {
   encryptFolderName,
   folderDerivedKeyContext,
+  generateId,
 } from "@serenity-tools/common";
 import {
   Heading,
@@ -16,10 +16,10 @@ import {
   SidebarLink,
   Text,
   Tooltip,
+  View,
   tw,
   useIsDesktopDevice,
   useIsPermanentLeftSidebar,
-  View,
 } from "@serenity-tools/ui";
 import { HStack } from "native-base";
 import { useState } from "react";

@@ -1,5 +1,5 @@
-import { generateId } from "@naisho/core";
 import { expect, test } from "@playwright/test";
+import { generateId } from "@serenity-tools/common";
 import { delayForSeconds } from "../../helpers/delayForSeconds";
 import { e2eLoginUser } from "../../helpers/e2e/e2eLoginUser";
 import { e2eRegisterUser } from "../../helpers/e2e/e2eRegisterUser";

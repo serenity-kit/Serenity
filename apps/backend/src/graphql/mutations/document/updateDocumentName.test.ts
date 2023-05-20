@@ -1,8 +1,8 @@
-import { generateId } from "@naisho/core";
 import {
   decryptWorkspaceKey,
   deriveKeysFromKeyDerivationTrace,
   folderDerivedKeyContext,
+  generateId,
 } from "@serenity-tools/common";
 import { decryptDocumentTitleBasedOnSnapshotKey } from "@serenity-tools/common/src/decryptDocumentTitleBasedOnSnapshotKey/decryptDocumentTitleBasedOnSnapshotKey";
 import { kdfDeriveFromKey } from "@serenity-tools/common/src/kdfDeriveFromKey/kdfDeriveFromKey";

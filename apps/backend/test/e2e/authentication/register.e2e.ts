@@ -1,5 +1,5 @@
-import { generateId } from "@naisho/core";
 import { expect, test } from "@playwright/test";
+import { generateId } from "@serenity-tools/common";
 import sodium from "react-native-libsodium";
 import { prisma } from "../../../src/database/prisma";
 import { delayForSeconds } from "../../helpers/delayForSeconds";

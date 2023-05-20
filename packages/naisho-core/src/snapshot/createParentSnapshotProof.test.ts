@@ -1,3 +1,4 @@
+import sodium from "libsodium-wrappers";
 import { createParentSnapshotProof } from "./createParentSnapshotProof";
 
 const grandParentSnapshotProof = "abc";
@@ -7,6 +8,7 @@ test("it returns a valid proof", () => {
   const parentSnapshotProof = createParentSnapshotProof({
     grandParentSnapshotProof,
     parentSnapshotCiphertext,
+    sodium,
   });
 
   expect(parentSnapshotProof).toEqual(

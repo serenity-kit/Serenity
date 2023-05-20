@@ -1,7 +1,7 @@
-import { generateId } from "@naisho/core";
 import {
   decryptWorkspaceKey,
   deriveKeysFromKeyDerivationTrace,
+  generateId,
 } from "@serenity-tools/common";
 import { decryptDocumentTitleBasedOnSnapshotKey } from "@serenity-tools/common/src/decryptDocumentTitleBasedOnSnapshotKey/decryptDocumentTitleBasedOnSnapshotKey";
 import deleteAllRecords from "../../../../test/helpers/deleteAllRecords";

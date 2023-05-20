@@ -1,8 +1,9 @@
-import { createInitialSnapshot, generateId } from "@naisho/core";
+import { createInitialSnapshot } from "@naisho/core";
 import {
   decryptWorkspaceKey,
   deriveKeysFromKeyDerivationTrace,
   folderDerivedKeyContext,
+  generateId,
   snapshotDerivedKeyContext,
 } from "@serenity-tools/common";
 import sodium, { KeyPair } from "react-native-libsodium";
@@ -81,7 +82,8 @@ const setup = async () => {
     "CONTENT DUMMY",
     publicData,
     sodium.from_base64(snapshotKey),
-    signatureKeyPair
+    signatureKeyPair,
+    sodium
   );
 };
 beforeAll(async () => {

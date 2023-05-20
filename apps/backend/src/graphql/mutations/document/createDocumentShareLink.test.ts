@@ -1,7 +1,7 @@
-import { generateId } from "@naisho/core";
 import {
   createSnapshotKey,
   deriveKeysFromKeyDerivationTrace,
+  generateId,
 } from "@serenity-tools/common";
 import { gql } from "graphql-request";
 import sodium from "react-native-libsodium";

@@ -1,7 +1,7 @@
-import { generateId } from "@naisho/core";
 import {
   createAndEncryptWorkspaceKeyForDevice,
   encryptWorkspaceKeyForDevice,
+  generateId,
 } from "@serenity-tools/common";
 import deleteAllRecords from "../../../../test/helpers/deleteAllRecords";
 import { attachDeviceToWorkspaces } from "../../../../test/helpers/device/attachDeviceToWorkspaces";

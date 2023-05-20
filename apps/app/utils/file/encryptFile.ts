@@ -1,4 +1,4 @@
-import { encryptAead } from "@naisho/core";
+import { encryptAead } from "@serenity-tools/common";
 import { base64_variants, from_base64 } from "react-native-libsodium";
 
 export type Props = {

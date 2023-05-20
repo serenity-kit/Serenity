@@ -1,3 +1,4 @@
+import sodium from "libsodium-wrappers";
 import { isValidParentSnapshot } from "./isValidParentSnapshot";
 
 const grandParentSnapshotProof = "abc";
@@ -20,6 +21,7 @@ test("it returns true for a valid proof", () => {
       },
       signature: "signature",
     },
+    sodium,
   });
   expect(isValid).toBe(true);
 });
@@ -40,6 +42,7 @@ test("it returns false to due a changed parentSnapshotCiphertext", () => {
       },
       signature: "signature",
     },
+    sodium,
   });
   expect(isValid).toBe(false);
 });
@@ -60,6 +63,7 @@ test("it returns false to due a changed grandParentSnapshotProof", () => {
       },
       signature: "signature",
     },
+    sodium,
   });
   expect(isValid).toBe(false);
 });
@@ -80,6 +84,7 @@ test("it returns false if parentSnapshotCiphertext and grandParentSnapshotProof 
       },
       signature: "signature",
     },
+    sodium,
   });
   expect(isValid).toBe(false);
 });
@@ -100,6 +105,7 @@ test("it returns false to due a manipulated parentSnapshotProof", () => {
       },
       signature: "signature",
     },
+    sodium,
   });
   expect(isValid).toBe(false);
 });

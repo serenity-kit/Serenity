@@ -1,4 +1,4 @@
-import { createInitialSnapshot, generateId } from "@naisho/core";
+import { createInitialSnapshot } from "@naisho/core";
 import { useFocusRing } from "@react-native-aria/focus";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import {
@@ -11,6 +11,7 @@ import {
   encryptDocumentTitle,
   encryptFolderName,
   folderDerivedKeyContext,
+  generateId,
   snapshotDerivedKeyContext,
 } from "@serenity-tools/common";
 import {
@@ -316,7 +317,8 @@ export default function SidebarFolder(props: Props) {
       sodium.from_base64(initialDocument),
       publicData,
       sodium.from_base64(snapshotKey.key),
-      signatureKeyPair
+      signatureKeyPair,
+      sodium
     );
     const documentNameKey = createDocumentTitleKey({
       snapshotKey: snapshotKey.key,

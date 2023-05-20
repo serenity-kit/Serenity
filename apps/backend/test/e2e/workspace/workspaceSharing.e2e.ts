@@ -1,5 +1,5 @@
-import { generateId } from "@naisho/core";
 import { expect, test } from "@playwright/test";
+import { generateId } from "@serenity-tools/common";
 import { Role } from "../../../prisma/generated/output";
 import createUserWithWorkspace from "../../../src/database/testHelpers/createUserWithWorkspace";
 import { delayForSeconds } from "../../helpers/delayForSeconds";

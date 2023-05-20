@@ -1,4 +1,4 @@
-import { encryptAead } from "@naisho/core";
+import { encryptAead } from "@serenity-tools/common";
 import canonicalize from "canonicalize";
 import sodium from "react-native-libsodium";
 import { createDocumentTitleKey } from "../createDocumentTitleKey/createDocumentTitleKey";

@@ -1,4 +1,3 @@
-import { generateId } from "@naisho/core";
 import {
   createAndEncryptDevice,
   createAndEncryptWorkspaceKeyForDevice,
@@ -9,6 +8,7 @@ import {
   encryptFolderName,
   encryptWorkspaceKeyForDevice,
   folderDerivedKeyContext,
+  generateId,
   snapshotDerivedKeyContext,
 } from "@serenity-tools/common";
 import { Registration } from "@serenity-tools/opaque-server";

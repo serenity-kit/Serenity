@@ -56,8 +56,10 @@ export const useYjsSyncMachine = (config: YjsSyncMachineConfig) => {
           applyAwarenessUpdate(config.yAwareness, ephemeralUpdate, null);
         });
       },
-      serializeChanges: serializeUint8ArrayUpdates,
-      deserializeChanges: deserializeUint8ArrayUpdates,
+      serializeChanges: (updates: Uint8Array[]) =>
+        serializeUint8ArrayUpdates(updates, config.sodium),
+      deserializeChanges: (serialized: string) =>
+        deserializeUint8ArrayUpdates(serialized, config.sodium),
     },
   });
   const [state, send] = machine;

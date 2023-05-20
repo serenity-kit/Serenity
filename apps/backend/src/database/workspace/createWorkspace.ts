@@ -1,5 +1,4 @@
-import { generateId } from "@naisho/core";
-import { equalArrayContent } from "@serenity-tools/common";
+import { equalArrayContent, generateId } from "@serenity-tools/common";
 import {
   Workspace,
   WorkspaceKey,

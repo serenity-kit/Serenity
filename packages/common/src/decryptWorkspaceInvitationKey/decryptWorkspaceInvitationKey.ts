@@ -1,4 +1,4 @@
-import { decryptAead } from "@naisho/core";
+import { decryptAead } from "@serenity-tools/common";
 import sodium from "react-native-libsodium";
 import { createEncryptionKeyFromOpaqueExportKey } from "../createEncryptionKeyFromOpaqueExportKey/createEncryptionKeyFromOpaqueExportKey";
 import { workspaceInvitationDerivedKeyContext } from "../encryptWorkspaceInvitationKey/encryptWorkspaceInvitationKey";

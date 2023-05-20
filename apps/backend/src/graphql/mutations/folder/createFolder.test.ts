@@ -1,7 +1,7 @@
-import { generateId } from "@naisho/core";
 import {
   encryptFolderName,
   folderDerivedKeyContext,
+  generateId,
 } from "@serenity-tools/common";
 import { kdfDeriveFromKey } from "@serenity-tools/common/src/kdfDeriveFromKey/kdfDeriveFromKey";
 import { gql } from "graphql-request";

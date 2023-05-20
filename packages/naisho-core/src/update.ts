@@ -1,5 +1,5 @@
 import canonicalize from "canonicalize";
-import sodium, { KeyPair } from "react-native-libsodium";
+import type { KeyPair } from "libsodium-wrappers";
 import { decryptAead, encryptAead, sign, verifySignature } from "./crypto";
 import { Update, UpdatePublicData } from "./types";
 
@@ -8,7 +8,8 @@ export function createUpdate(
   publicData: UpdatePublicData,
   key: Uint8Array,
   signatureKeyPair: KeyPair,
-  clock: number
+  clock: number,
+  sodium: typeof import("libsodium-wrappers")
 ) {
   const publicDataWithClock = {
     ...publicData,
@@ -21,7 +22,8 @@ export function createUpdate(
   const { ciphertext, publicNonce } = encryptAead(
     content,
     publicDataAsBase64,
-    key
+    key,
+    sodium
   );
   const signature = sign(
     {
@@ -29,7 +31,8 @@ export function createUpdate(
       ciphertext,
       publicData: publicDataAsBase64,
     },
-    signatureKeyPair.privateKey
+    signatureKeyPair.privateKey,
+    sodium
   );
 
   const update: Update = {
@@ -46,7 +49,8 @@ export function verifyAndDecryptUpdate(
   update: Update,
   key: Uint8Array,
   publicKey: Uint8Array,
-  currentClock: number
+  currentClock: number,
+  sodium: typeof import("libsodium-wrappers")
 ) {
   const publicDataAsBase64 = sodium.to_base64(
     canonicalize(update.publicData) as string
@@ -59,7 +63,8 @@ export function verifyAndDecryptUpdate(
       publicData: publicDataAsBase64,
     },
     update.signature,
-    publicKey
+    publicKey,
+    sodium
   );
   if (!isValid) {
     throw new Error("Invalid signature for update");
@@ -69,7 +74,8 @@ export function verifyAndDecryptUpdate(
     sodium.from_base64(update.ciphertext),
     sodium.to_base64(canonicalize(update.publicData) as string),
     key,
-    update.nonce
+    update.nonce,
+    sodium
   );
 
   if (currentClock + 1 !== update.publicData.clock) {

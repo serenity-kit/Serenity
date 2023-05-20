@@ -1,5 +1,5 @@
-import { generateId } from "@naisho/core";
 import { test } from "@playwright/test";
+import { generateId } from "@serenity-tools/common";
 import sodium from "react-native-libsodium";
 import createUserWithWorkspace from "../../../src/database/testHelpers/createUserWithWorkspace";
 import { delayForSeconds } from "../../helpers/delayForSeconds";

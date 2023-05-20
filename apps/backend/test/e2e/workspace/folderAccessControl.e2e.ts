@@ -1,5 +1,5 @@
-import { generateId } from "@naisho/core";
 import { expect, Page, test } from "@playwright/test";
+import { generateId } from "@serenity-tools/common";
 import sodium from "react-native-libsodium";
 import { Role } from "../../../prisma/generated/output";
 import createUserWithWorkspace from "../../../src/database/testHelpers/createUserWithWorkspace";

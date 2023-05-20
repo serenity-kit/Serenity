@@ -1,4 +1,10 @@
-import type { KeyPair } from "libsodium-wrappers";
+import type {
+  KeyPair,
+  crypto_aead_xchacha20poly1305_ietf_decrypt,
+  crypto_aead_xchacha20poly1305_ietf_encrypt,
+  crypto_sign_verify_detached,
+  from_base64,
+} from "libsodium-wrappers";
 import { z } from "zod";
 import { SnapshotProofChainEntry } from "./snapshot/isValidAncestorSnapshot";
 
@@ -174,4 +180,11 @@ export type SyncMachineConfig = {
   onCustomMessage?: (message: any) => Promise<void> | void;
   knownSnapshotInfo?: KnownSnapshotInfo;
   additionalAuthenticationDataValidations?: AdditionalAuthenticationDataValidations;
+};
+
+export type SodiumConstantsAndFunctions = {
+  crypto_aead_xchacha20poly1305_ietf_encrypt: typeof crypto_aead_xchacha20poly1305_ietf_encrypt;
+  crypto_aead_xchacha20poly1305_ietf_decrypt: typeof crypto_aead_xchacha20poly1305_ietf_decrypt;
+  from_base64: typeof from_base64;
+  crypto_sign_verify_detached: typeof crypto_sign_verify_detached;
 };

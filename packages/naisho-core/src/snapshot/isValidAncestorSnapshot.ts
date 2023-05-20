@@ -11,22 +11,25 @@ type IsValidAncestorSnapshotParams = {
   knownSnapshotProofEntry: SnapshotProofChainEntry;
   snapshotProofChain: SnapshotProofChainEntry[];
   currentSnapshot: Snapshot;
+  sodium: typeof import("libsodium-wrappers");
 };
 
 type CreateParentSnapshotProofBasedOnHashParams = {
   grandParentSnapshotProof: string;
   parentSnapshotCiphertextHash: string;
+  sodium: typeof import("libsodium-wrappers");
 };
 
 export function createParentSnapshotProofBasedOnHash({
   grandParentSnapshotProof,
   parentSnapshotCiphertextHash,
+  sodium,
 }: CreateParentSnapshotProofBasedOnHashParams) {
   const snapshotProofData = canonicalize({
     grandParentSnapshotProof,
     parentSnapshotCiphertext: parentSnapshotCiphertextHash,
   })!;
-  const parentSnapshotProof = hash(snapshotProofData);
+  const parentSnapshotProof = hash(snapshotProofData, sodium);
   return parentSnapshotProof;
 }
 
@@ -34,6 +37,7 @@ export function isValidAncestorSnapshot({
   knownSnapshotProofEntry,
   snapshotProofChain,
   currentSnapshot,
+  sodium,
 }: IsValidAncestorSnapshotParams) {
   let isValid = true;
   if (snapshotProofChain.length === 0) {
@@ -45,6 +49,7 @@ export function isValidAncestorSnapshot({
     grandParentSnapshotProof: knownSnapshotProofEntry.parentSnapshotProof,
     parentSnapshotCiphertextHash:
       knownSnapshotProofEntry.snapshotCiphertextHash,
+    sodium,
   });
   if (
     snapshotProofChain.length > 0 &&
@@ -58,7 +63,7 @@ export function isValidAncestorSnapshot({
     snapshotProofChain[snapshotProofChain.length - 1].parentSnapshotProof !==
       currentSnapshot.publicData.parentSnapshotProof ||
     snapshotProofChain[snapshotProofChain.length - 1].snapshotCiphertextHash !==
-      hash(currentSnapshot.ciphertext)
+      hash(currentSnapshot.ciphertext, sodium)
   ) {
     return false;
   }
@@ -71,6 +76,7 @@ export function isValidAncestorSnapshot({
       {
         grandParentSnapshotProof: parentSnapshotProof,
         parentSnapshotCiphertextHash: snapshotCiphertextHash,
+        sodium,
       }
     );
     if (
