@@ -1,4 +1,4 @@
-import { decryptAead } from "@naisho/core";
+import { decryptAead } from "@serenity-tools/common";
 import {
   base64_variants,
   from_base64,

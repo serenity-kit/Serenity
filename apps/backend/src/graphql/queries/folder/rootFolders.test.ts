@@ -1,4 +1,4 @@
-import { generateId } from "@naisho/core";
+import { generateId } from "@serenity-tools/common";
 import deleteAllRecords from "../../../../test/helpers/deleteAllRecords";
 import { getWorkspaceKeyForWorkspaceAndDevice } from "../../../../test/helpers/device/getWorkspaceKeyForWorkspaceAndDevice";
 import { createFolder } from "../../../../test/helpers/folder/createFolder";

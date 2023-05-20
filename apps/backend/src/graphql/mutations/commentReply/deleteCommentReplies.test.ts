@@ -1,4 +1,4 @@
-import { generateId } from "@naisho/core";
+import { generateId } from "@serenity-tools/common";
 import { Role } from "../../../../prisma/generated/output";
 import { createComment } from "../../../../test/helpers/comment/createComment";
 import { createCommentReply } from "../../../../test/helpers/commentReply/createCommentReply";

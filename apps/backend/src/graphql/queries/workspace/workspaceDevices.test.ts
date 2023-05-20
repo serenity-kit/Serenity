@@ -1,5 +1,7 @@
-import { generateId } from "@naisho/core";
-import { encryptWorkspaceKeyForDevice } from "@serenity-tools/common";
+import {
+  encryptWorkspaceKeyForDevice,
+  generateId,
+} from "@serenity-tools/common";
 import { Role } from "../../../../prisma/generated/output";
 import deleteAllRecords from "../../../../test/helpers/deleteAllRecords";
 import { attachDevicesToWorkspaces } from "../../../../test/helpers/device/attachDevicesToWorkspaces";

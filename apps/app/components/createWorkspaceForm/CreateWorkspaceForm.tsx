@@ -1,4 +1,3 @@
-import { generateId } from "@naisho/core";
 import { useNavigation } from "@react-navigation/native";
 import {
   createIntroductionDocumentSnapshot,
@@ -7,6 +6,7 @@ import {
   encryptDocumentTitle,
   encryptFolderName,
   folderDerivedKeyContext,
+  generateId,
   snapshotDerivedKeyContext,
 } from "@serenity-tools/common";
 import {

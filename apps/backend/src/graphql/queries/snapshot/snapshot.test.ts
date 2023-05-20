@@ -1,8 +1,9 @@
-import { createInitialSnapshot, generateId } from "@naisho/core";
 import {
+  createInitialSnapshot,
   decryptWorkspaceKey,
   deriveKeysFromKeyDerivationTrace,
   folderDerivedKeyContext,
+  generateId,
   snapshotDerivedKeyContext,
 } from "@serenity-tools/common";
 import sodium, { KeyPair } from "react-native-libsodium";

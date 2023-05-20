@@ -1,5 +1,5 @@
-import { generateId } from "@naisho/core";
 import { expect, test } from "@playwright/test";
+import { generateId } from "@serenity-tools/common";
 import { MAX_UNVERIFIED_USER_CONFIRMATION_ATTEMPTS } from "../../../src/database/authentication/verifyRegistration";
 import { prisma } from "../../../src/database/prisma";
 

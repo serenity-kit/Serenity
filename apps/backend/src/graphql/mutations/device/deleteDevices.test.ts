@@ -1,5 +1,7 @@
-import { generateId } from "@naisho/core";
-import { encryptWorkspaceKeyForDevice } from "@serenity-tools/common";
+import {
+  encryptWorkspaceKeyForDevice,
+  generateId,
+} from "@serenity-tools/common";
 import { gql } from "graphql-request";
 import deleteAllRecords from "../../../../test/helpers/deleteAllRecords";
 import { deleteDevices } from "../../../../test/helpers/device/deleteDevices";

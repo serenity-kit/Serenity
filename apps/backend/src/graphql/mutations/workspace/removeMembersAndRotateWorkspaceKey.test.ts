@@ -1,8 +1,8 @@
-import { generateId } from "@naisho/core";
 import {
   decryptFolderName,
   deriveKeysFromKeyDerivationTrace,
   encryptWorkspaceKeyForDevice,
+  generateId,
 } from "@serenity-tools/common";
 import { gql } from "graphql-request";
 import { Role } from "../../../../prisma/generated/output";

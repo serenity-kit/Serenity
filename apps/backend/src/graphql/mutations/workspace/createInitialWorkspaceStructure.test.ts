@@ -1,10 +1,10 @@
-import { generateId } from "@naisho/core";
 import {
   createDevice,
   decryptFolderName,
   decryptWorkspaceKey,
   deriveKeysFromKeyDerivationTrace,
   folderDerivedKeyContext,
+  generateId,
 } from "@serenity-tools/common";
 import { decryptDocumentTitleBasedOnSnapshotKey } from "@serenity-tools/common/src/decryptDocumentTitleBasedOnSnapshotKey/decryptDocumentTitleBasedOnSnapshotKey";
 import { gql } from "graphql-request";

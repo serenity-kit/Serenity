@@ -1,16 +1,17 @@
-import { createInitialSnapshot, generateId } from "@naisho/core";
 import { useFocusRing } from "@react-native-aria/focus";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import {
   KeyDerivationTrace,
   SerenitySnapshotPublicData,
   createDocumentTitleKey,
+  createInitialSnapshot,
   createSnapshotKey,
   decryptFolderName,
   deriveKeysFromKeyDerivationTrace,
   encryptDocumentTitle,
   encryptFolderName,
   folderDerivedKeyContext,
+  generateId,
   snapshotDerivedKeyContext,
 } from "@serenity-tools/common";
 import {

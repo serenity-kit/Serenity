@@ -1,4 +1,4 @@
-import { generateId } from "@naisho/core";
+import { generateId } from "@serenity-tools/common";
 import canonicalize from "canonicalize";
 import sodium from "react-native-libsodium";
 import {

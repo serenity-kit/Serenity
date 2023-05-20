@@ -1,4 +1,4 @@
-import { generateId } from "@naisho/core";
+import { generateId } from "@serenity-tools/common";
 import deleteAllRecords from "../../../../test/helpers/deleteAllRecords";
 import setupGraphql from "../../../../test/helpers/setupGraphql";
 import { createInitialWorkspaceStructure } from "../../../../test/helpers/workspace/createInitialWorkspaceStructure";

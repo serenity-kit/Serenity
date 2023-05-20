@@ -181,7 +181,8 @@ test("successfully creates a snapshot", async () => {
     "CONTENT DUMMY",
     publicData,
     sodium.from_base64(snapshotKey.key),
-    signatureKeyPair
+    signatureKeyPair,
+    sodium
   );
   snapshotId = snapshot.publicData.snapshotId;
   client.send(
@@ -222,7 +223,8 @@ test("successfully creates an update", async () => {
     publicData,
     sodium.from_base64(snapshotKey.key),
     signatureKeyPair,
-    0
+    0,
+    sodium
   );
 
   client.send(JSON.stringify(updateToSend));

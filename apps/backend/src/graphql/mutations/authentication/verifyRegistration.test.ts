@@ -1,4 +1,4 @@
-import { generateId } from "@naisho/core";
+import { generateId } from "@serenity-tools/common";
 import { gql } from "graphql-request";
 import { finalizeRegistration } from "../../../../test/helpers/authentication/finalizeRegistration";
 import { registerUnverifiedUser } from "../../../../test/helpers/authentication/registerUnverifiedUser";

@@ -1,6 +1,6 @@
 import sodium from "libsodium-wrappers";
 
-import { generateId } from "@naisho/core";
+import { generateId } from "@serenity-tools/common";
 import type {
   HandleLogin as HandleLoginType,
   HandleRegistration as HandleRegistrationType,

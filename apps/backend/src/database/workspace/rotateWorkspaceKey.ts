@@ -1,4 +1,4 @@
-import { generateId } from "@naisho/core";
+import { generateId } from "@serenity-tools/common";
 import { ForbiddenError, UserInputError } from "apollo-server-express";
 import { Prisma, Role } from "../../../prisma/generated/output";
 import { WorkspaceKey, WorkspaceKeyBox } from "../../types/workspace";

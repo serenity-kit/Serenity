@@ -1,5 +1,7 @@
-import { generateId } from "@naisho/core";
-import { encryptWorkspaceKeyForDevice } from "@serenity-tools/common";
+import {
+  encryptWorkspaceKeyForDevice,
+  generateId,
+} from "@serenity-tools/common";
 import {
   Avatar,
   CenterContent,

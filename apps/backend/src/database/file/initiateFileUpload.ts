@@ -1,6 +1,6 @@
 import { PutObjectCommand, S3Client } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
-import { generateId } from "@naisho/core";
+import { generateId } from "@serenity-tools/common";
 import { ForbiddenError, UserInputError } from "apollo-server-express";
 import { Role } from "../../../prisma/generated/output";
 import { prisma } from "../prisma";
