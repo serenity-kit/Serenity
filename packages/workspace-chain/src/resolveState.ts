@@ -1,5 +1,5 @@
-import { applyEvent } from ".";
 import { applyCreateChainEvent } from "./applyCreateChainEvent";
+import { applyEvent } from "./applyEvent";
 import { InvalidTrustChainError } from "./errors";
 import {
   CreateChainTrustChainEvent,

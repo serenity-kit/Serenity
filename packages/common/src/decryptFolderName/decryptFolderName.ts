@@ -1,6 +1,6 @@
-import { decryptAead } from "@serenity-tools/common";
 import canonicalize from "canonicalize";
 import sodium from "react-native-libsodium";
+import { decryptAead } from "../decryptAead/decryptAead";
 import { folderDerivedKeyContext } from "../encryptFolderName/encryptFolderName";
 import { kdfDeriveFromKey } from "../kdfDeriveFromKey/kdfDeriveFromKey";
 
