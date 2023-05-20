@@ -88,7 +88,8 @@ export const websocketService =
             event.data,
             publicData,
             ephemeralUpdateKey,
-            context.signatureKeyPair
+            context.signatureKeyPair,
+            context.sodium
           );
           console.debug("send ephemeralUpdate");
           send({

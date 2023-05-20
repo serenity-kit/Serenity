@@ -1,3 +1,4 @@
+import sodium from "libsodium-wrappers";
 import { Snapshot } from "../types";
 import { createParentSnapshotProof } from "./createParentSnapshotProof";
 
@@ -15,6 +16,7 @@ export function isValidParentSnapshot({
   const parentSnapshotProof = createParentSnapshotProof({
     parentSnapshotCiphertext,
     grandParentSnapshotProof,
+    sodium,
   });
   return parentSnapshotProof === snapshot.publicData.parentSnapshotProof;
 }

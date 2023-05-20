@@ -1,5 +1,4 @@
-import sodiumWrappers from "libsodium-wrappers";
-import sodium, { KeyPair } from "react-native-libsodium";
+import sodium, { KeyPair } from "libsodium-wrappers";
 import {
   createEphemeralUpdate,
   verifyAndDecryptEphemeralUpdate,
@@ -9,15 +8,15 @@ import { EphemeralUpdatePublicData } from "./types";
 test("createEphemeralUpdate & verifyAndDecryptEphemeralUpdate successfully", async () => {
   await sodium.ready;
 
-  const key = sodiumWrappers.from_hex(
+  const key = sodium.from_hex(
     "724b092810ec86d7e35c9d067702b31ef90bc43a7b598626749914d6a3e033ed"
   );
 
   const signatureKeyPair: KeyPair = {
-    privateKey: sodiumWrappers.from_base64(
+    privateKey: sodium.from_base64(
       "g3dtwb9XzhSzZGkxTfg11t1KEIb4D8rO7K54R6dnxArvgg_OzZ2GgREtG7F5LvNp3MS8p9vsio4r6Mq7SZDEgw"
     ),
-    publicKey: sodiumWrappers.from_base64(
+    publicKey: sodium.from_base64(
       "74IPzs2dhoERLRuxeS7zadzEvKfb7IqOK-jKu0mQxIM"
     ),
     keyType: "ed25519",
@@ -32,13 +31,15 @@ test("createEphemeralUpdate & verifyAndDecryptEphemeralUpdate successfully", asy
     new Uint8Array([97, 97, 97]),
     publicData,
     key,
-    signatureKeyPair
+    signatureKeyPair,
+    sodium
   );
 
   const { content, date } = verifyAndDecryptEphemeralUpdate(
     ephemeralUpdate,
     key,
-    signatureKeyPair.publicKey
+    signatureKeyPair.publicKey,
+    sodium
   );
 
   if (content === null) {

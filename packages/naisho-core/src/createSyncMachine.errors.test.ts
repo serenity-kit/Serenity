@@ -1,5 +1,4 @@
-import sodiumWrappers from "libsodium-wrappers";
-import sodium, { KeyPair } from "react-native-libsodium";
+import sodium, { KeyPair } from "libsodium-wrappers";
 import { assign, interpret, spawn } from "xstate";
 import { createSyncMachine } from "./createSyncMachine";
 import { createEphemeralUpdate } from "./ephemeralUpdate";
@@ -20,12 +19,12 @@ let docId: string;
 let snapshotId: string;
 
 beforeEach(() => {
-  docId = generateId();
+  docId = generateId(sodium);
   signatureKeyPair = {
-    privateKey: sodiumWrappers.from_base64(
+    privateKey: sodium.from_base64(
       "g3dtwb9XzhSzZGkxTfg11t1KEIb4D8rO7K54R6dnxArvgg_OzZ2GgREtG7F5LvNp3MS8p9vsio4r6Mq7SZDEgw"
     ),
-    publicKey: sodiumWrappers.from_base64(
+    publicKey: sodium.from_base64(
       "74IPzs2dhoERLRuxeS7zadzEvKfb7IqOK-jKu0mQxIM"
     ),
     keyType: "ed25519",
@@ -41,10 +40,10 @@ type CreateSnapshotTestHelperParams = {
 };
 
 const createSnapshotTestHelper = (params?: CreateSnapshotTestHelperParams) => {
-  snapshotId = generateId();
+  snapshotId = generateId(sodium);
   const { parentSnapshotCiphertext, grandParentSnapshotProof, content } =
     params || {};
-  key = sodiumWrappers.from_hex(
+  key = sodium.from_hex(
     "724b092810ec86d7e35c9d067702b31ef90bc43a7b598626749914d6a3e033ed"
   );
 
@@ -61,7 +60,8 @@ const createSnapshotTestHelper = (params?: CreateSnapshotTestHelperParams) => {
     key,
     signatureKeyPair,
     parentSnapshotCiphertext || "",
-    grandParentSnapshotProof || ""
+    grandParentSnapshotProof || "",
+    sodium
   );
   return {
     snapshot: {
@@ -85,7 +85,14 @@ const createUpdateHelper = (params?: CreateUpdateTestHelperParams) => {
     pubKey: sodium.to_base64(signatureKeyPair.publicKey),
   };
 
-  const update = createUpdate("u", publicData, key, signatureKeyPair, version);
+  const update = createUpdate(
+    "u",
+    publicData,
+    key,
+    signatureKeyPair,
+    version,
+    sodium
+  );
 
   return { update: { ...update, serverData: { version } } };
 };
@@ -100,7 +107,8 @@ const createTestEphemeralUpdate = () => {
     new Uint8Array([42]),
     publicData,
     key,
-    signatureKeyPair
+    signatureKeyPair,
+    sodium
   );
   return { ephemeralUpdate };
 };
@@ -118,13 +126,12 @@ it("should set _documentDecryptionState to failed if not even the snapshot can b
         websocketHost: url,
         websocketSessionKey: "sessionKey",
         isValidCollaborator: (signingPublicKey) =>
-          sodiumWrappers.to_base64(signatureKeyPair.publicKey) ===
-          signingPublicKey,
+          sodium.to_base64(signatureKeyPair.publicKey) === signingPublicKey,
         getSnapshotKey: () => {
           throw new Error("INVALID");
         },
         applySnapshot: (snapshot) => {
-          docValue = sodiumWrappers.to_string(snapshot);
+          docValue = sodium.to_string(snapshot);
         },
         getUpdateKey: () => key,
         deserializeChanges: (changes) => {
@@ -135,7 +142,7 @@ it("should set _documentDecryptionState to failed if not even the snapshot can b
             docValue = docValue + change;
           });
         },
-        sodium: sodiumWrappers,
+        sodium: sodium,
         signatureKeyPair,
       })
       .withConfig({
@@ -183,11 +190,10 @@ it("should set _documentDecryptionState to partial and apply the first update, i
         websocketHost: url,
         websocketSessionKey: "sessionKey",
         isValidCollaborator: (signingPublicKey) =>
-          sodiumWrappers.to_base64(signatureKeyPair.publicKey) ===
-          signingPublicKey,
+          sodium.to_base64(signatureKeyPair.publicKey) === signingPublicKey,
         getSnapshotKey: () => key,
         applySnapshot: (snapshot) => {
-          docValue = sodiumWrappers.to_string(snapshot);
+          docValue = sodium.to_string(snapshot);
         },
         getUpdateKey: () => key,
         deserializeChanges: (changes) => {
@@ -198,7 +204,7 @@ it("should set _documentDecryptionState to partial and apply the first update, i
             docValue = docValue + change;
           });
         },
-        sodium: sodiumWrappers,
+        sodium: sodium,
         signatureKeyPair,
       })
       .withConfig({
@@ -251,11 +257,10 @@ it("should set _documentDecryptionState to partial, if document snapshot decrypt
         websocketHost: url,
         websocketSessionKey: "sessionKey",
         isValidCollaborator: (signingPublicKey) =>
-          sodiumWrappers.to_base64(signatureKeyPair.publicKey) ===
-          signingPublicKey,
+          sodium.to_base64(signatureKeyPair.publicKey) === signingPublicKey,
         getSnapshotKey: () => key,
         applySnapshot: (snapshot) => {
-          docValue = sodiumWrappers.to_string(snapshot);
+          docValue = sodium.to_string(snapshot);
         },
         getUpdateKey: () => key,
         deserializeChanges: (changes) => {
@@ -266,7 +271,7 @@ it("should set _documentDecryptionState to partial, if document snapshot decrypt
             docValue = docValue + change;
           });
         },
-        sodium: sodiumWrappers,
+        sodium: sodium,
         signatureKeyPair,
       })
       .withConfig({
@@ -317,11 +322,10 @@ it("should process three additional ephemeral updates where the second one fails
         websocketHost: url,
         websocketSessionKey: "sessionKey",
         isValidCollaborator: (signingPublicKey) =>
-          sodiumWrappers.to_base64(signatureKeyPair.publicKey) ===
-          signingPublicKey,
+          sodium.to_base64(signatureKeyPair.publicKey) === signingPublicKey,
         getSnapshotKey: () => key,
         applySnapshot: (snapshot) => {
-          docValue = sodiumWrappers.to_string(snapshot);
+          docValue = sodium.to_string(snapshot);
         },
         getUpdateKey: () => key,
         deserializeChanges: (changes) => {
@@ -339,7 +343,7 @@ it("should process three additional ephemeral updates where the second one fails
             ...ephemeralUpdates,
           ]);
         },
-        sodium: sodiumWrappers,
+        sodium: sodium,
         signatureKeyPair,
       })
       .withConfig({
@@ -423,11 +427,10 @@ it("should store not more than 20 failed ephemeral update errors", (done) => {
         websocketHost: url,
         websocketSessionKey: "sessionKey",
         isValidCollaborator: (signingPublicKey) =>
-          sodiumWrappers.to_base64(signatureKeyPair.publicKey) ===
-          signingPublicKey,
+          sodium.to_base64(signatureKeyPair.publicKey) === signingPublicKey,
         getSnapshotKey: () => key,
         applySnapshot: (snapshot) => {
-          docValue = sodiumWrappers.to_string(snapshot);
+          docValue = sodium.to_string(snapshot);
         },
         getUpdateKey: () => key,
         deserializeChanges: (changes) => {
@@ -445,7 +448,7 @@ it("should store not more than 20 failed ephemeral update errors", (done) => {
             ...ephemeralUpdates,
           ]);
         },
-        sodium: sodiumWrappers,
+        sodium: sodium,
         signatureKeyPair,
       })
       .withConfig({
@@ -518,11 +521,10 @@ it("should reset the context entries after websocket disconnect", (done) => {
         websocketHost: url,
         websocketSessionKey: "sessionKey",
         isValidCollaborator: (signingPublicKey) =>
-          sodiumWrappers.to_base64(signatureKeyPair.publicKey) ===
-          signingPublicKey,
+          sodium.to_base64(signatureKeyPair.publicKey) === signingPublicKey,
         getSnapshotKey: () => key,
         applySnapshot: (snapshot) => {
-          docValue = sodiumWrappers.to_string(snapshot);
+          docValue = sodium.to_string(snapshot);
         },
         getUpdateKey: () => key,
         deserializeChanges: (changes) => {
@@ -540,7 +542,7 @@ it("should reset the context entries after websocket disconnect", (done) => {
             ...ephemeralUpdates,
           ]);
         },
-        sodium: sodiumWrappers,
+        sodium: sodium,
         signatureKeyPair,
       })
       .withConfig({
@@ -610,11 +612,10 @@ it("should reconnect and reload the document", (done) => {
         websocketHost: url,
         websocketSessionKey: "sessionKey",
         isValidCollaborator: (signingPublicKey) =>
-          sodiumWrappers.to_base64(signatureKeyPair.publicKey) ===
-          signingPublicKey,
+          sodium.to_base64(signatureKeyPair.publicKey) === signingPublicKey,
         getSnapshotKey: () => key,
         applySnapshot: (snapshot) => {
-          docValue = sodiumWrappers.to_string(snapshot);
+          docValue = sodium.to_string(snapshot);
         },
         getUpdateKey: () => key,
         deserializeChanges: (changes) => {
@@ -632,7 +633,7 @@ it("should reconnect and reload the document", (done) => {
             ...ephemeralUpdates,
           ]);
         },
-        sodium: sodiumWrappers,
+        sodium: sodium,
         signatureKeyPair,
       })
       .withConfig({

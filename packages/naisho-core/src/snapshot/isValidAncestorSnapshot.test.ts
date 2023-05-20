@@ -1,3 +1,4 @@
+import sodium from "libsodium-wrappers";
 import { hash } from "../crypto";
 import { createParentSnapshotProof } from "./createParentSnapshotProof";
 import {
@@ -37,34 +38,38 @@ beforeEach(() => {
   const snapshot1Proof = createParentSnapshotProof({
     grandParentSnapshotProof: "",
     parentSnapshotCiphertext: "",
+    sodium,
   });
   snapshot1ProofEntry = {
     parentSnapshotProof: snapshot1Proof,
-    snapshotCiphertextHash: hash("abc"),
+    snapshotCiphertextHash: hash("abc", sodium),
   };
   const snapshot2Proof = createParentSnapshotProof({
     grandParentSnapshotProof: snapshot1Proof,
     parentSnapshotCiphertext: "abc",
+    sodium,
   });
   snapshot2ProofEntry = {
     parentSnapshotProof: snapshot2Proof,
-    snapshotCiphertextHash: hash("def"),
+    snapshotCiphertextHash: hash("def", sodium),
   };
   const snapshot3Proof = createParentSnapshotProof({
     grandParentSnapshotProof: snapshot2Proof,
     parentSnapshotCiphertext: "def",
+    sodium,
   });
   snapshot3ProofEntry = {
     parentSnapshotProof: snapshot3Proof,
-    snapshotCiphertextHash: hash("ghi"),
+    snapshotCiphertextHash: hash("ghi", sodium),
   };
   const snapshot4Proof = createParentSnapshotProof({
     grandParentSnapshotProof: snapshot3Proof,
     parentSnapshotCiphertext: "ghi",
+    sodium,
   });
   snapshot4ProofEntry = {
     parentSnapshotProof: snapshot4Proof,
-    snapshotCiphertextHash: hash("jkl"),
+    snapshotCiphertextHash: hash("jkl", sodium),
   };
 });
 
@@ -77,6 +82,7 @@ test("returns true for a valid proof of one item", () => {
       snapshot3ProofEntry.parentSnapshotProof,
       "ghi"
     ),
+    sodium,
   });
   expect(isValid).toBe(true);
 });
@@ -94,6 +100,7 @@ test("returns false for an invalid proof due a modified proof", () => {
         snapshot3ProofEntry.parentSnapshotProof,
         "ghi"
       ),
+      sodium,
     })
   ).toBe(false);
 
@@ -110,6 +117,7 @@ test("returns false for an invalid proof due a modified proof", () => {
         snapshot2ProofEntry.parentSnapshotProof,
         "def"
       ),
+      sodium,
     })
   ).toBe(false);
 
@@ -127,6 +135,7 @@ test("returns false for an invalid proof due a modified proof", () => {
         snapshot2ProofEntry.parentSnapshotProof,
         "def"
       ),
+      sodium,
     })
   ).toBe(false);
 });
@@ -143,6 +152,7 @@ test("returns false for an invalid proof due a modified ciphertext hash", () => 
         snapshot3ProofEntry.parentSnapshotProof,
         "ghi"
       ),
+      sodium,
     })
   ).toBe(false);
 
@@ -160,6 +170,7 @@ test("returns false for an invalid proof due a modified ciphertext hash", () => 
         snapshot4ProofEntry.parentSnapshotProof,
         "jkl"
       ),
+      sodium,
     })
   ).toBe(false);
 
@@ -177,6 +188,7 @@ test("returns false for an invalid proof due a modified ciphertext hash", () => 
         snapshot4ProofEntry.parentSnapshotProof,
         "jkl"
       ),
+      sodium,
     })
   ).toBe(false);
 });
@@ -190,6 +202,7 @@ test("returns true for valid proof of multiple items", () => {
       snapshot4ProofEntry.parentSnapshotProof,
       "jkl"
     ),
+    sodium,
   });
   expect(isValid).toBe(true);
 });
@@ -203,6 +216,7 @@ test("returns true for a valid proof for the initial snapshot", () => {
       snapshot2ProofEntry.parentSnapshotProof,
       "def"
     ),
+    sodium,
   });
   expect(isValid).toBe(true);
 });
@@ -216,6 +230,7 @@ test("returns false if an entry is missing", () => {
       snapshot4ProofEntry.parentSnapshotProof,
       "jkl"
     ),
+    sodium,
   });
   expect(isValid).toBe(false);
 });
@@ -229,6 +244,7 @@ test("returns false if an entry is missing using an initial snapshot", () => {
       snapshot3ProofEntry.parentSnapshotProof,
       "ghi"
     ),
+    sodium,
   });
   expect(isValid).toBe(false);
 });
@@ -242,6 +258,7 @@ test("returns false for an empty chain", () => {
       snapshot3ProofEntry.parentSnapshotProof,
       "ghi"
     ),
+    sodium,
   });
   expect(isValid).toBe(false);
 });
