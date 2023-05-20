@@ -1,5 +1,5 @@
+import { createInitialSnapshot } from "@naisho/core";
 import {
-  createInitialSnapshot,
   decryptWorkspaceKey,
   deriveKeysFromKeyDerivationTrace,
   folderDerivedKeyContext,
@@ -82,7 +82,8 @@ const setup = async () => {
     "CONTENT DUMMY",
     publicData,
     sodium.from_base64(snapshotKey),
-    signatureKeyPair
+    signatureKeyPair,
+    sodium
   );
 };
 beforeAll(async () => {
