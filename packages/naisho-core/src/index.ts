@@ -12,7 +12,7 @@ export * from "./snapshot/createSnapshot";
 export * from "./snapshot/parseSnapshotWithClientData";
 export * from "./snapshot/verifyAndDecryptSnapshot";
 export * from "./types";
-export * from "./update";
+export * from "./update/createUpdate";
 export * from "./utils/deserializeUint8ArrayUpdates";
 export * from "./utils/generateId";
 export * from "./utils/serializeUint8ArrayUpdates";

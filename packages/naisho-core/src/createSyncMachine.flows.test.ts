@@ -8,7 +8,7 @@ import {
   SnapshotPublicData,
   UpdatePublicData,
 } from "./types";
-import { createUpdate } from "./update";
+import { createUpdate } from "./update/createUpdate";
 import { generateId } from "./utils/generateId";
 
 const url = "wss://www.example.com";
