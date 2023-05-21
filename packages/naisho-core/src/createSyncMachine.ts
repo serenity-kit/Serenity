@@ -9,7 +9,7 @@ import {
 } from "xstate";
 import { z } from "zod";
 import { hash } from "./crypto/hash";
-import { verifyAndDecryptEphemeralUpdate } from "./ephemeralUpdate";
+import { verifyAndDecryptEphemeralUpdate } from "./ephemeralUpdate/verifyAndDecryptEphemeralUpdate";
 import { NaishoProcessingEphemeralUpdateError } from "./errors";
 import { createSnapshot } from "./snapshot/createSnapshot";
 import { isValidAncestorSnapshot } from "./snapshot/isValidAncestorSnapshot";
