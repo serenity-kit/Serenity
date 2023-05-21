@@ -1,6 +1,6 @@
 import sodium, { KeyPair } from "libsodium-wrappers";
+import { generateId } from "../crypto/generateId";
 import { UpdatePublicData } from "../types";
-import { generateId } from "../utils/generateId";
 import { createUpdate } from "./createUpdate";
 import { verifyAndDecryptUpdate } from "./verifyAndDecryptUpdate";
 
