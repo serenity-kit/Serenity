@@ -1,6 +1,6 @@
-import { encryptAead } from "@serenity-tools/common";
 import canonicalize from "canonicalize";
 import sodium from "react-native-libsodium";
+import { encryptAead } from "../encryptAead/encryptAead";
 import { kdfDeriveFromKey } from "../kdfDeriveFromKey/kdfDeriveFromKey";
 
 type Params = {

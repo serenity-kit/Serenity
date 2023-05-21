@@ -1,6 +1,6 @@
-import { encryptAead } from "@serenity-tools/common";
 import sodium from "react-native-libsodium";
 import { createEncryptionKeyFromOpaqueExportKey } from "../createEncryptionKeyFromOpaqueExportKey/createEncryptionKeyFromOpaqueExportKey";
+import { encryptAead } from "../encryptAead/encryptAead";
 import { kdfDeriveFromKey } from "../kdfDeriveFromKey/kdfDeriveFromKey";
 
 export type Params = {

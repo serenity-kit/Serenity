@@ -1,8 +1,8 @@
-import { encryptAead } from "@serenity-tools/common";
 import canonicalize from "canonicalize";
 import sodium from "react-native-libsodium";
 import { createDocumentTitleKey } from "../createDocumentTitleKey/createDocumentTitleKey";
 import { deriveKeysFromKeyDerivationTrace } from "../deriveKeysFromKeyDerivationTrace/deriveKeysFromKeyDerivationTrace";
+import { encryptAead } from "../encryptAead/encryptAead";
 import { Device, LocalDevice } from "../types";
 import { KeyDerivationTrace } from "../zodTypes";
 
