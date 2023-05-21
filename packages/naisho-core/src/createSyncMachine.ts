@@ -11,11 +11,12 @@ import { z } from "zod";
 import { hash } from "./crypto/hash";
 import { verifyAndDecryptEphemeralUpdate } from "./ephemeralUpdate";
 import { NaishoProcessingEphemeralUpdateError } from "./errors";
-import { createSnapshot, verifyAndDecryptSnapshot } from "./snapshot";
+import { createSnapshot } from "./snapshot/createSnapshot";
 import { isValidAncestorSnapshot } from "./snapshot/isValidAncestorSnapshot";
 import { parseEphemeralUpdateWithServerData } from "./snapshot/parseEphemeralUpdateWithServerData";
 import { parseSnapshotWithServerData } from "./snapshot/parseSnapshotWithServerData";
 import { parseUpdatesWithServerData } from "./snapshot/parseUpdatesWithServerData";
+import { verifyAndDecryptSnapshot } from "./snapshot/verifyAndDecryptSnapshot";
 import {
   ParentSnapshotProofInfo,
   SnapshotPublicData,

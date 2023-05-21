@@ -2,7 +2,7 @@ import sodium, { KeyPair } from "libsodium-wrappers";
 import { assign, interpret, spawn } from "xstate";
 import { createSyncMachine } from "./createSyncMachine";
 import { createEphemeralUpdate } from "./ephemeralUpdate";
-import { createSnapshot } from "./snapshot";
+import { createSnapshot } from "./snapshot/createSnapshot";
 import {
   EphemeralUpdatePublicData,
   SnapshotPublicData,
