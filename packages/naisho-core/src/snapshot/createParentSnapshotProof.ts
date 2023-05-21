@@ -1,5 +1,5 @@
 import canonicalize from "canonicalize";
-import { hash } from "../crypto";
+import { hash } from "../crypto/hash";
 
 type CreateParentSnapshotProofParams = {
   grandParentSnapshotProof: string;

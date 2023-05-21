@@ -1,6 +1,9 @@
 import canonicalize from "canonicalize";
 import type { KeyPair } from "libsodium-wrappers";
-import { decryptAead, encryptAead, sign, verifySignature } from "./crypto";
+import { decryptAead } from "./crypto/decryptAead";
+import { encryptAead } from "./crypto/encryptAead";
+import { sign } from "./crypto/sign";
+import { verifySignature } from "./crypto/verifySignature";
 import { EphemeralUpdate, EphemeralUpdatePublicData } from "./types";
 import {
   dateAsUint8ArrayLength,

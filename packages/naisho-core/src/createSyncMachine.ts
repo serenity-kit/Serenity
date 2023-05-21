@@ -8,7 +8,7 @@ import {
   spawn,
 } from "xstate";
 import { z } from "zod";
-import { hash } from "./crypto";
+import { hash } from "./crypto/hash";
 import { verifyAndDecryptEphemeralUpdate } from "./ephemeralUpdate";
 import { NaishoProcessingEphemeralUpdateError } from "./errors";
 import { createSnapshot, verifyAndDecryptSnapshot } from "./snapshot";
