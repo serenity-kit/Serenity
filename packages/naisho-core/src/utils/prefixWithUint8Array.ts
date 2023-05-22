@@ -3,15 +3,15 @@ export function prefixWithUint8Array(
   prefix: Uint8Array
 ): string | Uint8Array {
   if (typeof value === "string") {
-    const encoder = new TextEncoder();
-    const valueUint8Array = encoder.encode(value);
+    const valueUint8Array = new Uint8Array(
+      [...value].map((char) => char.charCodeAt(0))
+    );
     const result = new Uint8Array(prefix.length + valueUint8Array.length);
 
     result.set(prefix);
     result.set(valueUint8Array, prefix.length);
 
-    const decoder = new TextDecoder();
-    return decoder.decode(result);
+    return String.fromCharCode.apply(null, result);
   } else {
     const result = new Uint8Array(prefix.length + value.length);
 
