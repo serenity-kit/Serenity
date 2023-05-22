@@ -1,7 +1,8 @@
 import sodium, { KeyPair } from "libsodium-wrappers";
-import { createSnapshot, verifyAndDecryptSnapshot } from "./snapshot";
-import { SnapshotPublicData } from "./types";
-import { generateId } from "./utils/generateId";
+import { generateId } from "../crypto/generateId";
+import { SnapshotPublicData } from "../types";
+import { createSnapshot } from "./createSnapshot";
+import { verifyAndDecryptSnapshot } from "./verifyAndDecryptSnapshot";
 
 const snapshotDerivedKeyContext = "snapshot";
 

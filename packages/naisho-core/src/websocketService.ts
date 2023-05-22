@@ -1,4 +1,4 @@
-import { createEphemeralUpdate } from "./ephemeralUpdate";
+import { createEphemeralUpdate } from "./ephemeralUpdate/createEphemeralUpdate";
 import { SyncMachineConfig } from "./types";
 
 export const websocketService =

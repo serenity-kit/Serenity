@@ -7,10 +7,10 @@ import {
   removeAwarenessStates,
 } from "y-protocols/awareness";
 import * as Yjs from "yjs";
-import { createSyncMachine } from "../createSyncMachine";
-import { SyncMachineConfig } from "../types";
-import { deserializeUint8ArrayUpdates } from "./deserializeUint8ArrayUpdates";
-import { serializeUint8ArrayUpdates } from "./serializeUint8ArrayUpdates";
+import { createSyncMachine } from "./createSyncMachine";
+import { SyncMachineConfig } from "./types";
+import { deserializeUint8ArrayUpdates } from "./utils/deserializeUint8ArrayUpdates";
+import { serializeUint8ArrayUpdates } from "./utils/serializeUint8ArrayUpdates";
 
 export type YjsSyncMachineConfig = Omit<
   SyncMachineConfig,

@@ -1,5 +1,5 @@
 import sodium from "libsodium-wrappers";
-import { hash } from "../crypto";
+import { hash } from "../crypto/hash";
 import { createParentSnapshotProof } from "./createParentSnapshotProof";
 import {
   isValidAncestorSnapshot,

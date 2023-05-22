@@ -1,15 +1,15 @@
 import sodium, { KeyPair } from "libsodium-wrappers";
 import { assign, interpret, spawn } from "xstate";
 import { createSyncMachine } from "./createSyncMachine";
-import { createEphemeralUpdate } from "./ephemeralUpdate";
-import { createSnapshot } from "./snapshot";
+import { generateId } from "./crypto/generateId";
+import { createEphemeralUpdate } from "./ephemeralUpdate/createEphemeralUpdate";
+import { createSnapshot } from "./snapshot/createSnapshot";
 import {
   EphemeralUpdatePublicData,
   SnapshotPublicData,
   UpdatePublicData,
 } from "./types";
-import { createUpdate } from "./update";
-import { generateId } from "./utils/generateId";
+import { createUpdate } from "./update/createUpdate";
 
 const url = "wss://www.example.com";
 

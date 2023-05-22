@@ -1,9 +1,7 @@
 import sodium, { KeyPair } from "libsodium-wrappers";
-import {
-  createEphemeralUpdate,
-  verifyAndDecryptEphemeralUpdate,
-} from "./ephemeralUpdate";
-import { EphemeralUpdatePublicData } from "./types";
+import { EphemeralUpdatePublicData } from "../types";
+import { createEphemeralUpdate } from "./createEphemeralUpdate";
+import { verifyAndDecryptEphemeralUpdate } from "./verifyAndDecryptEphemeralUpdate";
 
 test("createEphemeralUpdate & verifyAndDecryptEphemeralUpdate successfully", async () => {
   await sodium.ready;

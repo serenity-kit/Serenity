@@ -8,14 +8,15 @@ import {
   spawn,
 } from "xstate";
 import { z } from "zod";
-import { hash } from "./crypto";
-import { verifyAndDecryptEphemeralUpdate } from "./ephemeralUpdate";
+import { hash } from "./crypto/hash";
+import { verifyAndDecryptEphemeralUpdate } from "./ephemeralUpdate/verifyAndDecryptEphemeralUpdate";
 import { NaishoProcessingEphemeralUpdateError } from "./errors";
-import { createSnapshot, verifyAndDecryptSnapshot } from "./snapshot";
+import { createSnapshot } from "./snapshot/createSnapshot";
 import { isValidAncestorSnapshot } from "./snapshot/isValidAncestorSnapshot";
 import { parseEphemeralUpdateWithServerData } from "./snapshot/parseEphemeralUpdateWithServerData";
 import { parseSnapshotWithServerData } from "./snapshot/parseSnapshotWithServerData";
 import { parseUpdatesWithServerData } from "./snapshot/parseUpdatesWithServerData";
+import { verifyAndDecryptSnapshot } from "./snapshot/verifyAndDecryptSnapshot";
 import {
   ParentSnapshotProofInfo,
   SnapshotPublicData,
@@ -23,7 +24,8 @@ import {
   SyncMachineConfig,
   UpdateWithServerData,
 } from "./types";
-import { createUpdate, verifyAndDecryptUpdate } from "./update";
+import { createUpdate } from "./update/createUpdate";
+import { verifyAndDecryptUpdate } from "./update/verifyAndDecryptUpdate";
 import { websocketService } from "./websocketService";
 
 // The sync machine is responsible for syncing the document with the server.

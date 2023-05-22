@@ -1,7 +1,8 @@
 import sodium, { KeyPair } from "libsodium-wrappers";
-import { UpdatePublicData } from "./types";
-import { createUpdate, verifyAndDecryptUpdate } from "./update";
-import { generateId } from "./utils/generateId";
+import { generateId } from "../crypto/generateId";
+import { UpdatePublicData } from "../types";
+import { createUpdate } from "./createUpdate";
+import { verifyAndDecryptUpdate } from "./verifyAndDecryptUpdate";
 
 test("createUpdate & verifyAndDecryptUpdate successfully", async () => {
   await sodium.ready;
