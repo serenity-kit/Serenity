@@ -93,6 +93,7 @@ export default function Page({
   });
   const syncState = useEditorStore((state) => state.syncState);
   const setSyncState = useEditorStore((state) => state.setSyncState);
+  const setDocumentState = useEditorStore((state) => state.setDocumentState);
   const setActiveDocumentId = useDocumentTitleStore(
     (state) => state.setActiveDocumentId
   );
@@ -391,6 +392,22 @@ export default function Page({
     setSyncState,
   ]);
 
+  const documentLoaded =
+    documentLoadedFromLocalDb ||
+    state.context._documentDecryptionState === "complete" ||
+    documentLoadedOnceFromRemote;
+
+  let documentState: DocumentState = "loading";
+  if (state.matches("failed")) {
+    documentState = "error";
+  } else if (documentLoaded) {
+    documentState = "active";
+  }
+
+  useEffect(() => {
+    setDocumentState(documentState);
+  }, [documentState, setDocumentState]);
+
   const updateTitle = async (title: string) => {
     const document = await getDocument({
       documentId: docId,
@@ -413,11 +430,6 @@ export default function Page({
     }
   };
 
-  const documentLoaded =
-    documentLoadedFromLocalDb ||
-    state.context._documentDecryptionState === "complete" ||
-    documentLoadedOnceFromRemote;
-
   if (state.matches("noAccess")) {
     return <PageNoAccessError />;
   }
@@ -428,13 +440,6 @@ export default function Page({
     state.context._documentDecryptionState === "pending"
   ) {
     return <PageLoadingError reloadPage={reloadPage} />;
-  }
-
-  let documentState: DocumentState = "loading";
-  if (state.matches("failed")) {
-    documentState = "error";
-  } else if (documentLoaded) {
-    documentState = "active";
   }
 
   return (

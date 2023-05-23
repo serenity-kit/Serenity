@@ -12,11 +12,7 @@ import { useAuthenticatedAppContext } from "../../../hooks/useAuthenticatedAppCo
 import { WorkspaceDrawerScreenProps } from "../../../types/navigationProps";
 
 import { LocalDevice } from "@serenity-tools/common";
-import {
-  tw,
-  useHasEditorSidebar,
-  useIsPermanentLeftSidebar,
-} from "@serenity-tools/ui";
+import { tw, useIsPermanentLeftSidebar } from "@serenity-tools/ui";
 import { useActor, useInterpret, useMachine } from "@xstate/react";
 import { Drawer } from "react-native-drawer-layout";
 import sodium, { KeyPair } from "react-native-libsodium";
@@ -123,8 +119,6 @@ const ActualPageScreen = (
       keyType: "ed25519",
     };
   }, [activeDevice]);
-
-  const hasEditorSidebar = useHasEditorSidebar();
 
   if (state.matches("hasNoAccess")) {
     return <PageNoAccessError />;

@@ -15,6 +15,7 @@ import { StyleSheet } from "react-native";
 import { usePage } from "../../context/PageContext";
 import { useWorkspace } from "../../context/WorkspaceContext";
 import { DecryptedComment } from "../../machines/commentsMachine";
+import { useEditorStore } from "../../utils/editorStore/editorStore";
 import { getUserFromWorkspaceQueryResultByDeviceInfo } from "../../utils/getUserFromWorkspaceQueryResultByDeviceInfo/getUserFromWorkspaceQueryResultByDeviceInfo";
 import CommentReply from "../commentReply/CommentReply";
 import CommentsMenu from "../commentsMenu/CommentsMenu";
@@ -30,7 +31,7 @@ export default function Comment({ comment, meId, meName }: Props) {
   const { commentsService } = usePage();
   const [state, send] = useActor(commentsService);
   const [isHovered, setIsHovered] = React.useState(false);
-
+  const documentState = useEditorStore((state) => state.documentState);
   const commentCreator = getUserFromWorkspaceQueryResultByDeviceInfo(
     workspaceQueryResult.data!,
     comment.creatorDevice
@@ -54,9 +55,7 @@ export default function Comment({ comment, meId, meName }: Props) {
     submit: tw`absolute h-${submitButtonHeight} w-${submitButtonHeight} bottom-0.5 right-0.5`,
   });
 
-  // TODO
-  const isLoading = false;
-  const hasError = false;
+  const hasError = documentState === "error";
 
   return (
     <Pressable
