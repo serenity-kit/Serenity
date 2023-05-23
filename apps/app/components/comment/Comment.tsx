@@ -131,7 +131,7 @@ export default function Comment({ comment, meId, meName }: Props) {
       {isActiveComment ? (
         <>
           <View style={!hasError || replyLength > 0 ? tw`mt-2` : tw``}>
-            {comment.replies.map((reply) => {
+            {comment.replies.map((reply, i) => {
               if (!reply) return null;
 
               return (
@@ -140,6 +140,7 @@ export default function Comment({ comment, meId, meName }: Props) {
                   reply={reply}
                   meId={meId}
                   commentId={comment.id}
+                  naked={hasError && i + 1 === replyLength}
                 />
               );
             })}
@@ -175,7 +176,7 @@ export default function Comment({ comment, meId, meName }: Props) {
         </>
       ) : null}
 
-      {!isActiveComment && !hasError ? (
+      {!isActiveComment && (!hasError || (hasError && replyLength > 0)) ? (
         <Text
           variant="xxs"
           style={tw`pt-1 pl-0.5 ${

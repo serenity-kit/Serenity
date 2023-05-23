@@ -33,6 +33,7 @@ import { useAuthenticatedAppContext } from "../../hooks/useAuthenticatedAppConte
 import { WorkspaceDrawerScreenProps } from "../../types/navigationProps";
 import { createDocumentShareLink } from "../../utils/document/createDocumentShareLink";
 import { notNull } from "../../utils/notNull/notNull";
+import { useEditorStore } from "../../utils/editorStore/editorStore";
 
 const styles = StyleSheet.create({
   createShareLinkButton: tw`self-start`,
@@ -63,6 +64,7 @@ export function PageShareModalContent() {
     documentShareLinksResult.data?.documentShareLinks?.nodes?.filter(notNull) ||
     [];
   const [sharingRole, _setSharingRole] = useState(Role.Viewer);
+  const documentState = useEditorStore((state) => state.documentState);
 
   const setSharingRole = (role: string) => {
     // admin sharing is disallowed
@@ -136,10 +138,6 @@ export function PageShareModalContent() {
     }, CLIPBOARD_NOTICE_TIMEOUT_SECONDS * 1000);
   };
 
-  // TODO
-  const isLoading = false;
-  const hasError = false;
-
   return (
     <>
       {documentShareLinksResult.fetching ? (
@@ -183,8 +181,8 @@ export function PageShareModalContent() {
                     }}
                     style={styles.createShareLinkButton}
                     testID="document-share-modal__create-share-link-button"
-                    disabled={isLoading || hasError}
-                    isLoading={isLoading}
+                    disabled={documentState !== "active"}
+                    isLoading={documentState === "loading"}
                   >
                     Create page link
                   </Button>

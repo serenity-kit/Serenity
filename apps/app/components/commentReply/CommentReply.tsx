@@ -19,9 +19,15 @@ type Props = {
   reply: DecryptedReply;
   meId: string;
   commentId: string;
+  naked?: boolean;
 };
 
-export default function CommentReply({ reply, meId, commentId }: Props) {
+export default function CommentReply({
+  reply,
+  meId,
+  commentId,
+  naked = false,
+}: Props) {
   const { workspaceQueryResult } = useWorkspace();
   const { commentsService } = usePage();
   const [, send] = useActor(commentsService);
@@ -83,7 +89,9 @@ export default function CommentReply({ reply, meId, commentId }: Props) {
         ) : null}
       </HStack>
       <View
-        style={tw`ml-2.75 pb-4 pl-4.25 border-l-2 border-solid border-gray-200`}
+        style={tw`ml-2.75 ${
+          naked ? `pb-2 border-transparent` : `pb-4 border-gray-200`
+        }  pl-4.25 border-l-2 border-solid`}
       >
         <Text variant="xxs" muted style={tw`mt-1 mb-1.5`}>
           {formatDistanceToNow(parseJSON(reply.createdAt), {
