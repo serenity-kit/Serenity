@@ -75,6 +75,7 @@ export const IconButton = forwardRef((props: IconButtonProps, ref) => {
     active: transparent
       ? tw`border border-${iconColor}/20 bg-${iconColor}/10`
       : tw`border border-gray-200 bg-gray-120`,
+    disabled: tw`opacity-50`,
   });
 
   return (
@@ -100,6 +101,7 @@ export const IconButton = forwardRef((props: IconButtonProps, ref) => {
               isActive && styles.active,
               isHovered && !isLoading && styles.hover,
               isPressed && !isLoading && styles.pressed,
+              props.disabled && styles.disabled,
               isFocusVisible && styles.focusVisible,
             ]}
             space={2}

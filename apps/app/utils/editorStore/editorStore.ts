@@ -1,5 +1,6 @@
 import { DocumentDecryptionState } from "@naisho/core";
 import create from "zustand";
+import { DocumentState } from "../../types/documentState";
 
 type SyncState =
   | { variant: "online" }
@@ -13,9 +14,11 @@ type SyncState =
 interface EditorState {
   isInEditingMode: boolean;
   syncState: SyncState;
+  documentState: DocumentState;
   subscriptions: (() => void)[];
   setIsInEditingMode: (isInEditingMode: boolean) => void;
-  setSyncState: (offlineState: SyncState) => void;
+  setSyncState: (newSyncState: SyncState) => void;
+  setDocumentState: (newDocumentState: DocumentState) => void;
   triggerBlur: () => void;
   subscribeToBlurTrigger: (callback: () => void) => void;
   removeAllSubscribers: () => void;
@@ -23,6 +26,7 @@ interface EditorState {
 
 export const useEditorStore = create<EditorState>((set, get) => ({
   syncState: { variant: "online" },
+  documentState: "loading",
   subscriptions: [],
   subscribeToBlurTrigger: (callback) =>
     set((state) => ({
@@ -43,8 +47,12 @@ export const useEditorStore = create<EditorState>((set, get) => ({
     set((state) => ({
       isInEditingMode,
     })),
-  setSyncState: (syncState) =>
+  setSyncState: (newSyncState) =>
     set((state) => ({
-      syncState,
+      syncState: newSyncState,
+    })),
+  setDocumentState: (newDocumentState) =>
+    set((state) => ({
+      documentState: newDocumentState,
     })),
 }));

@@ -7,10 +7,11 @@ export type HeadingProps = RNText["props"] & {
   center?: boolean;
   padded?: boolean;
   accessibilityOnly?: boolean; // set to visually hide element but leave it in for accessibility reasons
+  muted?: boolean;
 };
 
 export const Heading = (props: HeadingProps) => {
-  const { lvl, padded } = props;
+  const { lvl, padded, muted } = props;
 
   const styles = StyleSheet.create({
     // flex needed to make them "block" elements which can have margins
@@ -48,6 +49,7 @@ export const Heading = (props: HeadingProps) => {
         fontFamily: "Inter_500Medium",
       }
     ),
+    muted: tw`text-muted`,
     accessibilityOnly: tw`hidden`,
   });
 
@@ -58,6 +60,7 @@ export const Heading = (props: HeadingProps) => {
         styles[lvl],
         props.accessibilityOnly ? styles.accessibilityOnly : undefined,
         props.center && tw`justify-center text-center`, // justify for web, text-center for iOS
+        muted && styles.muted,
         props.style,
       ]}
       // @ts-expect-error react-native-web needs react-native unsupported values here

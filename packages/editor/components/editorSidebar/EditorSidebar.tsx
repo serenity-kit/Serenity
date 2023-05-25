@@ -26,20 +26,28 @@ import React from "react";
 import { Platform } from "react-native";
 import TableOfContents from "../tableOfContents/TableOfContents";
 
+type DocumentState = "active" | "loading" | "error";
+
 type EditorSidebarProps = {
   editor: Editor | null;
   headingLevels: Level[];
   encryptAndUploadFile: EncryptAndUploadFunctionFile;
+  documentState: DocumentState;
 };
 
 export default function EditorSidebar({
   editor,
   headingLevels,
   encryptAndUploadFile,
+  documentState,
 }: EditorSidebarProps) {
   const [activeTab, setActiveTab] = React.useState<
     "editing" | "tableOfContents"
   >("editing");
+
+  const muteHeading = documentState !== "active";
+  const disableButton = documentState !== "active";
+  const disableTab = documentState === "loading";
 
   return (
     <>
@@ -50,6 +58,7 @@ export default function EditorSidebar({
           onPress={() => {
             setActiveTab("editing");
           }}
+          disabled={disableTab}
         >
           Edit
         </Tab>
@@ -59,6 +68,7 @@ export default function EditorSidebar({
           onPress={() => {
             setActiveTab("tableOfContents");
           }}
+          disabled={disableTab}
         >
           Table of Contents
         </Tab>
@@ -70,13 +80,14 @@ export default function EditorSidebar({
         </TabPanel>
       ) : (
         <TabPanel tabId="editing">
-          <Heading lvl={4} style={tw`ml-4`} padded>
+          <Heading lvl={4} style={tw`ml-4`} padded muted={muteHeading}>
             Blocks
           </Heading>
 
           {headingLevels.map((lvl) => {
             return (
               <SidebarButton
+                disabled={disableButton}
                 key={lvl}
                 onPress={() =>
                   editor?.chain().focus().toggleHeading({ level: lvl }).run()
@@ -100,6 +111,7 @@ export default function EditorSidebar({
 
           <SidebarButton
             onPress={() => editor?.chain().focus().toggleCodeBlock().run()}
+            disabled={disableButton}
           >
             <EditorSidebarIcon
               isActive={editor?.isActive("codeBlock") || false}
@@ -112,6 +124,7 @@ export default function EditorSidebar({
 
           <SidebarButton
             onPress={() => editor?.chain().focus().toggleBlockquote().run()}
+            disabled={disableButton}
           >
             <EditorSidebarIcon
               isActive={editor?.isActive("blockquote") || false}
@@ -124,12 +137,13 @@ export default function EditorSidebar({
 
           <HorizontalDivider />
 
-          <Heading lvl={4} style={tw`ml-4`} padded>
+          <Heading lvl={4} style={tw`ml-4`} padded muted={muteHeading}>
             Lists
           </Heading>
 
           <SidebarButton
             onPress={() => editor?.chain().focus().toggleBulletList().run()}
+            disabled={disableButton}
           >
             <EditorSidebarIcon
               isActive={editor?.isActive("bulletList") || false}
@@ -142,6 +156,7 @@ export default function EditorSidebar({
 
           <SidebarButton
             onPress={() => editor?.chain().focus().toggleOrderedList().run()}
+            disabled={disableButton}
           >
             <EditorSidebarIcon
               isActive={editor?.isActive("orderedList") || false}
@@ -154,6 +169,7 @@ export default function EditorSidebar({
 
           <SidebarButton
             onPress={() => editor?.chain().focus().toggleTaskList().run()}
+            disabled={disableButton}
           >
             <EditorSidebarIcon
               isActive={editor?.isActive("taskList") || false}
@@ -166,11 +182,12 @@ export default function EditorSidebar({
 
           <HorizontalDivider />
 
-          <Heading lvl={4} style={tw`ml-4`} padded>
+          <Heading lvl={4} style={tw`ml-4`} padded muted={muteHeading}>
             Media
           </Heading>
 
           <SidebarButton
+            disabled={disableButton}
             onPress={() => {
               initiateImagePicker({
                 encryptAndUploadFile,
@@ -214,6 +231,7 @@ export default function EditorSidebar({
 
           {Platform.OS === "web" ? (
             <SidebarButton
+              disabled={disableButton}
               onPress={() => {
                 const input = document.createElement("input");
                 input.type = "file";
@@ -332,11 +350,12 @@ export default function EditorSidebar({
 
           <HorizontalDivider />
 
-          <Heading lvl={4} style={tw`ml-4`} padded>
+          <Heading lvl={4} style={tw`ml-4`} padded muted={muteHeading}>
             Blocks
           </Heading>
 
           <SidebarButton
+            disabled={disableButton}
             onPress={() =>
               editor
                 ?.chain()

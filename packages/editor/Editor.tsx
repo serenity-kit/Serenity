@@ -53,6 +53,8 @@ type HighlightedCommentSource = "editor" | "sidebar";
 
 type HighlightedComment = { id: string; source: HighlightedCommentSource };
 
+type DocumentState = "active" | "loading" | "error";
+
 type EditorProps = {
   documentId: string;
   yDocRef: React.MutableRefObject<Y.Doc>;
@@ -74,6 +76,7 @@ type EditorProps = {
   highlightedComment: HighlightedComment | null;
   hasOpenCommentsSidebar: () => boolean;
   editable: boolean;
+  documentState: DocumentState;
 };
 
 const headingLevels: Level[] = [1, 2, 3];
@@ -280,6 +283,7 @@ export const Editor = (props: EditorProps) => {
             editor={editor}
             headingLevels={headingLevels}
             encryptAndUploadFile={props.encryptAndUploadFile}
+            documentState={props.documentState}
           />
 
           <BubbleMenu

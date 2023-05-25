@@ -12,16 +12,12 @@ import { useAuthenticatedAppContext } from "../../../hooks/useAuthenticatedAppCo
 import { WorkspaceDrawerScreenProps } from "../../../types/navigationProps";
 
 import { LocalDevice } from "@serenity-tools/common";
-import {
-  CenterContent,
-  Spinner,
-  tw,
-  useIsPermanentLeftSidebar,
-} from "@serenity-tools/ui";
+import { tw, useIsPermanentLeftSidebar } from "@serenity-tools/ui";
 import { useActor, useInterpret, useMachine } from "@xstate/react";
 import { Drawer } from "react-native-drawer-layout";
 import sodium, { KeyPair } from "react-native-libsodium";
 import CommentsSidebar from "../../../components/commentsSidebar/CommentsSidebar";
+import { EditorLoading } from "../../../components/editorLoading/EditorLoading";
 import { PageHeader } from "../../../components/page/PageHeader";
 import { PageNoAccessError } from "../../../components/page/PageNoAccessError";
 import { PageHeaderRight } from "../../../components/pageHeaderRight/PageHeaderRight";
@@ -179,11 +175,7 @@ const ActualPageScreen = (
       </PageProvider>
     );
   } else {
-    return (
-      <CenterContent>
-        <Spinner fadeIn />
-      </CenterContent>
-    );
+    return <EditorLoading />;
   }
 };
 

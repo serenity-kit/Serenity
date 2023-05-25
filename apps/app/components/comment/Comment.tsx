@@ -15,6 +15,7 @@ import { StyleSheet } from "react-native";
 import { usePage } from "../../context/PageContext";
 import { useWorkspace } from "../../context/WorkspaceContext";
 import { DecryptedComment } from "../../machines/commentsMachine";
+import { useEditorStore } from "../../utils/editorStore/editorStore";
 import { getUserFromWorkspaceQueryResultByDeviceInfo } from "../../utils/getUserFromWorkspaceQueryResultByDeviceInfo/getUserFromWorkspaceQueryResultByDeviceInfo";
 import CommentReply from "../commentReply/CommentReply";
 import CommentsMenu from "../commentsMenu/CommentsMenu";
@@ -30,7 +31,7 @@ export default function Comment({ comment, meId, meName }: Props) {
   const { commentsService } = usePage();
   const [state, send] = useActor(commentsService);
   const [isHovered, setIsHovered] = React.useState(false);
-
+  const documentState = useEditorStore((state) => state.documentState);
   const commentCreator = getUserFromWorkspaceQueryResultByDeviceInfo(
     workspaceQueryResult.data!,
     comment.creatorDevice
@@ -53,6 +54,8 @@ export default function Comment({ comment, meId, meName }: Props) {
     textarea: tw`pb-${submitButtonHeight}`,
     submit: tw`absolute h-${submitButtonHeight} w-${submitButtonHeight} bottom-0.5 right-0.5`,
   });
+
+  const hasError = documentState === "error";
 
   return (
     <Pressable
@@ -127,8 +130,8 @@ export default function Comment({ comment, meId, meName }: Props) {
       </View>
       {isActiveComment ? (
         <>
-          <View style={tw`mt-2`}>
-            {comment.replies.map((reply) => {
+          <View style={!hasError || replyLength > 0 ? tw`mt-2` : tw``}>
+            {comment.replies.map((reply, i) => {
               if (!reply) return null;
 
               return (
@@ -137,38 +140,43 @@ export default function Comment({ comment, meId, meName }: Props) {
                   reply={reply}
                   meId={meId}
                   commentId={comment.id}
+                  naked={hasError && i + 1 === replyLength}
                 />
               );
             })}
           </View>
 
-          <HStack space="1.5">
-            <Avatar color={hashToCollaboratorColor(meId)} size="xs">
-              {meName?.split("@")[0].substring(0, 1)}
-            </Avatar>
+          {!hasError ? (
+            <HStack space="1.5">
+              <Avatar color={hashToCollaboratorColor(meId)} size="xs">
+                {meName?.split("@")[0].substring(0, 1)}
+              </Avatar>
 
-            {/* negative margin to align ReplyArea centered with Avatar on default
+              {/* negative margin to align ReplyArea centered with Avatar on default
             without losing line-connection between replying Avatars */}
-            <View style={tw`relative -mt-1.5`}>
-              <ReplyArea
-                value={state.context.replyTexts[comment.id]}
-                onChangeText={(text) =>
-                  send({
-                    type: "UPDATE_REPLY_TEXT",
-                    commentId: comment.id,
-                    text,
-                  })
-                }
-                style={styles.textarea}
-                onSubmitPress={() =>
-                  send({ type: "CREATE_REPLY", commentId: comment.id })
-                }
-                testPrefix={`comment-${comment.id}`}
-              />
-            </View>
-          </HStack>
+              <View style={tw`relative -mt-1.5`}>
+                <ReplyArea
+                  value={state.context.replyTexts[comment.id]}
+                  onChangeText={(text) =>
+                    send({
+                      type: "UPDATE_REPLY_TEXT",
+                      commentId: comment.id,
+                      text,
+                    })
+                  }
+                  style={styles.textarea}
+                  onSubmitPress={() =>
+                    send({ type: "CREATE_REPLY", commentId: comment.id })
+                  }
+                  testPrefix={`comment-${comment.id}`}
+                />
+              </View>
+            </HStack>
+          ) : null}
         </>
-      ) : (
+      ) : null}
+
+      {!isActiveComment && (!hasError || (hasError && replyLength > 0)) ? (
         <Text
           variant="xxs"
           style={tw`pt-1 pl-0.5 ${
@@ -177,7 +185,7 @@ export default function Comment({ comment, meId, meName }: Props) {
         >
           {replyPlaceholder}
         </Text>
-      )}
+      ) : null}
     </Pressable>
   );
 }

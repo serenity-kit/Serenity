@@ -19,6 +19,7 @@ import {
   useIsDesktopDevice,
   View,
 } from "@serenity-tools/ui";
+import { HStack } from "native-base";
 import * as Clipboard from "expo-clipboard";
 import { useMemo, useState } from "react";
 import { StyleSheet } from "react-native";
@@ -32,15 +33,10 @@ import { useAuthenticatedAppContext } from "../../hooks/useAuthenticatedAppConte
 import { WorkspaceDrawerScreenProps } from "../../types/navigationProps";
 import { createDocumentShareLink } from "../../utils/document/createDocumentShareLink";
 import { notNull } from "../../utils/notNull/notNull";
+import { useEditorStore } from "../../utils/editorStore/editorStore";
 
 const styles = StyleSheet.create({
   createShareLinkButton: tw`self-start`,
-  shareLinkWrapperBase: tw`relative mb-2 py-4 px-5 border rounded`,
-  shareLinkWrapperActive: tw`bg-primary-100/40 border-primary-200`,
-  shareLinkWrapperInactive: tw`bg-gray-100 border-gray-200`,
-  shareLinkTextActive: tw`text-primary-900`,
-  shareLinkTextInactive: tw`text-gray-400`,
-  createShareLinkOptions: tw`flex-row justify-between items-center mb-4`,
 });
 
 const CLIPBOARD_NOTICE_TIMEOUT_SECONDS = 1;
@@ -68,6 +64,7 @@ export function PageShareModalContent() {
     documentShareLinksResult.data?.documentShareLinks?.nodes?.filter(notNull) ||
     [];
   const [sharingRole, _setSharingRole] = useState(Role.Viewer);
+  const documentState = useEditorStore((state) => state.documentState);
 
   const setSharingRole = (role: string) => {
     // admin sharing is disallowed
@@ -165,7 +162,7 @@ export function PageShareModalContent() {
                     ? pageShareLink
                     : 'The share link will be generated here\nClick on "Create page link" to generate a new link'}
                 </SharetextBox>
-                <View style={styles.createShareLinkOptions}>
+                <HStack alignItems={"center"} style={tw`mb-4`} space={2}>
                   <Select
                     onValueChange={(value: Role) => {
                       setSharingRole(value);
@@ -184,10 +181,12 @@ export function PageShareModalContent() {
                     }}
                     style={styles.createShareLinkButton}
                     testID="document-share-modal__create-share-link-button"
+                    disabled={documentState !== "active"}
+                    isLoading={documentState === "loading"}
                   >
                     Create page link
                   </Button>
-                </View>
+                </HStack>
               </View>
               <View>
                 <Heading lvl={3} padded>

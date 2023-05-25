@@ -24,6 +24,7 @@ export const PageHeader: React.FC<Props> = ({
 }) => {
   const isInEditingMode = useEditorStore((state) => state.isInEditingMode);
   const syncState = useEditorStore((state) => state.syncState);
+  const documentState = useEditorStore((state) => state.documentState);
   const isDesktopDevice = useIsDesktopDevice();
   const hasEditorSidebar = useHasEditorSidebar();
 
@@ -75,6 +76,7 @@ export const PageHeader: React.FC<Props> = ({
             name={hasNewComment ? "chat-4-line-dot" : "chat-4-line"}
             size={"lg"}
             testID="open-comments-drawer-button"
+            disabled={documentState === "loading"}
           />
         </Tooltip>
       ) : null}
