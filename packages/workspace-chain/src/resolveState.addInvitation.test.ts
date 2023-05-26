@@ -10,7 +10,7 @@ import {
   addInvitation,
   addMember,
   createChain,
-  InvalidTrustChainError,
+  InvalidWorkspaceChainError,
   resolveState,
 } from "./index";
 import { hashTransaction } from "./utils";
@@ -66,7 +66,7 @@ test("should not be able to add an invitation as editor", async () => {
     workspaceId: "test",
   });
   const chain = [createEvent, addMemberEvent, addInvitationEvent];
-  expect(() => resolveState(chain)).toThrow(InvalidTrustChainError);
+  expect(() => resolveState(chain)).toThrow(InvalidWorkspaceChainError);
   expect(() => resolveState(chain)).toThrow(
     "Not allowed to add an invitation."
   );

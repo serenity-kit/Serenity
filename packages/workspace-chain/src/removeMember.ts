@@ -1,13 +1,13 @@
 import canonicalize from "canonicalize";
 import sodium from "react-native-libsodium";
-import { DefaultTrustChainEvent, RemoveMemberTransaction } from "./types";
+import { DefaultWorkspaceChainEvent, RemoveMemberTransaction } from "./types";
 import { hashTransaction } from "./utils";
 
 export const removeMember = (
   prevHash: string,
   authorKeyPair: sodium.KeyPair,
   memberMainDeviceSigningPublicKey: string
-): DefaultTrustChainEvent => {
+): DefaultWorkspaceChainEvent => {
   const transaction: RemoveMemberTransaction = {
     type: "remove-member",
     memberMainDeviceSigningPublicKey,

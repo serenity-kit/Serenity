@@ -8,7 +8,7 @@ import {
   KeyPairs,
 } from "../test/testUtils";
 import { addAuthorToEvent } from "./addAuthorToEvent";
-import { InvalidTrustChainError } from "./errors";
+import { InvalidWorkspaceChainError } from "./errors";
 import { addMember, createChain, resolveState } from "./index";
 import { hashTransaction } from "./utils";
 
@@ -81,7 +81,7 @@ test("should not be able to add a member as editor", async () => {
     "EDITOR"
   );
   const chain = [createEvent, addMemberEvent, addMemberEvent2];
-  expect(() => resolveState(chain)).toThrow(InvalidTrustChainError);
+  expect(() => resolveState(chain)).toThrow(InvalidWorkspaceChainError);
   expect(() => resolveState(chain)).toThrow("Not allowed to add a member.");
 });
 
@@ -142,7 +142,7 @@ test("should not be able to add the same admin twice as author", async () => {
   );
   const addAdminEvent3 = addAuthorToEvent(addAdminEvent2, keyPairA);
   const chain = [createEvent, addAdminEvent, addAdminEvent3];
-  expect(() => resolveState(chain)).toThrow(InvalidTrustChainError);
+  expect(() => resolveState(chain)).toThrow(InvalidWorkspaceChainError);
   expect(() => resolveState(chain)).toThrow(
     "An author can sign the event only once."
   );
@@ -163,6 +163,6 @@ test("should not be able to add the same member twice", async () => {
     "ADMIN"
   );
   const chain = [createEvent, addAdminEvent, addAdminEvent2];
-  expect(() => resolveState(chain)).toThrow(InvalidTrustChainError);
+  expect(() => resolveState(chain)).toThrow(InvalidWorkspaceChainError);
   expect(() => resolveState(chain)).toThrow("Member already exists.");
 });

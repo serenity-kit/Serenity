@@ -1,21 +1,21 @@
-import { InvalidTrustChainError } from "./errors";
+import { InvalidWorkspaceChainError } from "./errors";
 import {
-  CreateChainTrustChainEvent,
+  CreateChainWorkspaceChainEvent,
   MemberProperties,
-  TrustChainState,
+  WorkspaceChainState,
 } from "./types";
 import { hashTransaction, isValidCreateChainEvent } from "./utils";
 
 export const applyCreateChainEvent = (
-  event: CreateChainTrustChainEvent
-): TrustChainState => {
+  event: CreateChainWorkspaceChainEvent
+): WorkspaceChainState => {
   if (!isValidCreateChainEvent(event)) {
-    throw new InvalidTrustChainError("Invalid chain creation event.");
+    throw new InvalidWorkspaceChainError("Invalid chain creation event.");
   }
 
   let members: { [publicKey: string]: MemberProperties } = {};
   if (event.authors.length !== 1) {
-    throw new InvalidTrustChainError("Invalid chain creation event.");
+    throw new InvalidWorkspaceChainError("Invalid chain creation event.");
   }
   event.authors.forEach((author) => {
     members[author.publicKey] = {
@@ -30,6 +30,6 @@ export const applyCreateChainEvent = (
     members,
     lastEventHash: hashTransaction(event.transaction),
     encryptedStateClock: 0,
-    trustChainVersion: 1,
+    workspaceChainVersion: 1,
   };
 };

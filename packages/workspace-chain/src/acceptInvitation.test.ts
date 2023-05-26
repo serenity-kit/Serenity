@@ -13,7 +13,7 @@ import {
   addInvitation,
   AddInvitationResult,
   createChain,
-  CreateChainTrustChainEvent,
+  CreateChainWorkspaceChainEvent,
 } from "./index";
 import { hashTransaction } from "./utils";
 
@@ -21,7 +21,7 @@ let keyPairA: sodium.KeyPair;
 let keyPairsA: KeyPairs;
 let keyPairB: sodium.KeyPair;
 let keyPairsB: KeyPairs;
-let createEvent: CreateChainTrustChainEvent;
+let createEvent: CreateChainWorkspaceChainEvent;
 let addInvitationEvent: AddInvitationResult;
 let mainDevice: {
   mainDeviceSigningPublicKey: string;

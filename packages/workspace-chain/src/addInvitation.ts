@@ -2,7 +2,7 @@ import canonicalize from "canonicalize";
 import sodium from "react-native-libsodium";
 import {
   AddInvitationTransaction,
-  DefaultTrustChainEvent,
+  DefaultWorkspaceChainEvent,
   Role,
 } from "./types";
 import { hashTransaction } from "./utils";
@@ -15,7 +15,7 @@ type AddInvitationParams = {
   workspaceId: string;
 };
 
-export type AddInvitationResult = DefaultTrustChainEvent & {
+export type AddInvitationResult = DefaultWorkspaceChainEvent & {
   invitationSigningKeyPairSeed: string;
 };
 

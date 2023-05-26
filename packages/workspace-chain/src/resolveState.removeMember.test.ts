@@ -8,7 +8,7 @@ import {
   getKeyPairsC,
   KeyPairs,
 } from "../test/testUtils";
-import { InvalidTrustChainError } from "./errors";
+import { InvalidWorkspaceChainError } from "./errors";
 import { addMember, createChain, removeMember, resolveState } from "./index";
 import { hashTransaction } from "./utils";
 
@@ -123,7 +123,7 @@ test("should not be able to remove a member as EDITOR", async () => {
     addMemberEvent2,
     removeMemberEvent,
   ];
-  expect(() => resolveState(chain)).toThrow(InvalidTrustChainError);
+  expect(() => resolveState(chain)).toThrow(InvalidWorkspaceChainError);
   expect(() => resolveState(chain)).toThrow("Not allowed to remove a member.");
 });
 
@@ -141,7 +141,7 @@ test("should not be able to remove the last admin", async () => {
     sodium.to_base64(keyPairA.publicKey)
   );
   const chain = [createEvent, addMemberEvent, removeMemberEvent];
-  expect(() => resolveState(chain)).toThrow(InvalidTrustChainError);
+  expect(() => resolveState(chain)).toThrow(InvalidWorkspaceChainError);
   expect(() => resolveState(chain)).toThrow(
     "Not allowed to remove the last admin."
   );
@@ -155,7 +155,7 @@ test("should throw in case the member does not exist", async () => {
     sodium.to_base64(keyPairB.publicKey)
   );
   const chain = [createEvent, removeMemberEvent];
-  expect(() => resolveState(chain)).toThrow(InvalidTrustChainError);
+  expect(() => resolveState(chain)).toThrow(InvalidWorkspaceChainError);
   expect(() => resolveState(chain)).toThrow(
     "Failed to remove non-existing member."
   );
@@ -169,7 +169,7 @@ test("should not be able to remove the last member", async () => {
     sodium.to_base64(keyPairA.publicKey)
   );
   expect(() => resolveState([createEvent, eventRemoveMember])).toThrow(
-    InvalidTrustChainError
+    InvalidWorkspaceChainError
   );
   expect(() => resolveState([createEvent, eventRemoveMember])).toThrow(
     "Not allowed to remove last member."

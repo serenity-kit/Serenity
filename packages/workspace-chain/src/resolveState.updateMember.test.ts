@@ -7,7 +7,7 @@ import {
   KeyPairs,
 } from "../test/testUtils";
 import { addAuthorToEvent } from "./addAuthorToEvent";
-import { InvalidTrustChainError } from "./errors";
+import { InvalidWorkspaceChainError } from "./errors";
 import { addMember, createChain, resolveState, updateMember } from "./index";
 import { hashTransaction } from "./utils";
 
@@ -100,7 +100,7 @@ test("should fail to demote the last ADMIN to a EDITOR", async () => {
     "EDITOR"
   );
   const chain = [createEvent, updateMemberEvent];
-  expect(() => resolveState(chain)).toThrow(InvalidTrustChainError);
+  expect(() => resolveState(chain)).toThrow(InvalidWorkspaceChainError);
   expect(() => resolveState(chain)).toThrow(
     "Not allowed to demote the last admin."
   );
@@ -122,7 +122,7 @@ test("should fail to promote an ADMIN that is already an ADMIN", async () => {
   );
   const updateMemberEvent2 = addAuthorToEvent(updateMemberEvent, keyPairB);
   const chain = [createEvent, addAdminEvent, updateMemberEvent2];
-  expect(() => resolveState(chain)).toThrow(InvalidTrustChainError);
+  expect(() => resolveState(chain)).toThrow(InvalidWorkspaceChainError);
   expect(() => resolveState(chain)).toThrow("Not allowed member update.");
 });
 
@@ -141,6 +141,6 @@ test("should fail to update a member if nothing changes", async () => {
     "EDITOR"
   );
   const chain = [createEvent, addMemberEvent, updateMemberEvent];
-  expect(() => resolveState(chain)).toThrow(InvalidTrustChainError);
+  expect(() => resolveState(chain)).toThrow(InvalidWorkspaceChainError);
   expect(() => resolveState(chain)).toThrow("Not allowed member update.");
 });

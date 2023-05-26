@@ -14,7 +14,7 @@ import {
   addInvitation,
   addMemberViaInvitation,
   createChain,
-  InvalidTrustChainError,
+  InvalidWorkspaceChainError,
   resolveState,
 } from "./index";
 import { hashTransaction } from "./utils";
@@ -141,7 +141,7 @@ test("should be able to add a member twice", async () => {
     addMemberViaInvitationEvent,
     addMemberViaInvitationEvent2,
   ];
-  expect(() => resolveState(chain)).toThrow(InvalidTrustChainError);
+  expect(() => resolveState(chain)).toThrow(InvalidWorkspaceChainError);
   expect(() => resolveState(chain)).toThrow("Member already exists.");
 });
 
@@ -176,6 +176,6 @@ test("should fail if the author is not a member of the chain", async () => {
     expiresAt: new Date(addInvitationEvent.transaction.expiresAt),
   });
   const chain = [createEvent, addInvitationEvent, addMemberViaInvitationEvent];
-  expect(() => resolveState(chain)).toThrow(InvalidTrustChainError);
+  expect(() => resolveState(chain)).toThrow(InvalidWorkspaceChainError);
   expect(() => resolveState(chain)).toThrow("Author is not a member.");
 });

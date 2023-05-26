@@ -7,7 +7,7 @@ import {
   KeyPairs,
 } from "../test/testUtils";
 import { addAuthorToEvent } from "./addAuthorToEvent";
-import { InvalidTrustChainError } from "./errors";
+import { InvalidWorkspaceChainError } from "./errors";
 import { createChain, resolveState } from "./index";
 
 let keyPairsA: KeyPairs;
@@ -46,6 +46,6 @@ test("should fail in case there is more than one author", async () => {
   const event = createChain(keyPairsA.sign);
   const event2 = addAuthorToEvent(event, keyPairB);
   const chain = [event2];
-  expect(() => resolveState(chain)).toThrow(InvalidTrustChainError);
+  expect(() => resolveState(chain)).toThrow(InvalidWorkspaceChainError);
   expect(() => resolveState(chain)).toThrow("Invalid chain creation event.");
 });
