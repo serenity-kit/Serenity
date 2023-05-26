@@ -29,9 +29,7 @@ beforeAll(async () => {
 });
 
 test("should be able to add a invitation as ADMIN", async () => {
-  const createEvent = createChain(keyPairsA.sign, {
-    [keyPairsA.sign.publicKey]: keyPairsA.box.publicKey,
-  });
+  const createEvent = createChain(keyPairsA.sign);
   const addInvitationEvent = addInvitation({
     prevHash: hashTransaction(createEvent.transaction),
     authorKeyPair: keyPairA,
@@ -53,14 +51,11 @@ test("should be able to add a invitation as ADMIN", async () => {
 });
 
 test("should not be able to add an invitation as editor", async () => {
-  const createEvent = createChain(keyPairsA.sign, {
-    [keyPairsA.sign.publicKey]: keyPairsA.box.publicKey,
-  });
+  const createEvent = createChain(keyPairsA.sign);
   const addMemberEvent = addMember(
     hashTransaction(createEvent.transaction),
     keyPairA,
     keyPairsB.sign.publicKey,
-    keyPairsB.box.publicKey,
     "EDITOR"
   );
   const addInvitationEvent = addInvitation({

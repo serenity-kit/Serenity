@@ -1,9 +1,12 @@
-export type Role = "ADMIN" | "EDITOR" | "COMMENTER" | "VIEWER";
+import z from "zod";
+
+export const Role = z.enum(["ADMIN", "EDITOR", "COMMENTER", "VIEWER"]);
+
+export type Role = z.infer<typeof Role>;
 
 export type CreateChainTransaction = {
   type: "create";
   id: string;
-  lockboxPublicKeys: { [signingPublicKey: string]: string };
 };
 
 export type AddInvitationTransaction = {
@@ -19,7 +22,6 @@ export type AddInvitationTransaction = {
 export type AddMemberTransaction = {
   type: "add-member";
   memberMainDeviceSigningPublicKey: string;
-  memberMainDeviceEncryptionPublicKey: string;
   role: Role;
 };
 
@@ -30,8 +32,6 @@ export type AddMemberViaInvitationTransaction = {
   invitationSigningPublicKey: string;
   invitationId: string;
   memberMainDeviceSigningPublicKey: string;
-  memberMainDeviceEncryptionPublicKey: string;
-  memberMainDeviceEncryptionPublicKeySignature: string;
   workspaceId: string;
   expiresAt: string;
 };
@@ -82,7 +82,6 @@ export type Invitation = {
 };
 
 export type MemberProperties = {
-  lockboxPublicKey: string;
   role: Role;
   addedBy: string[];
 };

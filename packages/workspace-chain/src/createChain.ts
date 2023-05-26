@@ -9,13 +9,11 @@ import {
 import { hashTransaction } from "./utils";
 
 export const createChain = (
-  authorKeyPair: KeyPairBase64,
-  lockboxPublicKeys: { [signingPublicKey: string]: string }
+  authorKeyPair: KeyPairBase64
 ): CreateChainTrustChainEvent => {
   const transaction: CreateChainTransaction = {
     type: "create",
     id: generateId(),
-    lockboxPublicKeys,
   };
   const hash = hashTransaction(transaction);
   const message = canonicalize({

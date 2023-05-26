@@ -25,14 +25,11 @@ beforeAll(async () => {
 });
 
 test("should be able to promote an EDITOR to an ADMIN", async () => {
-  const createEvent = createChain(keyPairsA.sign, {
-    [keyPairsA.sign.publicKey]: keyPairsA.box.publicKey,
-  });
+  const createEvent = createChain(keyPairsA.sign);
   const addMemberEvent = addMember(
     hashTransaction(createEvent.transaction),
     keyPairA,
     keyPairsB.sign.publicKey,
-    keyPairsB.box.publicKey,
     "EDITOR"
   );
   const updateMemberEvent = updateMember(
@@ -48,14 +45,12 @@ test("should be able to promote an EDITOR to an ADMIN", async () => {
         "addedBy": [
           "74IPzs2dhoERLRuxeS7zadzEvKfb7IqOK-jKu0mQxIM",
         ],
-        "lockboxPublicKey": "wevxDsZ-L7wpy3ePZcQNfG8WDh0wB0d27phr5OMdLwI",
         "role": "ADMIN",
       },
       "MTDhqVIMflTD0Car-KSP1MWCIEYqs2LBaXfU20di0tY": {
         "addedBy": [
           "74IPzs2dhoERLRuxeS7zadzEvKfb7IqOK-jKu0mQxIM",
         ],
-        "lockboxPublicKey": "b_skeL8qudNQji-HuOldPNFDzYSBENNqmFMlawhtrHg",
         "role": "ADMIN",
       },
     }
@@ -63,14 +58,11 @@ test("should be able to promote an EDITOR to an ADMIN", async () => {
 });
 
 test("should be able to demote an ADMIN to an EDITOR", async () => {
-  const createEvent = createChain(keyPairsA.sign, {
-    [keyPairsA.sign.publicKey]: keyPairsA.box.publicKey,
-  });
+  const createEvent = createChain(keyPairsA.sign);
   const addAdminEvent = addMember(
     hashTransaction(createEvent.transaction),
     keyPairA,
     keyPairsB.sign.publicKey,
-    keyPairsB.box.publicKey,
     "ADMIN"
   );
   const updateMemberEvent = updateMember(
@@ -87,14 +79,12 @@ test("should be able to demote an ADMIN to an EDITOR", async () => {
         "addedBy": [
           "74IPzs2dhoERLRuxeS7zadzEvKfb7IqOK-jKu0mQxIM",
         ],
-        "lockboxPublicKey": "wevxDsZ-L7wpy3ePZcQNfG8WDh0wB0d27phr5OMdLwI",
         "role": "ADMIN",
       },
       "MTDhqVIMflTD0Car-KSP1MWCIEYqs2LBaXfU20di0tY": {
         "addedBy": [
           "74IPzs2dhoERLRuxeS7zadzEvKfb7IqOK-jKu0mQxIM",
         ],
-        "lockboxPublicKey": "b_skeL8qudNQji-HuOldPNFDzYSBENNqmFMlawhtrHg",
         "role": "EDITOR",
       },
     }
@@ -102,9 +92,7 @@ test("should be able to demote an ADMIN to an EDITOR", async () => {
 });
 
 test("should fail to demote the last ADMIN to a EDITOR", async () => {
-  const createEvent = createChain(keyPairsA.sign, {
-    [keyPairsA.sign.publicKey]: keyPairsA.box.publicKey,
-  });
+  const createEvent = createChain(keyPairsA.sign);
   const updateMemberEvent = updateMember(
     hashTransaction(createEvent.transaction),
     keyPairA,
@@ -119,14 +107,11 @@ test("should fail to demote the last ADMIN to a EDITOR", async () => {
 });
 
 test("should fail to promote an ADMIN that is already an ADMIN", async () => {
-  const createEvent = createChain(keyPairsA.sign, {
-    [keyPairsA.sign.publicKey]: keyPairsA.box.publicKey,
-  });
+  const createEvent = createChain(keyPairsA.sign);
   const addAdminEvent = addMember(
     hashTransaction(createEvent.transaction),
     keyPairA,
     keyPairsB.sign.publicKey,
-    keyPairsB.box.publicKey,
     "ADMIN"
   );
   const updateMemberEvent = updateMember(
@@ -142,14 +127,11 @@ test("should fail to promote an ADMIN that is already an ADMIN", async () => {
 });
 
 test("should fail to update a member if nothing changes", async () => {
-  const createEvent = createChain(keyPairsA.sign, {
-    [keyPairsA.sign.publicKey]: keyPairsA.box.publicKey,
-  });
+  const createEvent = createChain(keyPairsA.sign);
   const addMemberEvent = addMember(
     hashTransaction(createEvent.transaction),
     keyPairA,
     keyPairsB.sign.publicKey,
-    keyPairsB.box.publicKey,
     "EDITOR"
   );
   const updateMemberEvent = updateMember(

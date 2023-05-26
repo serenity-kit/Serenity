@@ -27,21 +27,17 @@ beforeAll(async () => {
 });
 
 test("should fail in case the chain is not correctly ordered", async () => {
-  const createEvent = createChain(keyPairsA.sign, {
-    [keyPairsA.sign.publicKey]: keyPairsA.box.publicKey,
-  });
+  const createEvent = createChain(keyPairsA.sign);
   const addMemberEvent = addMember(
     hashTransaction(createEvent.transaction),
     keyPairA,
     keyPairsB.sign.publicKey,
-    keyPairsB.box.publicKey,
     "ADMIN"
   );
   const addMemberEvent2 = addMember(
     hashTransaction(addMemberEvent.transaction),
     keyPairB,
     keyPairsC.sign.publicKey,
-    keyPairsC.box.publicKey,
     "ADMIN"
   );
   const chain = [createEvent, addMemberEvent2, addMemberEvent];

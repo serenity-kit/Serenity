@@ -30,14 +30,11 @@ beforeAll(async () => {
 });
 
 test("should be able to remove a member as ADMIN", async () => {
-  const createEvent = createChain(keyPairsA.sign, {
-    [keyPairsA.sign.publicKey]: keyPairsA.box.publicKey,
-  });
+  const createEvent = createChain(keyPairsA.sign);
   const addMemberEvent = addMember(
     hashTransaction(createEvent.transaction),
     keyPairA,
     keyPairsB.sign.publicKey,
-    keyPairsB.box.publicKey,
     "EDITOR"
   );
   const removeMemberEvent = removeMember(
@@ -52,7 +49,6 @@ test("should be able to remove a member as ADMIN", async () => {
         "addedBy": [
           "74IPzs2dhoERLRuxeS7zadzEvKfb7IqOK-jKu0mQxIM",
         ],
-        "lockboxPublicKey": "wevxDsZ-L7wpy3ePZcQNfG8WDh0wB0d27phr5OMdLwI",
         "role": "ADMIN",
       },
     }
@@ -60,21 +56,17 @@ test("should be able to remove a member as ADMIN", async () => {
 });
 
 test("should be able to remove a member as ADMIN added by an ADMIN", async () => {
-  const createEvent = createChain(keyPairsA.sign, {
-    [keyPairsA.sign.publicKey]: keyPairsA.box.publicKey,
-  });
+  const createEvent = createChain(keyPairsA.sign);
   const addMemberEvent = addMember(
     hashTransaction(createEvent.transaction),
     keyPairA,
     keyPairsB.sign.publicKey,
-    keyPairsB.box.publicKey,
     "ADMIN"
   );
   const addMemberEvent2 = addMember(
     hashTransaction(addMemberEvent.transaction),
     keyPairA,
     keyPairsC.sign.publicKey,
-    keyPairsC.box.publicKey,
     "EDITOR"
   );
   const removeMemberEvent = removeMember(
@@ -94,14 +86,12 @@ test("should be able to remove a member as ADMIN added by an ADMIN", async () =>
         "addedBy": [
           "74IPzs2dhoERLRuxeS7zadzEvKfb7IqOK-jKu0mQxIM",
         ],
-        "lockboxPublicKey": "wevxDsZ-L7wpy3ePZcQNfG8WDh0wB0d27phr5OMdLwI",
         "role": "ADMIN",
       },
       "MTDhqVIMflTD0Car-KSP1MWCIEYqs2LBaXfU20di0tY": {
         "addedBy": [
           "74IPzs2dhoERLRuxeS7zadzEvKfb7IqOK-jKu0mQxIM",
         ],
-        "lockboxPublicKey": "b_skeL8qudNQji-HuOldPNFDzYSBENNqmFMlawhtrHg",
         "role": "ADMIN",
       },
     }
@@ -109,21 +99,17 @@ test("should be able to remove a member as ADMIN added by an ADMIN", async () =>
 });
 
 test("should not be able to remove a member as EDITOR", async () => {
-  const createEvent = createChain(keyPairsA.sign, {
-    [keyPairsA.sign.publicKey]: keyPairsA.box.publicKey,
-  });
+  const createEvent = createChain(keyPairsA.sign);
   const addMemberEvent = addMember(
     hashTransaction(createEvent.transaction),
     keyPairA,
     keyPairsB.sign.publicKey,
-    keyPairsB.box.publicKey,
     "EDITOR"
   );
   const addMemberEvent2 = addMember(
     hashTransaction(addMemberEvent.transaction),
     keyPairA,
     keyPairsC.sign.publicKey,
-    keyPairsC.box.publicKey,
     "EDITOR"
   );
   const removeMemberEvent = removeMember(
@@ -142,14 +128,11 @@ test("should not be able to remove a member as EDITOR", async () => {
 });
 
 test("should not be able to remove the last admin", async () => {
-  const createEvent = createChain(keyPairsA.sign, {
-    [keyPairsA.sign.publicKey]: keyPairsA.box.publicKey,
-  });
+  const createEvent = createChain(keyPairsA.sign);
   const addMemberEvent = addMember(
     hashTransaction(createEvent.transaction),
     keyPairA,
     keyPairsB.sign.publicKey,
-    keyPairsB.box.publicKey,
     "EDITOR"
   );
   const removeMemberEvent = removeMember(
@@ -165,9 +148,7 @@ test("should not be able to remove the last admin", async () => {
 });
 
 test("should throw in case the member does not exist", async () => {
-  const createEvent = createChain(keyPairsA.sign, {
-    [keyPairsA.sign.publicKey]: keyPairsA.box.publicKey,
-  });
+  const createEvent = createChain(keyPairsA.sign);
   const removeMemberEvent = removeMember(
     hashTransaction(createEvent.transaction),
     keyPairB,
@@ -181,9 +162,7 @@ test("should throw in case the member does not exist", async () => {
 });
 
 test("should not be able to remove the last member", async () => {
-  const createEvent = createChain(keyPairsA.sign, {
-    [keyPairsA.sign.publicKey]: keyPairsA.box.publicKey,
-  });
+  const createEvent = createChain(keyPairsA.sign);
   const eventRemoveMember = removeMember(
     hashTransaction(createEvent.transaction),
     keyPairA,

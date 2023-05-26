@@ -19,9 +19,7 @@ let keyPairsB: KeyPairs;
 let addInvitationEvent: AddInvitationResult;
 let acceptInvitationSignature: Uint8Array;
 let mainDevice: {
-  mainDeviceEncryptionPublicKey: string;
   mainDeviceSigningPublicKey: string;
-  memberMainDeviceEncryptionPublicKeySignature: string;
 };
 
 beforeAll(async () => {
@@ -30,9 +28,7 @@ beforeAll(async () => {
   keyPairsA = getKeyPairsA();
   keyPairB = getKeyPairB();
   keyPairsB = getKeyPairsB();
-  const createEvent = createChain(keyPairsA.sign, {
-    [keyPairsA.sign.publicKey]: keyPairsA.box.publicKey,
-  });
+  const createEvent = createChain(keyPairsA.sign);
   addInvitationEvent = addInvitation({
     prevHash: hashTransaction(createEvent.transaction),
     authorKeyPair: keyPairA,
@@ -41,14 +37,7 @@ beforeAll(async () => {
     workspaceId: "test",
   });
   mainDevice = {
-    mainDeviceEncryptionPublicKey: keyPairsB.box.publicKey,
     mainDeviceSigningPublicKey: keyPairsB.sign.publicKey,
-    memberMainDeviceEncryptionPublicKeySignature: sodium.to_base64(
-      sodium.crypto_sign_detached(
-        keyPairsB.box.publicKey,
-        sodium.from_base64(keyPairsB.sign.privateKey)
-      )
-    ),
   };
   if (addInvitationEvent.transaction.type !== "add-invitation") {
     throw new Error("Invalid transaction type");
@@ -92,22 +81,6 @@ test("should fail to verify if acceptInvitationSignature has been modified", asy
   expect(result).toBe(false);
 });
 
-test("should fail to verify if mainDeviceEncryptionPublicKey has been modified", async () => {
-  if (addInvitationEvent.transaction.type !== "add-invitation") {
-    throw new Error("Invalid transaction type");
-  }
-  const result = verifyAcceptInvitation({
-    acceptInvitationSignature: sodium.to_base64(acceptInvitationSignature),
-    ...mainDevice,
-    ...addInvitationEvent.transaction,
-    expiresAt: new Date(addInvitationEvent.transaction.expiresAt),
-    mainDeviceEncryptionPublicKey:
-      "c" + mainDevice.mainDeviceEncryptionPublicKey.substring(1),
-  });
-
-  expect(result).toBe(false);
-});
-
 test("should fail to verify if mainDeviceSigningPublicKey has been modified", async () => {
   if (addInvitationEvent.transaction.type !== "add-invitation") {
     throw new Error("Invalid transaction type");
@@ -119,23 +92,6 @@ test("should fail to verify if mainDeviceSigningPublicKey has been modified", as
     expiresAt: new Date(addInvitationEvent.transaction.expiresAt),
     mainDeviceSigningPublicKey:
       "b" + mainDevice.mainDeviceSigningPublicKey.substring(1),
-  });
-
-  expect(result).toBe(false);
-});
-
-test("should fail to verify if memberMainDeviceEncryptionPublicKeySignature has been modified", async () => {
-  if (addInvitationEvent.transaction.type !== "add-invitation") {
-    throw new Error("Invalid transaction type");
-  }
-  const result = verifyAcceptInvitation({
-    acceptInvitationSignature: sodium.to_base64(acceptInvitationSignature),
-    ...mainDevice,
-    ...addInvitationEvent.transaction,
-    expiresAt: new Date(addInvitationEvent.transaction.expiresAt),
-    memberMainDeviceEncryptionPublicKeySignature:
-      "b" +
-      mainDevice.memberMainDeviceEncryptionPublicKeySignature.substring(1),
   });
 
   expect(result).toBe(false);

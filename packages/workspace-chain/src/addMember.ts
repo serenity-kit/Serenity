@@ -7,13 +7,11 @@ export const addMember = (
   prevHash: string,
   authorKeyPair: sodium.KeyPair,
   memberMainDeviceSigningPublicKey: string,
-  memberMainDeviceEncryptionPublicKey: string,
   memberRole: Role
 ): DefaultTrustChainEvent => {
   const transaction: AddMemberTransaction = {
     type: "add-member",
     memberMainDeviceSigningPublicKey,
-    memberMainDeviceEncryptionPublicKey,
     role: memberRole,
   };
 

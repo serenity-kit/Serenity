@@ -81,7 +81,6 @@ export const applyEvent = (
     }
 
     members[event.transaction.memberMainDeviceSigningPublicKey] = {
-      lockboxPublicKey: event.transaction.memberMainDeviceEncryptionPublicKey,
       role: event.transaction.role,
       addedBy: event.authors.map((author) => author.publicKey),
     };
@@ -121,12 +120,8 @@ export const applyEvent = (
       invitationId: event.transaction.invitationId,
       workspaceId: event.transaction.workspaceId,
       expiresAt: new Date(event.transaction.expiresAt),
-      mainDeviceEncryptionPublicKey:
-        event.transaction.memberMainDeviceEncryptionPublicKey,
       mainDeviceSigningPublicKey:
         event.transaction.memberMainDeviceSigningPublicKey,
-      memberMainDeviceEncryptionPublicKeySignature:
-        event.transaction.memberMainDeviceEncryptionPublicKeySignature,
       role: event.transaction.role,
     });
     if (!validInvitation) {
@@ -136,7 +131,6 @@ export const applyEvent = (
     }
 
     members[event.transaction.memberMainDeviceSigningPublicKey] = {
-      lockboxPublicKey: event.transaction.memberMainDeviceEncryptionPublicKey,
       role: event.transaction.role,
       addedBy: event.authors.map((author) => author.publicKey),
     };
@@ -171,9 +165,6 @@ export const applyEvent = (
     }
 
     members[event.transaction.memberMainDeviceSigningPublicKey] = {
-      lockboxPublicKey:
-        members[event.transaction.memberMainDeviceSigningPublicKey]
-          .lockboxPublicKey,
       role: event.transaction.role,
       addedBy:
         members[event.transaction.memberMainDeviceSigningPublicKey].addedBy,

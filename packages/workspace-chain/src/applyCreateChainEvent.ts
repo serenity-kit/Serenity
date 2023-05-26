@@ -14,9 +14,11 @@ export const applyCreateChainEvent = (
   }
 
   let members: { [publicKey: string]: MemberProperties } = {};
+  if (event.authors.length !== 1) {
+    throw new InvalidTrustChainError("Invalid chain creation event.");
+  }
   event.authors.forEach((author) => {
     members[author.publicKey] = {
-      lockboxPublicKey: event.transaction.lockboxPublicKeys[author.publicKey],
       role: "ADMIN",
       addedBy: event.authors.map((author) => author.publicKey),
     };

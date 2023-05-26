@@ -16,13 +16,7 @@ export const isValidCreateChainEvent = (event: TrustChainEvent) => {
   if (event.transaction.type !== "create" || event.prevHash !== null) {
     return false;
   }
-  if (
-    Object.keys(event.transaction.lockboxPublicKeys).length !==
-    event.authors.length
-  ) {
-    return false;
-  }
-  const lockboxPublicKeys = event.transaction.lockboxPublicKeys;
+
   const hash = hashTransaction(event.transaction);
   const message = canonicalize({
     prevHash: null,
@@ -33,9 +27,6 @@ export const isValidCreateChainEvent = (event: TrustChainEvent) => {
   }
 
   return event.authors.every((author) => {
-    if (!lockboxPublicKeys.hasOwnProperty(author.publicKey)) {
-      return false;
-    }
     return sodium.crypto_sign_verify_detached(
       sodium.from_base64(author.signature),
       message,
