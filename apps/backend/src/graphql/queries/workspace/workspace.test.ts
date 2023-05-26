@@ -35,6 +35,7 @@ const setup = async () => {
         encryptionPrivateKey: userData1.encryptionPrivateKey,
         signingPrivateKey: userData1.signingPrivateKey,
       },
+      mainDevice: userData1.mainDevice,
       devices: [userData1.device, userData1.webDevice],
       authorizationHeader: sessionKey,
     });

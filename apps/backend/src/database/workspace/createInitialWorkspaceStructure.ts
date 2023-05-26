@@ -1,3 +1,4 @@
+import * as workspaceChain from "@serenity-kit/workspace-chain";
 import { KeyDerivationTrace, SerenitySnapshot } from "@serenity-tools/common";
 import { Document } from "../../types/document";
 import { Folder, formatFolder } from "../../types/folder";
@@ -47,6 +48,7 @@ export type DocumentParams = {
 export type Params = {
   userId: string;
   workspace: WorkspaceParams;
+  workspaceChainEntry: workspaceChain.CreateChainWorkspaceChainEvent;
   folder: FolderParams;
   document: DocumentParams;
   creatorDeviceSigningPublicKey: string;
@@ -55,6 +57,7 @@ export type Params = {
 export async function createInitialWorkspaceStructure({
   userId,
   workspace,
+  workspaceChainEntry,
   folder,
   document,
   creatorDeviceSigningPublicKey,
@@ -66,6 +69,7 @@ export async function createInitialWorkspaceStructure({
     creatorDeviceSigningPublicKey,
     deviceWorkspaceKeyBoxes: workspace.deviceWorkspaceKeyBoxes,
     workspaceKeyId: workspace.workspaceKeyId,
+    workspaceChainEntry,
   });
   const workspaceKey = createdWorkspace.currentWorkspaceKey;
   const createdFolder = await createFolder({

@@ -77,6 +77,7 @@ export default async function createServer() {
       // useful for debugging
       if (process.env.NODE_ENV !== "test") {
         console.error(err);
+        console.error(err.extensions?.exception?.stacktrace);
       }
       if (
         err.originalError instanceof AuthenticationError ||
