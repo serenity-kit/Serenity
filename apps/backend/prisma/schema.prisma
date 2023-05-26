@@ -203,6 +203,7 @@ model WorkspaceChainEntry {
   id          String    @id @unique @default(uuid())
   position    Int
   content     Json
+  state       Json
   workspace   Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
   workspaceId String
   createdAt   DateTime  @default(now())

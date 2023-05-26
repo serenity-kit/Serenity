@@ -94,9 +94,14 @@ export async function createWorkspace({
       },
     });
 
+    const workspaceChainState = workspaceChain.resolveState([
+      workspaceChainEntry,
+    ]);
+
     await prisma.workspaceChainEntry.create({
       data: {
         content: workspaceChainEntry,
+        state: workspaceChainState,
         workspaceId: rawWorkspace.id,
         position: 0,
       },
