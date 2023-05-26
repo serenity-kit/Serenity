@@ -37,6 +37,7 @@ test("Invite admin", async () => {
     role,
     workspaceId,
     authorizationHeader: userAndDevice.sessionKey,
+    mainDevice: userAndDevice.mainDevice,
   });
   const workspaceInvitation =
     result.createWorkspaceInvitation.workspaceInvitation;
@@ -69,6 +70,7 @@ test("invite editor", async () => {
     role,
     workspaceId,
     authorizationHeader: userAndDevice.sessionKey,
+    mainDevice: userAndDevice.mainDevice,
   });
   const workspaceInvitation =
     result.createWorkspaceInvitation.workspaceInvitation;
@@ -101,6 +103,7 @@ test("invite commenter", async () => {
     role,
     workspaceId,
     authorizationHeader: userAndDevice.sessionKey,
+    mainDevice: userAndDevice.mainDevice,
   });
   const workspaceInvitation =
     result.createWorkspaceInvitation.workspaceInvitation;
@@ -133,6 +136,7 @@ test("invite viewer", async () => {
     role,
     workspaceId,
     authorizationHeader: userAndDevice.sessionKey,
+    mainDevice: userAndDevice.mainDevice,
   });
   const workspaceInvitation =
     result.createWorkspaceInvitation.workspaceInvitation;
@@ -158,8 +162,9 @@ test("fail on unknown role", async () => {
         //@ts-expect-error: bad role type
         role: "bad-role",
         authorizationHeader: userAndDevice.sessionKey,
+        mainDevice: userAndDevice.mainDevice,
       }))()
-  ).rejects.toThrow(/BAD_USER_INPUT/);
+  ).rejects.toThrow();
 });
 
 test("user should not be able to invite from a workspace they don't own", async () => {
@@ -182,6 +187,7 @@ test("user should not be able to invite from a workspace they don't own", async 
         workspaceId: workspaceId2,
         role: Role.EDITOR,
         authorizationHeader: userAndDevice1.sessionKey,
+        mainDevice: userAndDevice1.mainDevice,
       }))()
   ).rejects.toThrow("Unauthorized");
 });
@@ -192,9 +198,11 @@ test("user should not be able to invite from a workspace that doesn't exist", as
     (async () =>
       await createWorkspaceInvitation({
         graphql,
-        workspaceId: "nonexistantWorkspace",
+        workspaceId: "nonExistentWorkspace",
         role: Role.EDITOR,
         authorizationHeader: userAndDevice2.sessionKey,
+        mainDevice: userAndDevice2.mainDevice,
+        overwritePrevHash: "wrongHash",
       }))()
   ).rejects.toThrow("Unauthorized");
 });
@@ -213,6 +221,7 @@ test("Unauthenticated", async () => {
         workspaceId,
         role: Role.EDITOR,
         authorizationHeader: "badauthheader",
+        mainDevice: userAndDevice2.mainDevice,
       }))()
   ).rejects.toThrowError(/UNAUTHENTICATED/);
 });

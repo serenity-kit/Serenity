@@ -28,6 +28,7 @@ const setup = async () => {
     role: Role.VIEWER,
     workspaceId: userData1.workspace.id,
     authorizationHeader: userData1.sessionKey,
+    mainDevice: userData1.mainDevice,
   });
   const workspaceInvitationId =
     workspaceInvitationResult.createWorkspaceInvitation.workspaceInvitation.id;
@@ -36,8 +37,8 @@ const setup = async () => {
     workspaceInvitationId,
     inviteeUsername: userData2.user.username,
     inviteeMainDevice: userData2.mainDevice,
-    invitationSigningPrivateKey:
-      workspaceInvitationResult.invitationSigningPrivateKey,
+    invitationSigningKeyPairSeed:
+      workspaceInvitationResult.invitationSigningKeyPairSeed,
     authorizationHeader: userData2.sessionKey,
   });
 };

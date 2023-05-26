@@ -37,6 +37,14 @@ export async function getWorkspaces({
       name: "asc",
     },
     include: {
+      chain: {
+        orderBy: {
+          id: "desc",
+        },
+        select: {
+          content: true,
+        },
+      },
       usersToWorkspaces: {
         orderBy: {
           userId: "asc",

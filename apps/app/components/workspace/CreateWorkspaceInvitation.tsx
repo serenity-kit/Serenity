@@ -1,4 +1,4 @@
-import { addInvitation } from "@serenity-kit/workspace-chain";
+import * as workspaceChain from "@serenity-kit/workspace-chain";
 import {
   Button,
   Description,
@@ -13,6 +13,7 @@ import * as Clipboard from "expo-clipboard";
 import { useState } from "react";
 import { Platform, StyleSheet } from "react-native";
 import sodium from "react-native-libsodium";
+import { useWorkspace } from "../../context/WorkspaceContext";
 import {
   Role,
   runCreateWorkspaceInvitationMutation,
@@ -45,6 +46,7 @@ export function CreateWorkspaceInvitation(props: Props) {
     useState<boolean>(false);
   const [sharingRole, _setSharingRole] = useState<Role>(Role.Viewer);
   const CLIPBOARD_NOTICE_TIMEOUT_SECONDS = 2;
+  const { lastChainEvent } = useWorkspace();
 
   const setSharingRole = (role: string) => {
     if (role === "admin") {
@@ -97,7 +99,10 @@ export function CreateWorkspaceInvitation(props: Props) {
     if (!mainDevice) {
       throw new Error("No main device");
     }
-    const invitation = addInvitation({
+    if (!lastChainEvent) {
+      throw new Error("No last chain event");
+    }
+    const invitation = workspaceChain.addInvitation({
       workspaceId,
       authorKeyPair: {
         keyType: "ed25519",
@@ -106,7 +111,7 @@ export function CreateWorkspaceInvitation(props: Props) {
       },
       expiresAt,
       role: sharingRole,
-      prevHash: "TODO",
+      prevHash: workspaceChain.hashTransaction(lastChainEvent.transaction),
     });
 
     if (invitation.transaction.type !== "add-invitation") {
@@ -117,13 +122,7 @@ export function CreateWorkspaceInvitation(props: Props) {
       await runCreateWorkspaceInvitationMutation({
         input: {
           workspaceId,
-          invitationId: invitation.transaction.invitationId,
-          invitationSigningPublicKey:
-            invitation.transaction.invitationSigningPublicKey,
-          expiresAt: expiresAt.toISOString(),
-          role: sharingRole,
-          invitationDataSignature:
-            invitation.transaction.invitationDataSignature,
+          serializedWorkspaceChainEntry: JSON.stringify(invitation),
         },
       });
     refetchWorkspaceInvitationsResult();

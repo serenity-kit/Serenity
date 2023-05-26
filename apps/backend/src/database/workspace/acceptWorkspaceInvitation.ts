@@ -2,7 +2,7 @@ import { Device } from "@serenity-tools/common";
 import { ForbiddenError, UserInputError } from "apollo-server-express";
 import canonicalize from "canonicalize";
 import sodium from "react-native-libsodium";
-import { formatWorkspace, Workspace } from "../../types/workspace";
+import { Workspace, formatWorkspace } from "../../types/workspace";
 import { prisma } from "../prisma";
 
 type Params = {

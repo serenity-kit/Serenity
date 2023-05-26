@@ -65,6 +65,13 @@ export const WorkspaceMember = objectType({
   },
 });
 
+export const WorkspaceChainEvent = objectType({
+  name: "WorkspaceChainEvent",
+  definition(t) {
+    t.nonNull.string("serializedContent");
+  },
+});
+
 export const Workspace = objectType({
   name: "Workspace",
   definition(t) {
@@ -78,6 +85,7 @@ export const Workspace = objectType({
     t.list.nonNull.field("members", { type: WorkspaceMember });
     t.list.nonNull.field("workspaceKeys", { type: WorkspaceKey });
     t.field("currentWorkspaceKey", { type: WorkspaceKey });
+    t.nonNull.list.nonNull.field("chain", { type: WorkspaceChainEvent });
   },
 });
 

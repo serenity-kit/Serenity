@@ -1,13 +1,17 @@
-import canonicalize from "canonicalize";
+import * as workspaceChain from "@serenity-kit/workspace-chain";
+import { LocalDevice } from "@serenity-tools/common";
 import { gql } from "graphql-request";
 import sodium from "react-native-libsodium";
 import { Role } from "../../../prisma/generated/output";
+import { getLastWorkspaceChainEntry } from "./getLastWorkspaceChainEntry";
 
 type Params = {
   graphql: any;
   workspaceId: string;
   role: Role;
   authorizationHeader: string;
+  mainDevice: LocalDevice;
+  overwritePrevHash?: string;
 };
 
 export const createWorkspaceInvitation = async ({
@@ -15,6 +19,8 @@ export const createWorkspaceInvitation = async ({
   workspaceId,
   role,
   authorizationHeader,
+  mainDevice,
+  overwritePrevHash,
 }: Params) => {
   const authorizationHeaders = {
     authorization: authorizationHeader,
@@ -36,39 +42,50 @@ export const createWorkspaceInvitation = async ({
   `;
 
   // expires 48 hours in the future
-  const invitationId = sodium.to_base64(sodium.randombytes_buf(24));
   const expiresAt = new Date(Date.now() + 48 * 60 * 60 * 1000);
 
-  const signingKeys = sodium.crypto_sign_keypair();
-
-  const invitationData = canonicalize({
-    workspaceId,
-    invitationId,
-    invitationSigningPublicKey: sodium.to_base64(signingKeys.publicKey),
-    role,
-    expiresAt,
-  });
-  const invitationDataSignature = sodium.crypto_sign_detached(
-    invitationData!,
-    signingKeys.privateKey
-  );
+  let invitation: workspaceChain.AddInvitationResult;
+  if (overwritePrevHash) {
+    invitation = workspaceChain.addInvitation({
+      workspaceId,
+      authorKeyPair: {
+        keyType: "ed25519",
+        privateKey: sodium.from_base64(mainDevice.signingPrivateKey),
+        publicKey: sodium.from_base64(mainDevice.signingPublicKey),
+      },
+      expiresAt,
+      role,
+      prevHash: overwritePrevHash,
+    });
+  } else {
+    const { lastChainEntry } = await getLastWorkspaceChainEntry({
+      workspaceId,
+    });
+    invitation = workspaceChain.addInvitation({
+      workspaceId,
+      authorKeyPair: {
+        keyType: "ed25519",
+        privateKey: sodium.from_base64(mainDevice.signingPrivateKey),
+        publicKey: sodium.from_base64(mainDevice.signingPublicKey),
+      },
+      expiresAt,
+      role,
+      prevHash: workspaceChain.hashTransaction(lastChainEntry.transaction),
+    });
+  }
 
   const result = await graphql.client.request(
     query,
     {
       input: {
         workspaceId,
-        invitationId,
-        invitationSigningPublicKey: sodium.to_base64(signingKeys.publicKey),
-        expiresAt,
-        role,
-        invitationDataSignature: sodium.to_base64(invitationDataSignature),
+        serializedWorkspaceChainEntry: JSON.stringify(invitation),
       },
     },
     authorizationHeaders
   );
   return {
     ...result,
-    invitationSigningPrivateKey: sodium.to_base64(signingKeys.privateKey),
+    invitationSigningKeyPairSeed: invitation.invitationSigningKeyPairSeed,
   };
 };

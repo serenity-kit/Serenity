@@ -181,20 +181,20 @@ model CreatorDevice {
 }
 
 model Workspace {
-  id                  String                 @id
-  idSignature         String
-  name                String // TODO must be encrypted
-  infoCiphertext      String?
-  infoNonce           String?
-  infoWorkspaceKeyId  String?                @unique
-  folders             Folder[]
-  documents           Document[]
-  usersToWorkspaces   UsersToWorkspaces[]
-  invitations         WorkspaceInvitations[]
-  workspaceKeys       WorkspaceKey[]         @relation(name: "workspace")
-  infoWorkspaceKey    WorkspaceKey?          @relation(name: "infoWorkspaceKey", fields: [infoWorkspaceKeyId], references: [id])
-  createdAt           DateTime               @default(now())
-  workspaceChainEntry WorkspaceChainEntry[]
+  id                 String                 @id
+  idSignature        String
+  name               String // TODO must be encrypted
+  infoCiphertext     String?
+  infoNonce          String?
+  infoWorkspaceKeyId String?                @unique
+  folders            Folder[]
+  documents          Document[]
+  usersToWorkspaces  UsersToWorkspaces[]
+  invitations        WorkspaceInvitations[]
+  workspaceKeys      WorkspaceKey[]         @relation(name: "workspace")
+  infoWorkspaceKey   WorkspaceKey?          @relation(name: "infoWorkspaceKey", fields: [infoWorkspaceKeyId], references: [id])
+  createdAt          DateTime               @default(now())
+  chain              WorkspaceChainEntry[]
 
   @@index([createdAt(sort: Desc)])
 }

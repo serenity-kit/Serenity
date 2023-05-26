@@ -128,6 +128,7 @@ test("user can remove another user", async () => {
     role: Role.VIEWER,
     workspaceId: userData1.workspace.id,
     authorizationHeader: userData1.sessionKey,
+    mainDevice: userData1.mainDevice,
   });
   const workspaceInvitationId =
     workspaceInvitationResult.createWorkspaceInvitation.workspaceInvitation.id;
@@ -136,8 +137,8 @@ test("user can remove another user", async () => {
     workspaceInvitationId: workspaceInvitationId,
     inviteeUsername: userData2.user.username,
     inviteeMainDevice: userData2.mainDevice,
-    invitationSigningPrivateKey:
-      workspaceInvitationResult.invitationSigningPrivateKey,
+    invitationSigningKeyPairSeed:
+      workspaceInvitationResult.invitationSigningKeyPairSeed,
     authorizationHeader: userData2.sessionKey,
   });
   const user2WebDeviceKeyBox = encryptWorkspaceKeyForDevice({
@@ -344,6 +345,7 @@ test("user can rotate key for multiple devices", async () => {
     role: Role.VIEWER,
     workspaceId: userData1.workspace.id,
     authorizationHeader: userData1.sessionKey,
+    mainDevice: userData1.mainDevice,
   });
   const workspaceInvitationId =
     workspaceInvitationResult.createWorkspaceInvitation.workspaceInvitation.id;
@@ -352,8 +354,8 @@ test("user can rotate key for multiple devices", async () => {
     workspaceInvitationId: workspaceInvitationId,
     inviteeUsername: userData2.user.username,
     inviteeMainDevice: userData2.mainDevice,
-    invitationSigningPrivateKey:
-      workspaceInvitationResult.invitationSigningPrivateKey,
+    invitationSigningKeyPairSeed:
+      workspaceInvitationResult.invitationSigningKeyPairSeed,
     authorizationHeader: userData2.sessionKey,
   });
   const user2DeviceKeyBox = encryptWorkspaceKeyForDevice({

@@ -1,10 +1,10 @@
 import {
   CreatorDevice as PrismaCreatorDevice,
-  Role,
-  UsersToWorkspaces,
   Workspace as PrismaWorkspace,
   WorkspaceKey as PrismaWorkspaceKey,
   WorkspaceKeyBox as PrismaWorkspaceKeyBox,
+  Role,
+  UsersToWorkspaces,
 } from "../../prisma/generated/output";
 import { CreatorDevice, Device, MinimalDevice } from "./device";
 
@@ -43,6 +43,10 @@ export type WorkspaceMember = {
   devices: MinimalDevice[];
 };
 
+type ChainEntry = {
+  serializedContent: string;
+};
+
 export type Workspace = {
   id: string;
   idSignature: string;
@@ -54,6 +58,7 @@ export type Workspace = {
   members: WorkspaceMember[];
   workspaceKeys?: WorkspaceKey[];
   currentWorkspaceKey?: WorkspaceKey;
+  chain?: ChainEntry[];
 };
 
 export type WorkspaceInvitation = {
@@ -91,6 +96,8 @@ type DbWorkspace = PrismaWorkspace & {
       })
     | undefined
     | null;
+
+  chain?: { content: any }[];
 };
 
 export const formatWorkspaceKey = (workspaceKey: any): WorkspaceKey => {
@@ -147,5 +154,10 @@ export const formatWorkspace = (workspace: DbWorkspace): Workspace => {
     currentWorkspaceKey,
     infoWorkspaceKey,
     workspaceKeys,
+    chain: workspace.chain?.map((entry) => {
+      return {
+        serializedContent: JSON.stringify(entry.content),
+      };
+    }),
   };
 };

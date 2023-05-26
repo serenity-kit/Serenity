@@ -2,10 +2,9 @@ import canonicalize from "canonicalize";
 import sodium from "react-native-libsodium";
 import { InvalidWorkspaceChainError } from "./errors";
 import {
-  DefaultWorkspaceChainEvent,
   Invitation,
   MemberProperties,
-  WorkspaceChainEvent,
+  UpdateChainWorkspaceChainEvent,
   WorkspaceChainState,
 } from "./types";
 import { getAdminCount, hashTransaction, isValidAdminDecision } from "./utils";
@@ -13,7 +12,7 @@ import { verifyAcceptInvitation } from "./verifyAcceptInvitation";
 
 export const applyEvent = (
   state: WorkspaceChainState,
-  event: WorkspaceChainEvent
+  event: UpdateChainWorkspaceChainEvent
 ): WorkspaceChainState => {
   let invitations: { [invitationId: string]: Invitation } = {
     ...state.invitations,
@@ -54,12 +53,13 @@ export const applyEvent = (
     );
   }
 
+  // @ts-expect-error this is a safety check
   if (event.transaction.type === "create") {
     throw new InvalidWorkspaceChainError("Only one create event is allowed.");
   }
 
   if (event.transaction.type === "add-invitation") {
-    if (!isValidAdminDecision(state, event as DefaultWorkspaceChainEvent)) {
+    if (!isValidAdminDecision(state, event)) {
       throw new InvalidWorkspaceChainError("Not allowed to add an invitation.");
     }
     invitations[event.transaction.invitationId] = {
@@ -72,7 +72,7 @@ export const applyEvent = (
   }
 
   if (event.transaction.type === "add-member") {
-    if (!isValidAdminDecision(state, event as DefaultWorkspaceChainEvent)) {
+    if (!isValidAdminDecision(state, event)) {
       throw new InvalidWorkspaceChainError("Not allowed to add a member.");
     }
 
@@ -148,7 +148,7 @@ export const applyEvent = (
         "Failed to update non-existing member."
       );
     }
-    if (!isValidAdminDecision(state, event as DefaultWorkspaceChainEvent)) {
+    if (!isValidAdminDecision(state, event)) {
       throw new InvalidWorkspaceChainError("Not allowed to update a member.");
     }
 
@@ -187,7 +187,7 @@ export const applyEvent = (
         "Failed to remove non-existing member."
       );
     }
-    if (!isValidAdminDecision(state, event as DefaultWorkspaceChainEvent)) {
+    if (!isValidAdminDecision(state, event)) {
       throw new InvalidWorkspaceChainError("Not allowed to remove a member.");
     }
     if (Object.keys(members).length <= 1) {

@@ -215,11 +215,7 @@ export type CreateInitialWorkspaceStructureResult = {
 };
 
 export type CreateWorkspaceInvitationInput = {
-  expiresAt: Scalars['Date'];
-  invitationDataSignature: Scalars['String'];
-  invitationId: Scalars['String'];
-  invitationSigningPublicKey: Scalars['String'];
-  role: Role;
+  serializedWorkspaceChainEntry: Scalars['String'];
   workspaceId: Scalars['String'];
 };
 
@@ -1206,6 +1202,7 @@ export type VerifyRegistrationResult = {
 
 export type Workspace = {
   __typename?: 'Workspace';
+  chain: Array<WorkspaceChainEvent>;
   currentWorkspaceKey?: Maybe<WorkspaceKey>;
   id: Scalars['String'];
   idSignature?: Maybe<Scalars['String']>;
@@ -1216,6 +1213,11 @@ export type Workspace = {
   members?: Maybe<Array<WorkspaceMember>>;
   name?: Maybe<Scalars['String']>;
   workspaceKeys?: Maybe<Array<WorkspaceKey>>;
+};
+
+export type WorkspaceChainEvent = {
+  __typename?: 'WorkspaceChainEvent';
+  serializedContent: Scalars['String'];
 };
 
 export type WorkspaceConnection = {
@@ -1751,7 +1753,7 @@ export type WorkspaceQueryVariables = Exact<{
 }>;
 
 
-export type WorkspaceQuery = { __typename?: 'Query', workspace?: { __typename?: 'Workspace', id: string, name?: string | null, members?: Array<{ __typename?: 'WorkspaceMember', userId: string, username?: string | null, role: Role, devices?: Array<{ __typename?: 'MinimalDevice', signingPublicKey: string, encryptionPublicKey: string, encryptionPublicKeySignature: string }> | null }> | null, currentWorkspaceKey?: { __typename?: 'WorkspaceKey', id: string, workspaceId: string, workspaceKeyBox?: { __typename?: 'WorkspaceKeyBox', id: string, workspaceKeyId: string, deviceSigningPublicKey: string, ciphertext: string, nonce: string, creatorDevice: { __typename?: 'CreatorDevice', signingPublicKey: string, encryptionPublicKey: string } } | null } | null, workspaceKeys?: Array<{ __typename?: 'WorkspaceKey', id: string, workspaceId: string, generation: number, workspaceKeyBox?: { __typename?: 'WorkspaceKeyBox', id: string, workspaceKeyId: string, deviceSigningPublicKey: string, ciphertext: string, nonce: string, creatorDevice: { __typename?: 'CreatorDevice', signingPublicKey: string, encryptionPublicKey: string } } | null }> | null } | null };
+export type WorkspaceQuery = { __typename?: 'Query', workspace?: { __typename?: 'Workspace', id: string, name?: string | null, members?: Array<{ __typename?: 'WorkspaceMember', userId: string, username?: string | null, role: Role, devices?: Array<{ __typename?: 'MinimalDevice', signingPublicKey: string, encryptionPublicKey: string, encryptionPublicKeySignature: string }> | null }> | null, chain: Array<{ __typename?: 'WorkspaceChainEvent', serializedContent: string }>, currentWorkspaceKey?: { __typename?: 'WorkspaceKey', id: string, workspaceId: string, workspaceKeyBox?: { __typename?: 'WorkspaceKeyBox', id: string, workspaceKeyId: string, deviceSigningPublicKey: string, ciphertext: string, nonce: string, creatorDevice: { __typename?: 'CreatorDevice', signingPublicKey: string, encryptionPublicKey: string } } | null } | null, workspaceKeys?: Array<{ __typename?: 'WorkspaceKey', id: string, workspaceId: string, generation: number, workspaceKeyBox?: { __typename?: 'WorkspaceKeyBox', id: string, workspaceKeyId: string, deviceSigningPublicKey: string, ciphertext: string, nonce: string, creatorDevice: { __typename?: 'CreatorDevice', signingPublicKey: string, encryptionPublicKey: string } } | null }> | null } | null };
 
 export type WorkspaceDevicesQueryVariables = Exact<{
   workspaceId: Scalars['ID'];
@@ -2778,6 +2780,9 @@ export const WorkspaceDocument = gql`
         encryptionPublicKey
         encryptionPublicKeySignature
       }
+    }
+    chain {
+      serializedContent
     }
     currentWorkspaceKey {
       id

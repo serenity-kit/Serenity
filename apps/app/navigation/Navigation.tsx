@@ -7,6 +7,7 @@ import {
   NavigationContainer,
 } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
+import * as workspaceChain from "@serenity-kit/workspace-chain";
 import {
   Heading,
   Text,
@@ -195,6 +196,20 @@ function WorkspaceStackNavigator(props) {
     },
   });
 
+  let workspaceChainState: workspaceChain.WorkspaceChainState | null = null;
+  let lastChainEvent: workspaceChain.WorkspaceChainEvent | null = null;
+  if (workspaceQueryResult.data?.workspace?.chain) {
+    workspaceChainState = workspaceChain.resolveState(
+      workspaceQueryResult.data.workspace.chain.map((entry) => {
+        const data = workspaceChain.WorkspaceChainEvent.parse(
+          JSON.parse(entry.serializedContent)
+        );
+        lastChainEvent = data;
+        return data;
+      })
+    );
+  }
+
   useInterval(() => {
     if (activeDevice) {
       addNewMembersIfNecessary({ activeDevice });
@@ -216,6 +231,8 @@ function WorkspaceStackNavigator(props) {
       value={{
         workspaceId: props.route.params.workspaceId,
         workspaceQueryResult,
+        workspaceChainState,
+        lastChainEvent,
       }}
     >
       <WorkspaceStack.Navigator
@@ -229,7 +246,7 @@ function WorkspaceStackNavigator(props) {
           options={{
             headerShown: false,
             animation: "none",
-            // necessary for comments sidear to not extend the screen view to the right
+            // necessary for comments sidebar to not extend the screen view to the right
             contentStyle: { overflow: "hidden" },
           }}
         />

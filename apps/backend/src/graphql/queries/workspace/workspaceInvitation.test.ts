@@ -14,8 +14,6 @@ const otherWorkspaceId = "otherWorkspace";
 const inviter1Username = "inviter1@example.com";
 const inviter2Username = "inviter2@example.com";
 
-const setup = async () => {};
-
 beforeAll(async () => {
   await deleteAllRecords();
 });
@@ -43,12 +41,14 @@ test("should return a list of workspace invitations if they are admin", async ()
     workspaceId,
     role: Role.ADMIN,
     authorizationHeader: inviterUserAndDevice1.sessionKey,
+    mainDevice: inviterUserAndDevice1.mainDevice,
   });
   await createWorkspaceInvitation({
     graphql,
     workspaceId,
     role: Role.EDITOR,
     authorizationHeader: inviterUserAndDevice1.sessionKey,
+    mainDevice: inviterUserAndDevice1.mainDevice,
   });
   const workspaceInvitationsResult = await workspaceInvitations({
     graphql,

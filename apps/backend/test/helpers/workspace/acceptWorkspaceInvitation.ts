@@ -8,8 +8,8 @@ type Params = {
   workspaceInvitationId: string;
   inviteeUsername: string;
   inviteeMainDevice: Device;
-  invitationSigningPrivateKey: string;
   authorizationHeader: string;
+  invitationSigningKeyPairSeed: string;
 };
 
 export const acceptWorkspaceInvitation = async ({
@@ -17,8 +17,8 @@ export const acceptWorkspaceInvitation = async ({
   workspaceInvitationId,
   inviteeUsername,
   inviteeMainDevice,
-  invitationSigningPrivateKey,
   authorizationHeader,
+  invitationSigningKeyPairSeed,
 }: Params) => {
   const authorizationHeaders = {
     authorization: authorizationHeader,
@@ -55,10 +55,16 @@ export const acceptWorkspaceInvitation = async ({
       encryptionPublicKeySignature: safeMainDevice.encryptionPublicKeySignature,
     },
   });
+
+  const invitationSigningPrivateKey = sodium.crypto_sign_seed_keypair(
+    sodium.from_base64(invitationSigningKeyPairSeed)
+  ).privateKey;
+
   const inviteeUsernameAndDeviceSignature = sodium.crypto_sign_detached(
     inviteeUsernameAndDevice!,
-    sodium.from_base64(invitationSigningPrivateKey)
+    invitationSigningPrivateKey
   );
+
   const result = await graphql.client.request(
     query,
     {

@@ -29,6 +29,7 @@ export const attachUserToWorkspace = async ({
   hostUserId,
   hostSessionKey,
   hostWebDevice,
+  hostMainDevice,
   guestUserId,
   guestSessionKey,
   guestMainDevice,
@@ -47,18 +48,18 @@ export const attachUserToWorkspace = async ({
     role,
     workspaceId,
     authorizationHeader: hostSessionKey,
+    mainDevice: hostMainDevice,
   });
   const workspaceInvitation =
     workspaceInvitationResult.createWorkspaceInvitation.workspaceInvitation;
-  const invitationSigningPrivateKey =
-    workspaceInvitationResult.invitationSigningPrivateKey;
   await acceptWorkspaceInvitation({
     graphql,
     workspaceInvitationId: workspaceInvitation.id,
-    invitationSigningPrivateKey,
     inviteeUsername: guestUser.username,
     inviteeMainDevice: guestMainDevice,
     authorizationHeader: guestSessionKey,
+    invitationSigningKeyPairSeed:
+      workspaceInvitationResult.invitationSigningKeyPairSeed,
   });
   const workspaceResult = await getWorkspace({
     graphql,

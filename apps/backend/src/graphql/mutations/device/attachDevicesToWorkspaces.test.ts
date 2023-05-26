@@ -37,6 +37,7 @@ test("Existing workspace does nothing", async () => {
     role: Role.VIEWER,
     workspaceId,
     authorizationHeader,
+    mainDevice: userAndDevice1.mainDevice,
   });
   const workspaceInvitationId =
     workspaceInvitationResult.createWorkspaceInvitation.workspaceInvitation.id;
@@ -45,11 +46,11 @@ test("Existing workspace does nothing", async () => {
     workspaceInvitationId,
     inviteeUsername: userAndDevice2.user.username,
     inviteeMainDevice: userAndDevice2.mainDevice,
-    invitationSigningPrivateKey:
-      workspaceInvitationResult.invitationSigningPrivateKey,
     authorizationHeader: userAndDevice2.sessionKey,
+    invitationSigningKeyPairSeed:
+      workspaceInvitationResult.invitationSigningKeyPairSeed,
   });
-  // now we create workspacekeyboxes for the new user.
+  // now we create workspaceKeyBoxes for the new user.
   const workspaceKey = await prisma.workspaceKey.findFirst({
     where: { workspaceId },
     orderBy: { generation: "desc" },

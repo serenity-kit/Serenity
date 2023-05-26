@@ -86,18 +86,18 @@ test("empty keys on incomplete workspace share", async () => {
     role: Role.VIEWER,
     workspaceId: userData1.workspace.id,
     authorizationHeader: userData1.sessionKey,
+    mainDevice: userData1.mainDevice,
   });
   const workspaceInvitation =
     workspaceInvitationResult.createWorkspaceInvitation.workspaceInvitation;
-  const invitationSigningPrivateKey =
-    workspaceInvitationResult.invitationSigningPrivateKey;
   // accept workspace, but don't generate keys
   await acceptWorkspaceInvitation({
     graphql,
     workspaceInvitationId: workspaceInvitation.id,
-    invitationSigningPrivateKey,
     inviteeUsername: userData2.user.username,
     inviteeMainDevice: userData2.mainDevice,
+    invitationSigningKeyPairSeed:
+      workspaceInvitationResult.invitationSigningKeyPairSeed,
     authorizationHeader: userData2.sessionKey,
   });
   const workspaceKeyResult = await getWorkspaceKeyByDocumentId({
@@ -125,6 +125,7 @@ test("key for shared workspace", async () => {
     hostUserId: userData1.user.id,
     hostSessionKey: userData1.sessionKey,
     hostWebDevice: userData1.webDevice,
+    hostMainDevice: userData1.mainDevice,
     guestUserId: userData2.user.id,
     guestSessionKey: userData2.sessionKey,
     guestWebDevice: userData2.webDevice,

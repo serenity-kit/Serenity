@@ -12,16 +12,15 @@ const graphql = setupGraphql();
 const username = `${generateId}@example.com`;
 const password = "password";
 
-let sessionKey = "";
 let workspace1Id = "";
+let userAndDevice: any = undefined;
 
 const setup = async () => {
-  const userAndDevice = await createUserWithWorkspace({
+  userAndDevice = await createUserWithWorkspace({
     id: "workspace_id_1",
     username,
     password,
   });
-  sessionKey = userAndDevice.sessionKey;
   workspace1Id = userAndDevice.workspace.id;
 };
 
@@ -33,7 +32,7 @@ beforeAll(async () => {
 test("no devices members when workspace created", async () => {
   const result = await getUnauthorizedDevicesForWorkspaces({
     graphql,
-    sessionKey,
+    sessionKey: userAndDevice.sessionKey,
   });
   const unauthorizedMembers =
     result.unauthorizedDevicesForWorkspaces.unauthorizedMemberDevices;
@@ -53,7 +52,8 @@ test("unauthorized devices when workspace added", async () => {
     graphql,
     role: Role.VIEWER,
     workspaceId: workspace1Id,
-    authorizationHeader: sessionKey,
+    authorizationHeader: userAndDevice.sessionKey,
+    mainDevice: userAndDevice.mainDevice,
   });
   const workspaceInvitationId =
     workspaceInvitationResult.createWorkspaceInvitation.workspaceInvitation.id;
@@ -62,13 +62,13 @@ test("unauthorized devices when workspace added", async () => {
     workspaceInvitationId,
     inviteeUsername: otherUserAndDevice.user.username,
     inviteeMainDevice: otherUserAndDevice.mainDevice,
-    invitationSigningPrivateKey:
-      workspaceInvitationResult.invitationSigningPrivateKey,
+    invitationSigningKeyPairSeed:
+      workspaceInvitationResult.invitationSigningKeyPairSeed,
     authorizationHeader: otherUserAndDevice.sessionKey,
   });
   const result = await getUnauthorizedDevicesForWorkspaces({
     graphql,
-    sessionKey,
+    sessionKey: userAndDevice.sessionKey,
   });
   const unauthorizedMembers =
     result.unauthorizedDevicesForWorkspaces.unauthorizedMemberDevices;

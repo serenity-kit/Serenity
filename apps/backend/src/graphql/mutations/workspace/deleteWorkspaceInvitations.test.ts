@@ -40,6 +40,7 @@ test("user should be able to delete a workspace invitation they created", async 
     role: Role.VIEWER,
     workspaceId: workspace1,
     authorizationHeader: userAndDevice1.sessionKey,
+    mainDevice: userAndDevice1.mainDevice,
   });
   const workspaceInvitationId =
     workspaceInvitationResult.createWorkspaceInvitation.workspaceInvitation.id;
@@ -59,6 +60,7 @@ test("user should be able to delete a workspace invitation they created", async 
 
 test("user should be able to delete a workspace invitation they didn't create", async () => {
   // add user2 as an admin for workspace 1
+  // TODO should be an actual GraphQL call with a chain update
   await prisma.usersToWorkspaces.create({
     data: {
       user: {
@@ -79,6 +81,7 @@ test("user should be able to delete a workspace invitation they didn't create", 
     role: Role.VIEWER,
     workspaceId: workspace1,
     authorizationHeader: userAndDevice2.sessionKey,
+    mainDevice: userAndDevice2.mainDevice,
   });
   const workspaceInvitationId =
     workspaceInvitationResult.createWorkspaceInvitation.workspaceInvitation.id;
@@ -119,6 +122,7 @@ test("user should not be able to delete a workspace invitation if they aren't ad
     role: Role.VIEWER,
     workspaceId: workspace2,
     authorizationHeader: userAndDevice2.sessionKey,
+    mainDevice: userAndDevice2.mainDevice,
   });
   const workspaceInvitationId =
     workspaceInvitationResult.createWorkspaceInvitation.workspaceInvitation.id;
@@ -142,6 +146,7 @@ test("Unauthenticated", async () => {
     role: Role.VIEWER,
     workspaceId: workspace1,
     authorizationHeader: userAndDevice1.sessionKey,
+    mainDevice: userAndDevice1.mainDevice,
   });
   const workspaceInvitationId =
     workspaceInvitationResult.createWorkspaceInvitation.workspaceInvitation.id;

@@ -66,6 +66,7 @@ test("new user results in added device", async () => {
     role: Role.VIEWER,
     workspaceId: userData1.workspace.id,
     authorizationHeader: userData1.sessionKey,
+    mainDevice: userData1.mainDevice,
   });
   const workspaceInvitationId =
     invitationResult.createWorkspaceInvitation.workspaceInvitation.id;
@@ -74,7 +75,7 @@ test("new user results in added device", async () => {
     workspaceInvitationId,
     inviteeUsername: userData2.user.username,
     inviteeMainDevice: userData2.mainDevice,
-    invitationSigningPrivateKey: invitationResult.invitationSigningPrivateKey,
+    invitationSigningKeyPairSeed: invitationResult.invitationSigningKeyPairSeed,
     authorizationHeader: userData2.sessionKey,
   });
   const workspaceKey = getWorkspaceKeyForWorkspaceAndDevice({
