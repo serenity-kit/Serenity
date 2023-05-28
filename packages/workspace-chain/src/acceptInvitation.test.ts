@@ -13,7 +13,7 @@ import {
   addInvitation,
   AddInvitationResult,
   createChain,
-  CreateChainTrustChainEvent,
+  CreateChainWorkspaceChainEvent,
 } from "./index";
 import { hashTransaction } from "./utils";
 
@@ -21,12 +21,10 @@ let keyPairA: sodium.KeyPair;
 let keyPairsA: KeyPairs;
 let keyPairB: sodium.KeyPair;
 let keyPairsB: KeyPairs;
-let createEvent: CreateChainTrustChainEvent;
+let createEvent: CreateChainWorkspaceChainEvent;
 let addInvitationEvent: AddInvitationResult;
 let mainDevice: {
-  mainDeviceEncryptionPublicKey: string;
   mainDeviceSigningPublicKey: string;
-  mainDeviceEncryptionPublicKeySignature: string;
 };
 
 beforeAll(async () => {
@@ -35,9 +33,7 @@ beforeAll(async () => {
   keyPairsA = getKeyPairsA();
   keyPairB = getKeyPairB();
   keyPairsB = getKeyPairsB();
-  createEvent = createChain(keyPairsA.sign, {
-    [keyPairsA.sign.publicKey]: keyPairsA.box.publicKey,
-  });
+  createEvent = createChain(keyPairsA.sign);
   addInvitationEvent = addInvitation({
     prevHash: hashTransaction(createEvent.transaction),
     authorKeyPair: keyPairA,
@@ -46,14 +42,7 @@ beforeAll(async () => {
     workspaceId: "test",
   });
   mainDevice = {
-    mainDeviceEncryptionPublicKey: keyPairsB.box.publicKey,
     mainDeviceSigningPublicKey: keyPairsB.sign.publicKey,
-    mainDeviceEncryptionPublicKeySignature: sodium.to_base64(
-      sodium.crypto_sign_detached(
-        keyPairsB.box.publicKey,
-        sodium.from_base64(keyPairsB.sign.privateKey)
-      )
-    ),
   };
 });
 
@@ -71,33 +60,6 @@ test("should be able to accept an invitation", async () => {
   });
 
   expect(acceptInvitationSignature).toBeInstanceOf(Uint8Array);
-});
-
-test("should throw an error if the mainDevice signature is invalid", async () => {
-  const signature = sodium.to_base64(
-    sodium.crypto_sign_detached(
-      keyPairsB.box.publicKey,
-      sodium.from_base64(keyPairsA.sign.privateKey)
-    )
-  );
-  const mainDevice = {
-    mainDeviceEncryptionPublicKey: keyPairsB.box.publicKey,
-    mainDeviceSigningPublicKey: keyPairsB.sign.publicKey,
-    mainDeviceEncryptionPublicKeySignature: "b" + signature.substring(1),
-  };
-
-  expect(() => {
-    if (addInvitationEvent.transaction.type !== "add-invitation") {
-      return;
-    }
-    acceptInvitation({
-      invitationSigningKeyPairSeed:
-        addInvitationEvent.invitationSigningKeyPairSeed,
-      ...addInvitationEvent.transaction,
-      ...mainDevice,
-      expiresAt: new Date(addInvitationEvent.transaction.expiresAt),
-    });
-  }).toThrow("Main device encryption public key signature is invalid");
 });
 
 test("should throw an error if the invitationSigningPublicKey has been replaced", async () => {

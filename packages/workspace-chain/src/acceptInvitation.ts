@@ -7,8 +7,6 @@ export type AcceptInvitationParams = {
   invitationSigningPublicKey: string;
   invitationId: string;
   mainDeviceSigningPublicKey: string;
-  mainDeviceEncryptionPublicKey: string;
-  mainDeviceEncryptionPublicKeySignature: string;
   role: Role;
   workspaceId: string;
   expiresAt: Date;
@@ -20,8 +18,6 @@ export const acceptInvitation = ({
   invitationSigningPublicKey,
   invitationId,
   mainDeviceSigningPublicKey,
-  mainDeviceEncryptionPublicKey,
-  mainDeviceEncryptionPublicKeySignature,
   role,
   workspaceId,
   expiresAt,
@@ -35,16 +31,6 @@ export const acceptInvitation = ({
     invitationSigningPublicKey
   ) {
     throw new Error("Invitation signing public key doesn't match the seed");
-  }
-  // verify main device encryption public key signature
-  const isValidMainDeviceEncryptionPublicKeySignature =
-    sodium.crypto_sign_verify_detached(
-      sodium.from_base64(mainDeviceEncryptionPublicKeySignature),
-      mainDeviceEncryptionPublicKey,
-      sodium.from_base64(mainDeviceSigningPublicKey)
-    );
-  if (!isValidMainDeviceEncryptionPublicKeySignature) {
-    throw new Error("Main device encryption public key signature is invalid");
   }
 
   // verify invitation data signature
@@ -78,8 +64,6 @@ export const acceptInvitation = ({
     role,
     expiresAt: expiresAt.toISOString(),
     mainDeviceSigningPublicKey,
-    mainDeviceEncryptionPublicKey,
-    mainDeviceEncryptionPublicKeySignature,
   });
   if (!acceptInvitationData) {
     throw new Error("Accept invitation data can't be canonicalized");

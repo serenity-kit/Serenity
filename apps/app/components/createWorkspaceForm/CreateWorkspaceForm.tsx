@@ -1,4 +1,5 @@
 import { useNavigation } from "@react-navigation/native";
+import * as workspaceChain from "@serenity-kit/workspace-chain";
 import {
   createIntroductionDocumentSnapshot,
   createSnapshotKey,
@@ -77,7 +78,11 @@ export function CreateWorkspaceForm(props: CreateWorkspaceFormProps) {
       if (!mainDevice) {
         throw new Error("No active main device available");
       }
-      const workspaceId = generateId();
+
+      const event = workspaceChain.createChain({
+        privateKey: mainDevice.signingPrivateKey,
+        publicKey: mainDevice.signingPublicKey,
+      });
       const workspaceKeyId = generateId();
       const folderId = generateId();
       const documentId = generateId();
@@ -165,11 +170,11 @@ export function CreateWorkspaceForm(props: CreateWorkspaceFormProps) {
         await createInitialWorkspaceStructure({
           input: {
             workspace: {
-              id: workspaceId,
               name,
               workspaceKeyId,
               deviceWorkspaceKeyBoxes,
             },
+            serializedWorkspaceChainEntry: JSON.stringify(event),
             folder: {
               id: folderId,
               idSignature: sodium.to_base64(folderIdSignature),

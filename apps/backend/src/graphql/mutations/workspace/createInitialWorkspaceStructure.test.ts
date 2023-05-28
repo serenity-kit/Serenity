@@ -17,22 +17,19 @@ import { createInitialWorkspaceStructure } from "../../../../test/helpers/worksp
 const graphql = setupGraphql();
 let userData1: any = undefined;
 
-const setup = async () => {
+beforeAll(async () => {
+  await deleteAllRecords();
   userData1 = await registerUser(
     graphql,
     `${generateId()}@example.com`,
     "password"
   );
-};
-
-beforeAll(async () => {
-  await deleteAllRecords();
-  await setup();
 });
 
 test("create initial workspace structure", async () => {
   const authorizationHeader = userData1.sessionKey;
   const workspaceName = "My Worskpace";
+  console.log("userData1", userData1);
   const result = await createInitialWorkspaceStructure({
     graphql,
     workspaceName,
@@ -41,6 +38,7 @@ test("create initial workspace structure", async () => {
       encryptionPrivateKey: userData1.encryptionPrivateKey,
       signingPrivateKey: userData1.signingPrivateKey,
     },
+    mainDevice: userData1.mainDevice,
     devices: [userData1.mainDevice, userData1.webDevice],
     authorizationHeader,
   });
@@ -130,6 +128,7 @@ test("Unauthenticated", async () => {
           encryptionPrivateKey: userData1.encryptionPrivateKey,
           signingPrivateKey: userData1.signingPrivateKey,
         },
+        mainDevice: userData1.mainDevice,
         devices: [userData1.mainDevice, userData1.webDevice],
         authorizationHeader: "invalid-session-key",
       }))()
@@ -148,6 +147,7 @@ test("creator device must belong to user", async () => {
           encryptionPrivateKey: badDevice.encryptionPrivateKey,
           signingPrivateKey: badDevice.signingPrivateKey,
         },
+        mainDevice: userData1.mainDevice,
         devices: [badDevice, userData1.webDevice],
         authorizationHeader: "invalid-session-key",
       }))()

@@ -1,4 +1,4 @@
-export class InvalidTrustChainError extends Error {
+export class InvalidWorkspaceChainError extends Error {
   constructor(message) {
     super(message);
 

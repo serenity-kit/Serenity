@@ -1,20 +1,20 @@
 import canonicalize from "canonicalize";
 import sodium from "react-native-libsodium";
-import { InvalidTrustChainError } from "./errors";
+import { InvalidWorkspaceChainError } from "./errors";
 import {
-  DefaultTrustChainEvent,
+  DefaultWorkspaceChainEvent,
   Invitation,
   MemberProperties,
-  TrustChainEvent,
-  TrustChainState,
+  WorkspaceChainEvent,
+  WorkspaceChainState,
 } from "./types";
 import { getAdminCount, hashTransaction, isValidAdminDecision } from "./utils";
 import { verifyAcceptInvitation } from "./verifyAcceptInvitation";
 
 export const applyEvent = (
-  state: TrustChainState,
-  event: TrustChainEvent
-): TrustChainState => {
+  state: WorkspaceChainState,
+  event: WorkspaceChainEvent
+): WorkspaceChainState => {
   let invitations: { [invitationId: string]: Invitation } = {
     ...state.invitations,
   };
@@ -38,7 +38,7 @@ export const applyEvent = (
         sodium.from_base64(author.publicKey)
       )
     ) {
-      throw new InvalidTrustChainError(
+      throw new InvalidWorkspaceChainError(
         `Invalid signature for ${author.publicKey}.`
       );
     }
@@ -49,16 +49,18 @@ export const applyEvent = (
     return publicKeys.indexOf(publicKey) != index;
   });
   if (hasDuplicatedAuthors) {
-    throw new InvalidTrustChainError("An author can sign the event only once.");
+    throw new InvalidWorkspaceChainError(
+      "An author can sign the event only once."
+    );
   }
 
   if (event.transaction.type === "create") {
-    throw new InvalidTrustChainError("Only one create event is allowed.");
+    throw new InvalidWorkspaceChainError("Only one create event is allowed.");
   }
 
   if (event.transaction.type === "add-invitation") {
-    if (!isValidAdminDecision(state, event as DefaultTrustChainEvent)) {
-      throw new InvalidTrustChainError("Not allowed to add an invitation.");
+    if (!isValidAdminDecision(state, event as DefaultWorkspaceChainEvent)) {
+      throw new InvalidWorkspaceChainError("Not allowed to add an invitation.");
     }
     invitations[event.transaction.invitationId] = {
       expiresAt: event.transaction.expiresAt,
@@ -70,16 +72,17 @@ export const applyEvent = (
   }
 
   if (event.transaction.type === "add-member") {
-    if (!isValidAdminDecision(state, event as DefaultTrustChainEvent)) {
-      throw new InvalidTrustChainError("Not allowed to add a member.");
+    if (!isValidAdminDecision(state, event as DefaultWorkspaceChainEvent)) {
+      throw new InvalidWorkspaceChainError("Not allowed to add a member.");
     }
 
-    if (members.hasOwnProperty(event.transaction.memberSigningPublicKey)) {
-      throw new InvalidTrustChainError("Member already exists.");
+    if (
+      members.hasOwnProperty(event.transaction.memberMainDeviceSigningPublicKey)
+    ) {
+      throw new InvalidWorkspaceChainError("Member already exists.");
     }
 
-    members[event.transaction.memberSigningPublicKey] = {
-      lockboxPublicKey: event.transaction.memberLockboxPublicKey,
+    members[event.transaction.memberMainDeviceSigningPublicKey] = {
       role: event.transaction.role,
       addedBy: event.authors.map((author) => author.publicKey),
     };
@@ -88,12 +91,12 @@ export const applyEvent = (
   if (event.transaction.type === "add-member-via-invitation") {
     // check that the invitation exists in the current state
     if (!invitations.hasOwnProperty(event.transaction.invitationId)) {
-      throw new InvalidTrustChainError("Invitation doesn't exist.");
+      throw new InvalidWorkspaceChainError("Invitation doesn't exist.");
     }
 
     event.authors.forEach((author) => {
       if (!members.hasOwnProperty(author.publicKey)) {
-        throw new InvalidTrustChainError("Author is not a member.");
+        throw new InvalidWorkspaceChainError("Author is not a member.");
       }
     });
 
@@ -104,11 +107,13 @@ export const applyEvent = (
         event.transaction.invitationSigningPublicKey ||
       invitation.role !== event.transaction.role
     ) {
-      throw new InvalidTrustChainError("Invitation invalid.");
+      throw new InvalidWorkspaceChainError("Invitation invalid.");
     }
 
-    if (members.hasOwnProperty(event.transaction.memberSigningPublicKey)) {
-      throw new InvalidTrustChainError("Member already exists.");
+    if (
+      members.hasOwnProperty(event.transaction.memberMainDeviceSigningPublicKey)
+    ) {
+      throw new InvalidWorkspaceChainError("Member already exists.");
     }
 
     const validInvitation = verifyAcceptInvitation({
@@ -117,20 +122,17 @@ export const applyEvent = (
       invitationId: event.transaction.invitationId,
       workspaceId: event.transaction.workspaceId,
       expiresAt: new Date(event.transaction.expiresAt),
-      mainDeviceEncryptionPublicKey: event.transaction.memberLockboxPublicKey,
-      mainDeviceSigningPublicKey: event.transaction.memberSigningPublicKey,
-      mainDeviceEncryptionPublicKeySignature:
-        event.transaction.mainDeviceEncryptionPublicKeySignature,
+      mainDeviceSigningPublicKey:
+        event.transaction.memberMainDeviceSigningPublicKey,
       role: event.transaction.role,
     });
     if (!validInvitation) {
-      throw new InvalidTrustChainError(
+      throw new InvalidWorkspaceChainError(
         "Invalid add member via invitation event."
       );
     }
 
-    members[event.transaction.memberSigningPublicKey] = {
-      lockboxPublicKey: event.transaction.memberLockboxPublicKey,
+    members[event.transaction.memberMainDeviceSigningPublicKey] = {
       role: event.transaction.role,
       addedBy: event.authors.map((author) => author.publicKey),
     };
@@ -138,57 +140,71 @@ export const applyEvent = (
 
   if (event.transaction.type === "update-member") {
     if (
-      !state.members.hasOwnProperty(event.transaction.memberSigningPublicKey)
+      !state.members.hasOwnProperty(
+        event.transaction.memberMainDeviceSigningPublicKey
+      )
     ) {
-      throw new InvalidTrustChainError("Failed to update non-existing member.");
+      throw new InvalidWorkspaceChainError(
+        "Failed to update non-existing member."
+      );
     }
-    if (!isValidAdminDecision(state, event as DefaultTrustChainEvent)) {
-      throw new InvalidTrustChainError("Not allowed to update a member.");
+    if (!isValidAdminDecision(state, event as DefaultWorkspaceChainEvent)) {
+      throw new InvalidWorkspaceChainError("Not allowed to update a member.");
     }
 
     if (
       getAdminCount(state) <= 1 &&
       event.transaction.role !== "ADMIN" &&
-      members[event.transaction.memberSigningPublicKey].role === "ADMIN"
+      members[event.transaction.memberMainDeviceSigningPublicKey].role ===
+        "ADMIN"
     ) {
-      throw new InvalidTrustChainError("Not allowed to demote the last admin.");
+      throw new InvalidWorkspaceChainError(
+        "Not allowed to demote the last admin."
+      );
     }
 
     if (
-      members[event.transaction.memberSigningPublicKey].role ===
+      members[event.transaction.memberMainDeviceSigningPublicKey].role ===
       event.transaction.role
     ) {
-      throw new InvalidTrustChainError("Not allowed member update.");
+      throw new InvalidWorkspaceChainError("Not allowed member update.");
     }
 
-    members[event.transaction.memberSigningPublicKey] = {
-      lockboxPublicKey:
-        members[event.transaction.memberSigningPublicKey].lockboxPublicKey,
+    members[event.transaction.memberMainDeviceSigningPublicKey] = {
       role: event.transaction.role,
-      addedBy: members[event.transaction.memberSigningPublicKey].addedBy,
+      addedBy:
+        members[event.transaction.memberMainDeviceSigningPublicKey].addedBy,
     };
   }
 
   if (event.transaction.type === "remove-member") {
     if (
-      !state.members.hasOwnProperty(event.transaction.memberSigningPublicKey)
+      !state.members.hasOwnProperty(
+        event.transaction.memberMainDeviceSigningPublicKey
+      )
     ) {
-      throw new InvalidTrustChainError("Failed to remove non-existing member.");
+      throw new InvalidWorkspaceChainError(
+        "Failed to remove non-existing member."
+      );
     }
-    if (!isValidAdminDecision(state, event as DefaultTrustChainEvent)) {
-      throw new InvalidTrustChainError("Not allowed to remove a member.");
+    if (!isValidAdminDecision(state, event as DefaultWorkspaceChainEvent)) {
+      throw new InvalidWorkspaceChainError("Not allowed to remove a member.");
     }
     if (Object.keys(members).length <= 1) {
-      throw new InvalidTrustChainError("Not allowed to remove last member.");
+      throw new InvalidWorkspaceChainError(
+        "Not allowed to remove last member."
+      );
     }
     if (
-      state.members[event.transaction.memberSigningPublicKey].role ===
+      state.members[event.transaction.memberMainDeviceSigningPublicKey].role ===
         "ADMIN" &&
       getAdminCount(state) <= 1
     ) {
-      throw new InvalidTrustChainError("Not allowed to remove the last admin.");
+      throw new InvalidWorkspaceChainError(
+        "Not allowed to remove the last admin."
+      );
     }
-    delete members[event.transaction.memberSigningPublicKey];
+    delete members[event.transaction.memberMainDeviceSigningPublicKey];
   }
 
   return {
@@ -196,7 +212,7 @@ export const applyEvent = (
     invitations,
     members,
     lastEventHash: hash,
-    trustChainVersion: 1,
+    workspaceChainVersion: 1,
     encryptedStateClock: state.encryptedStateClock,
   };
 };

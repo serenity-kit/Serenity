@@ -1,3 +1,4 @@
+import * as workspaceChain from "@serenity-kit/workspace-chain";
 import { equalArrayContent, generateId } from "@serenity-tools/common";
 import {
   Workspace,
@@ -21,6 +22,7 @@ type Params = {
   creatorDeviceSigningPublicKey: string;
   deviceWorkspaceKeyBoxes: DeviceWorkspaceKeyBoxParams[];
   workspaceKeyId?: string | undefined;
+  workspaceChainEntry: workspaceChain.CreateChainWorkspaceChainEvent;
 };
 
 export async function createWorkspace({
@@ -30,6 +32,7 @@ export async function createWorkspace({
   creatorDeviceSigningPublicKey,
   deviceWorkspaceKeyBoxes,
   workspaceKeyId,
+  workspaceChainEntry,
 }: Params): Promise<Workspace> {
   return await prisma.$transaction(async (prisma) => {
     const allDeviceSigningPublicKeys = deviceWorkspaceKeyBoxes.map(
@@ -88,6 +91,19 @@ export async function createWorkspace({
             },
           },
         },
+      },
+    });
+
+    const workspaceChainState = workspaceChain.resolveState([
+      workspaceChainEntry,
+    ]);
+
+    await prisma.workspaceChainEntry.create({
+      data: {
+        content: workspaceChainEntry,
+        state: workspaceChainState,
+        workspaceId: rawWorkspace.id,
+        position: 0,
       },
     });
 

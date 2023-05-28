@@ -3,19 +3,17 @@ import canonicalize from "canonicalize";
 import sodium from "react-native-libsodium";
 import {
   CreateChainTransaction,
-  CreateChainTrustChainEvent,
+  CreateChainWorkspaceChainEvent,
   KeyPairBase64,
 } from "./types";
 import { hashTransaction } from "./utils";
 
 export const createChain = (
-  authorKeyPair: KeyPairBase64,
-  lockboxPublicKeys: { [signingPublicKey: string]: string }
-): CreateChainTrustChainEvent => {
+  authorKeyPair: KeyPairBase64
+): CreateChainWorkspaceChainEvent => {
   const transaction: CreateChainTransaction = {
     type: "create",
     id: generateId(),
-    lockboxPublicKeys,
   };
   const hash = hashTransaction(transaction);
   const message = canonicalize({

@@ -7,7 +7,7 @@ import {
   getKeyPairsC,
   KeyPairs,
 } from "../test/testUtils";
-import { InvalidTrustChainError } from "./errors";
+import { InvalidWorkspaceChainError } from "./errors";
 import { addMember, createChain, resolveState } from "./index";
 import { hashTransaction } from "./utils";
 
@@ -27,25 +27,21 @@ beforeAll(async () => {
 });
 
 test("should fail in case the chain is not correctly ordered", async () => {
-  const createEvent = createChain(keyPairsA.sign, {
-    [keyPairsA.sign.publicKey]: keyPairsA.box.publicKey,
-  });
+  const createEvent = createChain(keyPairsA.sign);
   const addMemberEvent = addMember(
     hashTransaction(createEvent.transaction),
     keyPairA,
     keyPairsB.sign.publicKey,
-    keyPairsB.box.publicKey,
     "ADMIN"
   );
   const addMemberEvent2 = addMember(
     hashTransaction(addMemberEvent.transaction),
     keyPairB,
     keyPairsC.sign.publicKey,
-    keyPairsC.box.publicKey,
     "ADMIN"
   );
   const chain = [createEvent, addMemberEvent2, addMemberEvent];
-  expect(() => resolveState(chain)).toThrow(InvalidTrustChainError);
+  expect(() => resolveState(chain)).toThrow(InvalidWorkspaceChainError);
   expect(() => resolveState(chain)).toThrow(
     "Invalid signature for MTDhqVIMflTD0Car-KSP1MWCIEYqs2LBaXfU20di0tY."
   );

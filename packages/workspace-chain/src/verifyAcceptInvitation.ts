@@ -7,8 +7,6 @@ export type AcceptInvitationParams = {
   invitationSigningPublicKey: string;
   invitationId: string;
   mainDeviceSigningPublicKey: string;
-  mainDeviceEncryptionPublicKey: string;
-  mainDeviceEncryptionPublicKeySignature: string;
   role: Role;
   workspaceId: string;
   expiresAt: Date;
@@ -19,8 +17,6 @@ export const verifyAcceptInvitation = ({
   invitationSigningPublicKey,
   invitationId,
   mainDeviceSigningPublicKey,
-  mainDeviceEncryptionPublicKey,
-  mainDeviceEncryptionPublicKeySignature,
   role,
   workspaceId,
   expiresAt,
@@ -32,8 +28,6 @@ export const verifyAcceptInvitation = ({
     role,
     expiresAt: expiresAt.toISOString(),
     mainDeviceSigningPublicKey,
-    mainDeviceEncryptionPublicKey,
-    mainDeviceEncryptionPublicKeySignature,
   });
   if (!acceptInvitationData) {
     throw new Error("Accept invitation data can't be canonicalized");

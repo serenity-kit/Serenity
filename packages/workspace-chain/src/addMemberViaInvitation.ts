@@ -2,7 +2,7 @@ import canonicalize from "canonicalize";
 import sodium from "react-native-libsodium";
 import {
   AddMemberViaInvitationTransaction,
-  DefaultTrustChainEvent,
+  DefaultWorkspaceChainEvent,
   Role,
 } from "./types";
 import { hashTransaction } from "./utils";
@@ -15,8 +15,6 @@ type AddMemberViaInvitationParams = {
   invitationSigningPublicKey: string;
   invitationId: string;
   mainDeviceSigningPublicKey: string;
-  mainDeviceEncryptionPublicKey: string;
-  mainDeviceEncryptionPublicKeySignature: string;
   workspaceId: string;
   expiresAt: Date;
 };
@@ -29,17 +27,13 @@ export const addMemberViaInvitation = ({
   invitationSigningPublicKey,
   invitationId,
   mainDeviceSigningPublicKey,
-  mainDeviceEncryptionPublicKey,
-  mainDeviceEncryptionPublicKeySignature,
   workspaceId,
   expiresAt,
-}: AddMemberViaInvitationParams): DefaultTrustChainEvent => {
+}: AddMemberViaInvitationParams): DefaultWorkspaceChainEvent => {
   const transaction: AddMemberViaInvitationTransaction = {
     type: "add-member-via-invitation",
-    memberSigningPublicKey: mainDeviceSigningPublicKey,
-    memberLockboxPublicKey: mainDeviceEncryptionPublicKey,
+    memberMainDeviceSigningPublicKey: mainDeviceSigningPublicKey,
     role,
-    mainDeviceEncryptionPublicKeySignature,
     acceptInvitationSignature,
     invitationSigningPublicKey,
     invitationId,

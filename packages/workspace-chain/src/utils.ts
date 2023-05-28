@@ -1,9 +1,9 @@
 import canonicalize from "canonicalize";
 import sodium from "react-native-libsodium";
 import {
-  DefaultTrustChainEvent,
-  TrustChainEvent,
-  TrustChainState,
+  DefaultWorkspaceChainEvent,
+  WorkspaceChainEvent,
+  WorkspaceChainState,
 } from "./types";
 
 export const hashTransaction = (transaction) => {
@@ -12,17 +12,11 @@ export const hashTransaction = (transaction) => {
   );
 };
 
-export const isValidCreateChainEvent = (event: TrustChainEvent) => {
+export const isValidCreateChainEvent = (event: WorkspaceChainEvent) => {
   if (event.transaction.type !== "create" || event.prevHash !== null) {
     return false;
   }
-  if (
-    Object.keys(event.transaction.lockboxPublicKeys).length !==
-    event.authors.length
-  ) {
-    return false;
-  }
-  const lockboxPublicKeys = event.transaction.lockboxPublicKeys;
+
   const hash = hashTransaction(event.transaction);
   const message = canonicalize({
     prevHash: null,
@@ -33,9 +27,6 @@ export const isValidCreateChainEvent = (event: TrustChainEvent) => {
   }
 
   return event.authors.every((author) => {
-    if (!lockboxPublicKeys.hasOwnProperty(author.publicKey)) {
-      return false;
-    }
     return sodium.crypto_sign_verify_detached(
       sodium.from_base64(author.signature),
       message,
@@ -45,8 +36,8 @@ export const isValidCreateChainEvent = (event: TrustChainEvent) => {
 };
 
 export const allAuthorsAreValidAdmins = (
-  state: TrustChainState,
-  event: DefaultTrustChainEvent
+  state: WorkspaceChainState,
+  event: DefaultWorkspaceChainEvent
 ) => {
   return event.authors.every((author) => {
     if (!state.members.hasOwnProperty(author.publicKey)) {
@@ -59,7 +50,7 @@ export const allAuthorsAreValidAdmins = (
   });
 };
 
-export const getAdminCount = (state: TrustChainState) => {
+export const getAdminCount = (state: WorkspaceChainState) => {
   let adminCount = 0;
   Object.keys(state.members).forEach((memberKey) => {
     if (state.members[memberKey].role === "ADMIN") {
@@ -70,10 +61,10 @@ export const getAdminCount = (state: TrustChainState) => {
 };
 
 export const isValidAdminDecision = (
-  state: TrustChainState,
-  event: DefaultTrustChainEvent
+  state: WorkspaceChainState,
+  event: DefaultWorkspaceChainEvent
 ) => {
-  if (!allAuthorsAreValidAdmins(state, event as DefaultTrustChainEvent)) {
+  if (!allAuthorsAreValidAdmins(state, event as DefaultWorkspaceChainEvent)) {
     return false;
   }
   if (event.authors.length > 0) {

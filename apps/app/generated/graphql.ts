@@ -194,7 +194,6 @@ export type CreateInitialFolderInput = {
 
 export type CreateInitialWorkspaceInput = {
   deviceWorkspaceKeyBoxes: Array<DeviceWorkspaceKeyBoxInput>;
-  id: Scalars['String'];
   name: Scalars['String'];
   workspaceKeyId: Scalars['String'];
 };
@@ -203,6 +202,7 @@ export type CreateInitialWorkspaceStructureInput = {
   creatorDeviceSigningPublicKey: Scalars['String'];
   document: CreateInitialDocumentInput;
   folder: CreateInitialFolderInput;
+  serializedWorkspaceChainEntry: Scalars['String'];
   workspace: CreateInitialWorkspaceInput;
 };
 

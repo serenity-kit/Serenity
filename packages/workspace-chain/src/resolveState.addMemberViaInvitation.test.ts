@@ -14,7 +14,7 @@ import {
   addInvitation,
   addMemberViaInvitation,
   createChain,
-  InvalidTrustChainError,
+  InvalidWorkspaceChainError,
   resolveState,
 } from "./index";
 import { hashTransaction } from "./utils";
@@ -26,9 +26,7 @@ let keyPairsB: KeyPairs;
 let keyPairC: sodium.KeyPair;
 let keyPairsC: KeyPairs;
 let mainDevice: {
-  mainDeviceEncryptionPublicKey: string;
   mainDeviceSigningPublicKey: string;
-  mainDeviceEncryptionPublicKeySignature: string;
 };
 
 beforeAll(async () => {
@@ -40,21 +38,12 @@ beforeAll(async () => {
   keyPairC = getKeyPairC();
   keyPairsC = getKeyPairsC();
   mainDevice = {
-    mainDeviceEncryptionPublicKey: keyPairsB.box.publicKey,
     mainDeviceSigningPublicKey: keyPairsB.sign.publicKey,
-    mainDeviceEncryptionPublicKeySignature: sodium.to_base64(
-      sodium.crypto_sign_detached(
-        keyPairsB.box.publicKey,
-        sodium.from_base64(keyPairsB.sign.privateKey)
-      )
-    ),
   };
 });
 
 test("should be able to add a member via an invitation", async () => {
-  const createEvent = createChain(keyPairsA.sign, {
-    [keyPairsA.sign.publicKey]: keyPairsA.box.publicKey,
-  });
+  const createEvent = createChain(keyPairsA.sign);
   const addInvitationEvent = addInvitation({
     prevHash: hashTransaction(createEvent.transaction),
     authorKeyPair: keyPairA,
@@ -94,14 +83,12 @@ test("should be able to add a member via an invitation", async () => {
         "addedBy": [
           "74IPzs2dhoERLRuxeS7zadzEvKfb7IqOK-jKu0mQxIM",
         ],
-        "lockboxPublicKey": "wevxDsZ-L7wpy3ePZcQNfG8WDh0wB0d27phr5OMdLwI",
         "role": "ADMIN",
       },
       "MTDhqVIMflTD0Car-KSP1MWCIEYqs2LBaXfU20di0tY": {
         "addedBy": [
           "74IPzs2dhoERLRuxeS7zadzEvKfb7IqOK-jKu0mQxIM",
         ],
-        "lockboxPublicKey": "b_skeL8qudNQji-HuOldPNFDzYSBENNqmFMlawhtrHg",
         "role": "EDITOR",
       },
     }
@@ -109,9 +96,7 @@ test("should be able to add a member via an invitation", async () => {
 });
 
 test("should be able to add a member twice", async () => {
-  const createEvent = createChain(keyPairsA.sign, {
-    [keyPairsA.sign.publicKey]: keyPairsA.box.publicKey,
-  });
+  const createEvent = createChain(keyPairsA.sign);
   const addInvitationEvent = addInvitation({
     prevHash: hashTransaction(createEvent.transaction),
     authorKeyPair: keyPairA,
@@ -156,14 +141,12 @@ test("should be able to add a member twice", async () => {
     addMemberViaInvitationEvent,
     addMemberViaInvitationEvent2,
   ];
-  expect(() => resolveState(chain)).toThrow(InvalidTrustChainError);
+  expect(() => resolveState(chain)).toThrow(InvalidWorkspaceChainError);
   expect(() => resolveState(chain)).toThrow("Member already exists.");
 });
 
 test("should fail if the author is not a member of the chain", async () => {
-  const createEvent = createChain(keyPairsA.sign, {
-    [keyPairsA.sign.publicKey]: keyPairsA.box.publicKey,
-  });
+  const createEvent = createChain(keyPairsA.sign);
   const addInvitationEvent = addInvitation({
     prevHash: hashTransaction(createEvent.transaction),
     authorKeyPair: keyPairA,
@@ -193,6 +176,6 @@ test("should fail if the author is not a member of the chain", async () => {
     expiresAt: new Date(addInvitationEvent.transaction.expiresAt),
   });
   const chain = [createEvent, addInvitationEvent, addMemberViaInvitationEvent];
-  expect(() => resolveState(chain)).toThrow(InvalidTrustChainError);
+  expect(() => resolveState(chain)).toThrow(InvalidWorkspaceChainError);
   expect(() => resolveState(chain)).toThrow("Author is not a member.");
 });

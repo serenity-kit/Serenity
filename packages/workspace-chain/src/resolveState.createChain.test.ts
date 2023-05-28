@@ -7,7 +7,7 @@ import {
   KeyPairs,
 } from "../test/testUtils";
 import { addAuthorToEvent } from "./addAuthorToEvent";
-import { InvalidTrustChainError } from "./errors";
+import { InvalidWorkspaceChainError } from "./errors";
 import { createChain, resolveState } from "./index";
 
 let keyPairsA: KeyPairs;
@@ -28,9 +28,7 @@ beforeAll(async () => {
 });
 
 test("should resolve to one admin after creating a chain", async () => {
-  const event = createChain(keyPairsA.sign, {
-    [keyPairsA.sign.publicKey]: keyPairsA.box.publicKey,
-  });
+  const event = createChain(keyPairsA.sign);
   const state = resolveState([event]);
   expect(state.members).toMatchInlineSnapshot(`
     {
@@ -38,59 +36,16 @@ test("should resolve to one admin after creating a chain", async () => {
         "addedBy": [
           "74IPzs2dhoERLRuxeS7zadzEvKfb7IqOK-jKu0mQxIM",
         ],
-        "lockboxPublicKey": "wevxDsZ-L7wpy3ePZcQNfG8WDh0wB0d27phr5OMdLwI",
         "role": "ADMIN",
       },
     }
   `);
 });
 
-test("should resolve to two admins after creating a chain with two authors", async () => {
-  const event = createChain(keyPairsA.sign, {
-    [keyPairsA.sign.publicKey]: keyPairsA.box.publicKey,
-    [keyPairsB.sign.publicKey]: keyPairsB.box.publicKey,
-  });
-  const event2 = addAuthorToEvent(event, keyPairB);
-  const state = resolveState([event2]);
-  expect(state.members).toMatchInlineSnapshot(`
-    {
-      "74IPzs2dhoERLRuxeS7zadzEvKfb7IqOK-jKu0mQxIM": {
-        "addedBy": [
-          "74IPzs2dhoERLRuxeS7zadzEvKfb7IqOK-jKu0mQxIM",
-          "MTDhqVIMflTD0Car-KSP1MWCIEYqs2LBaXfU20di0tY",
-        ],
-        "lockboxPublicKey": "wevxDsZ-L7wpy3ePZcQNfG8WDh0wB0d27phr5OMdLwI",
-        "role": "ADMIN",
-      },
-      "MTDhqVIMflTD0Car-KSP1MWCIEYqs2LBaXfU20di0tY": {
-        "addedBy": [
-          "74IPzs2dhoERLRuxeS7zadzEvKfb7IqOK-jKu0mQxIM",
-          "MTDhqVIMflTD0Car-KSP1MWCIEYqs2LBaXfU20di0tY",
-        ],
-        "lockboxPublicKey": "b_skeL8qudNQji-HuOldPNFDzYSBENNqmFMlawhtrHg",
-        "role": "ADMIN",
-      },
-    }
-  `);
-});
-
-test("should fail in case there are more authors than declared admins", async () => {
-  const event = createChain(keyPairsA.sign, {
-    [keyPairsA.sign.publicKey]: keyPairsA.box.publicKey,
-  });
+test("should fail in case there is more than one author", async () => {
+  const event = createChain(keyPairsA.sign);
   const event2 = addAuthorToEvent(event, keyPairB);
   const chain = [event2];
-  expect(() => resolveState(chain)).toThrow(InvalidTrustChainError);
-  expect(() => resolveState(chain)).toThrow("Invalid chain creation event.");
-});
-
-test("should fail in case the authors and declared admins don't match up", async () => {
-  const event = createChain(keyPairsA.sign, {
-    [keyPairsA.sign.publicKey]: keyPairsA.box.publicKey,
-    [keyPairsC.sign.publicKey]: keyPairsC.box.publicKey,
-  });
-  const event2 = addAuthorToEvent(event, keyPairB);
-  const chain = [event2];
-  expect(() => resolveState(chain)).toThrow(InvalidTrustChainError);
+  expect(() => resolveState(chain)).toThrow(InvalidWorkspaceChainError);
   expect(() => resolveState(chain)).toThrow("Invalid chain creation event.");
 });

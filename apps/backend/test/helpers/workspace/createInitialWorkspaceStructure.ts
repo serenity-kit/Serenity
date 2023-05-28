@@ -1,3 +1,4 @@
+import * as workspaceChain from "@serenity-kit/workspace-chain";
 import {
   LocalDevice,
   createDocumentTitleKey,
@@ -92,6 +93,7 @@ type Params = {
   graphql: any;
   workspaceName: string;
   creatorDevice: LocalDevice;
+  mainDevice: LocalDevice;
   devices: Device[];
   authorizationHeader: string;
 };
@@ -100,11 +102,16 @@ export const createInitialWorkspaceStructure = async ({
   graphql,
   workspaceName,
   creatorDevice,
+  mainDevice,
   devices,
   authorizationHeader,
 }: Params) => {
   // create ids
-  const workspaceId = generateId();
+  const event = workspaceChain.createChain({
+    privateKey: mainDevice.signingPrivateKey,
+    publicKey: mainDevice.signingPublicKey,
+  });
+
   const workspaceKeyId = generateId();
   const folderId = generateId();
   const documentId = generateId();
@@ -128,7 +135,6 @@ export const createInitialWorkspaceStructure = async ({
     });
   }
   const readyWorkspace = {
-    id: workspaceId,
     name: workspaceName,
     workspaceKeyId,
     deviceWorkspaceKeyBoxes,
@@ -230,6 +236,7 @@ export const createInitialWorkspaceStructure = async ({
     {
       input: {
         workspace: readyWorkspace,
+        serializedWorkspaceChainEntry: JSON.stringify(event),
         folder: readyFolder,
         document: readyDocument,
         creatorDeviceSigningPublicKey: creatorDevice.signingPublicKey,

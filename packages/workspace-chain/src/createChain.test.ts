@@ -11,9 +11,7 @@ beforeAll(async () => {
 });
 
 test("should create a new chain event", async () => {
-  const event = createChain(keyPairsA.sign, {
-    [keyPairsA.sign.publicKey]: keyPairsA.box.publicKey,
-  });
+  const event = createChain(keyPairsA.sign);
   expect(event.prevHash).toBeNull();
   expect(isValidCreateChainEvent(event)).toBe(true);
 });

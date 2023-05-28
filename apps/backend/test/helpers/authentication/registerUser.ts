@@ -36,8 +36,13 @@ export const registerUser = async (
   `;
 
   const exportKey = result.registration.getExportKey();
-  const { encryptionPrivateKey, signingPrivateKey, ...mainDevice } =
-    createAndEncryptDevice(sodium.to_base64(exportKey));
+
+  const mainDevice = createAndEncryptDevice(sodium.to_base64(exportKey));
+  const {
+    encryptionPrivateKey,
+    signingPrivateKey,
+    ...mainDeviceWithoutPrivateKeys
+  } = mainDevice;
 
   let pendingWorkspaceInvitationKeyCiphertext: string | null = null;
   let pendingWorkspaceInvitationKeyPublicNonce: string | null = null;
@@ -64,7 +69,7 @@ export const registerUser = async (
     input: {
       registrationId: result.data.registrationId,
       message: sodium.to_base64(message),
-      mainDevice,
+      mainDevice: mainDeviceWithoutPrivateKeys,
       pendingWorkspaceInvitationId,
       pendingWorkspaceInvitationKeyCiphertext,
       pendingWorkspaceInvitationKeyPublicNonce,

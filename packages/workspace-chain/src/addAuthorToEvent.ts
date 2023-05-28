@@ -1,12 +1,12 @@
 import canonicalize from "canonicalize";
 import sodium from "react-native-libsodium";
-import { TrustChainEvent } from "./types";
+import { WorkspaceChainEvent } from "./types";
 import { hashTransaction } from "./utils";
 
 export const addAuthorToEvent = (
-  event: TrustChainEvent,
+  event: WorkspaceChainEvent,
   authorKeyPair: sodium.KeyPair
-): TrustChainEvent => {
+): WorkspaceChainEvent => {
   const hash = hashTransaction(event.transaction);
   const message = canonicalize({
     prevHash: event.prevHash,

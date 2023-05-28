@@ -1,3 +1,4 @@
+import * as workspaceChain from "@serenity-kit/workspace-chain";
 import {
   createAndEncryptDevice,
   createAndEncryptWorkspaceKeyForDevice,
@@ -143,6 +144,11 @@ export default async function createUserWithWorkspace({
     device: mainDevice,
   });
 
+  const createWorkspaceChainEvent = workspaceChain.createChain({
+    privateKey: mainDevice.signingPrivateKey,
+    publicKey: mainDevice.signingPublicKey,
+  });
+
   const createWorkspaceResult = await createInitialWorkspaceStructure({
     userId: user.id,
     workspace: {
@@ -157,6 +163,7 @@ export default async function createUserWithWorkspace({
         },
       ],
     },
+    workspaceChainEntry: createWorkspaceChainEvent,
     folder: {
       id: folderId,
       idSignature: folderIdSignature,
