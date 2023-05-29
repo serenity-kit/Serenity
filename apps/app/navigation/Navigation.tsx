@@ -26,7 +26,10 @@ import { PageHeaderLeft } from "../components/pageHeaderLeft/PageHeaderLeft";
 import Sidebar from "../components/sidebar/Sidebar";
 import WorkspaceSettingsSidebar from "../components/workspaceSettingsSidebar/WorkspaceSettingsSidebar";
 import { WorkspaceProvider } from "../context/WorkspaceContext";
-import { useWorkspaceQuery } from "../generated/graphql";
+import {
+  useWorkspaceChainQuery,
+  useWorkspaceQuery,
+} from "../generated/graphql";
 import { redirectToLoginIfMissingTheActiveDeviceOrSessionKey } from "../higherOrderComponents/redirectToLoginIfMissingTheActiveDeviceOrSessionKey";
 import { useAuthenticatedAppContext } from "../hooks/useAuthenticatedAppContext";
 import { useInterval } from "../hooks/useInterval";
@@ -196,13 +199,20 @@ function WorkspaceStackNavigator(props) {
     },
   });
 
+  const [workspaceChainQueryResult] = useWorkspaceChainQuery({
+    variables: {
+      workspaceId: props.route.params.workspaceId,
+    },
+  });
+
   let workspaceChainState: workspaceChain.WorkspaceChainState | null = null;
   let lastChainEvent: workspaceChain.WorkspaceChainEvent | null = null;
-  if (workspaceQueryResult.data?.workspace?.chain) {
+  if (workspaceChainQueryResult.data?.workspaceChain?.nodes) {
     workspaceChainState = workspaceChain.resolveState(
-      workspaceQueryResult.data.workspace.chain.map((entry) => {
+      workspaceChainQueryResult.data.workspaceChain.nodes.map((event) => {
         const data = workspaceChain.WorkspaceChainEvent.parse(
-          JSON.parse(entry.serializedContent)
+          // @ts-expect-error
+          JSON.parse(event.serializedContent)
         );
         lastChainEvent = data;
         return data;

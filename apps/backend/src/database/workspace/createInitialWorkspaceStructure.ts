@@ -48,7 +48,7 @@ export type DocumentParams = {
 export type Params = {
   userId: string;
   workspace: WorkspaceParams;
-  workspaceChainEntry: workspaceChain.CreateChainWorkspaceChainEvent;
+  workspaceChainEvent: workspaceChain.CreateChainWorkspaceChainEvent;
   folder: FolderParams;
   document: DocumentParams;
   creatorDeviceSigningPublicKey: string;
@@ -57,7 +57,7 @@ export type Params = {
 export async function createInitialWorkspaceStructure({
   userId,
   workspace,
-  workspaceChainEntry,
+  workspaceChainEvent,
   folder,
   document,
   creatorDeviceSigningPublicKey,
@@ -69,7 +69,7 @@ export async function createInitialWorkspaceStructure({
     creatorDeviceSigningPublicKey,
     deviceWorkspaceKeyBoxes: workspace.deviceWorkspaceKeyBoxes,
     workspaceKeyId: workspace.workspaceKeyId,
-    workspaceChainEntry,
+    workspaceChainEvent,
   });
   const workspaceKey = createdWorkspace.currentWorkspaceKey;
   const createdFolder = await createFolder({

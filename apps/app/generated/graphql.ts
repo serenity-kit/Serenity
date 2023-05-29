@@ -202,7 +202,7 @@ export type CreateInitialWorkspaceStructureInput = {
   creatorDeviceSigningPublicKey: Scalars['String'];
   document: CreateInitialDocumentInput;
   folder: CreateInitialFolderInput;
-  serializedWorkspaceChainEntry: Scalars['String'];
+  serializedWorkspaceChainEvent: Scalars['String'];
   workspace: CreateInitialWorkspaceInput;
 };
 
@@ -215,7 +215,7 @@ export type CreateInitialWorkspaceStructureResult = {
 };
 
 export type CreateWorkspaceInvitationInput = {
-  serializedWorkspaceChainEntry: Scalars['String'];
+  serializedWorkspaceChainEvent: Scalars['String'];
   workspaceId: Scalars['String'];
 };
 
@@ -857,6 +857,7 @@ export type Query = {
   unauthorizedMembers?: Maybe<UnauthorizedMembersResult>;
   userIdFromUsername?: Maybe<UserIdFromUsernameResult>;
   workspace?: Maybe<Workspace>;
+  workspaceChain?: Maybe<WorkspaceChainEventConnection>;
   workspaceDevices?: Maybe<DeviceConnection>;
   workspaceInvitation?: Maybe<WorkspaceInvitation>;
   workspaceInvitations?: Maybe<WorkspaceInvitationConnection>;
@@ -979,6 +980,13 @@ export type QueryUserIdFromUsernameArgs = {
 export type QueryWorkspaceArgs = {
   deviceSigningPublicKey: Scalars['String'];
   id?: InputMaybe<Scalars['ID']>;
+};
+
+
+export type QueryWorkspaceChainArgs = {
+  after?: InputMaybe<Scalars['String']>;
+  first: Scalars['Int'];
+  workspaceId: Scalars['ID'];
 };
 
 
@@ -1202,7 +1210,6 @@ export type VerifyRegistrationResult = {
 
 export type Workspace = {
   __typename?: 'Workspace';
-  chain: Array<WorkspaceChainEvent>;
   currentWorkspaceKey?: Maybe<WorkspaceKey>;
   id: Scalars['String'];
   idSignature?: Maybe<Scalars['String']>;
@@ -1217,7 +1224,26 @@ export type Workspace = {
 
 export type WorkspaceChainEvent = {
   __typename?: 'WorkspaceChainEvent';
+  position: Scalars['String'];
   serializedContent: Scalars['String'];
+};
+
+export type WorkspaceChainEventConnection = {
+  __typename?: 'WorkspaceChainEventConnection';
+  /** https://facebook.github.io/relay/graphql/connections.htm#sec-Edge-Types */
+  edges?: Maybe<Array<Maybe<WorkspaceChainEventEdge>>>;
+  /** Flattened list of WorkspaceChainEvent type */
+  nodes?: Maybe<Array<Maybe<WorkspaceChainEvent>>>;
+  /** https://facebook.github.io/relay/graphql/connections.htm#sec-undefined.PageInfo */
+  pageInfo: PageInfo;
+};
+
+export type WorkspaceChainEventEdge = {
+  __typename?: 'WorkspaceChainEventEdge';
+  /** https://facebook.github.io/relay/graphql/connections.htm#sec-Cursor */
+  cursor: Scalars['String'];
+  /** https://facebook.github.io/relay/graphql/connections.htm#sec-Node */
+  node?: Maybe<WorkspaceChainEvent>;
 };
 
 export type WorkspaceConnection = {
@@ -1753,7 +1779,14 @@ export type WorkspaceQueryVariables = Exact<{
 }>;
 
 
-export type WorkspaceQuery = { __typename?: 'Query', workspace?: { __typename?: 'Workspace', id: string, name?: string | null, members?: Array<{ __typename?: 'WorkspaceMember', userId: string, username?: string | null, role: Role, devices?: Array<{ __typename?: 'MinimalDevice', signingPublicKey: string, encryptionPublicKey: string, encryptionPublicKeySignature: string }> | null }> | null, chain: Array<{ __typename?: 'WorkspaceChainEvent', serializedContent: string }>, currentWorkspaceKey?: { __typename?: 'WorkspaceKey', id: string, workspaceId: string, workspaceKeyBox?: { __typename?: 'WorkspaceKeyBox', id: string, workspaceKeyId: string, deviceSigningPublicKey: string, ciphertext: string, nonce: string, creatorDevice: { __typename?: 'CreatorDevice', signingPublicKey: string, encryptionPublicKey: string } } | null } | null, workspaceKeys?: Array<{ __typename?: 'WorkspaceKey', id: string, workspaceId: string, generation: number, workspaceKeyBox?: { __typename?: 'WorkspaceKeyBox', id: string, workspaceKeyId: string, deviceSigningPublicKey: string, ciphertext: string, nonce: string, creatorDevice: { __typename?: 'CreatorDevice', signingPublicKey: string, encryptionPublicKey: string } } | null }> | null } | null };
+export type WorkspaceQuery = { __typename?: 'Query', workspace?: { __typename?: 'Workspace', id: string, name?: string | null, members?: Array<{ __typename?: 'WorkspaceMember', userId: string, username?: string | null, role: Role, devices?: Array<{ __typename?: 'MinimalDevice', signingPublicKey: string, encryptionPublicKey: string, encryptionPublicKeySignature: string }> | null }> | null, currentWorkspaceKey?: { __typename?: 'WorkspaceKey', id: string, workspaceId: string, workspaceKeyBox?: { __typename?: 'WorkspaceKeyBox', id: string, workspaceKeyId: string, deviceSigningPublicKey: string, ciphertext: string, nonce: string, creatorDevice: { __typename?: 'CreatorDevice', signingPublicKey: string, encryptionPublicKey: string } } | null } | null, workspaceKeys?: Array<{ __typename?: 'WorkspaceKey', id: string, workspaceId: string, generation: number, workspaceKeyBox?: { __typename?: 'WorkspaceKeyBox', id: string, workspaceKeyId: string, deviceSigningPublicKey: string, ciphertext: string, nonce: string, creatorDevice: { __typename?: 'CreatorDevice', signingPublicKey: string, encryptionPublicKey: string } } | null }> | null } | null };
+
+export type WorkspaceChainQueryVariables = Exact<{
+  workspaceId: Scalars['ID'];
+}>;
+
+
+export type WorkspaceChainQuery = { __typename?: 'Query', workspaceChain?: { __typename?: 'WorkspaceChainEventConnection', nodes?: Array<{ __typename?: 'WorkspaceChainEvent', serializedContent: string, position: string } | null> | null } | null };
 
 export type WorkspaceDevicesQueryVariables = Exact<{
   workspaceId: Scalars['ID'];
@@ -2781,9 +2814,6 @@ export const WorkspaceDocument = gql`
         encryptionPublicKeySignature
       }
     }
-    chain {
-      serializedContent
-    }
     currentWorkspaceKey {
       id
       workspaceId
@@ -2821,6 +2851,20 @@ export const WorkspaceDocument = gql`
 
 export function useWorkspaceQuery(options: Omit<Urql.UseQueryArgs<WorkspaceQueryVariables>, 'query'>) {
   return Urql.useQuery<WorkspaceQuery, WorkspaceQueryVariables>({ query: WorkspaceDocument, ...options });
+};
+export const WorkspaceChainDocument = gql`
+    query workspaceChain($workspaceId: ID!) {
+  workspaceChain(workspaceId: $workspaceId, first: 1000) {
+    nodes {
+      serializedContent
+      position
+    }
+  }
+}
+    `;
+
+export function useWorkspaceChainQuery(options: Omit<Urql.UseQueryArgs<WorkspaceChainQueryVariables>, 'query'>) {
+  return Urql.useQuery<WorkspaceChainQuery, WorkspaceChainQueryVariables>({ query: WorkspaceChainDocument, ...options });
 };
 export const WorkspaceDevicesDocument = gql`
     query workspaceDevices($workspaceId: ID!) {
@@ -5721,6 +5765,109 @@ export const workspaceQueryService =
         // perform cleanup
         clearInterval(intervalId);
         workspaceQueryServiceSubscribers[variablesString].intervalId = null;
+      }
+    };
+  };
+
+
+
+export const runWorkspaceChainQuery = async (variables: WorkspaceChainQueryVariables, options?: any) => {
+  return await getUrqlClient()
+    .query<WorkspaceChainQuery, WorkspaceChainQueryVariables>(
+      WorkspaceChainDocument,
+      variables,
+      {
+        // better to be safe here and always refetch
+        requestPolicy: "network-only",
+        ...options
+      }
+    )
+    .toPromise();
+};
+
+export type WorkspaceChainQueryResult = Urql.OperationResult<WorkspaceChainQuery, WorkspaceChainQueryVariables>;
+
+export type WorkspaceChainQueryUpdateResultEvent = {
+  type: "WorkspaceChainQuery.UPDATE_RESULT";
+  result: WorkspaceChainQueryResult;
+};
+
+export type WorkspaceChainQueryErrorEvent = {
+  type: "WorkspaceChainQuery.ERROR";
+  result: WorkspaceChainQueryResult;
+};
+
+export type WorkspaceChainQueryServiceEvent = WorkspaceChainQueryUpdateResultEvent | WorkspaceChainQueryErrorEvent;
+
+type WorkspaceChainQueryServiceSubscribersEntry = {
+  variables: WorkspaceChainQueryVariables;
+  callbacks: ((event: WorkspaceChainQueryServiceEvent) => void)[];
+  intervalId: NodeJS.Timer | null;
+};
+
+type WorkspaceChainQueryServiceSubscribers = {
+  [variables: string]: WorkspaceChainQueryServiceSubscribersEntry;
+};
+
+const workspaceChainQueryServiceSubscribers: WorkspaceChainQueryServiceSubscribers = {};
+
+const triggerWorkspaceChainQuery = (variablesString: string, variables: WorkspaceChainQueryVariables) => {
+  getUrqlClient()
+    .query<WorkspaceChainQuery, WorkspaceChainQueryVariables>(WorkspaceChainDocument, variables)
+    .toPromise()
+    .then((result) => {
+      workspaceChainQueryServiceSubscribers[variablesString].callbacks.forEach(
+        (callback) => {
+          callback({
+            type: result.error ? "WorkspaceChainQuery.ERROR" : "WorkspaceChainQuery.UPDATE_RESULT",
+            result: result,
+          });
+        }
+      );
+    });
+};
+
+/**
+ * This service is used to query results every 4 seconds.
+ *
+ * It allows machines to spawn a service that will fetch the query
+ * and send the result to the machine.
+ * It will share the same interval for all machines.
+ * When the last subscription is stopped, the interval will be cleared.
+ * It also considers the variables passed to the service.
+ */
+export const workspaceChainQueryService =
+  (variables: WorkspaceChainQueryVariables, intervalInMs?: number) => (callback, onReceive) => {
+    const variablesString = canonicalize(variables) as string;
+    if (workspaceChainQueryServiceSubscribers[variablesString]) {
+      workspaceChainQueryServiceSubscribers[variablesString].callbacks.push(callback);
+    } else {
+      workspaceChainQueryServiceSubscribers[variablesString] = {
+        variables,
+        callbacks: [callback],
+        intervalId: null,
+      };
+    }
+
+    triggerWorkspaceChainQuery(variablesString, variables);
+    if (!workspaceChainQueryServiceSubscribers[variablesString].intervalId) {
+      workspaceChainQueryServiceSubscribers[variablesString].intervalId = setInterval(
+        () => {
+          triggerWorkspaceChainQuery(variablesString, variables);
+        },
+        intervalInMs || 4000
+      );
+    }
+
+    const intervalId = workspaceChainQueryServiceSubscribers[variablesString].intervalId;
+    return () => {
+      if (
+        workspaceChainQueryServiceSubscribers[variablesString].callbacks.length === 0 &&
+        intervalId
+      ) {
+        // perform cleanup
+        clearInterval(intervalId);
+        workspaceChainQueryServiceSubscribers[variablesString].intervalId = null;
       }
     };
   };

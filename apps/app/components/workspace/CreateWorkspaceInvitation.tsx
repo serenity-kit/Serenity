@@ -122,7 +122,7 @@ export function CreateWorkspaceInvitation(props: Props) {
       await runCreateWorkspaceInvitationMutation({
         input: {
           workspaceId,
-          serializedWorkspaceChainEntry: JSON.stringify(invitation),
+          serializedWorkspaceChainEvent: JSON.stringify(invitation),
         },
       });
     refetchWorkspaceInvitationsResult();

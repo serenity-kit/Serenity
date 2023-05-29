@@ -85,22 +85,22 @@ export async function createWorkspaceInvitation({
     }
 
     // TODO refactor to utility function
-    const prevWorkspaceChainEntry =
-      await prisma.workspaceChainEntry.findFirstOrThrow({
+    const prevWorkspaceChainEvent =
+      await prisma.workspaceChainEvent.findFirstOrThrow({
         where: { workspaceId },
         orderBy: { position: "desc" },
       });
     const prevState = workspaceChain.WorkspaceChainState.parse(
-      prevWorkspaceChainEntry.state
+      prevWorkspaceChainEvent.state
     );
 
     const newState = workspaceChain.applyEvent(prevState, workspaceChainEvent);
-    await prisma.workspaceChainEntry.create({
+    await prisma.workspaceChainEvent.create({
       data: {
         content: workspaceChainEvent,
         state: newState,
         workspaceId,
-        position: prevWorkspaceChainEntry.position + 1,
+        position: prevWorkspaceChainEvent.position + 1,
       },
     });
 

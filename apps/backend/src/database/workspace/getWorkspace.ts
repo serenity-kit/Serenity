@@ -25,14 +25,6 @@ export async function getWorkspace({
   // include userstoworkspaces but in descending alphabetical order by userId
   const rawWorkspace = await prisma.workspace.findUnique({
     include: {
-      chain: {
-        orderBy: {
-          id: "desc",
-        },
-        select: {
-          content: true,
-        },
-      },
       usersToWorkspaces: {
         orderBy: {
           userId: "asc",

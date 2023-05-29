@@ -62,7 +62,7 @@ export const CreateInitialWorkspaceStructureInput = inputObjectType({
   name: "CreateInitialWorkspaceStructureInput",
   definition(t) {
     t.nonNull.field("workspace", { type: CreateInitialWorkspaceInput });
-    t.nonNull.string("serializedWorkspaceChainEntry");
+    t.nonNull.string("serializedWorkspaceChainEvent");
     t.nonNull.field("folder", { type: CreateInitialFolderInput });
     t.nonNull.field("document", { type: CreateInitialDocumentInput });
     t.nonNull.string("creatorDeviceSigningPublicKey");
@@ -98,12 +98,12 @@ export const createInitialWorkspaceStructureMutation = mutationField(
         args.input.creatorDeviceSigningPublicKey
       );
 
-      const workspaceChainEntry =
+      const workspaceChainEvent =
         workspaceChain.CreateChainWorkspaceChainEvent.parse(
-          JSON.parse(args.input.serializedWorkspaceChainEntry)
+          JSON.parse(args.input.serializedWorkspaceChainEvent)
         );
 
-      const workspaceState = workspaceChain.resolveState([workspaceChainEntry]);
+      const workspaceState = workspaceChain.resolveState([workspaceChainEvent]);
       if (
         !workspaceState.members.hasOwnProperty(
           context.user.mainDeviceSigningPublicKey
@@ -115,7 +115,7 @@ export const createInitialWorkspaceStructureMutation = mutationField(
       const workspaceStructure = await createInitialWorkspaceStructure({
         userId: context.user.id,
         workspace: { ...args.input.workspace, id: workspaceState.id },
-        workspaceChainEntry,
+        workspaceChainEvent,
         folder: args.input.folder,
         // @ts-ignore we need to force the snapshot.publicData to have a snapshot Id
         document: args.input.document,

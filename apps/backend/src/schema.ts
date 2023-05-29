@@ -10,8 +10,8 @@ import * as CreateCommentMutationTypes from "./graphql/mutations/comment/createC
 import * as DeleteCommentsMutationTypes from "./graphql/mutations/comment/deleteComments";
 import * as CreateCommentReplyMutationTypes from "./graphql/mutations/commentReply/createCommentReply";
 import * as DeleteCommentRepliessMutationTypes from "./graphql/mutations/commentReply/deleteCommentReplies";
-import * as AttachDevicesToWorkspacesMutationTypes from "./graphql/mutations/device/attachDevicesToWorkspaces";
 import * as AttachDeviceToWorkspacesMutationTypes from "./graphql/mutations/device/attachDeviceToWorkspaces";
+import * as AttachDevicesToWorkspacesMutationTypes from "./graphql/mutations/device/attachDevicesToWorkspaces";
 import * as DeleteDevicesMutationTypes from "./graphql/mutations/device/deleteDevices";
 import * as CreateDocumentMutationTypes from "./graphql/mutations/document/createDocument";
 import * as CreateDocumentShareLinkTypes from "./graphql/mutations/document/createDocumentShareLink";
@@ -39,15 +39,15 @@ import * as MainDeviceQueryTypes from "./graphql/queries/device/mainDevice";
 import * as UnauthorizedDevicesForWorkspacesTypes from "./graphql/queries/device/unauthorizedDevicesForWorkspaces";
 import * as DocumentQueryTypes from "./graphql/queries/document/document";
 import * as DocumentPathQueryTypes from "./graphql/queries/document/documentPath";
-import * as DocumentsQueryTypes from "./graphql/queries/document/documents";
 import * as DocumentShareLinkQueryTypes from "./graphql/queries/document/documentShareLink";
 import * as DocumentShareLinksQueryTypes from "./graphql/queries/document/documentShareLinks";
+import * as DocumentsQueryTypes from "./graphql/queries/document/documents";
 import * as FirstDocumentQueryTypes from "./graphql/queries/document/firstDocument";
 import * as WorkspaceKeyByDocumentIdQueryTypes from "./graphql/queries/document/workspaceKeyByDocumentId";
 import * as FileUrlQueryTypes from "./graphql/queries/file/fileUrl";
 import * as FolderQueryTypes from "./graphql/queries/folder/folder";
-import * as FoldersQueryTypes from "./graphql/queries/folder/folders";
 import * as FolderTraceQueryTypes from "./graphql/queries/folder/folderTrace";
+import * as FoldersQueryTypes from "./graphql/queries/folder/folders";
 import * as RootFoldersQueryTypes from "./graphql/queries/folder/rootFolders";
 import * as SnapshotQueryTypes from "./graphql/queries/snapshot/snapshot";
 import * as UserIdFromUsernameQueryTypes from "./graphql/queries/userIdFromUsername";
@@ -59,10 +59,12 @@ import * as WorkspaceDevicesQueryTypes from "./graphql/queries/workspace/workspa
 import * as WorkspaceInvitationTypes from "./graphql/queries/workspace/workspaceInvitation";
 import * as WorkspaceInvitationsTypes from "./graphql/queries/workspace/workspaceInvitations";
 import * as WorkspacesQueryTypes from "./graphql/queries/workspace/workspaces";
+import * as WorkspaceChainQueryTypes from "./graphql/queries/workspaceChain/workspaceChain";
 import * as DateTypes from "./graphql/types/date";
 import * as DocumentTypes from "./graphql/types/document";
 import * as DocumentShareLinkTypes from "./graphql/types/documentShareLink";
 import * as WorkspaceTypes from "./graphql/types/workspace";
+import * as WorkspaceChainTypes from "./graphql/types/workspaceChain";
 
 export const schema = makeSchema({
   plugins: [
@@ -144,6 +146,9 @@ export const schema = makeSchema({
     DeleteCommentRepliessMutationTypes,
 
     SnapshotQueryTypes,
+
+    WorkspaceChainTypes,
+    WorkspaceChainQueryTypes,
   ],
   outputs: {
     schema: path.join(__dirname, "/generated/schema.graphql"),

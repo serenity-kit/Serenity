@@ -22,7 +22,7 @@ type Params = {
   creatorDeviceSigningPublicKey: string;
   deviceWorkspaceKeyBoxes: DeviceWorkspaceKeyBoxParams[];
   workspaceKeyId?: string | undefined;
-  workspaceChainEntry: workspaceChain.CreateChainWorkspaceChainEvent;
+  workspaceChainEvent: workspaceChain.CreateChainWorkspaceChainEvent;
 };
 
 export async function createWorkspace({
@@ -32,7 +32,7 @@ export async function createWorkspace({
   creatorDeviceSigningPublicKey,
   deviceWorkspaceKeyBoxes,
   workspaceKeyId,
-  workspaceChainEntry,
+  workspaceChainEvent,
 }: Params): Promise<Workspace> {
   return await prisma.$transaction(async (prisma) => {
     const allDeviceSigningPublicKeys = deviceWorkspaceKeyBoxes.map(
@@ -95,12 +95,12 @@ export async function createWorkspace({
     });
 
     const workspaceChainState = workspaceChain.resolveState([
-      workspaceChainEntry,
+      workspaceChainEvent,
     ]);
 
-    await prisma.workspaceChainEntry.create({
+    await prisma.workspaceChainEvent.create({
       data: {
-        content: workspaceChainEntry,
+        content: workspaceChainEvent,
         state: workspaceChainState,
         workspaceId: rawWorkspace.id,
         position: 0,

@@ -15,7 +15,7 @@ export const CreateWorkspaceInvitationInput = inputObjectType({
   name: "CreateWorkspaceInvitationInput",
   definition(t) {
     t.nonNull.string("workspaceId");
-    t.nonNull.string("serializedWorkspaceChainEntry");
+    t.nonNull.string("serializedWorkspaceChainEvent");
   },
 });
 
@@ -44,7 +44,7 @@ export const createWorkspaceInvitationMutation = mutationField(
 
       const workspaceChainEvent =
         workspaceChain.AddInvitationWorkspaceChainEvent.parse(
-          JSON.parse(args.input.serializedWorkspaceChainEntry)
+          JSON.parse(args.input.serializedWorkspaceChainEvent)
         );
 
       // TODO create a utility function or move it to the DB function

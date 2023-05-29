@@ -194,13 +194,12 @@ model Workspace {
   workspaceKeys      WorkspaceKey[]         @relation(name: "workspace")
   infoWorkspaceKey   WorkspaceKey?          @relation(name: "infoWorkspaceKey", fields: [infoWorkspaceKeyId], references: [id])
   createdAt          DateTime               @default(now())
-  chain              WorkspaceChainEntry[]
+  chain              WorkspaceChainEvent[]
 
   @@index([createdAt(sort: Desc)])
 }
 
-model WorkspaceChainEntry {
-  id          String    @id @unique @default(uuid())
+model WorkspaceChainEvent {
   position    Int
   content     Json
   state       Json
@@ -208,6 +207,7 @@ model WorkspaceChainEntry {
   workspaceId String
   createdAt   DateTime  @default(now())
 
+  @@id([workspaceId, position])
   @@index([workspaceId, position(sort: Asc)])
 }
 

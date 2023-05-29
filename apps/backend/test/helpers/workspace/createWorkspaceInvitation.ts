@@ -3,7 +3,7 @@ import { LocalDevice } from "@serenity-tools/common";
 import { gql } from "graphql-request";
 import sodium from "react-native-libsodium";
 import { Role } from "../../../prisma/generated/output";
-import { getLastWorkspaceChainEntry } from "./getLastWorkspaceChainEntry";
+import { getLastWorkspaceChainEvent } from "./getLastWorkspaceChainEvent";
 
 type Params = {
   graphql: any;
@@ -58,7 +58,7 @@ export const createWorkspaceInvitation = async ({
       prevHash: overwritePrevHash,
     });
   } else {
-    const { lastChainEntry } = await getLastWorkspaceChainEntry({
+    const { lastChainEntry } = await getLastWorkspaceChainEvent({
       workspaceId,
     });
     invitation = workspaceChain.addInvitation({
@@ -79,7 +79,7 @@ export const createWorkspaceInvitation = async ({
     {
       input: {
         workspaceId,
-        serializedWorkspaceChainEntry: JSON.stringify(invitation),
+        serializedWorkspaceChainEvent: JSON.stringify(invitation),
       },
     },
     authorizationHeaders

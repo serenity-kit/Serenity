@@ -12,9 +12,6 @@ query workspace($id: ID, $deviceSigningPublicKey: String!) {
         encryptionPublicKeySignature
       }
     }
-    chain {
-      serializedContent
-    }
     currentWorkspaceKey {
       id
       workspaceId

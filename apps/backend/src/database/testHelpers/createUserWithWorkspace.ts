@@ -172,7 +172,7 @@ export default async function createUserWithWorkspace({
         },
       ],
     },
-    workspaceChainEntry: createWorkspaceChainEvent,
+    workspaceChainEvent: createWorkspaceChainEvent,
     folder: {
       id: folderId,
       idSignature: folderIdSignature,
