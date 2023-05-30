@@ -104,6 +104,8 @@ export async function acceptWorkspaceInvitation({
           workspaceId,
           role: workspaceInvitation.role,
           isAuthorizedMember: false,
+          acceptInvitationSignature,
+          acceptInvitationAuthorSignature,
         },
       });
       // and return the workspace
