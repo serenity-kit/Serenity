@@ -2,8 +2,9 @@ import canonicalize from "canonicalize";
 import sodium from "react-native-libsodium";
 import { Role } from "./types";
 
-export type AcceptInvitationParams = {
+export type VerifyAcceptInvitationParams = {
   acceptInvitationSignature: string;
+  acceptInvitationAuthorSignature: string;
   invitationSigningPublicKey: string;
   invitationId: string;
   mainDeviceSigningPublicKey: string;
@@ -14,13 +15,14 @@ export type AcceptInvitationParams = {
 
 export const verifyAcceptInvitation = ({
   acceptInvitationSignature,
+  acceptInvitationAuthorSignature,
   invitationSigningPublicKey,
   invitationId,
   mainDeviceSigningPublicKey,
   role,
   workspaceId,
   expiresAt,
-}: AcceptInvitationParams) => {
+}: VerifyAcceptInvitationParams) => {
   const acceptInvitationData = canonicalize({
     workspaceId,
     invitationId,
@@ -33,9 +35,16 @@ export const verifyAcceptInvitation = ({
     throw new Error("Accept invitation data can't be canonicalized");
   }
 
-  return sodium.crypto_sign_verify_detached(
-    sodium.from_base64(acceptInvitationSignature),
-    acceptInvitationData,
-    sodium.from_base64(invitationSigningPublicKey)
+  return (
+    sodium.crypto_sign_verify_detached(
+      sodium.from_base64(acceptInvitationSignature),
+      acceptInvitationData,
+      sodium.from_base64(invitationSigningPublicKey)
+    ) &&
+    sodium.crypto_sign_verify_detached(
+      sodium.from_base64(acceptInvitationAuthorSignature),
+      acceptInvitationData,
+      sodium.from_base64(mainDeviceSigningPublicKey)
+    )
   );
 };

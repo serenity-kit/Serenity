@@ -118,6 +118,8 @@ export const applyEvent = (
 
     const validInvitation = verifyAcceptInvitation({
       acceptInvitationSignature: event.transaction.acceptInvitationSignature,
+      acceptInvitationAuthorSignature:
+        event.transaction.acceptInvitationAuthorSignature,
       invitationSigningPublicKey: event.transaction.invitationSigningPublicKey,
       invitationId: event.transaction.invitationId,
       workspaceId: event.transaction.workspaceId,

@@ -18,6 +18,7 @@ let keyPairB: sodium.KeyPair;
 let keyPairsB: KeyPairs;
 let addInvitationEvent: AddInvitationResult;
 let acceptInvitationSignature: Uint8Array;
+let acceptInvitationAuthorSignature: Uint8Array;
 let mainDevice: {
   mainDeviceSigningPublicKey: string;
 };
@@ -43,13 +44,17 @@ beforeAll(async () => {
     throw new Error("Invalid transaction type");
   }
 
-  acceptInvitationSignature = acceptInvitation({
+  const acceptInvitationResult = acceptInvitation({
     invitationSigningKeyPairSeed:
       addInvitationEvent.invitationSigningKeyPairSeed,
     ...addInvitationEvent.transaction,
-    ...mainDevice,
     expiresAt: new Date(addInvitationEvent.transaction.expiresAt),
+    authorKeyPair: keyPairB,
   });
+
+  acceptInvitationSignature = acceptInvitationResult.acceptInvitationSignature;
+  acceptInvitationAuthorSignature =
+    acceptInvitationResult.acceptInvitationAuthorSignature;
 });
 
 test("should be able to verify a accepted invitation", async () => {
@@ -58,6 +63,9 @@ test("should be able to verify a accepted invitation", async () => {
   }
   const result = verifyAcceptInvitation({
     acceptInvitationSignature: sodium.to_base64(acceptInvitationSignature),
+    acceptInvitationAuthorSignature: sodium.to_base64(
+      acceptInvitationAuthorSignature
+    ),
     ...mainDevice,
     ...addInvitationEvent.transaction,
     expiresAt: new Date(addInvitationEvent.transaction.expiresAt),
@@ -73,6 +81,9 @@ test("should fail to verify if acceptInvitationSignature has been modified", asy
   const result = verifyAcceptInvitation({
     acceptInvitationSignature:
       "b" + sodium.to_base64(acceptInvitationSignature).substring(1),
+    acceptInvitationAuthorSignature: sodium.to_base64(
+      acceptInvitationAuthorSignature
+    ),
     ...mainDevice,
     ...addInvitationEvent.transaction,
     expiresAt: new Date(addInvitationEvent.transaction.expiresAt),
@@ -87,7 +98,9 @@ test("should fail to verify if mainDeviceSigningPublicKey has been modified", as
   }
   const result = verifyAcceptInvitation({
     acceptInvitationSignature: sodium.to_base64(acceptInvitationSignature),
-    ...mainDevice,
+    acceptInvitationAuthorSignature: sodium.to_base64(
+      acceptInvitationAuthorSignature
+    ),
     ...addInvitationEvent.transaction,
     expiresAt: new Date(addInvitationEvent.transaction.expiresAt),
     mainDeviceSigningPublicKey:
@@ -103,6 +116,9 @@ test("should fail to verify if expiresAt has been modified", async () => {
   }
   const result = verifyAcceptInvitation({
     acceptInvitationSignature: sodium.to_base64(acceptInvitationSignature),
+    acceptInvitationAuthorSignature: sodium.to_base64(
+      acceptInvitationAuthorSignature
+    ),
     ...mainDevice,
     ...addInvitationEvent.transaction,
     expiresAt: getDateIn2Min(),
@@ -117,6 +133,9 @@ test("should fail to verify if role has been modified", async () => {
   }
   const result = verifyAcceptInvitation({
     acceptInvitationSignature: sodium.to_base64(acceptInvitationSignature),
+    acceptInvitationAuthorSignature: sodium.to_base64(
+      acceptInvitationAuthorSignature
+    ),
     ...mainDevice,
     ...addInvitationEvent.transaction,
     expiresAt: new Date(addInvitationEvent.transaction.expiresAt),
@@ -132,6 +151,9 @@ test("should fail to verify if workspaceId has been modified", async () => {
   }
   const result = verifyAcceptInvitation({
     acceptInvitationSignature: sodium.to_base64(acceptInvitationSignature),
+    acceptInvitationAuthorSignature: sodium.to_base64(
+      acceptInvitationAuthorSignature
+    ),
     ...mainDevice,
     ...addInvitationEvent.transaction,
     expiresAt: new Date(addInvitationEvent.transaction.expiresAt),
@@ -147,6 +169,9 @@ test("should fail to verify if invitationId has been modified", async () => {
   }
   const result = verifyAcceptInvitation({
     acceptInvitationSignature: sodium.to_base64(acceptInvitationSignature),
+    acceptInvitationAuthorSignature: sodium.to_base64(
+      acceptInvitationAuthorSignature
+    ),
     ...mainDevice,
     ...addInvitationEvent.transaction,
     expiresAt: new Date(addInvitationEvent.transaction.expiresAt),

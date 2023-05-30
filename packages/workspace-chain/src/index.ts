@@ -1,3 +1,4 @@
+export * from "./acceptInvitation";
 export * from "./addAuthorToEvent";
 export * from "./addInvitation";
 export * from "./addMember";
@@ -10,3 +11,4 @@ export * from "./resolveState";
 export * from "./types";
 export * from "./updateMember";
 export * from "./utils";
+export * from "./verifyAcceptInvitation";

@@ -27,6 +27,7 @@ export const AddMemberViaInvitationTransaction = z.object({
   type: z.literal("add-member-via-invitation"),
   role: Role,
   acceptInvitationSignature: z.string(),
+  acceptInvitationAuthorSignature: z.string(),
   invitationSigningPublicKey: z.string(),
   invitationId: z.string(),
   memberMainDeviceSigningPublicKey: z.string(),

@@ -6,12 +6,14 @@ import {
   Role,
 } from "./types";
 import { hashTransaction } from "./utils";
+import { verifyAcceptInvitation } from "./verifyAcceptInvitation";
 
 type AddMemberViaInvitationParams = {
   prevHash: string;
   authorKeyPair: sodium.KeyPair;
   role: Role;
   acceptInvitationSignature: string;
+  acceptInvitationAuthorSignature: string;
   invitationSigningPublicKey: string;
   invitationId: string;
   mainDeviceSigningPublicKey: string;
@@ -24,17 +26,33 @@ export const addMemberViaInvitation = ({
   authorKeyPair,
   role,
   acceptInvitationSignature,
+  acceptInvitationAuthorSignature,
   invitationSigningPublicKey,
   invitationId,
   mainDeviceSigningPublicKey,
   workspaceId,
   expiresAt,
 }: AddMemberViaInvitationParams): AddMemberViaInvitationWorkspaceChainEvent => {
+  const isValid = verifyAcceptInvitation({
+    acceptInvitationSignature,
+    acceptInvitationAuthorSignature,
+    mainDeviceSigningPublicKey,
+    expiresAt,
+    invitationId,
+    invitationSigningPublicKey,
+    role,
+    workspaceId,
+  });
+  if (!isValid) {
+    throw new Error("Invalid accept invitation data");
+  }
+
   const transaction: AddMemberViaInvitationTransaction = {
     type: "add-member-via-invitation",
     memberMainDeviceSigningPublicKey: mainDeviceSigningPublicKey,
     role,
     acceptInvitationSignature,
+    acceptInvitationAuthorSignature,
     invitationSigningPublicKey,
     invitationId,
     workspaceId,

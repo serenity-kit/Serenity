@@ -6,22 +6,22 @@ export type AcceptInvitationParams = {
   invitationSigningKeyPairSeed: string;
   invitationSigningPublicKey: string;
   invitationId: string;
-  mainDeviceSigningPublicKey: string;
   role: Role;
   workspaceId: string;
   expiresAt: Date;
   invitationDataSignature: string;
+  authorKeyPair: sodium.KeyPair;
 };
 
 export const acceptInvitation = ({
   invitationSigningKeyPairSeed,
   invitationSigningPublicKey,
   invitationId,
-  mainDeviceSigningPublicKey,
   role,
   workspaceId,
   expiresAt,
   invitationDataSignature,
+  authorKeyPair,
 }: AcceptInvitationParams) => {
   const invitationSigningKeyPair = sodium.crypto_sign_seed_keypair(
     sodium.from_base64(invitationSigningKeyPairSeed)
@@ -63,7 +63,7 @@ export const acceptInvitation = ({
     invitationSigningPublicKey,
     role,
     expiresAt: expiresAt.toISOString(),
-    mainDeviceSigningPublicKey,
+    mainDeviceSigningPublicKey: sodium.to_base64(authorKeyPair.publicKey),
   });
   if (!acceptInvitationData) {
     throw new Error("Accept invitation data can't be canonicalized");
@@ -73,5 +73,12 @@ export const acceptInvitation = ({
     acceptInvitationData,
     invitationSigningKeyPair.privateKey
   );
-  return acceptInvitationSignature;
+  const acceptInvitationAuthorSignature = sodium.crypto_sign_detached(
+    acceptInvitationData,
+    authorKeyPair.privateKey
+  );
+  return {
+    acceptInvitationSignature,
+    acceptInvitationAuthorSignature,
+  };
 };

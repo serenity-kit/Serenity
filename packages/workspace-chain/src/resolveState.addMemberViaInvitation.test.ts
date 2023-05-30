@@ -56,18 +56,22 @@ test("should be able to add a member via an invitation", async () => {
     throw new Error("Invalid transaction type");
   }
 
-  const acceptInvitationSignature = acceptInvitation({
-    invitationSigningKeyPairSeed:
-      addInvitationEvent.invitationSigningKeyPairSeed,
-    ...addInvitationEvent.transaction,
-    ...mainDevice,
-    expiresAt: new Date(addInvitationEvent.transaction.expiresAt),
-  });
+  const { acceptInvitationSignature, acceptInvitationAuthorSignature } =
+    acceptInvitation({
+      invitationSigningKeyPairSeed:
+        addInvitationEvent.invitationSigningKeyPairSeed,
+      ...addInvitationEvent.transaction,
+      expiresAt: new Date(addInvitationEvent.transaction.expiresAt),
+      authorKeyPair: keyPairB,
+    });
 
   const addMemberViaInvitationEvent = addMemberViaInvitation({
     prevHash: hashTransaction(addInvitationEvent.transaction),
     authorKeyPair: keyPairA,
     acceptInvitationSignature: sodium.to_base64(acceptInvitationSignature),
+    acceptInvitationAuthorSignature: sodium.to_base64(
+      acceptInvitationAuthorSignature
+    ),
     ...addInvitationEvent.transaction,
     ...mainDevice,
     expiresAt: new Date(addInvitationEvent.transaction.expiresAt),
@@ -109,18 +113,22 @@ test("should be able to add a member twice", async () => {
     throw new Error("Invalid transaction type");
   }
 
-  const acceptInvitationSignature = acceptInvitation({
-    invitationSigningKeyPairSeed:
-      addInvitationEvent.invitationSigningKeyPairSeed,
-    ...addInvitationEvent.transaction,
-    ...mainDevice,
-    expiresAt: new Date(addInvitationEvent.transaction.expiresAt),
-  });
+  const { acceptInvitationSignature, acceptInvitationAuthorSignature } =
+    acceptInvitation({
+      invitationSigningKeyPairSeed:
+        addInvitationEvent.invitationSigningKeyPairSeed,
+      ...addInvitationEvent.transaction,
+      expiresAt: new Date(addInvitationEvent.transaction.expiresAt),
+      authorKeyPair: keyPairB,
+    });
 
   const addMemberViaInvitationEvent = addMemberViaInvitation({
     prevHash: hashTransaction(addInvitationEvent.transaction),
     authorKeyPair: keyPairA,
     acceptInvitationSignature: sodium.to_base64(acceptInvitationSignature),
+    acceptInvitationAuthorSignature: sodium.to_base64(
+      acceptInvitationAuthorSignature
+    ),
     ...addInvitationEvent.transaction,
     ...mainDevice,
     expiresAt: new Date(addInvitationEvent.transaction.expiresAt),
@@ -130,6 +138,9 @@ test("should be able to add a member twice", async () => {
     prevHash: hashTransaction(addMemberViaInvitationEvent.transaction),
     authorKeyPair: keyPairA,
     acceptInvitationSignature: sodium.to_base64(acceptInvitationSignature),
+    acceptInvitationAuthorSignature: sodium.to_base64(
+      acceptInvitationAuthorSignature
+    ),
     ...addInvitationEvent.transaction,
     ...mainDevice,
     expiresAt: new Date(addInvitationEvent.transaction.expiresAt),
@@ -159,18 +170,22 @@ test("should fail if the author is not a member of the chain", async () => {
     throw new Error("Invalid transaction type");
   }
 
-  const acceptInvitationSignature = acceptInvitation({
-    invitationSigningKeyPairSeed:
-      addInvitationEvent.invitationSigningKeyPairSeed,
-    ...addInvitationEvent.transaction,
-    ...mainDevice,
-    expiresAt: new Date(addInvitationEvent.transaction.expiresAt),
-  });
+  const { acceptInvitationSignature, acceptInvitationAuthorSignature } =
+    acceptInvitation({
+      invitationSigningKeyPairSeed:
+        addInvitationEvent.invitationSigningKeyPairSeed,
+      ...addInvitationEvent.transaction,
+      expiresAt: new Date(addInvitationEvent.transaction.expiresAt),
+      authorKeyPair: keyPairB,
+    });
 
   const addMemberViaInvitationEvent = addMemberViaInvitation({
     prevHash: hashTransaction(addInvitationEvent.transaction),
     authorKeyPair: keyPairC,
     acceptInvitationSignature: sodium.to_base64(acceptInvitationSignature),
+    acceptInvitationAuthorSignature: sodium.to_base64(
+      acceptInvitationAuthorSignature
+    ),
     ...addInvitationEvent.transaction,
     ...mainDevice,
     expiresAt: new Date(addInvitationEvent.transaction.expiresAt),

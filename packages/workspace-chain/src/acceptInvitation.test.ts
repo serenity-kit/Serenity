@@ -23,9 +23,6 @@ let keyPairB: sodium.KeyPair;
 let keyPairsB: KeyPairs;
 let createEvent: CreateChainWorkspaceChainEvent;
 let addInvitationEvent: AddInvitationResult;
-let mainDevice: {
-  mainDeviceSigningPublicKey: string;
-};
 
 beforeAll(async () => {
   await sodium.ready;
@@ -41,9 +38,6 @@ beforeAll(async () => {
     role: "EDITOR",
     workspaceId: "test",
   });
-  mainDevice = {
-    mainDeviceSigningPublicKey: keyPairsB.sign.publicKey,
-  };
 });
 
 test("should be able to accept an invitation", async () => {
@@ -51,15 +45,17 @@ test("should be able to accept an invitation", async () => {
     throw new Error("Invalid transaction type");
   }
 
-  const acceptInvitationSignature = acceptInvitation({
-    invitationSigningKeyPairSeed:
-      addInvitationEvent.invitationSigningKeyPairSeed,
-    ...addInvitationEvent.transaction,
-    ...mainDevice,
-    expiresAt: new Date(addInvitationEvent.transaction.expiresAt),
-  });
+  const { acceptInvitationSignature, acceptInvitationAuthorSignature } =
+    acceptInvitation({
+      invitationSigningKeyPairSeed:
+        addInvitationEvent.invitationSigningKeyPairSeed,
+      ...addInvitationEvent.transaction,
+      expiresAt: new Date(addInvitationEvent.transaction.expiresAt),
+      authorKeyPair: keyPairB,
+    });
 
   expect(acceptInvitationSignature).toBeInstanceOf(Uint8Array);
+  expect(acceptInvitationAuthorSignature).toBeInstanceOf(Uint8Array);
 });
 
 test("should throw an error if the invitationSigningPublicKey has been replaced", async () => {
@@ -71,9 +67,9 @@ test("should throw an error if the invitationSigningPublicKey has been replaced"
       invitationSigningKeyPairSeed:
         addInvitationEvent.invitationSigningKeyPairSeed,
       ...addInvitationEvent.transaction,
-      ...mainDevice,
       expiresAt: new Date(addInvitationEvent.transaction.expiresAt),
       invitationSigningPublicKey: keyPairsA.sign.publicKey,
+      authorKeyPair: keyPairB,
     });
   }).toThrow("Invitation signing public key doesn't match the seed");
 });
@@ -87,9 +83,9 @@ test("should throw an error if the workspaceId has been replaced", async () => {
       invitationSigningKeyPairSeed:
         addInvitationEvent.invitationSigningKeyPairSeed,
       ...addInvitationEvent.transaction,
-      ...mainDevice,
       expiresAt: new Date(addInvitationEvent.transaction.expiresAt),
       workspaceId: "wrong",
+      authorKeyPair: keyPairB,
     });
   }).toThrow("Invitation data signature is invalid");
 });
@@ -103,9 +99,9 @@ test("should throw an error if the invitationId has been replaced", async () => 
       invitationSigningKeyPairSeed:
         addInvitationEvent.invitationSigningKeyPairSeed,
       ...addInvitationEvent.transaction,
-      ...mainDevice,
       expiresAt: new Date(addInvitationEvent.transaction.expiresAt),
       invitationId: "wrong",
+      authorKeyPair: keyPairB,
     });
   }).toThrow("Invitation data signature is invalid");
 });
@@ -119,9 +115,9 @@ test("should throw an error if the invitationId has been replaced", async () => 
       invitationSigningKeyPairSeed:
         addInvitationEvent.invitationSigningKeyPairSeed,
       ...addInvitationEvent.transaction,
-      ...mainDevice,
       expiresAt: new Date(addInvitationEvent.transaction.expiresAt),
       role: "ADMIN",
+      authorKeyPair: keyPairB,
     });
   }).toThrow("Invitation data signature is invalid");
 });
@@ -135,8 +131,8 @@ test("should throw an error if the expiredAt has been replaced", async () => {
       invitationSigningKeyPairSeed:
         addInvitationEvent.invitationSigningKeyPairSeed,
       ...addInvitationEvent.transaction,
-      ...mainDevice,
       expiresAt: getDate2MinAgo(),
+      authorKeyPair: keyPairB,
     });
   }).toThrow("Invitation data signature is invalid");
 });
@@ -159,8 +155,8 @@ test("should throw an error if the invitation is expired", async () => {
       invitationSigningKeyPairSeed:
         addInvitationEvent.invitationSigningKeyPairSeed,
       ...addInvitationEvent.transaction,
-      ...mainDevice,
       expiresAt: new Date(addInvitationEvent.transaction.expiresAt),
+      authorKeyPair: keyPairB,
     });
   }).toThrow("Invitation has expired");
 });
