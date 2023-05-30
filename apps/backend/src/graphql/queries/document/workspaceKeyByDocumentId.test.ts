@@ -93,8 +93,7 @@ test("empty keys on incomplete workspace share", async () => {
   // accept workspace, but don't generate keys
   await acceptWorkspaceInvitation({
     graphql,
-    workspaceInvitationId: workspaceInvitation.id,
-    inviteeUsername: userData2.user.username,
+    invitationId: workspaceInvitation.id,
     inviteeMainDevice: userData2.mainDevice,
     invitationSigningKeyPairSeed:
       workspaceInvitationResult.invitationSigningKeyPairSeed,

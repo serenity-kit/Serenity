@@ -130,12 +130,11 @@ test("user can remove another user", async () => {
     authorizationHeader: userData1.sessionKey,
     mainDevice: userData1.mainDevice,
   });
-  const workspaceInvitationId =
+  const invitationId =
     workspaceInvitationResult.createWorkspaceInvitation.workspaceInvitation.id;
   await acceptWorkspaceInvitation({
     graphql,
-    workspaceInvitationId: workspaceInvitationId,
-    inviteeUsername: userData2.user.username,
+    invitationId,
     inviteeMainDevice: userData2.mainDevice,
     invitationSigningKeyPairSeed:
       workspaceInvitationResult.invitationSigningKeyPairSeed,
@@ -347,12 +346,11 @@ test("user can rotate key for multiple devices", async () => {
     authorizationHeader: userData1.sessionKey,
     mainDevice: userData1.mainDevice,
   });
-  const workspaceInvitationId =
+  const invitationId =
     workspaceInvitationResult.createWorkspaceInvitation.workspaceInvitation.id;
   await acceptWorkspaceInvitation({
     graphql,
-    workspaceInvitationId: workspaceInvitationId,
-    inviteeUsername: userData2.user.username,
+    invitationId: invitationId,
     inviteeMainDevice: userData2.mainDevice,
     invitationSigningKeyPairSeed:
       workspaceInvitationResult.invitationSigningKeyPairSeed,
@@ -545,7 +543,7 @@ describe("Input errors", () => {
       }
     }
   `;
-  test("Invalid workspaceInvitationId", async () => {
+  test("Invalid invitationId", async () => {
     await expect(
       (async () =>
         await graphql.client.request(

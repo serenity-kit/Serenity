@@ -1,22 +1,35 @@
+import * as workspaceChain from "@serenity-kit/workspace-chain";
 import { LocalDevice } from "@serenity-tools/common";
-import canonicalize from "canonicalize";
 import sodium from "react-native-libsodium";
 import {
+  Role as RoleEnum,
+  Workspace,
   runAcceptWorkspaceInvitationMutation,
   runMeQuery,
-  Workspace,
 } from "../../generated/graphql";
 
+type Role = `${RoleEnum}`;
+
 export type Props = {
-  workspaceInvitationId: string;
   mainDevice: LocalDevice;
   signingKeyPairSeed: string;
+  expiresAt: string;
+  invitationId: string;
+  workspaceId: string;
+  role: Role;
+  invitationDataSignature: string;
+  invitationSigningPublicKey: string;
 };
 
 export const acceptWorkspaceInvitation = async ({
-  workspaceInvitationId,
   mainDevice,
   signingKeyPairSeed,
+  expiresAt,
+  invitationId,
+  workspaceId,
+  invitationDataSignature,
+  invitationSigningPublicKey,
+  role,
 }: Props): Promise<Workspace | undefined> => {
   const meResult = await runMeQuery({});
   if (!meResult.data?.me) {
@@ -29,31 +42,32 @@ export const acceptWorkspaceInvitation = async ({
     encryptionPublicKey: mainDevice.encryptionPublicKey,
     encryptionPublicKeySignature: mainDevice.encryptionPublicKeySignature,
   };
-  const inviteeInfo = canonicalize({
-    username: me.username,
-    mainDevice: {
-      signingPublicKey: safeMainDevice.signingPublicKey,
-      encryptionPublicKey: safeMainDevice.encryptionPublicKey,
-      encryptionPublicKeySignature: safeMainDevice.encryptionPublicKeySignature,
-    },
-  })!;
-  const invitationSigningPrivateKey = sodium.crypto_sign_seed_keypair(
-    sodium.from_base64(signingKeyPairSeed)
-  ).privateKey;
 
-  const inviteeUsernameAndDeviceSignature = sodium.crypto_sign_detached(
-    inviteeInfo,
-    invitationSigningPrivateKey
-  );
+  const { acceptInvitationSignature, acceptInvitationAuthorSignature } =
+    workspaceChain.acceptInvitation({
+      invitationSigningKeyPairSeed: signingKeyPairSeed,
+      expiresAt: new Date(expiresAt),
+      invitationId,
+      role,
+      workspaceId,
+      invitationDataSignature,
+      invitationSigningPublicKey,
+      authorKeyPair: {
+        keyType: "ed25519",
+        privateKey: sodium.from_base64(mainDevice.signingPrivateKey),
+        publicKey: sodium.from_base64(mainDevice.signingPublicKey),
+      },
+    });
+
   const result = await runAcceptWorkspaceInvitationMutation(
     {
       input: {
-        workspaceInvitationId,
-        inviteeUsername: me.username,
-        inviteeMainDevice: safeMainDevice,
-        inviteeUsernameAndDeviceSignature: sodium.to_base64(
-          inviteeUsernameAndDeviceSignature
+        invitationId,
+        acceptInvitationSignature: sodium.to_base64(acceptInvitationSignature),
+        acceptInvitationAuthorSignature: sodium.to_base64(
+          acceptInvitationAuthorSignature
         ),
+        inviteeMainDeviceSigningPublicKey: safeMainDevice.signingPublicKey,
       },
     },
     { requestPolicy: "network-only" }

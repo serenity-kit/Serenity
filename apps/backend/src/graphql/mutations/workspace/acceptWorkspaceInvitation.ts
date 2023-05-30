@@ -7,16 +7,15 @@ import {
   objectType,
 } from "nexus";
 import { acceptWorkspaceInvitation } from "../../../database/workspace/acceptWorkspaceInvitation";
-import { ReducedDeviceInput } from "../../types/device";
 import { Workspace } from "../../types/workspace";
 
 export const AcceptWorkspaceInvitationInput = inputObjectType({
   name: "AcceptWorkspaceInvitationInput",
   definition(t) {
-    t.nonNull.string("workspaceInvitationId");
-    t.nonNull.string("inviteeUsername");
-    t.nonNull.field("inviteeMainDevice", { type: ReducedDeviceInput });
-    t.nonNull.string("inviteeUsernameAndDeviceSignature");
+    t.nonNull.string("invitationId");
+    t.nonNull.string("acceptInvitationSignature");
+    t.nonNull.string("acceptInvitationAuthorSignature");
+    t.nonNull.string("inviteeMainDeviceSigningPublicKey");
   },
 });
 
@@ -43,12 +42,13 @@ export const createWorkspaceInvitationMutation = mutationField(
         throw new AuthenticationError("Not authenticated");
       }
       const workspace = await acceptWorkspaceInvitation({
-        workspaceInvitationId: args.input.workspaceInvitationId,
-        inviteeUsername: args.input.inviteeUsername,
-        inviteeMainDevice: args.input.inviteeMainDevice,
-        inviteeUsernameAndDeviceSignature:
-          args.input.inviteeUsernameAndDeviceSignature,
-        userId: context.user.id,
+        invitationId: args.input.invitationId,
+        acceptInvitationSignature: args.input.acceptInvitationSignature,
+        acceptInvitationAuthorSignature:
+          args.input.acceptInvitationAuthorSignature,
+        inviteeMainDeviceSigningPublicKey:
+          args.input.inviteeMainDeviceSigningPublicKey,
+        currentUserId: context.user.id,
       });
       return { workspace };
     },

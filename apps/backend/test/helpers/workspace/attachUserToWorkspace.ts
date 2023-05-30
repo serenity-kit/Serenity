@@ -54,8 +54,7 @@ export const attachUserToWorkspace = async ({
     workspaceInvitationResult.createWorkspaceInvitation.workspaceInvitation;
   await acceptWorkspaceInvitation({
     graphql,
-    workspaceInvitationId: workspaceInvitation.id,
-    inviteeUsername: guestUser.username,
+    invitationId: workspaceInvitation.id,
     inviteeMainDevice: guestMainDevice,
     authorizationHeader: guestSessionKey,
     invitationSigningKeyPairSeed:

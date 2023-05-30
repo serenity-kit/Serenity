@@ -112,7 +112,8 @@ export async function createWorkspaceInvitation({
         invitationSigningPublicKey,
         invitationDataSignature,
         role,
-        expiresAt: new Date(Date.now() + INVITATION_EXPIRATION_TIME),
+        // TODO maybe additionally check that the date is not very far in the future
+        expiresAt: workspaceChainEvent.transaction.expiresAt,
       },
     });
     const workspaceInvitation: WorkspaceInvitation = {

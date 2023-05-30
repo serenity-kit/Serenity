@@ -30,12 +30,11 @@ const setup = async () => {
     authorizationHeader: userData1.sessionKey,
     mainDevice: userData1.mainDevice,
   });
-  const workspaceInvitationId =
+  const invitationId =
     workspaceInvitationResult.createWorkspaceInvitation.workspaceInvitation.id;
   await acceptWorkspaceInvitation({
     graphql,
-    workspaceInvitationId,
-    inviteeUsername: userData2.user.username,
+    invitationId,
     inviteeMainDevice: userData2.mainDevice,
     invitationSigningKeyPairSeed:
       workspaceInvitationResult.invitationSigningKeyPairSeed,

@@ -19,10 +19,10 @@ export type Scalars = {
 };
 
 export type AcceptWorkspaceInvitationInput = {
-  inviteeMainDevice: ReducedDeviceInput;
-  inviteeUsername: Scalars['String'];
-  inviteeUsernameAndDeviceSignature: Scalars['String'];
-  workspaceInvitationId: Scalars['String'];
+  acceptInvitationAuthorSignature: Scalars['String'];
+  acceptInvitationSignature: Scalars['String'];
+  invitationId: Scalars['String'];
+  inviteeMainDeviceSigningPublicKey: Scalars['String'];
 };
 
 export type AcceptWorkspaceInvitationResult = {
@@ -1021,13 +1021,6 @@ export type QueryWorkspacesArgs = {
   first: Scalars['Int'];
 };
 
-export type ReducedDeviceInput = {
-  encryptionPublicKey: Scalars['String'];
-  encryptionPublicKeySignature: Scalars['String'];
-  signingPublicKey: Scalars['String'];
-  userId: Scalars['String'];
-};
-
 export type RemoveDocumentShareLinkInput = {
   token: Scalars['String'];
 };
@@ -1297,6 +1290,8 @@ export type WorkspaceInvitation = {
   __typename?: 'WorkspaceInvitation';
   expiresAt: Scalars['Date'];
   id: Scalars['String'];
+  invitationDataSignature: Scalars['String'];
+  invitationSigningPublicKey: Scalars['String'];
   inviterUserId: Scalars['String'];
   inviterUsername: Scalars['String'];
   role: Role;
@@ -1800,7 +1795,7 @@ export type WorkspaceInvitationQueryVariables = Exact<{
 }>;
 
 
-export type WorkspaceInvitationQuery = { __typename?: 'Query', me?: { __typename?: 'MeResult', id: string, username: string } | null, workspaceInvitation?: { __typename?: 'WorkspaceInvitation', id: string, workspaceId: string, inviterUserId: string, inviterUsername: string, workspaceName?: string | null, role: Role, expiresAt: any } | null };
+export type WorkspaceInvitationQuery = { __typename?: 'Query', me?: { __typename?: 'MeResult', id: string, username: string } | null, workspaceInvitation?: { __typename?: 'WorkspaceInvitation', id: string, workspaceId: string, inviterUserId: string, inviterUsername: string, workspaceName?: string | null, role: Role, expiresAt: any, invitationDataSignature: string, invitationSigningPublicKey: string } | null };
 
 export type WorkspaceInvitationsQueryVariables = Exact<{
   workspaceId: Scalars['ID'];
@@ -2902,6 +2897,8 @@ export const WorkspaceInvitationDocument = gql`
     workspaceName
     role
     expiresAt
+    invitationDataSignature
+    invitationSigningPublicKey
   }
 }
     `;

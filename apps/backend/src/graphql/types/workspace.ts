@@ -117,6 +117,8 @@ export const WorkspaceInvitation = objectType({
     t.nonNull.string("workspaceId");
     t.nonNull.string("inviterUserId");
     t.nonNull.string("inviterUsername");
+    t.nonNull.string("invitationDataSignature");
+    t.nonNull.string("invitationSigningPublicKey");
     t.nonNull.field("role", { type: MemberRoleEnum });
     t.string("workspaceName");
     t.field("expiresAt", { type: nonNull("Date") });

@@ -55,12 +55,11 @@ test("unauthorized devices when workspace added", async () => {
     authorizationHeader: userAndDevice.sessionKey,
     mainDevice: userAndDevice.mainDevice,
   });
-  const workspaceInvitationId =
+  const invitationId =
     workspaceInvitationResult.createWorkspaceInvitation.workspaceInvitation.id;
   await acceptWorkspaceInvitation({
     graphql,
-    workspaceInvitationId,
-    inviteeUsername: otherUserAndDevice.user.username,
+    invitationId,
     inviteeMainDevice: otherUserAndDevice.mainDevice,
     invitationSigningKeyPairSeed:
       workspaceInvitationResult.invitationSigningKeyPairSeed,

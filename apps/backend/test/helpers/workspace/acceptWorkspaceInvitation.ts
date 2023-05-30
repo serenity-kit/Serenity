@@ -1,24 +1,25 @@
-import canonicalize from "canonicalize";
+import * as workspaceChain from "@serenity-kit/workspace-chain";
+import { LocalDevice } from "@serenity-tools/common";
 import { gql } from "graphql-request";
 import sodium from "react-native-libsodium";
-import { Device } from "../../../src/types/device";
+import { prisma } from "../../../src/database/prisma";
 
 type Params = {
   graphql: any;
-  workspaceInvitationId: string;
-  inviteeUsername: string;
-  inviteeMainDevice: Device;
+  invitationId: string;
+  inviteeMainDevice: LocalDevice;
   authorizationHeader: string;
   invitationSigningKeyPairSeed: string;
+  overwriteInvitationId?: string;
 };
 
 export const acceptWorkspaceInvitation = async ({
   graphql,
-  workspaceInvitationId,
-  inviteeUsername,
+  invitationId,
   inviteeMainDevice,
   authorizationHeader,
   invitationSigningKeyPairSeed,
+  overwriteInvitationId,
 }: Params) => {
   const authorizationHeaders = {
     authorization: authorizationHeader,
@@ -40,41 +41,41 @@ export const acceptWorkspaceInvitation = async ({
       }
     }
   `;
-  const safeMainDevice = {
-    signingPublicKey: inviteeMainDevice.signingPublicKey,
-    encryptionPublicKey: inviteeMainDevice.encryptionPublicKey,
-    encryptionPublicKeySignature:
-      inviteeMainDevice.encryptionPublicKeySignature,
-    userId: inviteeMainDevice.userId,
-  };
-  const inviteeUsernameAndDevice = canonicalize({
-    username: inviteeUsername,
-    mainDevice: {
-      signingPublicKey: safeMainDevice.signingPublicKey,
-      encryptionPublicKey: safeMainDevice.encryptionPublicKey,
-      encryptionPublicKeySignature: safeMainDevice.encryptionPublicKeySignature,
-    },
-  });
 
-  const invitationSigningPrivateKey = sodium.crypto_sign_seed_keypair(
-    sodium.from_base64(invitationSigningKeyPairSeed)
-  ).privateKey;
+  const workspaceInvitation =
+    await prisma.workspaceInvitations.findUniqueOrThrow({
+      where: { id: invitationId },
+    });
 
-  const inviteeUsernameAndDeviceSignature = sodium.crypto_sign_detached(
-    inviteeUsernameAndDevice!,
-    invitationSigningPrivateKey
-  );
+  const { acceptInvitationSignature, acceptInvitationAuthorSignature } =
+    workspaceChain.acceptInvitation({
+      invitationSigningKeyPairSeed: invitationSigningKeyPairSeed,
+      expiresAt: workspaceInvitation.expiresAt,
+      invitationId,
+      role: workspaceInvitation.role,
+      workspaceId: workspaceInvitation.workspaceId,
+      invitationDataSignature: workspaceInvitation.invitationDataSignature,
+      invitationSigningPublicKey:
+        workspaceInvitation.invitationSigningPublicKey,
+      authorKeyPair: {
+        keyType: "ed25519",
+        privateKey: sodium.from_base64(inviteeMainDevice.signingPrivateKey),
+        publicKey: sodium.from_base64(inviteeMainDevice.signingPublicKey),
+      },
+    });
 
   const result = await graphql.client.request(
     query,
     {
       input: {
-        workspaceInvitationId,
-        inviteeUsername,
-        inviteeMainDevice: safeMainDevice,
-        inviteeUsernameAndDeviceSignature: sodium.to_base64(
-          inviteeUsernameAndDeviceSignature
+        invitationId: overwriteInvitationId
+          ? overwriteInvitationId
+          : invitationId,
+        acceptInvitationSignature: sodium.to_base64(acceptInvitationSignature),
+        acceptInvitationAuthorSignature: sodium.to_base64(
+          acceptInvitationAuthorSignature
         ),
+        inviteeMainDeviceSigningPublicKey: inviteeMainDevice.signingPublicKey,
       },
     },
     authorizationHeaders

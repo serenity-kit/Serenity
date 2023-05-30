@@ -1,17 +1,16 @@
 import { generateId } from "@serenity-tools/common";
 import { gql } from "graphql-request";
-import sodium from "react-native-libsodium";
 import { Role } from "../../../../prisma/generated/output";
 import deleteAllRecords from "../../../../test/helpers/deleteAllRecords";
 import setupGraphql from "../../../../test/helpers/setupGraphql";
 import { acceptWorkspaceInvitation } from "../../../../test/helpers/workspace/acceptWorkspaceInvitation";
 import { createWorkspaceInvitation } from "../../../../test/helpers/workspace/createWorkspaceInvitation";
-import { prisma } from "../../../database/prisma";
 import createUserWithWorkspace from "../../../database/testHelpers/createUserWithWorkspace";
 import { getWorkspace } from "../../../database/workspace/getWorkspace";
 
 const graphql = setupGraphql();
-let workspaceInvitationId = "";
+let invitationId = "";
+let workspaceId = "";
 const inviteeUsername = `invitee-${generateId()}@example.com`;
 let inviterUserAndDevice: any = null;
 let inviteeUserAndDevice: any = null;
@@ -24,7 +23,7 @@ beforeAll(async () => {
 test("accept admin role", async () => {
   const inviterUsername = `invite-${generateId()}@example.com`;
   const inviteeUsername = `invitee-${generateId()}@example.com`;
-  const workspaceId = generateId();
+  workspaceId = generateId();
   const otherWorkspaceId = generateId();
   const role = Role.ADMIN;
   inviterUserAndDevice = await createUserWithWorkspace({
@@ -51,24 +50,13 @@ test("accept admin role", async () => {
     authorizationHeader: inviterUserAndDevice.sessionKey,
     mainDevice: inviterUserAndDevice.mainDevice,
   });
-  workspaceInvitationId =
+  invitationId =
     workspaceInvitationResult.createWorkspaceInvitation.workspaceInvitation.id;
-  const encryptionPublicKeySignature = sodium.to_base64(
-    sodium.crypto_sign_detached(
-      inviteeUserAndDevice.mainDevice.encryptionPublicKey,
-      sodium.from_base64(inviteeUserAndDevice.signingPrivateKey)
-    )
-  );
+
   const acceptedWorkspaceResult = await acceptWorkspaceInvitation({
     graphql,
-    workspaceInvitationId,
-    inviteeUsername: inviteeUserAndDevice.user.username,
-    inviteeMainDevice: {
-      userId: inviteeUserAndDevice.user.id,
-      signingPublicKey: inviteeUserAndDevice.mainDevice.signingPublicKey,
-      encryptionPublicKey: inviteeUserAndDevice.mainDevice.encryptionPublicKey,
-      encryptionPublicKeySignature: encryptionPublicKeySignature,
-    },
+    invitationId,
+    inviteeMainDevice: inviteeUserAndDevice.mainDevice,
     invitationSigningKeyPairSeed:
       workspaceInvitationResult.invitationSigningKeyPairSeed,
     authorizationHeader: inviteeUserAndDevice.sessionKey,
@@ -91,22 +79,11 @@ test("accept admin role", async () => {
 
 test("double-accepting invitation does nothing", async () => {
   const lastInviteeAssignedRole = Role.ADMIN;
-  const encryptionPublicKeySignature = sodium.to_base64(
-    sodium.crypto_sign_detached(
-      inviteeUserAndDevice.mainDevice.encryptionPublicKey,
-      sodium.from_base64(inviteeUserAndDevice.signingPrivateKey)
-    )
-  );
+
   const acceptedWorkspaceResult = await acceptWorkspaceInvitation({
     graphql,
-    workspaceInvitationId,
-    inviteeUsername: inviteeUserAndDevice.user.username,
-    inviteeMainDevice: {
-      userId: inviteeUserAndDevice.user.id,
-      signingPublicKey: inviteeUserAndDevice.mainDevice.signingPublicKey,
-      encryptionPublicKey: inviteeUserAndDevice.mainDevice.encryptionPublicKey,
-      encryptionPublicKeySignature: encryptionPublicKeySignature,
-    },
+    invitationId,
+    inviteeMainDevice: inviteeUserAndDevice.mainDevice,
     invitationSigningKeyPairSeed:
       workspaceInvitationResult.invitationSigningKeyPairSeed,
     authorizationHeader: inviteeUserAndDevice.sessionKey,
@@ -126,7 +103,7 @@ test("double-accepting invitation does nothing", async () => {
 test("accept editor role", async () => {
   const inviterUsername = `invite-${generateId()}@example.com`;
   const inviteeUsername = `invitee-${generateId()}@example.com`;
-  const workspaceId = generateId();
+  workspaceId = generateId();
   const otherWorkspaceId = generateId();
   const role = Role.EDITOR;
   inviterUserAndDevice = await createUserWithWorkspace({
@@ -153,24 +130,12 @@ test("accept editor role", async () => {
     authorizationHeader: inviterUserAndDevice.sessionKey,
     mainDevice: inviterUserAndDevice.mainDevice,
   });
-  workspaceInvitationId =
+  invitationId =
     workspaceInvitationResult.createWorkspaceInvitation.workspaceInvitation.id;
-  const encryptionPublicKeySignature = sodium.to_base64(
-    sodium.crypto_sign_detached(
-      inviteeUserAndDevice.mainDevice.encryptionPublicKey,
-      sodium.from_base64(inviteeUserAndDevice.signingPrivateKey)
-    )
-  );
   const acceptedWorkspaceResult = await acceptWorkspaceInvitation({
     graphql,
-    workspaceInvitationId,
-    inviteeUsername: inviteeUserAndDevice.user.username,
-    inviteeMainDevice: {
-      userId: inviteeUserAndDevice.user.id,
-      signingPublicKey: inviteeUserAndDevice.mainDevice.signingPublicKey,
-      encryptionPublicKey: inviteeUserAndDevice.mainDevice.encryptionPublicKey,
-      encryptionPublicKeySignature: encryptionPublicKeySignature,
-    },
+    invitationId,
+    inviteeMainDevice: inviteeUserAndDevice.mainDevice,
     invitationSigningKeyPairSeed:
       workspaceInvitationResult.invitationSigningKeyPairSeed,
     authorizationHeader: inviteeUserAndDevice.sessionKey,
@@ -194,7 +159,7 @@ test("accept editor role", async () => {
 test("accept commenter role", async () => {
   const inviterUsername = `invite-${generateId()}@example.com`;
   const inviteeUsername = `invitee-${generateId()}@example.com`;
-  const workspaceId = generateId();
+  workspaceId = generateId();
   const otherWorkspaceId = generateId();
   const role = Role.COMMENTER;
   inviterUserAndDevice = await createUserWithWorkspace({
@@ -221,24 +186,13 @@ test("accept commenter role", async () => {
     authorizationHeader: inviterUserAndDevice.sessionKey,
     mainDevice: inviterUserAndDevice.mainDevice,
   });
-  workspaceInvitationId =
+  invitationId =
     workspaceInvitationResult.createWorkspaceInvitation.workspaceInvitation.id;
-  const encryptionPublicKeySignature = sodium.to_base64(
-    sodium.crypto_sign_detached(
-      inviteeUserAndDevice.mainDevice.encryptionPublicKey,
-      sodium.from_base64(inviteeUserAndDevice.signingPrivateKey)
-    )
-  );
+
   const acceptedWorkspaceResult = await acceptWorkspaceInvitation({
     graphql,
-    workspaceInvitationId,
-    inviteeUsername: inviteeUserAndDevice.user.username,
-    inviteeMainDevice: {
-      userId: inviteeUserAndDevice.user.id,
-      signingPublicKey: inviteeUserAndDevice.mainDevice.signingPublicKey,
-      encryptionPublicKey: inviteeUserAndDevice.mainDevice.encryptionPublicKey,
-      encryptionPublicKeySignature: encryptionPublicKeySignature,
-    },
+    invitationId,
+    inviteeMainDevice: inviteeUserAndDevice.mainDevice,
     invitationSigningKeyPairSeed:
       workspaceInvitationResult.invitationSigningKeyPairSeed,
     authorizationHeader: inviteeUserAndDevice.sessionKey,
@@ -262,7 +216,7 @@ test("accept commenter role", async () => {
 test("accept viewer role", async () => {
   const inviterUsername = `invite-${generateId()}@example.com`;
   const inviteeUsername = `invitee-${generateId()}@example.com`;
-  const workspaceId = generateId();
+  workspaceId = generateId();
   const otherWorkspaceId = generateId();
   const role = Role.VIEWER;
   inviterUserAndDevice = await createUserWithWorkspace({
@@ -289,24 +243,13 @@ test("accept viewer role", async () => {
     authorizationHeader: inviterUserAndDevice.sessionKey,
     mainDevice: inviterUserAndDevice.mainDevice,
   });
-  workspaceInvitationId =
+  invitationId =
     workspaceInvitationResult.createWorkspaceInvitation.workspaceInvitation.id;
-  const encryptionPublicKeySignature = sodium.to_base64(
-    sodium.crypto_sign_detached(
-      inviteeUserAndDevice.mainDevice.encryptionPublicKey,
-      sodium.from_base64(inviteeUserAndDevice.signingPrivateKey)
-    )
-  );
+
   const acceptedWorkspaceResult = await acceptWorkspaceInvitation({
     graphql,
-    workspaceInvitationId,
-    inviteeUsername: inviteeUserAndDevice.user.username,
-    inviteeMainDevice: {
-      userId: inviteeUserAndDevice.user.id,
-      signingPublicKey: inviteeUserAndDevice.mainDevice.signingPublicKey,
-      encryptionPublicKey: inviteeUserAndDevice.mainDevice.encryptionPublicKey,
-      encryptionPublicKeySignature: encryptionPublicKeySignature,
-    },
+    invitationId,
+    inviteeMainDevice: inviteeUserAndDevice.mainDevice,
     invitationSigningKeyPairSeed:
       workspaceInvitationResult.invitationSigningKeyPairSeed,
     authorizationHeader: inviteeUserAndDevice.sessionKey,
@@ -328,87 +271,37 @@ test("accept viewer role", async () => {
 });
 
 test("invalid invitation id should throw error", async () => {
-  const encryptionPublicKeySignature = sodium.to_base64(
-    sodium.crypto_sign_detached(
-      inviteeUserAndDevice.mainDevice.encryptionPublicKey,
-      sodium.from_base64(inviteeUserAndDevice.signingPrivateKey)
-    )
-  );
-  await expect(
-    (async () =>
-      await acceptWorkspaceInvitation({
-        graphql,
-        workspaceInvitationId: "invalid",
-        inviteeUsername: inviteeUserAndDevice.user.username,
-        inviteeMainDevice: {
-          userId: inviteeUserAndDevice.user.id,
-          signingPublicKey: inviteeUserAndDevice.mainDevice.signingPublicKey,
-          encryptionPublicKey:
-            inviteeUserAndDevice.mainDevice.encryptionPublicKey,
-          encryptionPublicKeySignature: encryptionPublicKeySignature,
-        },
-        invitationSigningKeyPairSeed:
-          workspaceInvitationResult.invitationSigningKeyPairSeed,
-        authorizationHeader: inviteeUserAndDevice.sessionKey,
-      }))()
-  ).rejects.toThrowError(/FORBIDDEN/);
-});
-
-test("expired invitation id should throw error", async () => {
-  await prisma.workspaceInvitations.update({
-    where: {
-      id: workspaceInvitationId,
-    },
-    data: {
-      expiresAt: new Date(Date.now() - 1000),
-    },
+  const workspaceInvitationResult2 = await createWorkspaceInvitation({
+    graphql,
+    role: Role.ADMIN,
+    workspaceId,
+    authorizationHeader: inviterUserAndDevice.sessionKey,
+    mainDevice: inviterUserAndDevice.mainDevice,
   });
-  const encryptionPublicKeySignature = sodium.to_base64(
-    sodium.crypto_sign_detached(
-      inviteeUserAndDevice.mainDevice.encryptionPublicKey,
-      sodium.from_base64(inviteeUserAndDevice.signingPrivateKey)
-    )
-  );
+  const invitationId2 =
+    workspaceInvitationResult2.createWorkspaceInvitation.workspaceInvitation.id;
+
   await expect(
     (async () =>
       await acceptWorkspaceInvitation({
         graphql,
-        workspaceInvitationId: "invalid",
-        inviteeUsername: inviteeUserAndDevice.user.username,
-        inviteeMainDevice: {
-          userId: inviteeUserAndDevice.user.id,
-          signingPublicKey: inviteeUserAndDevice.mainDevice.signingPublicKey,
-          encryptionPublicKey:
-            inviteeUserAndDevice.mainDevice.encryptionPublicKey,
-          encryptionPublicKeySignature: encryptionPublicKeySignature,
-        },
+        invitationId,
+        inviteeMainDevice: inviteeUserAndDevice.mainDevice,
         invitationSigningKeyPairSeed:
           workspaceInvitationResult.invitationSigningKeyPairSeed,
         authorizationHeader: inviteeUserAndDevice.sessionKey,
+        overwriteInvitationId: invitationId2,
       }))()
-  ).rejects.toThrowError(/FORBIDDEN/);
+  ).rejects.toThrow();
 });
 
 test("Unauthenticated", async () => {
-  const encryptionPublicKeySignature = sodium.to_base64(
-    sodium.crypto_sign_detached(
-      inviteeUserAndDevice.mainDevice.encryptionPublicKey,
-      sodium.from_base64(inviteeUserAndDevice.signingPrivateKey)
-    )
-  );
   await expect(
     (async () =>
       await acceptWorkspaceInvitation({
         graphql,
-        workspaceInvitationId,
-        inviteeUsername: inviteeUserAndDevice.user.username,
-        inviteeMainDevice: {
-          userId: inviteeUserAndDevice.user.id,
-          signingPublicKey: inviteeUserAndDevice.mainDevice.signingPublicKey,
-          encryptionPublicKey:
-            inviteeUserAndDevice.mainDevice.encryptionPublicKey,
-          encryptionPublicKeySignature: encryptionPublicKeySignature,
-        },
+        invitationId,
+        inviteeMainDevice: inviteeUserAndDevice.mainDevice,
         invitationSigningKeyPairSeed:
           workspaceInvitationResult.invitationSigningKeyPairSeed,
         authorizationHeader: "badauthheader",
@@ -435,14 +328,14 @@ describe("Input errors", () => {
       }
     }
   `;
-  test("Invalid workspaceInvitationId", async () => {
+  test("Invalid invitationId", async () => {
     await expect(
       (async () =>
         await graphql.client.request(
           query,
           {
             input: {
-              workspaceInvitationId: null,
+              invitationId: null,
             },
           },
           authorizationHeaders

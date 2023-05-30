@@ -39,12 +39,11 @@ test("Existing workspace does nothing", async () => {
     authorizationHeader,
     mainDevice: userAndDevice1.mainDevice,
   });
-  const workspaceInvitationId =
+  const invitationId =
     workspaceInvitationResult.createWorkspaceInvitation.workspaceInvitation.id;
   await acceptWorkspaceInvitation({
     graphql,
-    workspaceInvitationId,
-    inviteeUsername: userAndDevice2.user.username,
+    invitationId,
     inviteeMainDevice: userAndDevice2.mainDevice,
     authorizationHeader: userAndDevice2.sessionKey,
     invitationSigningKeyPairSeed:
