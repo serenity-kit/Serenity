@@ -1,12 +1,5 @@
-import sodium from "libsodium-wrappers";
-import { WebSocket } from "mock-socket";
+import sodium from "react-native-libsodium";
 
-// @ts-expect-error
-global.setImmediate = jest.useRealTimers;
-global.WebSocket = WebSocket;
-
-jest.setTimeout(25000);
-
-beforeEach(async () => {
+module.exports = async function () {
   await sodium.ready;
-});
+};

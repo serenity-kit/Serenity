@@ -26,6 +26,9 @@
   },
   "jest": {
     "setupFilesAfterEnv": [
+      "<rootDir>/test/config/jestTestSetupAfterEnv.ts"
+    ],
+    "setupFiles": [
       "<rootDir>/test/config/jestTestSetup.ts"
     ]
   }
