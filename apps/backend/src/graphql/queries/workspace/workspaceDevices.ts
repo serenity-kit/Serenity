@@ -1,5 +1,3 @@
-// unauthorizedMembers(workspaceIds: ['abc', 'cde'])
-
 import { AuthenticationError, UserInputError } from "apollo-server-express";
 import { idArg, nonNull, objectType, queryField } from "nexus";
 import { getWorkspaceDevices } from "../../../database/workspace/getWorkspaceDevices";

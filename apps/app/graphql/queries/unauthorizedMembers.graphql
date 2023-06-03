@@ -1,5 +1,0 @@
-query unauthorizedMembers($workspaceIds: [ID!]!) {
-  unauthorizedMembers(workspaceIds: $workspaceIds) {
-    userIds
-  }
-}

@@ -9,9 +9,8 @@ import * as VerifyRegistrationTypes from "./graphql/mutations/authentication/ver
 import * as CreateCommentMutationTypes from "./graphql/mutations/comment/createComment";
 import * as DeleteCommentsMutationTypes from "./graphql/mutations/comment/deleteComments";
 import * as CreateCommentReplyMutationTypes from "./graphql/mutations/commentReply/createCommentReply";
-import * as DeleteCommentRepliessMutationTypes from "./graphql/mutations/commentReply/deleteCommentReplies";
+import * as DeleteCommentRepliesMutationTypes from "./graphql/mutations/commentReply/deleteCommentReplies";
 import * as AttachDeviceToWorkspacesMutationTypes from "./graphql/mutations/device/attachDeviceToWorkspaces";
-import * as AttachDevicesToWorkspacesMutationTypes from "./graphql/mutations/device/attachDevicesToWorkspaces";
 import * as DeleteDevicesMutationTypes from "./graphql/mutations/device/deleteDevices";
 import * as CreateDocumentMutationTypes from "./graphql/mutations/document/createDocument";
 import * as CreateDocumentShareLinkTypes from "./graphql/mutations/document/createDocumentShareLink";
@@ -23,6 +22,7 @@ import * as CreateFolderMutationTypes from "./graphql/mutations/folder/createFol
 import * as DeleteFoldersMutationTypes from "./graphql/mutations/folder/deleteFolders";
 import * as UpdateFolderNameMutationTypes from "./graphql/mutations/folder/updateFolderName";
 import * as AcceptWorkspaceInvitationTypes from "./graphql/mutations/workspace/acceptWorkspaceInvitation";
+import * as AuthorizeMemberTypes from "./graphql/mutations/workspace/authorizeMember";
 import * as CreateInitialWorkspaceStructureMutationTypes from "./graphql/mutations/workspace/createInitialWorkspaceStructure";
 import * as CreateWorkspaceInvitationTypes from "./graphql/mutations/workspace/createWorkspaceInvitation";
 import * as DeleteWorkspaceInvitationsTypes from "./graphql/mutations/workspace/deleteWorkspaceInvitations";
@@ -36,7 +36,6 @@ import * as CommentsByDocumentIdQueryTypes from "./graphql/queries/comment/comme
 import * as deviceBySigningPublicKeyQueryTypes from "./graphql/queries/device/deviceBySigningPublicKey";
 import * as DevicesQueryTypes from "./graphql/queries/device/devices";
 import * as MainDeviceQueryTypes from "./graphql/queries/device/mainDevice";
-import * as UnauthorizedDevicesForWorkspacesTypes from "./graphql/queries/device/unauthorizedDevicesForWorkspaces";
 import * as DocumentQueryTypes from "./graphql/queries/document/document";
 import * as DocumentPathQueryTypes from "./graphql/queries/document/documentPath";
 import * as DocumentShareLinkQueryTypes from "./graphql/queries/document/documentShareLink";
@@ -53,7 +52,7 @@ import * as SnapshotQueryTypes from "./graphql/queries/snapshot/snapshot";
 import * as UserIdFromUsernameQueryTypes from "./graphql/queries/userIdFromUsername";
 import * as ActiveWorkspaceKeysQueryTypes from "./graphql/queries/workspace/activeWorkspaceKeys";
 import * as PendingingWorkspaceInvitationQueryTypes from "./graphql/queries/workspace/pendingWorkspaceInvitation";
-import * as UnauthorizedMembersTypes from "./graphql/queries/workspace/unauthorizedMembers";
+import * as UnauthorizedMemberTypes from "./graphql/queries/workspace/unauthorizedMember";
 import * as WorkspaceQueryTypes from "./graphql/queries/workspace/workspace";
 import * as WorkspaceDevicesQueryTypes from "./graphql/queries/workspace/workspaceDevices";
 import * as WorkspaceInvitationTypes from "./graphql/queries/workspace/workspaceInvitation";
@@ -121,7 +120,6 @@ export const schema = makeSchema({
     DeleteWorkspaceInvitationsTypes,
     CreateInitialWorkspaceStructureMutationTypes,
     PendingingWorkspaceInvitationQueryTypes,
-    UnauthorizedMembersTypes,
     RemoveMembersAndRotateWorkspaceKeyMutationTypes,
     WorkspaceDevicesQueryTypes,
     ActiveWorkspaceKeysQueryTypes,
@@ -135,20 +133,22 @@ export const schema = makeSchema({
     DeleteDevicesMutationTypes,
     MainDeviceQueryTypes,
     AttachDeviceToWorkspacesMutationTypes,
-    UnauthorizedDevicesForWorkspacesTypes,
-    AttachDevicesToWorkspacesMutationTypes,
 
     CreateCommentMutationTypes,
     DeleteCommentsMutationTypes,
     CommentsByDocumentIdQueryTypes,
 
     CreateCommentReplyMutationTypes,
-    DeleteCommentRepliessMutationTypes,
+    DeleteCommentRepliesMutationTypes,
 
     SnapshotQueryTypes,
 
     WorkspaceChainTypes,
     WorkspaceChainQueryTypes,
+
+    AuthorizeMemberTypes,
+
+    UnauthorizedMemberTypes,
   ],
   outputs: {
     schema: path.join(__dirname, "/generated/schema.graphql"),

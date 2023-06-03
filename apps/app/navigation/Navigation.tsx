@@ -39,9 +39,9 @@ import {
 } from "../types/navigation";
 import { setLastUsedWorkspaceId } from "../utils/lastUsedWorkspaceAndDocumentStore/lastUsedWorkspaceAndDocumentStore";
 import {
-  addNewMembersIfNecessary,
+  authorizeMembersIfNecessary,
   secondsBetweenNewMemberChecks,
-} from "../utils/workspace/addNewMembersIfNecessary";
+} from "../utils/workspace/authorizeMembersIfNecessary";
 import AcceptWorkspaceInvitationScreen from "./screens/acceptWorkspaceInvitationScreen/AcceptWorkspaceInvitationScreen";
 import AccountDevicesSettingsScreen from "./screens/accountDevicesSettingsScreen/AccountDevicesSettingsScreen";
 import AccountProfileSettingsScreen from "./screens/accountProfileSettingsScreen/AccountProfileSettingsScreen";
@@ -222,7 +222,7 @@ function WorkspaceStackNavigator(props) {
 
   useInterval(() => {
     if (activeDevice) {
-      addNewMembersIfNecessary({ activeDevice });
+      authorizeMembersIfNecessary({ activeDevice });
     }
   }, secondsBetweenNewMemberChecks * 1000);
 

@@ -1,53 +1,46 @@
 import { generateId } from "@serenity-tools/common";
 import { Role } from "../../../../prisma/generated/output";
 import deleteAllRecords from "../../../../test/helpers/deleteAllRecords";
-import { getUnauthorizedDevicesForWorkspaces } from "../../../../test/helpers/device/getUnauthorizedDevicesForWorkspaces";
 import setupGraphql from "../../../../test/helpers/setupGraphql";
 import { acceptWorkspaceInvitation } from "../../../../test/helpers/workspace/acceptWorkspaceInvitation";
 import { createWorkspaceInvitation } from "../../../../test/helpers/workspace/createWorkspaceInvitation";
-import { getUnauthorizedMembers } from "../../../../test/helpers/workspace/getUnauthorizedMembers";
+import { getUnauthorizedMember } from "../../../../test/helpers/workspace/getUnauthorizedMember";
 import createUserWithWorkspace from "../../../database/testHelpers/createUserWithWorkspace";
 
 const graphql = setupGraphql();
-const username = `${generateId}@example.com`;
+const username = "7dfb4dd9-88be-414c-8a40-b5c030003d89@example.com";
 const password = "password";
 
 let workspace1Id = "";
-let userAndDevice: any = undefined;
+let userAndDevice: any = null;
 
-const setup = async () => {
+beforeAll(async () => {
+  await deleteAllRecords();
+
   userAndDevice = await createUserWithWorkspace({
-    id: "workspace_id_1",
+    id: generateId(),
     username,
     password,
   });
   workspace1Id = userAndDevice.workspace.id;
-};
-
-beforeAll(async () => {
-  await deleteAllRecords();
-  await setup();
 });
 
-test("no devices members when workspace created", async () => {
-  const result = await getUnauthorizedDevicesForWorkspaces({
+test("no unauthorized members when workspace created", async () => {
+  const result = await getUnauthorizedMember({
     graphql,
+    input: { workspaceIds: [workspace1Id] },
     sessionKey: userAndDevice.sessionKey,
   });
-  const unauthorizedMembers =
-    result.unauthorizedDevicesForWorkspaces.unauthorizedMemberDevices;
-  expect(unauthorizedMembers.length).toBe(0);
+  expect(result.unauthorizedMember).toBe(null);
 });
 
-test("unauthorized devices when workspace added", async () => {
+test("unauthorized members when workspace added", async () => {
   const otherUserAndDevice = await createUserWithWorkspace({
-    id: "workspace_id_2",
+    id: generateId(),
     username: `${generateId()}@example.com`,
     password,
   });
   const otherUserId = otherUserAndDevice.user.id;
-  const otherSessionKey = otherUserAndDevice.sessionKey;
-  const otherDevice = otherUserAndDevice.device;
   const workspaceInvitationResult = await createWorkspaceInvitation({
     graphql,
     role: Role.VIEWER,
@@ -57,6 +50,7 @@ test("unauthorized devices when workspace added", async () => {
   });
   const invitationId =
     workspaceInvitationResult.createWorkspaceInvitation.workspaceInvitation.id;
+
   await acceptWorkspaceInvitation({
     graphql,
     invitationId,
@@ -65,37 +59,19 @@ test("unauthorized devices when workspace added", async () => {
       workspaceInvitationResult.invitationSigningKeyPairSeed,
     authorizationHeader: otherUserAndDevice.sessionKey,
   });
-  const result = await getUnauthorizedDevicesForWorkspaces({
+  const result = await getUnauthorizedMember({
     graphql,
+    input: { workspaceIds: [workspace1Id] },
     sessionKey: userAndDevice.sessionKey,
   });
-  const unauthorizedMembers =
-    result.unauthorizedDevicesForWorkspaces.unauthorizedMemberDevices;
-
-  expect(unauthorizedMembers.length).toBe(1);
-  const workspaceInfo = unauthorizedMembers[0];
-
-  expect(workspaceInfo.id).toBe(workspace1Id);
-  expect(workspaceInfo.members.length).toBe(1);
-
-  const unauthorizedMember = workspaceInfo.members[0];
-  expect(unauthorizedMember.id).toBe(otherUserId);
-  expect(unauthorizedMember.devices.length).toBe(2);
-  for (let unauthorizedDevice of unauthorizedMember.devices) {
-    if (unauthorizedDevice.info === null) {
-      expect(unauthorizedDevice.signingPublicKey).toBe(
-        otherDevice.signingPublicKey
-      );
-      break;
-    }
-  }
-  // TODO: test when user re-encodes workspace key boxes
+  expect(result.unauthorizedMember).toBeDefined();
+  expect(result.unauthorizedMember.userId).toBeDefined();
 });
 
 test("Unauthenticated", async () => {
   await expect(
     (async () =>
-      await getUnauthorizedMembers({
+      await getUnauthorizedMember({
         graphql,
         input: { workspaceIds: [workspace1Id] },
         sessionKey: "badauthheader",

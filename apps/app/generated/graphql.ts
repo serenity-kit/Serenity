@@ -35,6 +35,11 @@ export type ActiveWorkspaceKeysResult = {
   activeWorkspaceKeys: Array<WorkspaceKey>;
 };
 
+export type AddMemberWorkspaceKeyInput = {
+  workspaceKeyBoxes: Array<WorkspaceDeviceInput>;
+  workspaceKeyId: Scalars['String'];
+};
+
 export type AttachDeviceToWorkspacesInput = {
   creatorDeviceSigningPublicKey: Scalars['String'];
   deviceWorkspaceKeyBoxes: Array<WorkspaceKeyBoxData>;
@@ -54,6 +59,17 @@ export type AttachDevicesToWorkspacesInput = {
 export type AttachDevicesToWorkspacesResult = {
   __typename?: 'AttachDevicesToWorkspacesResult';
   workspaces: Array<WorkspaceWithWorkspaceKeys>;
+};
+
+export type AuthorizeMemberInput = {
+  creatorDeviceSigningPublicKey: Scalars['String'];
+  workspaceId: Scalars['String'];
+  workspaceKeys: Array<AddMemberWorkspaceKeyInput>;
+};
+
+export type AuthorizeMemberResult = {
+  __typename?: 'AuthorizeMemberResult';
+  success: Scalars['Boolean'];
 };
 
 export type Comment = {
@@ -630,6 +646,7 @@ export type Mutation = {
   acceptWorkspaceInvitation?: Maybe<AcceptWorkspaceInvitationResult>;
   attachDeviceToWorkspaces?: Maybe<AttachDeviceToWorkspacesResult>;
   attachDevicesToWorkspaces?: Maybe<AttachDevicesToWorkspacesResult>;
+  authorizeMember?: Maybe<AuthorizeMemberResult>;
   createComment?: Maybe<CreateCommentResult>;
   createCommentReply?: Maybe<CreateCommentReplyResult>;
   createDocument?: Maybe<CreateDocumentResult>;
@@ -673,6 +690,11 @@ export type MutationAttachDeviceToWorkspacesArgs = {
 
 export type MutationAttachDevicesToWorkspacesArgs = {
   input: AttachDevicesToWorkspacesInput;
+};
+
+
+export type MutationAuthorizeMemberArgs = {
+  input: AuthorizeMemberInput;
 };
 
 
@@ -854,7 +876,7 @@ export type Query = {
   rootFolders?: Maybe<FolderConnection>;
   snapshot?: Maybe<Snapshot>;
   unauthorizedDevicesForWorkspaces?: Maybe<UnauthorizedDevicesForWorkspacesResult>;
-  unauthorizedMembers?: Maybe<UnauthorizedMembersResult>;
+  unauthorizedMember?: Maybe<UnauthorizedMemberResult>;
   userIdFromUsername?: Maybe<UserIdFromUsernameResult>;
   workspace?: Maybe<Workspace>;
   workspaceChain?: Maybe<WorkspaceChainEventConnection>;
@@ -964,11 +986,6 @@ export type QueryRootFoldersArgs = {
 export type QuerySnapshotArgs = {
   documentId: Scalars['ID'];
   documentShareLinkToken?: InputMaybe<Scalars['String']>;
-};
-
-
-export type QueryUnauthorizedMembersArgs = {
-  workspaceIds: Array<Scalars['ID']>;
 };
 
 
@@ -1110,9 +1127,11 @@ export type UnauthorizedDevicesForWorkspacesResult = {
   unauthorizedMemberDevices: Array<WorkspaceIdWithMemberDevices>;
 };
 
-export type UnauthorizedMembersResult = {
-  __typename?: 'UnauthorizedMembersResult';
-  userIds: Array<Maybe<Scalars['String']>>;
+export type UnauthorizedMemberResult = {
+  __typename?: 'UnauthorizedMemberResult';
+  devices: Array<Device>;
+  userId: Scalars['String'];
+  workspaceId: Scalars['String'];
 };
 
 export type Update = {
@@ -1411,12 +1430,12 @@ export type AttachDeviceToWorkspacesMutationVariables = Exact<{
 
 export type AttachDeviceToWorkspacesMutation = { __typename?: 'Mutation', attachDeviceToWorkspaces?: { __typename?: 'AttachDeviceToWorkspacesResult', workspaceKeys: Array<{ __typename?: 'WorkspaceKey', id: string, generation: number, workspaceId: string, workspaceKeyBox?: { __typename?: 'WorkspaceKeyBox', id: string, deviceSigningPublicKey: string, creatorDeviceSigningPublicKey: string, ciphertext: string, nonce: string, creatorDevice: { __typename?: 'CreatorDevice', signingPublicKey: string, encryptionPublicKey: string } } | null }> } | null };
 
-export type AttachDevicesToWorkspacesMutationVariables = Exact<{
-  input: AttachDevicesToWorkspacesInput;
+export type AuthorizeMemberMutationVariables = Exact<{
+  input: AuthorizeMemberInput;
 }>;
 
 
-export type AttachDevicesToWorkspacesMutation = { __typename?: 'Mutation', attachDevicesToWorkspaces?: { __typename?: 'AttachDevicesToWorkspacesResult', workspaces: Array<{ __typename?: 'WorkspaceWithWorkspaceKeys', id: string, workspaceKeys: Array<{ __typename?: 'WorkspaceKeyWithMembers', id: string, generation: number, members: Array<{ __typename?: 'MemberWithWorkspaceKeyBoxes', id: string, workspaceKeyBoxes: Array<{ __typename?: 'WorkspaceKeyBox', id: string, deviceSigningPublicKey: string, creatorDeviceSigningPublicKey: string, ciphertext: string, nonce: string }> }> }> }> } | null };
+export type AuthorizeMemberMutation = { __typename?: 'Mutation', authorizeMember?: { __typename?: 'AuthorizeMemberResult', success: boolean } | null };
 
 export type CreateCommentMutationVariables = Exact<{
   input: CreateCommentInput;
@@ -1749,17 +1768,10 @@ export type SnapshotQueryVariables = Exact<{
 
 export type SnapshotQuery = { __typename?: 'Query', snapshot?: { __typename?: 'Snapshot', id: string, latestVersion: number, data: string, documentId: string, keyDerivationTrace: { __typename?: 'KeyDerivationTrace', workspaceKeyId: string, trace: Array<{ __typename?: 'KeyDerivationTraceEntry', entryId: string, subkeyId: number, parentId?: string | null, context: string }> } } | null };
 
-export type UnauthorizedDevicesForWorkspacesQueryVariables = Exact<{ [key: string]: never; }>;
+export type UnauthorizedMemberQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type UnauthorizedDevicesForWorkspacesQuery = { __typename?: 'Query', unauthorizedDevicesForWorkspaces?: { __typename?: 'UnauthorizedDevicesForWorkspacesResult', unauthorizedMemberDevices: Array<{ __typename?: 'WorkspaceIdWithMemberDevices', id: string, members: Array<{ __typename?: 'WorkspaceIdWithDevices', id: string, devices: Array<{ __typename?: 'Device', userId?: string | null, signingPublicKey: string, encryptionPublicKey: string, info?: string | null, createdAt?: any | null, encryptionPublicKeySignature: string }> }> }> } | null };
-
-export type UnauthorizedMembersQueryVariables = Exact<{
-  workspaceIds: Array<Scalars['ID']> | Scalars['ID'];
-}>;
-
-
-export type UnauthorizedMembersQuery = { __typename?: 'Query', unauthorizedMembers?: { __typename?: 'UnauthorizedMembersResult', userIds: Array<string | null> } | null };
+export type UnauthorizedMemberQuery = { __typename?: 'Query', unauthorizedMember?: { __typename?: 'UnauthorizedMemberResult', userId: string, workspaceId: string, devices: Array<{ __typename?: 'Device', userId?: string | null, signingPublicKey: string, encryptionPublicKey: string, info?: string | null, createdAt?: any | null, encryptionPublicKeySignature: string }> } | null };
 
 export type UserIdFromUsernameQueryVariables = Exact<{
   username: Scalars['String'];
@@ -1857,32 +1869,16 @@ export const AttachDeviceToWorkspacesDocument = gql`
 export function useAttachDeviceToWorkspacesMutation() {
   return Urql.useMutation<AttachDeviceToWorkspacesMutation, AttachDeviceToWorkspacesMutationVariables>(AttachDeviceToWorkspacesDocument);
 };
-export const AttachDevicesToWorkspacesDocument = gql`
-    mutation attachDevicesToWorkspaces($input: AttachDevicesToWorkspacesInput!) {
-  attachDevicesToWorkspaces(input: $input) {
-    workspaces {
-      id
-      workspaceKeys {
-        id
-        generation
-        members {
-          id
-          workspaceKeyBoxes {
-            id
-            deviceSigningPublicKey
-            creatorDeviceSigningPublicKey
-            ciphertext
-            nonce
-          }
-        }
-      }
-    }
+export const AuthorizeMemberDocument = gql`
+    mutation authorizeMember($input: AuthorizeMemberInput!) {
+  authorizeMember(input: $input) {
+    success
   }
 }
     `;
 
-export function useAttachDevicesToWorkspacesMutation() {
-  return Urql.useMutation<AttachDevicesToWorkspacesMutation, AttachDevicesToWorkspacesMutationVariables>(AttachDevicesToWorkspacesDocument);
+export function useAuthorizeMemberMutation() {
+  return Urql.useMutation<AuthorizeMemberMutation, AuthorizeMemberMutationVariables>(AuthorizeMemberDocument);
 };
 export const CreateCommentDocument = gql`
     mutation createComment($input: CreateCommentInput!) {
@@ -2748,40 +2744,25 @@ export const SnapshotDocument = gql`
 export function useSnapshotQuery(options: Omit<Urql.UseQueryArgs<SnapshotQueryVariables>, 'query'>) {
   return Urql.useQuery<SnapshotQuery, SnapshotQueryVariables>({ query: SnapshotDocument, ...options });
 };
-export const UnauthorizedDevicesForWorkspacesDocument = gql`
-    query unauthorizedDevicesForWorkspaces {
-  unauthorizedDevicesForWorkspaces {
-    unauthorizedMemberDevices {
-      id
-      members {
-        id
-        devices {
-          userId
-          signingPublicKey
-          encryptionPublicKey
-          info
-          createdAt
-          encryptionPublicKeySignature
-        }
-      }
+export const UnauthorizedMemberDocument = gql`
+    query unauthorizedMember {
+  unauthorizedMember {
+    userId
+    workspaceId
+    devices {
+      userId
+      signingPublicKey
+      encryptionPublicKey
+      info
+      createdAt
+      encryptionPublicKeySignature
     }
   }
 }
     `;
 
-export function useUnauthorizedDevicesForWorkspacesQuery(options?: Omit<Urql.UseQueryArgs<UnauthorizedDevicesForWorkspacesQueryVariables>, 'query'>) {
-  return Urql.useQuery<UnauthorizedDevicesForWorkspacesQuery, UnauthorizedDevicesForWorkspacesQueryVariables>({ query: UnauthorizedDevicesForWorkspacesDocument, ...options });
-};
-export const UnauthorizedMembersDocument = gql`
-    query unauthorizedMembers($workspaceIds: [ID!]!) {
-  unauthorizedMembers(workspaceIds: $workspaceIds) {
-    userIds
-  }
-}
-    `;
-
-export function useUnauthorizedMembersQuery(options: Omit<Urql.UseQueryArgs<UnauthorizedMembersQueryVariables>, 'query'>) {
-  return Urql.useQuery<UnauthorizedMembersQuery, UnauthorizedMembersQueryVariables>({ query: UnauthorizedMembersDocument, ...options });
+export function useUnauthorizedMemberQuery(options?: Omit<Urql.UseQueryArgs<UnauthorizedMemberQueryVariables>, 'query'>) {
+  return Urql.useQuery<UnauthorizedMemberQuery, UnauthorizedMemberQueryVariables>({ query: UnauthorizedMemberDocument, ...options });
 };
 export const UserIdFromUsernameDocument = gql`
     query userIdFromUsername($username: String!) {
@@ -3007,10 +2988,10 @@ export const runAttachDeviceToWorkspacesMutation = async (variables: AttachDevic
     .toPromise();
 };
 
-export const runAttachDevicesToWorkspacesMutation = async (variables: AttachDevicesToWorkspacesMutationVariables, options?: any) => {
+export const runAuthorizeMemberMutation = async (variables: AuthorizeMemberMutationVariables, options?: any) => {
   return await getUrqlClient()
-    .mutation<AttachDevicesToWorkspacesMutation, AttachDevicesToWorkspacesMutationVariables>(
-      AttachDevicesToWorkspacesDocument,
+    .mutation<AuthorizeMemberMutation, AuthorizeMemberMutationVariables>(
+      AuthorizeMemberDocument,
       variables,
       {
         // better to be safe here and always refetch
@@ -5356,10 +5337,10 @@ export const snapshotQueryService =
 
 
 
-export const runUnauthorizedDevicesForWorkspacesQuery = async (variables: UnauthorizedDevicesForWorkspacesQueryVariables, options?: any) => {
+export const runUnauthorizedMemberQuery = async (variables: UnauthorizedMemberQueryVariables, options?: any) => {
   return await getUrqlClient()
-    .query<UnauthorizedDevicesForWorkspacesQuery, UnauthorizedDevicesForWorkspacesQueryVariables>(
-      UnauthorizedDevicesForWorkspacesDocument,
+    .query<UnauthorizedMemberQuery, UnauthorizedMemberQueryVariables>(
+      UnauthorizedMemberDocument,
       variables,
       {
         // better to be safe here and always refetch
@@ -5370,41 +5351,41 @@ export const runUnauthorizedDevicesForWorkspacesQuery = async (variables: Unauth
     .toPromise();
 };
 
-export type UnauthorizedDevicesForWorkspacesQueryResult = Urql.OperationResult<UnauthorizedDevicesForWorkspacesQuery, UnauthorizedDevicesForWorkspacesQueryVariables>;
+export type UnauthorizedMemberQueryResult = Urql.OperationResult<UnauthorizedMemberQuery, UnauthorizedMemberQueryVariables>;
 
-export type UnauthorizedDevicesForWorkspacesQueryUpdateResultEvent = {
-  type: "UnauthorizedDevicesForWorkspacesQuery.UPDATE_RESULT";
-  result: UnauthorizedDevicesForWorkspacesQueryResult;
+export type UnauthorizedMemberQueryUpdateResultEvent = {
+  type: "UnauthorizedMemberQuery.UPDATE_RESULT";
+  result: UnauthorizedMemberQueryResult;
 };
 
-export type UnauthorizedDevicesForWorkspacesQueryErrorEvent = {
-  type: "UnauthorizedDevicesForWorkspacesQuery.ERROR";
-  result: UnauthorizedDevicesForWorkspacesQueryResult;
+export type UnauthorizedMemberQueryErrorEvent = {
+  type: "UnauthorizedMemberQuery.ERROR";
+  result: UnauthorizedMemberQueryResult;
 };
 
-export type UnauthorizedDevicesForWorkspacesQueryServiceEvent = UnauthorizedDevicesForWorkspacesQueryUpdateResultEvent | UnauthorizedDevicesForWorkspacesQueryErrorEvent;
+export type UnauthorizedMemberQueryServiceEvent = UnauthorizedMemberQueryUpdateResultEvent | UnauthorizedMemberQueryErrorEvent;
 
-type UnauthorizedDevicesForWorkspacesQueryServiceSubscribersEntry = {
-  variables: UnauthorizedDevicesForWorkspacesQueryVariables;
-  callbacks: ((event: UnauthorizedDevicesForWorkspacesQueryServiceEvent) => void)[];
+type UnauthorizedMemberQueryServiceSubscribersEntry = {
+  variables: UnauthorizedMemberQueryVariables;
+  callbacks: ((event: UnauthorizedMemberQueryServiceEvent) => void)[];
   intervalId: NodeJS.Timer | null;
 };
 
-type UnauthorizedDevicesForWorkspacesQueryServiceSubscribers = {
-  [variables: string]: UnauthorizedDevicesForWorkspacesQueryServiceSubscribersEntry;
+type UnauthorizedMemberQueryServiceSubscribers = {
+  [variables: string]: UnauthorizedMemberQueryServiceSubscribersEntry;
 };
 
-const unauthorizedDevicesForWorkspacesQueryServiceSubscribers: UnauthorizedDevicesForWorkspacesQueryServiceSubscribers = {};
+const unauthorizedMemberQueryServiceSubscribers: UnauthorizedMemberQueryServiceSubscribers = {};
 
-const triggerUnauthorizedDevicesForWorkspacesQuery = (variablesString: string, variables: UnauthorizedDevicesForWorkspacesQueryVariables) => {
+const triggerUnauthorizedMemberQuery = (variablesString: string, variables: UnauthorizedMemberQueryVariables) => {
   getUrqlClient()
-    .query<UnauthorizedDevicesForWorkspacesQuery, UnauthorizedDevicesForWorkspacesQueryVariables>(UnauthorizedDevicesForWorkspacesDocument, variables)
+    .query<UnauthorizedMemberQuery, UnauthorizedMemberQueryVariables>(UnauthorizedMemberDocument, variables)
     .toPromise()
     .then((result) => {
-      unauthorizedDevicesForWorkspacesQueryServiceSubscribers[variablesString].callbacks.forEach(
+      unauthorizedMemberQueryServiceSubscribers[variablesString].callbacks.forEach(
         (callback) => {
           callback({
-            type: result.error ? "UnauthorizedDevicesForWorkspacesQuery.ERROR" : "UnauthorizedDevicesForWorkspacesQuery.UPDATE_RESULT",
+            type: result.error ? "UnauthorizedMemberQuery.ERROR" : "UnauthorizedMemberQuery.UPDATE_RESULT",
             result: result,
           });
         }
@@ -5421,141 +5402,38 @@ const triggerUnauthorizedDevicesForWorkspacesQuery = (variablesString: string, v
  * When the last subscription is stopped, the interval will be cleared.
  * It also considers the variables passed to the service.
  */
-export const unauthorizedDevicesForWorkspacesQueryService =
-  (variables: UnauthorizedDevicesForWorkspacesQueryVariables, intervalInMs?: number) => (callback, onReceive) => {
+export const unauthorizedMemberQueryService =
+  (variables: UnauthorizedMemberQueryVariables, intervalInMs?: number) => (callback, onReceive) => {
     const variablesString = canonicalize(variables) as string;
-    if (unauthorizedDevicesForWorkspacesQueryServiceSubscribers[variablesString]) {
-      unauthorizedDevicesForWorkspacesQueryServiceSubscribers[variablesString].callbacks.push(callback);
+    if (unauthorizedMemberQueryServiceSubscribers[variablesString]) {
+      unauthorizedMemberQueryServiceSubscribers[variablesString].callbacks.push(callback);
     } else {
-      unauthorizedDevicesForWorkspacesQueryServiceSubscribers[variablesString] = {
+      unauthorizedMemberQueryServiceSubscribers[variablesString] = {
         variables,
         callbacks: [callback],
         intervalId: null,
       };
     }
 
-    triggerUnauthorizedDevicesForWorkspacesQuery(variablesString, variables);
-    if (!unauthorizedDevicesForWorkspacesQueryServiceSubscribers[variablesString].intervalId) {
-      unauthorizedDevicesForWorkspacesQueryServiceSubscribers[variablesString].intervalId = setInterval(
+    triggerUnauthorizedMemberQuery(variablesString, variables);
+    if (!unauthorizedMemberQueryServiceSubscribers[variablesString].intervalId) {
+      unauthorizedMemberQueryServiceSubscribers[variablesString].intervalId = setInterval(
         () => {
-          triggerUnauthorizedDevicesForWorkspacesQuery(variablesString, variables);
+          triggerUnauthorizedMemberQuery(variablesString, variables);
         },
         intervalInMs || 4000
       );
     }
 
-    const intervalId = unauthorizedDevicesForWorkspacesQueryServiceSubscribers[variablesString].intervalId;
+    const intervalId = unauthorizedMemberQueryServiceSubscribers[variablesString].intervalId;
     return () => {
       if (
-        unauthorizedDevicesForWorkspacesQueryServiceSubscribers[variablesString].callbacks.length === 0 &&
+        unauthorizedMemberQueryServiceSubscribers[variablesString].callbacks.length === 0 &&
         intervalId
       ) {
         // perform cleanup
         clearInterval(intervalId);
-        unauthorizedDevicesForWorkspacesQueryServiceSubscribers[variablesString].intervalId = null;
-      }
-    };
-  };
-
-
-
-export const runUnauthorizedMembersQuery = async (variables: UnauthorizedMembersQueryVariables, options?: any) => {
-  return await getUrqlClient()
-    .query<UnauthorizedMembersQuery, UnauthorizedMembersQueryVariables>(
-      UnauthorizedMembersDocument,
-      variables,
-      {
-        // better to be safe here and always refetch
-        requestPolicy: "network-only",
-        ...options
-      }
-    )
-    .toPromise();
-};
-
-export type UnauthorizedMembersQueryResult = Urql.OperationResult<UnauthorizedMembersQuery, UnauthorizedMembersQueryVariables>;
-
-export type UnauthorizedMembersQueryUpdateResultEvent = {
-  type: "UnauthorizedMembersQuery.UPDATE_RESULT";
-  result: UnauthorizedMembersQueryResult;
-};
-
-export type UnauthorizedMembersQueryErrorEvent = {
-  type: "UnauthorizedMembersQuery.ERROR";
-  result: UnauthorizedMembersQueryResult;
-};
-
-export type UnauthorizedMembersQueryServiceEvent = UnauthorizedMembersQueryUpdateResultEvent | UnauthorizedMembersQueryErrorEvent;
-
-type UnauthorizedMembersQueryServiceSubscribersEntry = {
-  variables: UnauthorizedMembersQueryVariables;
-  callbacks: ((event: UnauthorizedMembersQueryServiceEvent) => void)[];
-  intervalId: NodeJS.Timer | null;
-};
-
-type UnauthorizedMembersQueryServiceSubscribers = {
-  [variables: string]: UnauthorizedMembersQueryServiceSubscribersEntry;
-};
-
-const unauthorizedMembersQueryServiceSubscribers: UnauthorizedMembersQueryServiceSubscribers = {};
-
-const triggerUnauthorizedMembersQuery = (variablesString: string, variables: UnauthorizedMembersQueryVariables) => {
-  getUrqlClient()
-    .query<UnauthorizedMembersQuery, UnauthorizedMembersQueryVariables>(UnauthorizedMembersDocument, variables)
-    .toPromise()
-    .then((result) => {
-      unauthorizedMembersQueryServiceSubscribers[variablesString].callbacks.forEach(
-        (callback) => {
-          callback({
-            type: result.error ? "UnauthorizedMembersQuery.ERROR" : "UnauthorizedMembersQuery.UPDATE_RESULT",
-            result: result,
-          });
-        }
-      );
-    });
-};
-
-/**
- * This service is used to query results every 4 seconds.
- *
- * It allows machines to spawn a service that will fetch the query
- * and send the result to the machine.
- * It will share the same interval for all machines.
- * When the last subscription is stopped, the interval will be cleared.
- * It also considers the variables passed to the service.
- */
-export const unauthorizedMembersQueryService =
-  (variables: UnauthorizedMembersQueryVariables, intervalInMs?: number) => (callback, onReceive) => {
-    const variablesString = canonicalize(variables) as string;
-    if (unauthorizedMembersQueryServiceSubscribers[variablesString]) {
-      unauthorizedMembersQueryServiceSubscribers[variablesString].callbacks.push(callback);
-    } else {
-      unauthorizedMembersQueryServiceSubscribers[variablesString] = {
-        variables,
-        callbacks: [callback],
-        intervalId: null,
-      };
-    }
-
-    triggerUnauthorizedMembersQuery(variablesString, variables);
-    if (!unauthorizedMembersQueryServiceSubscribers[variablesString].intervalId) {
-      unauthorizedMembersQueryServiceSubscribers[variablesString].intervalId = setInterval(
-        () => {
-          triggerUnauthorizedMembersQuery(variablesString, variables);
-        },
-        intervalInMs || 4000
-      );
-    }
-
-    const intervalId = unauthorizedMembersQueryServiceSubscribers[variablesString].intervalId;
-    return () => {
-      if (
-        unauthorizedMembersQueryServiceSubscribers[variablesString].callbacks.length === 0 &&
-        intervalId
-      ) {
-        // perform cleanup
-        clearInterval(intervalId);
-        unauthorizedMembersQueryServiceSubscribers[variablesString].intervalId = null;
+        unauthorizedMemberQueryServiceSubscribers[variablesString].intervalId = null;
       }
     };
   };

@@ -4,10 +4,10 @@ import {
 } from "@serenity-tools/common";
 import { Role } from "../../../../prisma/generated/output";
 import deleteAllRecords from "../../../../test/helpers/deleteAllRecords";
-import { attachDevicesToWorkspaces } from "../../../../test/helpers/device/attachDevicesToWorkspaces";
 import { getWorkspaceKeyForWorkspaceAndDevice } from "../../../../test/helpers/device/getWorkspaceKeyForWorkspaceAndDevice";
 import setupGraphql from "../../../../test/helpers/setupGraphql";
 import { acceptWorkspaceInvitation } from "../../../../test/helpers/workspace/acceptWorkspaceInvitation";
+import { authorizeMember } from "../../../../test/helpers/workspace/authorizeMember";
 import { createWorkspaceInvitation } from "../../../../test/helpers/workspace/createWorkspaceInvitation";
 import { getWorkspaceDevices } from "../../../../test/helpers/workspace/getWorkspaceDevices";
 import createUserWithWorkspace from "../../../database/testHelpers/createUserWithWorkspace";
@@ -82,66 +82,62 @@ test("new user results in added device", async () => {
     deviceEncryptionPrivateKey: userData1.deviceEncryptionPrivateKey,
     workspace: userData1.workspace,
   });
-  const { ciphertext, nonce } = encryptWorkspaceKeyForDevice({
-    receiverDeviceEncryptionPublicKey: userData2.device.encryptionPublicKey,
+
+  const userData2DeviceWorkspaceKeyBox = encryptWorkspaceKeyForDevice({
+    receiverDeviceEncryptionPublicKey: userData2.webDevice.encryptionPublicKey,
     creatorDeviceEncryptionPrivateKey: userData1.encryptionPrivateKey,
     workspaceKey,
   });
-  const workspaceMemberDevices = [
+  const userData2MainDeviceWorkspaceKeyBox = encryptWorkspaceKeyForDevice({
+    receiverDeviceEncryptionPublicKey: userData2.mainDevice.encryptionPublicKey,
+    creatorDeviceEncryptionPrivateKey: userData1.encryptionPrivateKey,
+    workspaceKey,
+  });
+
+  const workspaceKeys = [
     {
-      id: userData1.workspace.id,
-      workspaceKeysMembers: [
+      workspaceKeyId: userData1.workspace.currentWorkspaceKey.id,
+      workspaceKeyBoxes: [
         {
-          id: userData1.workspace.currentWorkspaceKey.id,
-          members: [
-            {
-              id: userData2.user.id,
-              workspaceDevices: [
-                {
-                  receiverDeviceSigningPublicKey:
-                    userData2.device.signingPublicKey,
-                  ciphertext,
-                  nonce,
-                },
-              ],
-            },
-          ],
+          ciphertext: userData2DeviceWorkspaceKeyBox.ciphertext,
+          nonce: userData2DeviceWorkspaceKeyBox.nonce,
+          receiverDeviceSigningPublicKey: userData2.webDevice.signingPublicKey,
+        },
+        {
+          ciphertext: userData2MainDeviceWorkspaceKeyBox.ciphertext,
+          nonce: userData2MainDeviceWorkspaceKeyBox.nonce,
+          receiverDeviceSigningPublicKey: userData2.mainDevice.signingPublicKey,
         },
       ],
     },
   ];
-  await attachDevicesToWorkspaces({
+
+  await authorizeMember({
     graphql,
+    workspaceId: userData1.workspace.id,
     creatorDeviceSigningPublicKey: userData1.device.signingPublicKey,
-    workspaceMemberDevices,
+    workspaceKeys,
     authorizationHeader: userData1.sessionKey,
   });
+
   const workspaceDevicesResult = await getWorkspaceDevices({
     graphql,
     workspaceId: userData1.workspace.id,
     authorizationHeader: userData1.sessionKey,
   });
   const devices = workspaceDevicesResult.workspaceDevices.nodes;
-  expect(devices.length).toBe(numStartingDevices + 1);
-  let foundUser1Device = false;
-  let foundUser1Device2 = false;
-  let foundUser2Device = false;
-  for (let device of devices) {
-    if (device.signingPublicKey === userData1.device.signingPublicKey) {
-      foundUser1Device = true;
-    } else if (
-      device.signingPublicKey === userData1.webDevice.signingPublicKey
-    ) {
-      foundUser1Device2 = true;
-    } else if (device.signingPublicKey === userData2.device.signingPublicKey) {
-      foundUser2Device = true;
-    } else {
-      throw new Error("Unexpected device found");
-    }
-  }
-  expect(foundUser1Device).toBe(true);
-  expect(foundUser1Device2).toBe(true);
-  expect(foundUser2Device).toBe(true);
+
+  expect(devices.length).toBe(numStartingDevices + 2);
+
+  const deviceSigningPublicKeys = devices.map(
+    (device) => device.signingPublicKey
+  );
+  expect(deviceSigningPublicKeys).toContain(
+    userData2.webDevice.signingPublicKey
+  );
+  expect(deviceSigningPublicKeys).toContain(
+    userData2.mainDevice.signingPublicKey
+  );
 });
 
 test("not workspace member throw error", async () => {

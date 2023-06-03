@@ -6,16 +6,25 @@ export type Props = {
   input: { workspaceIds: string[] };
   sessionKey: string;
 };
-export const getUnauthorizedMembers = async ({
+export const getUnauthorizedMember = async ({
   graphql,
   input,
   sessionKey,
 }: Props) => {
   const authorizationHeader = { authorization: sessionKey };
   const query = gql`
-    query unauthorizedMembers($workspaceIds: [ID!]!) {
-      unauthorizedMembers(workspaceIds: $workspaceIds) {
-        userIds
+    query unauthorizedMember {
+      unauthorizedMember {
+        userId
+        workspaceId
+        devices {
+          userId
+          signingPublicKey
+          encryptionPublicKey
+          info
+          createdAt
+          encryptionPublicKeySignature
+        }
       }
     }
   `;
