@@ -1,0 +1,8 @@
+query workspaceChainByInvitationId($invitationId: ID!) {
+  workspaceChainByInvitationId(invitationId: $invitationId, first: 5000) {
+    nodes {
+      serializedContent
+      position
+    }
+  }
+}

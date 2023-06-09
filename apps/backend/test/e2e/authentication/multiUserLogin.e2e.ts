@@ -59,12 +59,10 @@ test("Multi reg, multi remember login", async ({ page }) => {
   const password = "password";
   const stayLoggedIn = true;
   const registrationResult1 = await createUserWithWorkspace({
-    id: generateId(),
     username: `${generateId()}@example.com`,
     password,
   });
   const registrationResult2 = await createUserWithWorkspace({
-    id: generateId(),
     username: `${generateId()}@example.com`,
     password,
   });

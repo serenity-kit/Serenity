@@ -21,7 +21,6 @@ let user1Workspace: any = null;
 const setup = async () => {
   await sodium.ready;
   userData1 = await createUserWithWorkspace({
-    id: generateId(),
     username: `${generateId()}@example.com`,
     password,
   });
@@ -72,7 +71,6 @@ test("list share link", async () => {
 
 test("User has no access to the workspace", async () => {
   const otherUser = await createUserWithWorkspace({
-    id: generateId(),
     username: `${generateId()}@example.com`,
     password,
   });

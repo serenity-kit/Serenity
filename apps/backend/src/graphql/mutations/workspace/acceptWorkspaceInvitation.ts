@@ -1,3 +1,4 @@
+import * as workspaceChain from "@serenity-kit/workspace-chain";
 import { AuthenticationError } from "apollo-server-express";
 import {
   arg,
@@ -7,22 +8,18 @@ import {
   objectType,
 } from "nexus";
 import { acceptWorkspaceInvitation } from "../../../database/workspace/acceptWorkspaceInvitation";
-import { Workspace } from "../../types/workspace";
 
 export const AcceptWorkspaceInvitationInput = inputObjectType({
   name: "AcceptWorkspaceInvitationInput",
   definition(t) {
-    t.nonNull.string("invitationId");
-    t.nonNull.string("acceptInvitationSignature");
-    t.nonNull.string("acceptInvitationAuthorSignature");
-    t.nonNull.string("inviteeMainDeviceSigningPublicKey");
+    t.nonNull.string("serializedWorkspaceChainEvent");
   },
 });
 
 export const AcceptWorkspaceInvitationResult = objectType({
   name: "AcceptWorkspaceInvitationResult",
   definition(t) {
-    t.field("workspace", { type: Workspace });
+    t.nonNull.string("workspaceId");
   },
 });
 
@@ -41,16 +38,29 @@ export const createWorkspaceInvitationMutation = mutationField(
       if (!context.user) {
         throw new AuthenticationError("Not authenticated");
       }
-      const workspace = await acceptWorkspaceInvitation({
-        invitationId: args.input.invitationId,
-        acceptInvitationSignature: args.input.acceptInvitationSignature,
-        acceptInvitationAuthorSignature:
-          args.input.acceptInvitationAuthorSignature,
-        inviteeMainDeviceSigningPublicKey:
-          args.input.inviteeMainDeviceSigningPublicKey,
+
+      const workspaceChainEvent =
+        workspaceChain.AcceptInvitationWorkspaceChainEvent.parse(
+          JSON.parse(args.input.serializedWorkspaceChainEvent)
+        );
+
+      // TODO create a utility function or move it to the DB function
+      // verify that the user and the invitation event match
+      // TODO THIS CHECK CAN'T WORK: publicKey vs user.id
+      if (
+        !workspaceChainEvent.authors.some((author) => author.publicKey) ===
+        context.user.id
+      ) {
+        throw new AuthenticationError(
+          "The user is not the author of the event"
+        );
+      }
+
+      const workspaceId = await acceptWorkspaceInvitation({
+        workspaceChainEvent,
         currentUserId: context.user.id,
       });
-      return { workspace };
+      return { workspaceId };
     },
   }
 );

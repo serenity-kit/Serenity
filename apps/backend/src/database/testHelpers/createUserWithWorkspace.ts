@@ -25,13 +25,11 @@ import { prisma } from "../prisma";
 import { createDeviceAndLogin } from "./createDeviceAndLogin";
 
 type Params = {
-  id: string;
   username: string;
   password?: string;
 };
 
 export default async function createUserWithWorkspace({
-  id,
   username,
   password,
 }: Params) {
@@ -161,7 +159,7 @@ export default async function createUserWithWorkspace({
   const createWorkspaceResult = await createInitialWorkspaceStructure({
     userId: user.id,
     workspace: {
-      id,
+      id: createWorkspaceChainEvent.transaction.id,
       name: "My Workspace",
       workspaceKeyId,
       deviceWorkspaceKeyBoxes: [

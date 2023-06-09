@@ -9,7 +9,6 @@ test("Bad login then good login", async ({ page }) => {
   const username = `${generateId()}@example.com`;
   const password = "password";
   const { user, workspace, document } = await createUserWithWorkspace({
-    id: generateId(),
     username,
     password,
   });

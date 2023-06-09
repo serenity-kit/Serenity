@@ -12,7 +12,6 @@ import { login } from "../../helpers/e2e/login";
 import { reloadPage } from "../../helpers/e2e/reloadPage";
 
 type UserData = {
-  id: string;
   username: string;
   password: string;
   data: any;
@@ -23,19 +22,16 @@ let user2: UserData;
 test.beforeAll(async () => {
   await sodium.ready;
   user1 = {
-    id: generateId(),
     username: `${generateId()}@example.com`,
     password: "password",
     data: undefined,
   };
   user2 = {
-    id: generateId(),
     username: `${generateId()}@example.com`,
     password: "password",
     data: undefined,
   };
   user1.data = await createUserWithWorkspace({
-    id: user1.id,
     username: user1.username,
     password: user1.password,
   });

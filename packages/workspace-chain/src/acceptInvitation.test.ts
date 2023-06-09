@@ -36,7 +36,7 @@ beforeAll(async () => {
     authorKeyPair: keyPairA,
     expiresAt: getDateIn2Min(),
     role: "EDITOR",
-    workspaceId: "test",
+    workspaceId: createEvent.transaction.id,
   });
 });
 
@@ -45,17 +45,17 @@ test("should be able to accept an invitation", async () => {
     throw new Error("Invalid transaction type");
   }
 
-  const { acceptInvitationSignature, acceptInvitationAuthorSignature } =
-    acceptInvitation({
-      invitationSigningKeyPairSeed:
-        addInvitationEvent.invitationSigningKeyPairSeed,
-      ...addInvitationEvent.transaction,
-      expiresAt: new Date(addInvitationEvent.transaction.expiresAt),
-      authorKeyPair: keyPairB,
-    });
+  const event = acceptInvitation({
+    ...addInvitationEvent.transaction,
+    prevHash: hashTransaction(addInvitationEvent.transaction),
+    invitationSigningKeyPairSeed:
+      addInvitationEvent.invitationSigningKeyPairSeed,
+    expiresAt: new Date(addInvitationEvent.transaction.expiresAt),
+    authorKeyPair: keyPairB,
+  });
 
-  expect(acceptInvitationSignature).toBeInstanceOf(Uint8Array);
-  expect(acceptInvitationAuthorSignature).toBeInstanceOf(Uint8Array);
+  expect(event.authors[0].publicKey).toBe(sodium.to_base64(keyPairB.publicKey));
+  expect(event.transaction.invitationId).toBeDefined();
 });
 
 test("should throw an error if the invitationSigningPublicKey has been replaced", async () => {
@@ -64,12 +64,13 @@ test("should throw an error if the invitationSigningPublicKey has been replaced"
       return;
     }
     acceptInvitation({
+      ...addInvitationEvent.transaction,
+      prevHash: hashTransaction(addInvitationEvent.transaction),
       invitationSigningKeyPairSeed:
         addInvitationEvent.invitationSigningKeyPairSeed,
-      ...addInvitationEvent.transaction,
       expiresAt: new Date(addInvitationEvent.transaction.expiresAt),
-      invitationSigningPublicKey: keyPairsA.sign.publicKey,
       authorKeyPair: keyPairB,
+      invitationSigningPublicKey: keyPairsA.sign.publicKey,
     });
   }).toThrow("Invitation signing public key doesn't match the seed");
 });
@@ -80,12 +81,13 @@ test("should throw an error if the workspaceId has been replaced", async () => {
       return;
     }
     acceptInvitation({
+      ...addInvitationEvent.transaction,
+      prevHash: hashTransaction(addInvitationEvent.transaction),
       invitationSigningKeyPairSeed:
         addInvitationEvent.invitationSigningKeyPairSeed,
-      ...addInvitationEvent.transaction,
       expiresAt: new Date(addInvitationEvent.transaction.expiresAt),
+      authorKeyPair: keyPairB,
       workspaceId: "wrong",
-      authorKeyPair: keyPairB,
     });
   }).toThrow("Invitation data signature is invalid");
 });
@@ -96,28 +98,30 @@ test("should throw an error if the invitationId has been replaced", async () => 
       return;
     }
     acceptInvitation({
+      ...addInvitationEvent.transaction,
+      prevHash: hashTransaction(addInvitationEvent.transaction),
       invitationSigningKeyPairSeed:
         addInvitationEvent.invitationSigningKeyPairSeed,
-      ...addInvitationEvent.transaction,
       expiresAt: new Date(addInvitationEvent.transaction.expiresAt),
+      authorKeyPair: keyPairB,
       invitationId: "wrong",
-      authorKeyPair: keyPairB,
     });
   }).toThrow("Invitation data signature is invalid");
 });
 
-test("should throw an error if the invitationId has been replaced", async () => {
+test("should throw an error if the role has been replaced", async () => {
   expect(() => {
     if (addInvitationEvent.transaction.type !== "add-invitation") {
       return;
     }
     acceptInvitation({
+      ...addInvitationEvent.transaction,
+      prevHash: hashTransaction(addInvitationEvent.transaction),
       invitationSigningKeyPairSeed:
         addInvitationEvent.invitationSigningKeyPairSeed,
-      ...addInvitationEvent.transaction,
       expiresAt: new Date(addInvitationEvent.transaction.expiresAt),
-      role: "ADMIN",
       authorKeyPair: keyPairB,
+      role: "ADMIN",
     });
   }).toThrow("Invitation data signature is invalid");
 });
@@ -128,11 +132,12 @@ test("should throw an error if the expiredAt has been replaced", async () => {
       return;
     }
     acceptInvitation({
+      ...addInvitationEvent.transaction,
+      prevHash: hashTransaction(addInvitationEvent.transaction),
       invitationSigningKeyPairSeed:
         addInvitationEvent.invitationSigningKeyPairSeed,
-      ...addInvitationEvent.transaction,
-      expiresAt: getDate2MinAgo(),
       authorKeyPair: keyPairB,
+      expiresAt: getDate2MinAgo(),
     });
   }).toThrow("Invitation data signature is invalid");
 });
@@ -143,7 +148,7 @@ test("should throw an error if the invitation is expired", async () => {
     authorKeyPair: keyPairA,
     expiresAt: getDate2MinAgo(),
     role: "EDITOR",
-    workspaceId: "test",
+    workspaceId: createEvent.transaction.id,
   });
 
   expect(() => {
@@ -152,11 +157,12 @@ test("should throw an error if the invitation is expired", async () => {
     }
 
     acceptInvitation({
+      ...addInvitationEvent.transaction,
+      prevHash: hashTransaction(addInvitationEvent.transaction),
       invitationSigningKeyPairSeed:
         addInvitationEvent.invitationSigningKeyPairSeed,
-      ...addInvitationEvent.transaction,
-      expiresAt: new Date(addInvitationEvent.transaction.expiresAt),
       authorKeyPair: keyPairB,
+      expiresAt: new Date(addInvitationEvent.transaction.expiresAt),
     });
   }).toThrow("Invitation has expired");
 });

@@ -15,7 +15,6 @@ let userAndDevice1: any;
 beforeAll(async () => {
   await deleteAllRecords();
   userAndDevice1 = await createUserWithWorkspace({
-    id: "5a3484e6-c46e-42ce-a285-088fc1fd6915",
     username: username1,
   });
 });

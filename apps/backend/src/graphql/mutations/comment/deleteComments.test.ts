@@ -16,12 +16,10 @@ let userData2: any;
 
 const setup = async () => {
   userData1 = await createUserWithWorkspace({
-    id: generateId(),
     username: `${generateId()}@example.com`,
     password: "password",
   });
   userData2 = await createUserWithWorkspace({
-    id: generateId(),
     username: `${generateId()}@example.com`,
     password: "password",
   });
@@ -265,7 +263,6 @@ test("editor share token", async () => {
   });
   const comment = commentResult.createComment.comment;
   const userData2 = await createUserWithWorkspace({
-    id: generateId(),
     username: `${generateId()}@example.com`,
     password: "password",
   });
@@ -310,7 +307,6 @@ test("commenter share token", async () => {
   });
   const comment = commentResult.createComment.comment;
   const userData2 = await createUserWithWorkspace({
-    id: generateId(),
     username: `${generateId()}@example.com`,
     password: "password",
   });
@@ -351,7 +347,6 @@ test("viewer share token can't delete", async () => {
   });
   const comment = commentResult.createComment.comment;
   const userData2 = await createUserWithWorkspace({
-    id: generateId(),
     username: `${generateId()}@example.com`,
     password: "password",
   });

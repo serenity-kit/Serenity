@@ -18,7 +18,6 @@ const password = "password";
 
 const setup = async () => {
   userData1 = await createUserWithWorkspace({
-    id: generateId(),
     username: `${generateId()}@example.com`,
     password,
   });
@@ -76,7 +75,6 @@ test("key for main workspace, main device", async () => {
 test("empty keys on incomplete workspace share", async () => {
   // create new user
   const userData2 = await createUserWithWorkspace({
-    id: generateId(),
     username: `${generateId()}@example.com`,
     password,
   });
@@ -114,7 +112,6 @@ test("empty keys on incomplete workspace share", async () => {
 
 test("key for shared workspace", async () => {
   const userData2 = await createUserWithWorkspace({
-    id: generateId(),
     username: `${generateId()}@example.com`,
     password,
   });
@@ -155,7 +152,6 @@ test("key for shared workspace", async () => {
 
 test("error on unauthorized workspace", async () => {
   const userData2 = await createUserWithWorkspace({
-    id: generateId(),
     username: `${generateId()}@example.com`,
     password,
   });
@@ -184,7 +180,6 @@ test("error on invalid document", async () => {
 
 test("bad deviceSigningPublicKey", async () => {
   const userData2 = await createUserWithWorkspace({
-    id: generateId(),
     username: `${generateId()}@example.com`,
     password,
   });

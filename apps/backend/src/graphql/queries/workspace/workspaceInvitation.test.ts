@@ -9,8 +9,7 @@ import createUserWithWorkspace from "../../../database/testHelpers/createUserWit
 import { getWorkspace } from "../../../database/workspace/getWorkspace";
 
 const graphql = setupGraphql();
-const workspaceId = "workspace1";
-const otherWorkspaceId = "otherWorkspace";
+let workspaceId = "";
 const inviter1Username = "inviter1@example.com";
 const inviter2Username = "inviter2@example.com";
 
@@ -20,12 +19,11 @@ beforeAll(async () => {
 
 test("should return a list of workspace invitations if they are admin", async () => {
   const inviterUserAndDevice1 = await createUserWithWorkspace({
-    id: workspaceId,
     username: inviter1Username,
   });
   const device = inviterUserAndDevice1.device;
+  workspaceId = inviterUserAndDevice1.workspace.id;
   const inviterUserAndDevice2 = await createUserWithWorkspace({
-    id: otherWorkspaceId,
     username: inviter2Username,
   });
   const workspace = await getWorkspace({
@@ -60,10 +58,8 @@ test("should return a list of workspace invitations if they are admin", async ()
 });
 
 test("should throw an error if we try to fetch more than 50", async () => {
-  const otherWorkspaceId2 = "otherWorkspace44";
   const username = "newuser44@example.com";
   const userAndDevice = await createUserWithWorkspace({
-    id: otherWorkspaceId2,
     username: username,
   });
   await expect(
@@ -79,10 +75,8 @@ test("should throw an error if we try to fetch more than 50", async () => {
 
 test("not admin should throw error", async () => {
   // add user2 as an non-admin
-  const otherWorkspaceId2 = "otherWorkspace2";
   const username = "newuser@example.com";
   const userAndDevice = await createUserWithWorkspace({
-    id: otherWorkspaceId2,
     username: username,
   });
   await prisma.usersToWorkspaces.create({
@@ -113,7 +107,6 @@ test("not admin should throw error", async () => {
 test("not logged in user should throw an authentication error", async () => {
   const username = "newuserd87509bb502f@example.com";
   const userAndDevice = await createUserWithWorkspace({
-    id: "25364d28-0883-42d4-872c-d87509bb502f",
     username: username,
   });
   await prisma.usersToWorkspaces.create({
@@ -147,7 +140,6 @@ describe("Input errors", () => {
     const workspaceId = generateId();
     const username = `${generateId()}@example.com`;
     userAndDevice = await createUserWithWorkspace({
-      id: workspaceId,
       username: username,
     });
   });

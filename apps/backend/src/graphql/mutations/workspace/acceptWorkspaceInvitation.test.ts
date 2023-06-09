@@ -24,15 +24,13 @@ test("accept admin role", async () => {
   const inviterUsername = `invite-${generateId()}@example.com`;
   const inviteeUsername = `invitee-${generateId()}@example.com`;
   workspaceId = generateId();
-  const otherWorkspaceId = generateId();
   const role = Role.ADMIN;
   inviterUserAndDevice = await createUserWithWorkspace({
-    id: workspaceId,
     username: inviterUsername,
   });
+  workspaceId = inviterUserAndDevice.workspace.id;
   const device = inviterUserAndDevice.device;
   inviteeUserAndDevice = await createUserWithWorkspace({
-    id: otherWorkspaceId,
     username: inviteeUsername,
   });
   const workspace = await getWorkspace({
@@ -61,58 +59,53 @@ test("accept admin role", async () => {
       workspaceInvitationResult.invitationSigningKeyPairSeed,
     authorizationHeader: inviteeUserAndDevice.sessionKey,
   });
-  const sharedWorkspace =
-    acceptedWorkspaceResult.acceptWorkspaceInvitation.workspace;
-  expect(typeof sharedWorkspace.id).toBe("string");
-  expect(sharedWorkspace.name).toBe(sharedWorkspace.name);
-  expect(sharedWorkspace.members.length).toBe(2);
-  sharedWorkspace.members.forEach(
-    (member: { username: string; role: Role }) => {
-      if (member.username === inviteeUsername) {
-        expect(member.role).toBe(role);
-      } else if (member.username === inviterUsername) {
-        expect(member.role).toBe(Role.ADMIN);
-      }
-    }
+
+  expect(acceptedWorkspaceResult.acceptWorkspaceInvitation.workspaceId).toBe(
+    workspaceId
   );
+
+  const sharedWorkspace = await getWorkspace({
+    id: workspaceId,
+    userId: inviterUserAndDevice.user.id,
+    deviceSigningPublicKey: device.signingPublicKey,
+  });
+  if (!sharedWorkspace) {
+    throw new Error("workspace not found");
+  }
+  expect(sharedWorkspace.members.length).toBe(2);
+  sharedWorkspace.members.forEach((member) => {
+    if (member.username === inviteeUsername) {
+      expect(member.role).toBe(role);
+    } else if (member.username === inviterUsername) {
+      expect(member.role).toBe(Role.ADMIN);
+    }
+  });
 });
 
-test("double-accepting invitation does nothing", async () => {
-  const lastInviteeAssignedRole = Role.ADMIN;
-
-  const acceptedWorkspaceResult = await acceptWorkspaceInvitation({
-    graphql,
-    invitationId,
-    inviteeMainDevice: inviteeUserAndDevice.mainDevice,
-    invitationSigningKeyPairSeed:
-      workspaceInvitationResult.invitationSigningKeyPairSeed,
-    authorizationHeader: inviteeUserAndDevice.sessionKey,
-  });
-  const sharedWorkspace =
-    acceptedWorkspaceResult.acceptWorkspaceInvitation.workspace;
-  expect(typeof sharedWorkspace.id).toBe("string");
-  expect(sharedWorkspace.name).toBe(sharedWorkspace.name);
-  expect(sharedWorkspace.members.length).toBe(2);
-  sharedWorkspace.members.forEach((member: { userId: string; role: Role }) => {
-    if (member.userId === inviteeUsername) {
-      expect(member.role).toBe(lastInviteeAssignedRole);
-    }
-  });
+test("double-accepting invitation throws an error", async () => {
+  await expect(
+    (async () =>
+      await acceptWorkspaceInvitation({
+        graphql,
+        invitationId,
+        inviteeMainDevice: inviteeUserAndDevice.mainDevice,
+        invitationSigningKeyPairSeed:
+          workspaceInvitationResult.invitationSigningKeyPairSeed,
+        authorizationHeader: inviteeUserAndDevice.sessionKey,
+      }))()
+  ).rejects.toThrow();
 });
 
 test("accept editor role", async () => {
   const inviterUsername = `invite-${generateId()}@example.com`;
   const inviteeUsername = `invitee-${generateId()}@example.com`;
-  workspaceId = generateId();
-  const otherWorkspaceId = generateId();
   const role = Role.EDITOR;
   inviterUserAndDevice = await createUserWithWorkspace({
-    id: workspaceId,
     username: inviterUsername,
   });
+  workspaceId = inviterUserAndDevice.workspace.id;
   const device = inviterUserAndDevice.device;
   inviteeUserAndDevice = await createUserWithWorkspace({
-    id: otherWorkspaceId,
     username: inviteeUsername,
   });
   const workspace = await getWorkspace({
@@ -140,35 +133,39 @@ test("accept editor role", async () => {
       workspaceInvitationResult.invitationSigningKeyPairSeed,
     authorizationHeader: inviteeUserAndDevice.sessionKey,
   });
-  const sharedWorkspace =
-    acceptedWorkspaceResult.acceptWorkspaceInvitation.workspace;
-  expect(typeof sharedWorkspace.id).toBe("string");
-  expect(sharedWorkspace.name).toBe(sharedWorkspace.name);
-  expect(sharedWorkspace.members.length).toBe(2);
-  sharedWorkspace.members.forEach(
-    (member: { username: string; role: Role }) => {
-      if (member.username === inviteeUsername) {
-        expect(member.role).toBe(role);
-      } else if (member.username === inviterUsername) {
-        expect(member.role).toBe(Role.ADMIN);
-      }
-    }
+
+  expect(acceptedWorkspaceResult.acceptWorkspaceInvitation.workspaceId).toBe(
+    workspaceId
   );
+
+  const sharedWorkspace = await getWorkspace({
+    id: workspaceId,
+    userId: inviterUserAndDevice.user.id,
+    deviceSigningPublicKey: device.signingPublicKey,
+  });
+  if (!sharedWorkspace) {
+    throw new Error("workspace not found");
+  }
+  expect(sharedWorkspace.members.length).toBe(2);
+  sharedWorkspace.members.forEach((member) => {
+    if (member.username === inviteeUsername) {
+      expect(member.role).toBe(role);
+    } else if (member.username === inviterUsername) {
+      expect(member.role).toBe(Role.ADMIN);
+    }
+  });
 });
 
 test("accept commenter role", async () => {
   const inviterUsername = `invite-${generateId()}@example.com`;
   const inviteeUsername = `invitee-${generateId()}@example.com`;
-  workspaceId = generateId();
-  const otherWorkspaceId = generateId();
   const role = Role.COMMENTER;
   inviterUserAndDevice = await createUserWithWorkspace({
-    id: workspaceId,
     username: inviterUsername,
   });
+  workspaceId = inviterUserAndDevice.workspace.id;
   const device = inviterUserAndDevice.device;
   inviteeUserAndDevice = await createUserWithWorkspace({
-    id: otherWorkspaceId,
     username: inviteeUsername,
   });
   const workspace = await getWorkspace({
@@ -197,35 +194,39 @@ test("accept commenter role", async () => {
       workspaceInvitationResult.invitationSigningKeyPairSeed,
     authorizationHeader: inviteeUserAndDevice.sessionKey,
   });
-  const sharedWorkspace =
-    acceptedWorkspaceResult.acceptWorkspaceInvitation.workspace;
-  expect(typeof sharedWorkspace.id).toBe("string");
-  expect(sharedWorkspace.name).toBe(sharedWorkspace.name);
-  expect(sharedWorkspace.members.length).toBe(2);
-  sharedWorkspace.members.forEach(
-    (member: { username: string; role: Role }) => {
-      if (member.username === inviteeUsername) {
-        expect(member.role).toBe(role);
-      } else if (member.username === inviterUsername) {
-        expect(member.role).toBe(Role.ADMIN);
-      }
-    }
+
+  expect(acceptedWorkspaceResult.acceptWorkspaceInvitation.workspaceId).toBe(
+    workspaceId
   );
+
+  const sharedWorkspace = await getWorkspace({
+    id: workspaceId,
+    userId: inviterUserAndDevice.user.id,
+    deviceSigningPublicKey: device.signingPublicKey,
+  });
+  if (!sharedWorkspace) {
+    throw new Error("workspace not found");
+  }
+  expect(sharedWorkspace.members.length).toBe(2);
+  sharedWorkspace.members.forEach((member) => {
+    if (member.username === inviteeUsername) {
+      expect(member.role).toBe(role);
+    } else if (member.username === inviterUsername) {
+      expect(member.role).toBe(Role.ADMIN);
+    }
+  });
 });
 
 test("accept viewer role", async () => {
   const inviterUsername = `invite-${generateId()}@example.com`;
   const inviteeUsername = `invitee-${generateId()}@example.com`;
-  workspaceId = generateId();
-  const otherWorkspaceId = generateId();
   const role = Role.VIEWER;
   inviterUserAndDevice = await createUserWithWorkspace({
-    id: workspaceId,
     username: inviterUsername,
   });
+  workspaceId = inviterUserAndDevice.workspace.id;
   const device = inviterUserAndDevice.device;
   inviteeUserAndDevice = await createUserWithWorkspace({
-    id: otherWorkspaceId,
     username: inviteeUsername,
   });
   const workspace = await getWorkspace({
@@ -254,20 +255,27 @@ test("accept viewer role", async () => {
       workspaceInvitationResult.invitationSigningKeyPairSeed,
     authorizationHeader: inviteeUserAndDevice.sessionKey,
   });
-  const sharedWorkspace =
-    acceptedWorkspaceResult.acceptWorkspaceInvitation.workspace;
-  expect(typeof sharedWorkspace.id).toBe("string");
-  expect(sharedWorkspace.name).toBe(sharedWorkspace.name);
-  expect(sharedWorkspace.members.length).toBe(2);
-  sharedWorkspace.members.forEach(
-    (member: { username: string; role: Role }) => {
-      if (member.username === inviteeUsername) {
-        expect(member.role).toBe(role);
-      } else if (member.username === inviterUsername) {
-        expect(member.role).toBe(Role.ADMIN);
-      }
-    }
+
+  expect(acceptedWorkspaceResult.acceptWorkspaceInvitation.workspaceId).toBe(
+    workspaceId
   );
+
+  const sharedWorkspace = await getWorkspace({
+    id: workspaceId,
+    userId: inviterUserAndDevice.user.id,
+    deviceSigningPublicKey: device.signingPublicKey,
+  });
+  if (!sharedWorkspace) {
+    throw new Error("workspace not found");
+  }
+  expect(sharedWorkspace.members.length).toBe(2);
+  sharedWorkspace.members.forEach((member) => {
+    if (member.username === inviteeUsername) {
+      expect(member.role).toBe(role);
+    } else if (member.username === inviterUsername) {
+      expect(member.role).toBe(Role.ADMIN);
+    }
+  });
 });
 
 test("invalid invitation id should throw error", async () => {
@@ -316,15 +324,7 @@ describe("Input errors", () => {
   const query = gql`
     mutation ($input: AcceptWorkspaceInvitationInput!) {
       acceptWorkspaceInvitation(input: $input) {
-        workspace {
-          id
-          name
-          members {
-            userId
-            username
-            role
-          }
-        }
+        workspaceId
       }
     }
   `;

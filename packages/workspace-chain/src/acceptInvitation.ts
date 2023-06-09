@@ -1,28 +1,35 @@
 import canonicalize from "canonicalize";
 import sodium from "react-native-libsodium";
-import { Role } from "./types";
+import {
+  AcceptInvitationTransaction,
+  AcceptInvitationWorkspaceChainEvent,
+  Role,
+} from "./types";
+import { hashTransaction } from "./utils";
 
-export type AcceptInvitationParams = {
-  invitationSigningKeyPairSeed: string;
+type AcceptInvitationParams = {
+  prevHash: string;
+  authorKeyPair: sodium.KeyPair;
+  role: Role;
   invitationSigningPublicKey: string;
   invitationId: string;
-  role: Role;
   workspaceId: string;
   expiresAt: Date;
+  invitationSigningKeyPairSeed: string;
   invitationDataSignature: string;
-  authorKeyPair: sodium.KeyPair;
 };
 
 export const acceptInvitation = ({
-  invitationSigningKeyPairSeed,
-  invitationSigningPublicKey,
-  invitationId,
+  prevHash,
+  authorKeyPair,
   role,
+  invitationId,
   workspaceId,
   expiresAt,
+  invitationSigningPublicKey,
+  invitationSigningKeyPairSeed,
   invitationDataSignature,
-  authorKeyPair,
-}: AcceptInvitationParams) => {
+}: AcceptInvitationParams): AcceptInvitationWorkspaceChainEvent => {
   const invitationSigningKeyPair = sodium.crypto_sign_seed_keypair(
     sodium.from_base64(invitationSigningKeyPairSeed)
   );
@@ -63,7 +70,6 @@ export const acceptInvitation = ({
     invitationSigningPublicKey,
     role,
     expiresAt: expiresAt.toISOString(),
-    mainDeviceSigningPublicKey: sodium.to_base64(authorKeyPair.publicKey),
   });
   if (!acceptInvitationData) {
     throw new Error("Accept invitation data can't be canonicalized");
@@ -73,12 +79,36 @@ export const acceptInvitation = ({
     acceptInvitationData,
     invitationSigningKeyPair.privateKey
   );
-  const acceptInvitationAuthorSignature = sodium.crypto_sign_detached(
-    acceptInvitationData,
-    authorKeyPair.privateKey
-  );
+
+  const transaction: AcceptInvitationTransaction = {
+    type: "accept-invitation",
+    role,
+    acceptInvitationSignature: sodium.to_base64(acceptInvitationSignature),
+    invitationSigningPublicKey,
+    invitationId,
+    workspaceId,
+    expiresAt: expiresAt.toISOString(),
+  };
+
+  const hash = hashTransaction(transaction);
+  const message = canonicalize({
+    prevHash,
+    hash,
+  });
+  if (typeof message !== "string") {
+    throw new Error("Could not canonicalize hashes");
+  }
+
   return {
-    acceptInvitationSignature,
-    acceptInvitationAuthorSignature,
+    authors: [
+      {
+        publicKey: sodium.to_base64(authorKeyPair.publicKey),
+        signature: sodium.to_base64(
+          sodium.crypto_sign_detached(message, authorKeyPair.privateKey)
+        ),
+      },
+    ],
+    transaction,
+    prevHash,
   };
 };

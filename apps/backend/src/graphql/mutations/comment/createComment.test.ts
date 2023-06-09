@@ -19,7 +19,6 @@ const password = "password";
 
 const setup = async () => {
   userData1 = await createUserWithWorkspace({
-    id: generateId(),
     username: `${generateId()}@example.com`,
     password,
   });
@@ -62,7 +61,6 @@ test("owner comments", async () => {
 
 test("shared editor comments", async () => {
   const userData2 = await createUserWithWorkspace({
-    id: generateId(),
     username: `${generateId()}@example.com`,
     password: "password",
   });
@@ -105,7 +103,6 @@ test("shared editor comments", async () => {
 
 test("shared commentor comments", async () => {
   const userData2 = await createUserWithWorkspace({
-    id: generateId(),
     username: `${generateId()}@example.com`,
     password: "password",
   });
@@ -148,7 +145,6 @@ test("shared commentor comments", async () => {
 
 test("shared viewer cannot comment", async () => {
   const userData2 = await createUserWithWorkspace({
-    id: generateId(),
     username: `${generateId()}@example.com`,
     password: "password",
   });
@@ -310,7 +306,6 @@ test("viewer tries to comment", async () => {
 
 test("unauthorized document", async () => {
   const otherUser = await createUserWithWorkspace({
-    id: generateId(),
     username: `${generateId()}@example.com`,
     password: "password",
   });

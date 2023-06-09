@@ -84,6 +84,7 @@ export const createWorkspaceInvitation = async ({
     },
     authorizationHeaders
   );
+
   return {
     ...result,
     invitationSigningKeyPairSeed: invitation.invitationSigningKeyPairSeed,

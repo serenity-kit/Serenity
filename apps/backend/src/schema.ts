@@ -59,6 +59,7 @@ import * as WorkspaceInvitationTypes from "./graphql/queries/workspace/workspace
 import * as WorkspaceInvitationsTypes from "./graphql/queries/workspace/workspaceInvitations";
 import * as WorkspacesQueryTypes from "./graphql/queries/workspace/workspaces";
 import * as WorkspaceChainQueryTypes from "./graphql/queries/workspaceChain/workspaceChain";
+import * as WorkspaceChainByInvitationIdQueryTypes from "./graphql/queries/workspaceChain/workspaceChainByInvitationId";
 import * as DateTypes from "./graphql/types/date";
 import * as DocumentTypes from "./graphql/types/document";
 import * as DocumentShareLinkTypes from "./graphql/types/documentShareLink";
@@ -145,6 +146,7 @@ export const schema = makeSchema({
 
     WorkspaceChainTypes,
     WorkspaceChainQueryTypes,
+    WorkspaceChainByInvitationIdQueryTypes,
 
     AuthorizeMemberTypes,
 

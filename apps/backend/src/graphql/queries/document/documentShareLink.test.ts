@@ -18,7 +18,6 @@ let token = "";
 
 const setup = async () => {
   userData = await createUserWithWorkspace({
-    id: generateId(),
     username: `${generateId()}@example.com`,
   });
   const getWorkspaceResult = await getWorkspace({

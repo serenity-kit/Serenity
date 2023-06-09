@@ -16,7 +16,6 @@ let user1Device3: any = undefined;
 
 const setup = async () => {
   userData1 = await createUserWithWorkspace({
-    id: generateId(),
     username: `${generateId()}@example.com`,
     password: "password",
   });

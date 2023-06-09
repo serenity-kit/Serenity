@@ -18,7 +18,6 @@ beforeAll(async () => {
   await deleteAllRecords();
 
   userAndDevice = await createUserWithWorkspace({
-    id: generateId(),
     username,
     password,
   });
@@ -36,11 +35,9 @@ test("no unauthorized members when workspace created", async () => {
 
 test("unauthorized members when workspace added", async () => {
   const otherUserAndDevice = await createUserWithWorkspace({
-    id: generateId(),
     username: `${generateId()}@example.com`,
     password,
   });
-  const otherUserId = otherUserAndDevice.user.id;
   const workspaceInvitationResult = await createWorkspaceInvitation({
     graphql,
     role: Role.VIEWER,

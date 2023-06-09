@@ -6,9 +6,6 @@ import { Role } from "../../../prisma/generated/output";
 import { WorkspaceInvitation } from "../../types/workspace";
 import { prisma } from "../prisma";
 
-// by default, invitation expires in 48 hours
-const INVITATION_EXPIRATION_TIME = 48 * 60 * 60 * 1000;
-
 type Params = {
   workspaceId: string;
   inviterUserId: string;
@@ -20,6 +17,10 @@ export async function createWorkspaceInvitation({
   workspaceChainEvent,
   inviterUserId,
 }: Params) {
+  if (workspaceId !== workspaceChainEvent.transaction.workspaceId) {
+    throw new UserInputError("The workspace ID does not match");
+  }
+
   const expiresAt = new Date(workspaceChainEvent.transaction.expiresAt);
   const invitationId = workspaceChainEvent.transaction.invitationId;
   const invitationSigningPublicKey =
@@ -90,11 +91,13 @@ export async function createWorkspaceInvitation({
         where: { workspaceId },
         orderBy: { position: "desc" },
       });
+
     const prevState = workspaceChain.WorkspaceChainState.parse(
       prevWorkspaceChainEvent.state
     );
 
     const newState = workspaceChain.applyEvent(prevState, workspaceChainEvent);
+
     await prisma.workspaceChainEvent.create({
       data: {
         content: workspaceChainEvent,

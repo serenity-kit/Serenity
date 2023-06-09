@@ -3,6 +3,7 @@ import { LocalDevice } from "@serenity-tools/common";
 import { gql } from "graphql-request";
 import sodium from "react-native-libsodium";
 import { prisma } from "../../../src/database/prisma";
+import { getLastWorkspaceChainEvent } from "./getLastWorkspaceChainEvent";
 
 type Params = {
   graphql: any;
@@ -29,15 +30,7 @@ export const acceptWorkspaceInvitation = async ({
       $input: AcceptWorkspaceInvitationInput!
     ) {
       acceptWorkspaceInvitation(input: $input) {
-        workspace {
-          id
-          name
-          members {
-            userId
-            username
-            role
-          }
-        }
+        workspaceId
       }
     }
   `;
@@ -47,35 +40,32 @@ export const acceptWorkspaceInvitation = async ({
       where: { id: invitationId },
     });
 
-  const { acceptInvitationSignature, acceptInvitationAuthorSignature } =
-    workspaceChain.acceptInvitation({
-      invitationSigningKeyPairSeed: invitationSigningKeyPairSeed,
-      expiresAt: workspaceInvitation.expiresAt,
-      invitationId,
-      role: workspaceInvitation.role,
-      workspaceId: workspaceInvitation.workspaceId,
-      invitationDataSignature: workspaceInvitation.invitationDataSignature,
-      invitationSigningPublicKey:
-        workspaceInvitation.invitationSigningPublicKey,
-      authorKeyPair: {
-        keyType: "ed25519",
-        privateKey: sodium.from_base64(inviteeMainDevice.signingPrivateKey),
-        publicKey: sodium.from_base64(inviteeMainDevice.signingPublicKey),
-      },
-    });
+  const { lastChainEntry } = await getLastWorkspaceChainEvent({
+    workspaceId: workspaceInvitation.workspaceId,
+  });
+  const prevHash = workspaceChain.hashTransaction(lastChainEntry.transaction);
+
+  const acceptInvitationEvent = workspaceChain.acceptInvitation({
+    prevHash,
+    invitationSigningKeyPairSeed: invitationSigningKeyPairSeed,
+    expiresAt: workspaceInvitation.expiresAt,
+    invitationId,
+    role: workspaceInvitation.role,
+    workspaceId: workspaceInvitation.workspaceId,
+    invitationDataSignature: workspaceInvitation.invitationDataSignature,
+    invitationSigningPublicKey: workspaceInvitation.invitationSigningPublicKey,
+    authorKeyPair: {
+      keyType: "ed25519",
+      privateKey: sodium.from_base64(inviteeMainDevice.signingPrivateKey),
+      publicKey: sodium.from_base64(inviteeMainDevice.signingPublicKey),
+    },
+  });
 
   const result = await graphql.client.request(
     query,
     {
       input: {
-        invitationId: overwriteInvitationId
-          ? overwriteInvitationId
-          : invitationId,
-        acceptInvitationSignature: sodium.to_base64(acceptInvitationSignature),
-        acceptInvitationAuthorSignature: sodium.to_base64(
-          acceptInvitationAuthorSignature
-        ),
-        inviteeMainDeviceSigningPublicKey: inviteeMainDevice.signingPublicKey,
+        serializedWorkspaceChainEvent: JSON.stringify(acceptInvitationEvent),
       },
     },
     authorizationHeaders

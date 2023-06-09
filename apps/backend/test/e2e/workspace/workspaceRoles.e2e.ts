@@ -11,7 +11,6 @@ import { e2eLoginUser } from "../../helpers/e2e/e2eLoginUser";
 import { reloadPage } from "../../helpers/e2e/reloadPage";
 
 type UserData = {
-  id: string;
   username: string;
   password: string;
   data: any;
@@ -21,13 +20,11 @@ let user2: UserData;
 
 const setup = async () => {
   user1 = {
-    id: generateId(),
     username: `${generateId()}@example.com`,
     password: "password",
     data: undefined,
   };
   user2 = {
-    id: generateId(),
     username: `${generateId()}@example.com`,
     password: "password",
     data: undefined,

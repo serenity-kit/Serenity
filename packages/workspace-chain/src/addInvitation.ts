@@ -46,8 +46,12 @@ export const addInvitation = ({
     expiresAt: expiresAt.toISOString(),
   });
 
+  if (!invitationData) {
+    throw new Error("Invitation data can't be canonicalized");
+  }
+
   const invitationDataSignature = sodium.crypto_sign_detached(
-    invitationData!,
+    invitationData,
     invitationSigningKeys.privateKey
   );
 

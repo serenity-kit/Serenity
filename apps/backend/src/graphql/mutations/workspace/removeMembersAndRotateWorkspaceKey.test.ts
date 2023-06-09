@@ -29,12 +29,10 @@ const password2 = generateId();
 beforeAll(async () => {
   await deleteAllRecords();
   userData1 = await createUserWithWorkspace({
-    id: generateId(),
     username: `${generateId()}@example.com`,
     password: password1,
   });
   userData2 = await createUserWithWorkspace({
-    id: generateId(),
     username: `${generateId()}@example.com`,
     password: password2,
   });

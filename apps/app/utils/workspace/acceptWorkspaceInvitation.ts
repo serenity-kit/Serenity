@@ -3,9 +3,8 @@ import { LocalDevice } from "@serenity-tools/common";
 import sodium from "react-native-libsodium";
 import {
   Role as RoleEnum,
-  Workspace,
   runAcceptWorkspaceInvitationMutation,
-  runMeQuery,
+  runWorkspaceChainByInvitationIdQuery,
 } from "../../generated/graphql";
 
 type Role = `${RoleEnum}`;
@@ -30,44 +29,55 @@ export const acceptWorkspaceInvitation = async ({
   invitationDataSignature,
   invitationSigningPublicKey,
   role,
-}: Props): Promise<Workspace | undefined> => {
-  const meResult = await runMeQuery({});
-  if (!meResult.data?.me) {
-    throw new Error(meResult.error?.message || "Could not fetch me");
-  }
-  const me = meResult.data.me;
-  const safeMainDevice = {
-    userId: me.id,
-    signingPublicKey: mainDevice.signingPublicKey,
-    encryptionPublicKey: mainDevice.encryptionPublicKey,
-    encryptionPublicKeySignature: mainDevice.encryptionPublicKeySignature,
-  };
+}: Props): Promise<string> => {
+  const workspaceChainByInvitationIdResult =
+    await runWorkspaceChainByInvitationIdQuery({ invitationId });
 
-  const { acceptInvitationSignature, acceptInvitationAuthorSignature } =
-    workspaceChain.acceptInvitation({
-      invitationSigningKeyPairSeed: signingKeyPairSeed,
-      expiresAt: new Date(expiresAt),
-      invitationId,
-      role,
-      workspaceId,
-      invitationDataSignature,
-      invitationSigningPublicKey,
-      authorKeyPair: {
-        keyType: "ed25519",
-        privateKey: sodium.from_base64(mainDevice.signingPrivateKey),
-        publicKey: sodium.from_base64(mainDevice.signingPublicKey),
-      },
-    });
+  let lastChainEvent: workspaceChain.WorkspaceChainEvent | null = null;
+  if (
+    workspaceChainByInvitationIdResult.data?.workspaceChainByInvitationId?.nodes
+  ) {
+    workspaceChain.resolveState(
+      workspaceChainByInvitationIdResult.data.workspaceChainByInvitationId.nodes.map(
+        (event) => {
+          const data = workspaceChain.WorkspaceChainEvent.parse(
+            // @ts-expect-error
+            JSON.parse(event.serializedContent)
+          );
+          lastChainEvent = data;
+          return data;
+        }
+      )
+    );
+  }
+
+  if (lastChainEvent === null) {
+    throw new Error("Could not find lastChainEvent");
+  }
+
+  // @ts-expect-error not sure why the types don't match up here
+  const prevHash = workspaceChain.hashTransaction(lastChainEvent.transaction);
+
+  const acceptInvitationEvent = workspaceChain.acceptInvitation({
+    prevHash,
+    invitationSigningKeyPairSeed: signingKeyPairSeed,
+    expiresAt: new Date(expiresAt),
+    invitationId,
+    role,
+    workspaceId,
+    invitationDataSignature,
+    invitationSigningPublicKey,
+    authorKeyPair: {
+      keyType: "ed25519",
+      privateKey: sodium.from_base64(mainDevice.signingPrivateKey),
+      publicKey: sodium.from_base64(mainDevice.signingPublicKey),
+    },
+  });
 
   const result = await runAcceptWorkspaceInvitationMutation(
     {
       input: {
-        invitationId,
-        acceptInvitationSignature: sodium.to_base64(acceptInvitationSignature),
-        acceptInvitationAuthorSignature: sodium.to_base64(
-          acceptInvitationAuthorSignature
-        ),
-        inviteeMainDeviceSigningPublicKey: safeMainDevice.signingPublicKey,
+        serializedWorkspaceChainEvent: JSON.stringify(acceptInvitationEvent),
       },
     },
     { requestPolicy: "network-only" }
@@ -75,13 +85,9 @@ export const acceptWorkspaceInvitation = async ({
   if (result.error) {
     throw new Error(result.error.message);
   }
-  if (result.data) {
-    // TODO: put up a toast explaining the new workspace
-    const workspace = result.data.acceptWorkspaceInvitation?.workspace;
-    if (!workspace) {
-      // NOTE: probably the invitation expired or was deleted
-      throw new Error("Could not find workspace");
-    }
-    return workspace;
+  if (result.data?.acceptWorkspaceInvitation?.workspaceId) {
+    return result.data.acceptWorkspaceInvitation.workspaceId;
+  } else {
+    throw new Error("Could not accept workspace invitation");
   }
 };

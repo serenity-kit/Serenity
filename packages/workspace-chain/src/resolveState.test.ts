@@ -43,6 +43,6 @@ test("should fail in case the chain is not correctly ordered", async () => {
   const chain = [createEvent, addMemberEvent2, addMemberEvent];
   expect(() => resolveState(chain)).toThrow(InvalidWorkspaceChainError);
   expect(() => resolveState(chain)).toThrow(
-    "Invalid signature for MTDhqVIMflTD0Car-KSP1MWCIEYqs2LBaXfU20di0tY."
+    "Invalid signature for author MTDhqVIMflTD0Car-KSP1MWCIEYqs2LBaXfU20di0tY."
   );
 });

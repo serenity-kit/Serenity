@@ -12,7 +12,6 @@ import { removeMemberFromWorkspace } from "../../helpers/e2e/removeMemberFromWor
 import { renameFolder } from "../../helpers/e2e/renameFolder";
 
 type UserData = {
-  id: string;
   username: string;
   password: string;
   data: any;
@@ -38,19 +37,16 @@ const hasFolderAccess = async ({
 
 const setup = async () => {
   user1 = {
-    id: generateId(),
     username: `${generateId()}@example.com`,
     password: "password",
     data: undefined,
   };
   user2 = {
-    id: generateId(),
     username: `${generateId()}@example.com`,
     password: "password",
     data: undefined,
   };
   user3 = {
-    id: generateId(),
     username: `${generateId()}@example.com`,
     password: "password",
     data: undefined,

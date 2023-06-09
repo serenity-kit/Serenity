@@ -10,35 +10,24 @@ import createUserWithWorkspace from "../../../database/testHelpers/createUserWit
 const graphql = setupGraphql();
 const username1 = "user1";
 const username2 = "user2";
-const workspace1 = "workspace1";
-const workspace2 = "workspace2";
 let userAndDevice1: any = null;
 let userAndDevice2: any = null;
 
-const setup = async () => {
+beforeAll(async () => {
+  await deleteAllRecords();
   userAndDevice1 = await createUserWithWorkspace({
-    id: workspace1,
     username: username1,
   });
   userAndDevice2 = await createUserWithWorkspace({
-    id: workspace2,
     username: username2,
   });
-  return { userAndDevice1, userAndDevice2 };
-};
-
-beforeAll(async () => {
-  await deleteAllRecords();
-  const setupResult = await setup();
-  userAndDevice1 = setupResult.userAndDevice1;
-  userAndDevice2 = setupResult.userAndDevice2;
 });
 
 test("user should be able to delete a workspace invitation they created", async () => {
   const workspaceInvitationResult = await createWorkspaceInvitation({
     graphql,
     role: Role.VIEWER,
-    workspaceId: workspace1,
+    workspaceId: userAndDevice1.workspace.id,
     authorizationHeader: userAndDevice1.sessionKey,
     mainDevice: userAndDevice1.mainDevice,
   });
@@ -70,7 +59,7 @@ test("user should be able to delete a workspace invitation they didn't create", 
       },
       workspace: {
         connect: {
-          id: workspace1,
+          id: userAndDevice1.workspace.id,
         },
       },
       role: Role.ADMIN,
@@ -79,7 +68,7 @@ test("user should be able to delete a workspace invitation they didn't create", 
   const workspaceInvitationResult = await createWorkspaceInvitation({
     graphql,
     role: Role.VIEWER,
-    workspaceId: workspace1,
+    workspaceId: userAndDevice1.workspace.id,
     authorizationHeader: userAndDevice2.sessionKey,
     mainDevice: userAndDevice2.mainDevice,
   });
@@ -110,7 +99,7 @@ test("user should not be able to delete a workspace invitation if they aren't ad
       },
       workspace: {
         connect: {
-          id: workspace2,
+          id: userAndDevice2.workspace.id,
         },
       },
       role: Role.EDITOR,
@@ -120,7 +109,7 @@ test("user should not be able to delete a workspace invitation if they aren't ad
   const workspaceInvitationResult = await createWorkspaceInvitation({
     graphql,
     role: Role.VIEWER,
-    workspaceId: workspace2,
+    workspaceId: userAndDevice2.workspace.id,
     authorizationHeader: userAndDevice2.sessionKey,
     mainDevice: userAndDevice2.mainDevice,
   });
@@ -144,7 +133,7 @@ test("Unauthenticated", async () => {
   const workspaceInvitationResult = await createWorkspaceInvitation({
     graphql,
     role: Role.VIEWER,
-    workspaceId: workspace1,
+    workspaceId: userAndDevice1.workspace.id,
     authorizationHeader: userAndDevice1.sessionKey,
     mainDevice: userAndDevice1.mainDevice,
   });

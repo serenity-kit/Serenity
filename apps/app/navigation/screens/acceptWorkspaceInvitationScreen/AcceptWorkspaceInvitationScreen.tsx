@@ -76,7 +76,7 @@ export default function AcceptWorkspaceInvitationScreen(
 
     try {
       setIsSubmitting(true);
-      const workspace = await acceptWorkspaceInvitation({
+      const workspaceId = await acceptWorkspaceInvitation({
         invitationId: workspaceInvitationId,
         mainDevice,
         signingKeyPairSeed,
@@ -93,7 +93,7 @@ export default function AcceptWorkspaceInvitationScreen(
             .invitationSigningPublicKey,
       });
       props.navigation.navigate("Workspace", {
-        workspaceId: workspace!.id,
+        workspaceId: workspaceId,
         screen: "WorkspaceDrawer",
         params: {
           screen: "WorkspaceRoot",
