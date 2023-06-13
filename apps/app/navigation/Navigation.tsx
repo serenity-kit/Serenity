@@ -199,11 +199,12 @@ function WorkspaceStackNavigator(props) {
     },
   });
 
-  const [workspaceChainQueryResult] = useWorkspaceChainQuery({
-    variables: {
-      workspaceId: props.route.params.workspaceId,
-    },
-  });
+  const [workspaceChainQueryResult, reExecuteWorkspaceChainQuery] =
+    useWorkspaceChainQuery({
+      variables: {
+        workspaceId: props.route.params.workspaceId,
+      },
+    });
 
   let workspaceChainState: workspaceChain.WorkspaceChainState | null = null;
   let lastChainEvent: workspaceChain.WorkspaceChainEvent | null = null;
@@ -221,10 +222,17 @@ function WorkspaceStackNavigator(props) {
   }
 
   useInterval(() => {
-    if (activeDevice) {
-      authorizeMembersIfNecessary({ activeDevice });
+    if (activeDevice && workspaceChainState) {
+      authorizeMembersIfNecessary({ activeDevice, workspaceChainState });
     }
   }, secondsBetweenNewMemberChecks * 1000);
+
+  useInterval(() => {
+    if (workspaceChainState) {
+      // TODO re-execute with a param of the last known event
+      reExecuteWorkspaceChainQuery();
+    }
+  }, 10 * 1000);
 
   useEffect(() => {
     if (props.route.params.workspaceId) {

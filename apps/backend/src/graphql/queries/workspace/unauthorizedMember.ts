@@ -7,6 +7,7 @@ export const UnauthorizedMemberResult = objectType({
   name: "UnauthorizedMemberResult",
   definition(t) {
     t.nonNull.string("userId");
+    t.nonNull.string("userMainDeviceSigningPublicKey");
     t.nonNull.string("workspaceId");
     t.nonNull.list.nonNull.field("devices", { type: Device });
   },

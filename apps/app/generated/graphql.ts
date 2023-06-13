@@ -1103,6 +1103,7 @@ export type UnauthorizedMemberResult = {
   __typename?: 'UnauthorizedMemberResult';
   devices: Array<Device>;
   userId: Scalars['String'];
+  userMainDeviceSigningPublicKey: Scalars['String'];
   workspaceId: Scalars['String'];
 };
 
@@ -1720,7 +1721,7 @@ export type SnapshotQuery = { __typename?: 'Query', snapshot?: { __typename?: 'S
 export type UnauthorizedMemberQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type UnauthorizedMemberQuery = { __typename?: 'Query', unauthorizedMember?: { __typename?: 'UnauthorizedMemberResult', userId: string, workspaceId: string, devices: Array<{ __typename?: 'Device', userId?: string | null, signingPublicKey: string, encryptionPublicKey: string, info?: string | null, createdAt?: any | null, encryptionPublicKeySignature: string }> } | null };
+export type UnauthorizedMemberQuery = { __typename?: 'Query', unauthorizedMember?: { __typename?: 'UnauthorizedMemberResult', userId: string, userMainDeviceSigningPublicKey: string, workspaceId: string, devices: Array<{ __typename?: 'Device', userId?: string | null, signingPublicKey: string, encryptionPublicKey: string, info?: string | null, createdAt?: any | null, encryptionPublicKeySignature: string }> } | null };
 
 export type UserIdFromUsernameQueryVariables = Exact<{
   username: Scalars['String'];
@@ -2696,6 +2697,7 @@ export const UnauthorizedMemberDocument = gql`
     query unauthorizedMember {
   unauthorizedMember {
     userId
+    userMainDeviceSigningPublicKey
     workspaceId
     devices {
       userId

@@ -27,6 +27,13 @@ export async function unauthorizedMember({ userId }: Params) {
       workspaceId: workspace.workspaceId,
       isAuthorizedMember: false,
     },
+    include: {
+      user: {
+        select: {
+          mainDeviceSigningPublicKey: true,
+        },
+      },
+    },
   });
 
   // get all the devices of the unauthorized user
@@ -37,6 +44,8 @@ export async function unauthorizedMember({ userId }: Params) {
   return {
     workspaceId: workspace.workspaceId,
     userId: unauthorizedMember.userId,
+    userMainDeviceSigningPublicKey:
+      unauthorizedMember.user.mainDeviceSigningPublicKey,
     devices,
   };
 }
