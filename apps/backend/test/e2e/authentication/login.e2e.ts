@@ -1,7 +1,6 @@
 import { expect, test } from "@playwright/test";
 import { generateId } from "@serenity-tools/common";
 import createUserWithWorkspace from "../../../src/database/testHelpers/createUserWithWorkspace";
-import { delayForSeconds } from "../../helpers/delayForSeconds";
 import { e2eLoginUser } from "../../helpers/e2e/e2eLoginUser";
 import { e2eRegisterUser } from "../../helpers/e2e/e2eRegisterUser";
 
@@ -16,7 +15,6 @@ test("Login without remembering web keys", async ({ page }) => {
 
   await page.goto("http://localhost:19006/login");
   await e2eLoginUser({ page, username, password, stayLoggedIn: false });
-  delayForSeconds(3);
   await expect(page).toHaveURL(
     `http://localhost:19006/workspace/${workspace.id}/page/${document.id}`
   );
@@ -33,7 +31,6 @@ test("Login and remember web keys", async ({ page }) => {
 
   await page.goto("http://localhost:19006/login");
   await e2eLoginUser({ page, username, password, stayLoggedIn: true });
-  delayForSeconds(3);
   await expect(page).toHaveURL(
     `http://localhost:19006/workspace/${workspace.id}/page/${document.id}`
   );
@@ -50,9 +47,7 @@ test("Register then Login", async ({ page }) => {
     workspaceName: generateId(),
   });
   await page.goto("http://localhost:19006/login");
-  delayForSeconds(3);
   await e2eLoginUser({ page, username, password, stayLoggedIn: true });
-  delayForSeconds(3);
   await expect(page).toHaveURL(
     `http://localhost:19006/workspace/${workspace?.id}/page/${document?.id}`
   );

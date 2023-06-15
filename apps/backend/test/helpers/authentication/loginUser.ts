@@ -1,3 +1,4 @@
+import { clientLoginFinish } from "@serenity-kit/opaque";
 import { createDevice } from "@serenity-tools/common";
 import { gql } from "graphql-request";
 import sodium from "react-native-libsodium";
@@ -15,12 +16,15 @@ export const loginUser = async ({ graphql, username, password }: Params) => {
     username,
     password,
   });
-  const finishMessage = sodium.to_base64(
-    startLoginResult.login.finish(
-      password,
-      sodium.from_base64(startLoginResult.data.challengeResponse)
-    )
-  );
+
+  const clientLoginFinishResult = clientLoginFinish({
+    password,
+    clientLogin: startLoginResult.login,
+    credentialResponse: startLoginResult.data.challengeResponse,
+  });
+  if (!clientLoginFinishResult) {
+    throw new Error("clientLoginFinishResult is null");
+  }
 
   const finishLoginQuery = gql`
     mutation finishLogin($input: FinishLoginInput!) {
@@ -30,7 +34,7 @@ export const loginUser = async ({ graphql, username, password }: Params) => {
     }
   `;
 
-  const sessionKey = sodium.to_base64(startLoginResult.login.getSessionKey());
+  const sessionKey = clientLoginFinishResult.sessionKey;
 
   const device = createDevice();
   const deviceInfoJson = {
@@ -50,7 +54,7 @@ export const loginUser = async ({ graphql, username, password }: Params) => {
   await graphql.client.request(finishLoginQuery, {
     input: {
       loginId: startLoginResult.data.loginId,
-      message: finishMessage,
+      message: clientLoginFinishResult.credentialFinalization,
       deviceSigningPublicKey: device.signingPublicKey,
       deviceEncryptionPublicKey: device.encryptionPublicKey,
       deviceEncryptionPublicKeySignature: device.encryptionPublicKeySignature,

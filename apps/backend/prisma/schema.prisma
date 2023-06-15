@@ -334,3 +334,10 @@ model CommentReply {
   snapshotId                    String
   subkeyId                      Int
 }
+
+model LoginAttempt {
+  id                   String   @id @unique @default(uuid())
+  username             String
+  startLoginServerData String
+  createdAt            DateTime @default(now())
+}

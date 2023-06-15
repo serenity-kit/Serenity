@@ -1,26 +1,28 @@
+import { clientRegistrationFinish } from "@serenity-kit/opaque";
 import { createAndEncryptDevice } from "@serenity-tools/common";
-import { Registration } from "@serenity-tools/opaque-server";
 import { gql } from "graphql-request";
 import sodium from "libsodium-wrappers";
 
 export type Props = {
   graphql: any;
   challengeResponse: string;
-  registrationId: string;
-  registration: Registration;
+  registration: string;
   password: string;
+  username: string;
 };
 export const finalizeRegistration = async ({
   graphql,
   challengeResponse,
-  registrationId,
   registration,
   password,
+  username,
 }: Props) => {
-  const message = registration.finish(
+  const clientRegistrationFinishResult = clientRegistrationFinish({
     password,
-    sodium.from_base64(challengeResponse)
-  );
+    clientRegistration: registration,
+    registrationResponse: challengeResponse,
+  });
+
   const query = gql`
     mutation finishRegistration($input: FinishRegistrationInput!) {
       finishRegistration(input: $input) {
@@ -29,19 +31,19 @@ export const finalizeRegistration = async ({
     }
   `;
 
-  const exportKey = registration.getExportKey();
+  const exportKey = clientRegistrationFinishResult.exportKey;
   const { signingPrivateKey, encryptionPrivateKey, ...mainDevice } =
     createAndEncryptDevice(sodium.to_base64(exportKey));
 
   const registrationResponse = await graphql.client.request(query, {
     input: {
-      registrationId,
-      message: sodium.to_base64(message),
+      message: clientRegistrationFinishResult.registrationUpload,
+      username,
       mainDevice,
     },
   });
   return {
-    message,
+    message: clientRegistrationFinishResult.registrationUpload,
     exportKey,
     mainDevice,
     signingPrivateKey,

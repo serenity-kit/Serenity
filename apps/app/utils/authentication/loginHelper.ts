@@ -1,7 +1,7 @@
-import { decryptDevice, LocalDevice } from "@serenity-tools/common";
-import { finishLogin, startLogin } from "@serenity-tools/opaque";
+import { LocalDevice, decryptDevice } from "@serenity-tools/common";
 import { Platform } from "react-native";
 import sodium from "react-native-libsodium";
+import { clientLoginFinish, clientLoginStart } from "react-native-opaque";
 import { UpdateAuthenticationFunction } from "../../context/AppContext";
 import {
   MainDeviceDocument,
@@ -66,11 +66,11 @@ export const login = async ({
     console.error("Remote logout failed");
   }
   await updateAuthentication(null);
-  const message = await startLogin(password);
+  const clientLoginResult = clientLoginStart(password);
   const startLoginResult = await startLoginMutation({
     input: {
       username: username,
-      challenge: message,
+      challenge: clientLoginResult.credentialRequest,
     },
   });
   // check for an error
@@ -78,10 +78,14 @@ export const login = async ({
     console.error(startLoginResult.error);
     throw new Error("Failed to start login");
   }
-  const result = await finishLogin(
+  const result = clientLoginFinish({
     password,
-    startLoginResult.data.startLogin.challengeResponse
-  );
+    credentialResponse: startLoginResult.data.startLogin.challengeResponse,
+    clientLogin: clientLoginResult.clientLogin,
+  });
+  if (!result) {
+    throw new Error("Failed to finish login");
+  }
 
   const sessionTokenSignature = sodium.to_base64(
     sodium.crypto_sign_detached(
@@ -93,7 +97,7 @@ export const login = async ({
   const finishLoginResult = await finishLoginMutation({
     input: {
       loginId: startLoginResult.data.startLogin.loginId,
-      message: result.response,
+      message: result.credentialFinalization,
       deviceSigningPublicKey: device.signingPublicKey,
       deviceEncryptionPublicKey: device.encryptionPublicKey,
       deviceEncryptionPublicKeySignature: device.encryptionPublicKeySignature,

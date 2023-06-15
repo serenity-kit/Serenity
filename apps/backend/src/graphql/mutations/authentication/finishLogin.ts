@@ -1,3 +1,4 @@
+import { serverLoginFinish } from "@serenity-kit/opaque";
 import { verifyDevice } from "@serenity-tools/common";
 import { UserInputError } from "apollo-server-express";
 import {
@@ -9,9 +10,9 @@ import {
 } from "nexus";
 import sodium from "react-native-libsodium";
 import { createSession } from "../../../database/authentication/createSession";
+import { getLoginAttempt } from "../../../database/authentication/getLoginAttempt";
 import { addDays } from "../../../utils/addDays/addDays";
 import { addYears } from "../../../utils/addYears/addYears";
-import { finishLogin } from "../../../utils/opaque";
 
 export const deviceTypes = ["temporary-web", "web", "mobile"] as const;
 
@@ -71,14 +72,22 @@ export const finishLoginMutation = mutationField("finishLogin", {
       );
     }
 
-    const finishLoginResult = finishLogin({
-      loginId: args.input.loginId,
-      message: args.input.message,
+    if (!process.env.OPAQUE_SERVER_SETUP) {
+      throw new Error("Missing process.env.OPAQUE_SERVER_SETUP");
+    }
+
+    const loginAttempt = await getLoginAttempt({
+      loginAttemptId: args.input.loginId,
+    });
+
+    const sessionKey = serverLoginFinish({
+      credentialFinalization: args.input.message,
+      serverLogin: loginAttempt.startLoginServerData,
     });
 
     const isValidSessionTokenSignature = sodium.crypto_sign_verify_detached(
       sodium.from_base64(args.input.sessionTokenSignature),
-      finishLoginResult.sessionKey,
+      sessionKey,
       sodium.from_base64(args.input.deviceSigningPublicKey)
     );
     if (!isValidSessionTokenSignature) {
@@ -95,8 +104,8 @@ export const finishLoginMutation = mutationField("finishLogin", {
     }
 
     const session = await createSession({
-      username: finishLoginResult.username,
-      sessionKey: finishLoginResult.sessionKey,
+      username: loginAttempt.username,
+      sessionKey: sessionKey,
       expiresAt,
       device: {
         signingPublicKey: args.input.deviceSigningPublicKey,

@@ -1,32 +1,32 @@
-import { Registration } from "@serenity-tools/opaque-server";
+import { clientRegistrationStart } from "@serenity-kit/opaque";
 import { gql } from "graphql-request";
-import sodium from "libsodium-wrappers";
 
-export type RegistrationChallengeReponseType = {
+export type RegistrationChallengeResponseType = {
   data: any;
-  registration: Registration;
+  registration: string;
 };
 
 export const requestRegistrationChallengeResponse = async (
   graphql: any,
   username: string,
   password: string
-): Promise<RegistrationChallengeReponseType> => {
-  const registration = new Registration();
-  const challenge = registration.start(password);
+): Promise<RegistrationChallengeResponseType> => {
+  const clientRegistrationStartResult = clientRegistrationStart(password);
   const query = gql`
     mutation startRegistration($input: StartRegistrationInput!) {
       startRegistration(input: $input) {
         challengeResponse
-        registrationId
       }
     }
   `;
   const data = await graphql.client.request(query, {
-    input: { username, challenge: sodium.to_base64(challenge) },
+    input: {
+      username,
+      challenge: clientRegistrationStartResult.registrationRequest,
+    },
   });
   return {
     data: data.startRegistration,
-    registration,
+    registration: clientRegistrationStartResult.clientRegistration,
   };
 };

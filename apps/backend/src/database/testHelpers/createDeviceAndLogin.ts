@@ -1,8 +1,10 @@
+import {
+  clientLoginFinish,
+  clientLoginStart,
+  serverLoginStart,
+} from "@serenity-kit/opaque";
 import { createDevice } from "@serenity-tools/common";
-import { Login } from "@serenity-tools/opaque-server";
-import sodium from "react-native-libsodium";
 import { addDays } from "../../utils/addDays/addDays";
-import { finishLogin, startLogin } from "../../utils/opaque";
 import { createSession } from "../authentication/createSession";
 
 type Params = {
@@ -16,28 +18,32 @@ export const createDeviceAndLogin = async ({
   password,
   envelope,
 }: Params) => {
-  const login = new Login();
-  const loginChallenge = login.start(password);
-  const { message: loginMessage, loginId } = startLogin({
-    envelope,
-    username,
-    challenge: sodium.to_base64(loginChallenge),
-  });
-  const loginStartResponse = login.finish(
-    password,
-    sodium.from_base64(loginMessage)
-  );
+  if (!process.env.OPAQUE_SERVER_SETUP) {
+    throw new Error("OPAQUE_SERVER_SETUP is not set");
+  }
 
-  const { sessionKey } = finishLogin({
-    loginId,
-    message: sodium.to_base64(loginStartResponse),
+  const clientLoginStartResult = clientLoginStart(password);
+  const serverLoginStartResult = serverLoginStart({
+    passwordFile: envelope,
+    credentialRequest: clientLoginStartResult.credentialRequest,
+    serverSetup: process.env.OPAQUE_SERVER_SETUP,
+    userIdentifier: username,
   });
+  const loginStartResponse = clientLoginFinish({
+    credentialResponse: serverLoginStartResult.credentialResponse,
+    clientLogin: clientLoginStartResult.clientLogin,
+    password,
+  });
+
+  if (!loginStartResponse) {
+    throw new Error("Login failed");
+  }
 
   const webDevice = createDevice();
 
   const session = await createSession({
     username,
-    sessionKey,
+    sessionKey: loginStartResponse.sessionKey,
     expiresAt: addDays(new Date(), 30),
     device: {
       ...webDevice,
@@ -52,7 +58,7 @@ export const createDeviceAndLogin = async ({
   });
   return {
     session,
-    sessionKey,
+    sessionKey: loginStartResponse.sessionKey,
     webDevice,
   };
 };

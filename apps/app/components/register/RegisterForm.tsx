@@ -2,7 +2,6 @@ import {
   createAndEncryptDevice,
   encryptWorkspaceInvitationPrivateKey,
 } from "@serenity-tools/common";
-import { finishRegistration, registerInitialize } from "@serenity-tools/opaque";
 import {
   Button,
   Checkbox,
@@ -14,6 +13,10 @@ import {
 } from "@serenity-tools/ui";
 import { useEffect, useState } from "react";
 import { useWindowDimensions } from "react-native";
+import {
+  clientRegistrationFinish,
+  clientRegistrationStart,
+} from "react-native-opaque";
 import { z } from "zod";
 import { useAppContext } from "../../context/AppContext";
 import {
@@ -85,18 +88,21 @@ export default function RegisterForm(props: Props) {
       // TODO the getServerChallenge should include a signature of the challenge response and be verified that it belongs to
       // the server public to make sure it wasn't tampered with
       await updateAuthentication(null);
-      const challenge = await registerInitialize(password);
+
+      const clientRegistrationStartResult = clientRegistrationStart(password);
       const startRegistrationResult = await startRegistrationMutation({
         input: {
           username,
-          challenge,
+          challenge: clientRegistrationStartResult.registrationRequest,
         },
       });
       if (startRegistrationResult.data?.startRegistration) {
-        const { response, exportKey } = await finishRegistration(
+        const { registrationUpload, exportKey } = clientRegistrationFinish({
           password,
-          startRegistrationResult.data.startRegistration.challengeResponse
-        );
+          registrationResponse:
+            startRegistrationResult.data.startRegistration.challengeResponse,
+          clientRegistration: clientRegistrationStartResult.clientRegistration,
+        });
         const { encryptionPrivateKey, signingPrivateKey, ...mainDevice } =
           createAndEncryptDevice(exportKey);
 
@@ -131,9 +137,8 @@ export default function RegisterForm(props: Props) {
         }
         const finishRegistrationResult = await finishRegistrationMutation({
           input: {
-            message: response,
-            registrationId:
-              startRegistrationResult.data.startRegistration.registrationId,
+            message: registrationUpload,
+            username,
             mainDevice,
             pendingWorkspaceInvitationId: props.pendingWorkspaceInvitationId,
             pendingWorkspaceInvitationKeySubkeyId,

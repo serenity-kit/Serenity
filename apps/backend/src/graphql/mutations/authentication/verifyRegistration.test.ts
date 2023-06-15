@@ -20,14 +20,12 @@ let isUserRegistered = false;
 const setup = async () => {
   const registrationChallengeResponse =
     await requestRegistrationChallengeResponse(graphql, username, password);
-  const challengeResponse =
-    registrationChallengeResponse.data.challengeResponse;
-  const registrationId = registrationChallengeResponse.data.registrationId;
+
   const registration = registrationChallengeResponse.registration;
   await finalizeRegistration({
+    username,
     graphql,
-    challengeResponse,
-    registrationId,
+    challengeResponse: registrationChallengeResponse.data.challengeResponse,
     registration,
     password,
   });
