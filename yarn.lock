@@ -7133,6 +7133,11 @@
     "@sendgrid/client" "^7.7.0"
     "@sendgrid/helpers" "^7.7.0"
 
+"@serenity-kit/opaque@^0.6.0":
+  version "0.6.0"
+  resolved "https://registry.yarnpkg.com/@serenity-kit/opaque/-/opaque-0.6.0.tgz#60d0255d3814c71e5e960a301e3714d1901bdbc8"
+  integrity sha512-0FMBP5CTKC0BdpKPUKEyGnP8g4jwvEqWbgUUAIC4uJKsresREObI4XMn1bfJokeBFCbUKHlly+IRJ7Jg85sTdQ==
+
 "@sideway/address@^4.1.3":
   version "4.1.3"
   resolved "https://registry.yarnpkg.com/@sideway/address/-/address-4.1.3.tgz#d93cce5d45c5daec92ad76db492cc2ee3c64ab27"
@@ -20050,6 +20055,13 @@ react-native-modal@^13.0.1:
   dependencies:
     prop-types "^15.6.2"
     react-native-animatable "1.3.3"
+
+react-native-opaque@^0.2.5:
+  version "0.2.5"
+  resolved "https://registry.yarnpkg.com/react-native-opaque/-/react-native-opaque-0.2.5.tgz#323edebf4fae89c864ea964d461a330b65b6ad5d"
+  integrity sha512-iKWpuVKuuxxbYPcDqhy7+j6YqjwJ44hAYydYJtHdT65tBLei8wriA4DwpzOwCUKtz3Kjk4qeKPNoIX9DBh8NyQ==
+  dependencies:
+    "@serenity-kit/opaque" "^0.6.0"
 
 react-native-popper@^0.3.2:
   version "0.3.2"
