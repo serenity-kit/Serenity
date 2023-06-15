@@ -1,12 +1,12 @@
+import { Role } from "@serenity-kit/workspace-chain";
 import {
+  HorizontalDivider,
   IconButton,
   Menu,
   MenuButton,
-  HorizontalDivider,
   tw,
 } from "@serenity-tools/ui";
 import { useState } from "react";
-import { Role } from "../../generated/graphql";
 
 type Props = {
   memberId: string;
@@ -46,10 +46,10 @@ export default function MemberMenu(props: Props) {
         testID={`member-menu--${memberId}__make-editor`}
         onPress={() => {
           setIsOpenMenu(false);
-          props.onUpdateRole(Role.Editor);
+          props.onUpdateRole("EDITOR");
         }}
         iconName={"check-line"}
-        hideIcon={role !== Role.Editor}
+        hideIcon={role !== "EDITOR"}
       >
         Editor
       </MenuButton>
@@ -57,10 +57,10 @@ export default function MemberMenu(props: Props) {
         testID={`member-menu--${memberId}__make-admin`}
         onPress={() => {
           setIsOpenMenu(false);
-          props.onUpdateRole(Role.Admin);
+          props.onUpdateRole("ADMIN");
         }}
         iconName={"check-line"}
-        hideIcon={role !== Role.Admin}
+        hideIcon={role !== "ADMIN"}
       >
         Admin
       </MenuButton>

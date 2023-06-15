@@ -1,3 +1,4 @@
+import * as workspaceChain from "@serenity-kit/workspace-chain";
 import { ForbiddenError, UserInputError } from "apollo-server-express";
 import { Role } from "../../../prisma/generated/output";
 import { WorkspaceDeviceParing } from "../../types/workspaceDevice";
@@ -10,6 +11,7 @@ export type Props = {
   workspaceId: string;
   revokedUserIds: string[];
   userId: string;
+  workspaceChainEvent: workspaceChain.RemoveMemberWorkspaceChainEvent;
 };
 
 export const removeMembersAndRotateWorkspaceKey = async ({
@@ -18,6 +20,7 @@ export const removeMembersAndRotateWorkspaceKey = async ({
   workspaceId,
   creatorDeviceSigningPublicKey,
   newDeviceWorkspaceKeyBoxes,
+  workspaceChainEvent,
 }) => {
   return await prisma.$transaction(async (prisma) => {
     // verify user owns workspace
@@ -43,6 +46,27 @@ export const removeMembersAndRotateWorkspaceKey = async ({
     if (!verifiedCreatorDevice) {
       throw new UserInputError("Invalid creatorDeviceSigningPublicKey");
     }
+
+    // TODO refactor to utility function
+    const prevWorkspaceChainEvent =
+      await prisma.workspaceChainEvent.findFirstOrThrow({
+        where: { workspaceId },
+        orderBy: { position: "desc" },
+      });
+    const prevState = workspaceChain.WorkspaceChainState.parse(
+      prevWorkspaceChainEvent.state
+    );
+
+    const newState = workspaceChain.applyEvent(prevState, workspaceChainEvent);
+    await prisma.workspaceChainEvent.create({
+      data: {
+        content: workspaceChainEvent,
+        state: newState,
+        workspaceId,
+        position: prevWorkspaceChainEvent.position + 1,
+      },
+    });
+
     // add only devices which will belong to this workspace
     const allowedUsers = await prisma.usersToWorkspaces.findMany({
       where: { workspaceId, userId: { notIn: revokedUserIds } },

@@ -6,6 +6,7 @@ query workspace($id: ID, $deviceSigningPublicKey: String!) {
       userId
       username
       role
+      mainDeviceSigningPublicKey
       devices {
         signingPublicKey
         encryptionPublicKey

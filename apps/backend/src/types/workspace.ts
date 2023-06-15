@@ -40,6 +40,7 @@ export type WorkspaceMember = {
   userId: string;
   username: string | undefined | null;
   role: Role;
+  mainDeviceSigningPublicKey: string;
   devices: MinimalDevice[];
 };
 
@@ -76,6 +77,7 @@ type DbWorkspace = PrismaWorkspace & {
   usersToWorkspaces: (UsersToWorkspaces & {
     user: {
       username: string;
+      mainDeviceSigningPublicKey: string;
       devices: {
         signingPublicKey: string;
         encryptionPublicKey: string;
@@ -119,6 +121,7 @@ export const formatWorkspace = (workspace: DbWorkspace): Workspace => {
   workspace.usersToWorkspaces.forEach((member) => {
     const workspaceMember: WorkspaceMember = {
       userId: member.userId,
+      mainDeviceSigningPublicKey: member.user.mainDeviceSigningPublicKey,
       username: member.user.username,
       role: member.role,
       devices: member.user.devices,

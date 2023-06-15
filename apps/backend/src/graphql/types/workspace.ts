@@ -59,8 +59,9 @@ export const WorkspaceMember = objectType({
   name: "WorkspaceMember",
   definition(t) {
     t.nonNull.string("userId");
-    t.string("username");
+    t.nonNull.string("username");
     t.nonNull.field("role", { type: MemberRoleEnum });
+    t.nonNull.string("mainDeviceSigningPublicKey");
     t.list.nonNull.field("devices", { type: MinimalDevice });
   },
 });

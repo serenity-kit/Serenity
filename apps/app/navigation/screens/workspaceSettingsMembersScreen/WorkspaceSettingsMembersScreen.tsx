@@ -1,3 +1,4 @@
+import * as workspaceChain from "@serenity-kit/workspace-chain";
 import {
   encryptWorkspaceKeyForDevice,
   generateId,
@@ -16,9 +17,9 @@ import {
   SettingsContentWrapper,
   Spinner,
   Text,
+  View,
   tw,
   useIsDesktopDevice,
-  View,
 } from "@serenity-tools/ui";
 import { useMachine } from "@xstate/react";
 import { useEffect, useState } from "react";
@@ -29,13 +30,13 @@ import { VerifyPasswordModal } from "../../../components/verifyPasswordModal/Ver
 import { CreateWorkspaceInvitation } from "../../../components/workspace/CreateWorkspaceInvitation";
 import { useWorkspace } from "../../../context/WorkspaceContext";
 import {
+  Role as GraphQlRole,
   MeResult,
-  Role,
+  Workspace,
+  WorkspaceMember,
   runRemoveMembersAndRotateWorkspaceKeyMutation,
   runWorkspaceDevicesQuery,
   useUpdateWorkspaceMembersRolesMutation,
-  Workspace,
-  WorkspaceMember,
 } from "../../../generated/graphql";
 import { useAuthenticatedAppContext } from "../../../hooks/useAuthenticatedAppContext";
 import { workspaceSettingsLoadWorkspaceMachine } from "../../../machines/workspaceSettingsLoadWorkspaceMachine";
@@ -47,13 +48,14 @@ import { getWorkspace } from "../../../utils/workspace/getWorkspace";
 type Member = {
   userId: string;
   username: string;
-  role: Role;
+  role: GraphQlRole;
+  mainDeviceSigningPublicKey: string;
 };
 
 export default function WorkspaceSettingsMembersScreen(
   props: WorkspaceStackScreenProps<"WorkspaceSettingsMembers">
 ) {
-  const { workspaceId } = useWorkspace();
+  const { workspaceId, lastChainEvent, workspaceChainState } = useWorkspace();
   const { activeDevice } = useAuthenticatedAppContext();
   const [state] = useMachine(workspaceSettingsLoadWorkspaceMachine, {
     context: {
@@ -101,7 +103,7 @@ export default function WorkspaceSettingsMembersScreen(
     members.forEach((member: WorkspaceMember, row: number) => {
       memberLookup[member.userId] = row;
       if (member.userId === me?.id) {
-        setIsAdmin(member.role === Role.Admin);
+        setIsAdmin(member.role === GraphQlRole.Admin);
       }
     });
     setMemberLookup(memberLookup);
@@ -133,10 +135,21 @@ export default function WorkspaceSettingsMembersScreen(
     }
   };
 
-  const updateMember = async (member: WorkspaceMember, role: Role) => {
+  const updateMember = async (
+    member: WorkspaceMember,
+    role: workspaceChain.Role
+  ) => {
     const existingMemberRow = memberLookup[member.userId];
     if (existingMemberRow >= 0) {
-      members[existingMemberRow].role = role;
+      if (role === "ADMIN") {
+        members[existingMemberRow].role = GraphQlRole.Admin;
+      } else if (role === "EDITOR") {
+        members[existingMemberRow].role = GraphQlRole.Editor;
+      } else if (role === "VIEWER") {
+        members[existingMemberRow].role = GraphQlRole.Viewer;
+      } else if (role === "COMMENTER") {
+        members[existingMemberRow].role = GraphQlRole.Commenter;
+      }
       setMembers(members);
       await _updateWorkspaceMemberData(members);
     }
@@ -153,6 +166,15 @@ export default function WorkspaceSettingsMembersScreen(
   };
 
   const removeMember = async (username: string) => {
+    const mainDevice = getMainDevice();
+    if (mainDevice === null) {
+      throw new Error("mainDevice is null");
+    }
+
+    if (lastChainEvent === null) {
+      throw new Error("lastChainEvent is null");
+    }
+
     setUsernameToRemove(username);
     const row = memberLookup[username];
     if (row >= 0) {
@@ -169,9 +191,7 @@ export default function WorkspaceSettingsMembersScreen(
 
       const deviceWorkspaceKeyBoxes: WorkspaceDeviceParing[] = [];
       let workspaceDeviceResult = await runWorkspaceDevicesQuery(
-        {
-          workspaceId,
-        },
+        { workspaceId },
         { requestPolicy: "network-only" }
       );
       if (
@@ -201,13 +221,31 @@ export default function WorkspaceSettingsMembersScreen(
         }
       }
 
+      const member = members.find((member) => {
+        return member.username === username;
+      });
+      if (member === null || member === undefined) {
+        throw new Error("member is not defined");
+      }
+
+      const removeMemberEvent = workspaceChain.removeMember(
+        workspaceChain.hashTransaction(lastChainEvent.transaction),
+        {
+          keyType: "ed25519",
+          privateKey: sodium.from_base64(mainDevice.signingPrivateKey),
+          publicKey: sodium.from_base64(mainDevice.signingPublicKey),
+        },
+        sodium.to_base64(member.mainDeviceSigningPublicKey)
+      );
+
       await runRemoveMembersAndRotateWorkspaceKeyMutation(
         {
           input: {
             creatorDeviceSigningPublicKey: activeDevice.signingPublicKey,
             deviceWorkspaceKeyBoxes,
-            revokedUserIds: [removingMember.userId],
+            revokedUserId: [removingMember.userId],
             workspaceId,
+            serializedWorkspaceChainEvent: JSON.stringify(removeMemberEvent),
           },
         },
         { requestPolicy: "network-only" }
@@ -277,62 +315,79 @@ export default function WorkspaceSettingsMembersScreen(
                 <ListHeader data={["Name", "Email", "Role"]} mainIsIconText />
               }
             >
-              {members.map((member: any) => {
-                const adminUserId =
-                  state.context.meWithWorkspaceLoadingInfoQueryResult?.data?.me
-                    ?.id;
-                // TODO acutally use username when available
-                const username = member.username.slice(
-                  0,
-                  member.username.indexOf("@")
-                );
-                // TODO actually use initials when we have a username
-                const initials = username.substring(0, 1);
-                const email = member.username;
+              {workspaceChainState &&
+                Object.entries(workspaceChainState.members).map(
+                  ([mainDeviceSigningPublicKey, memberInfo]) => {
+                    const member = members.find((member) => {
+                      return (
+                        member.mainDeviceSigningPublicKey ===
+                        mainDeviceSigningPublicKey
+                      );
+                    });
 
-                const allowEditing = isAdmin && member.userId !== adminUserId;
+                    if (!member) {
+                      return null;
+                    }
 
-                // capitalize by css doesn't work here as it will only affect the first letter
-                const roleName =
-                  member.role.charAt(0).toUpperCase() +
-                  member.role.slice(1).toLowerCase();
+                    const adminUserId =
+                      state.context.meWithWorkspaceLoadingInfoQueryResult?.data
+                        ?.me?.id;
+                    // TODO acutally use username when available
+                    const username = member.username.slice(
+                      0,
+                      member.username.indexOf("@")
+                    );
+                    // TODO actually use initials when we have a username
+                    const initials = username.substring(0, 1);
+                    const email = member.username;
 
-                return (
-                  <ListItem
-                    testID={`workspace-member-row__${adminUserId}`}
-                    key={member.userId}
-                    mainItem={
-                      <ListIconText
-                        main={
-                          username +
-                          (member.userId === adminUserId ? " (you)" : "")
+                    const allowEditing =
+                      isAdmin && member.userId !== adminUserId;
+
+                    // capitalize by css doesn't work here as it will only affect the first letter
+                    const roleName =
+                      memberInfo.role.charAt(0).toUpperCase() +
+                      memberInfo.role.slice(1).toLowerCase();
+
+                    return (
+                      <ListItem
+                        testID={`workspace-member-row__${adminUserId}`}
+                        key={member.userId}
+                        mainItem={
+                          <ListIconText
+                            main={
+                              username +
+                              (member.userId === adminUserId ? " (you)" : "")
+                            }
+                            secondary={email}
+                            avatar={
+                              <Avatar size={isDesktopDevice ? "xs" : "sm"}>
+                                {initials}
+                              </Avatar>
+                            }
+                          />
                         }
-                        secondary={email}
-                        avatar={
-                          <Avatar size={isDesktopDevice ? "xs" : "sm"}>
-                            {initials}
-                          </Avatar>
+                        secondaryItem={
+                          <ListText secondary>{roleName}</ListText>
+                        }
+                        actionItem={
+                          allowEditing ? (
+                            <MemberMenu
+                              memberId={member.userId}
+                              role={memberInfo.role}
+                              onUpdateRole={(role) => {
+                                updateMember(member, role);
+                              }}
+                              onDeletePressed={() => {
+                                removeMemberPreflight(member.userId);
+                              }}
+                            />
+                          ) : null
                         }
                       />
-                    }
-                    secondaryItem={<ListText secondary>{roleName}</ListText>}
-                    actionItem={
-                      allowEditing ? (
-                        <MemberMenu
-                          memberId={member.userId}
-                          role={member.role}
-                          onUpdateRole={(role) => {
-                            updateMember(member, role);
-                          }}
-                          onDeletePressed={() => {
-                            removeMemberPreflight(member.userId);
-                          }}
-                        />
-                      ) : null
-                    }
-                  />
-                );
-              })}
+                    );
+                  }
+                )}
             </List>
           </>
         )}
