@@ -1,3 +1,4 @@
+import * as workspaceChain from "@serenity-kit/workspace-chain";
 import {
   decryptFolderName,
   deriveKeysFromKeyDerivationTrace,
@@ -5,6 +6,7 @@ import {
   generateId,
 } from "@serenity-tools/common";
 import { gql } from "graphql-request";
+import sodium from "react-native-libsodium";
 import { Role } from "../../../../prisma/generated/output";
 import deleteAllRecords from "../../../../test/helpers/deleteAllRecords";
 import { attachDeviceToWorkspaces } from "../../../../test/helpers/device/attachDeviceToWorkspaces";
@@ -13,8 +15,9 @@ import { getRootFolders } from "../../../../test/helpers/folder/getRootFolders";
 import setupGraphql from "../../../../test/helpers/setupGraphql";
 import { acceptWorkspaceInvitation } from "../../../../test/helpers/workspace/acceptWorkspaceInvitation";
 import { createWorkspaceInvitation } from "../../../../test/helpers/workspace/createWorkspaceInvitation";
+import { getLastWorkspaceChainEvent } from "../../../../test/helpers/workspace/getLastWorkspaceChainEvent";
 import { getWorkspace } from "../../../../test/helpers/workspace/getWorkspace";
-import { removeMembersAndRotateWorkspaceKey } from "../../../../test/helpers/workspace/removeMembersAndRotateWorkspaceKey";
+import { removeMemberAndRotateWorkspaceKey } from "../../../../test/helpers/workspace/removeMemberAndRotateWorkspaceKey";
 import { prisma } from "../../../database/prisma";
 import { createDeviceAndLogin } from "../../../database/testHelpers/createDeviceAndLogin";
 import createUserWithWorkspace from "../../../database/testHelpers/createUserWithWorkspace";
@@ -26,7 +29,7 @@ let userData2: any = null;
 const password1 = generateId();
 const password2 = generateId();
 
-beforeAll(async () => {
+beforeEach(async () => {
   await deleteAllRecords();
   userData1 = await createUserWithWorkspace({
     username: `${generateId()}@example.com`,
@@ -62,16 +65,30 @@ test("user cannot remove self", async () => {
       receiverDeviceSigningPublicKey: newDevice.signingPublicKey,
     },
   ];
-  const revokedUserIds = [userData1.user.id];
+
+  const { lastChainEntry } = await getLastWorkspaceChainEvent({
+    workspaceId: userData1.workspace.id,
+  });
+  const removeMemberEvent = workspaceChain.removeMember(
+    workspaceChain.hashTransaction(lastChainEntry.transaction),
+    {
+      keyType: "ed25519",
+      privateKey: sodium.from_base64(userData1.mainDevice.signingPrivateKey),
+      publicKey: sodium.from_base64(userData1.mainDevice.signingPublicKey),
+    },
+    userData1.mainDevice.signingPublicKey
+  );
+
   await expect(
     (async () =>
-      await removeMembersAndRotateWorkspaceKey({
+      await removeMemberAndRotateWorkspaceKey({
         graphql,
         workspaceId: userData1.workspace.id,
-        revokedUserIds,
+        revokedUserId: userData1.user.id,
         creatorDeviceSigningPublicKey: userData1.device.signingPublicKey,
         deviceWorkspaceKeyBoxes,
         authorizationHeader: userData1.sessionKey,
+        serializedWorkspaceChainEvent: JSON.stringify(removeMemberEvent),
       }))()
   ).rejects.toThrowError(/BAD_USER_INPUT/);
 });
@@ -82,6 +99,24 @@ test("user cannot revoke own main device", async () => {
     deviceEncryptionPrivateKey: userData1.deviceEncryptionPrivateKey,
     workspace: userData1.workspace,
   });
+  const workspaceInvitationResult = await createWorkspaceInvitation({
+    graphql,
+    role: Role.VIEWER,
+    workspaceId: userData1.workspace.id,
+    authorizationHeader: userData1.sessionKey,
+    mainDevice: userData1.mainDevice,
+  });
+  const invitationId =
+    workspaceInvitationResult.createWorkspaceInvitation.workspaceInvitation.id;
+  await acceptWorkspaceInvitation({
+    graphql,
+    invitationId,
+    inviteeMainDevice: userData2.mainDevice,
+    invitationSigningKeyPairSeed:
+      workspaceInvitationResult.invitationSigningKeyPairSeed,
+    authorizationHeader: userData2.sessionKey,
+  });
+
   const loginResult = await createDeviceAndLogin({
     username: userData1.user.username,
     envelope: userData1.envelope,
@@ -100,16 +135,30 @@ test("user cannot revoke own main device", async () => {
       receiverDeviceSigningPublicKey: newDevice.signingPublicKey,
     },
   ];
-  const revokedUserIds = [userData2.user.id];
+
+  const { lastChainEntry } = await getLastWorkspaceChainEvent({
+    workspaceId: userData1.workspace.id,
+  });
+  const removeMemberEvent = workspaceChain.removeMember(
+    workspaceChain.hashTransaction(lastChainEntry.transaction),
+    {
+      keyType: "ed25519",
+      privateKey: sodium.from_base64(userData1.mainDevice.signingPrivateKey),
+      publicKey: sodium.from_base64(userData1.mainDevice.signingPublicKey),
+    },
+    userData2.mainDevice.signingPublicKey
+  );
+
   await expect(
     (async () =>
-      await removeMembersAndRotateWorkspaceKey({
+      await removeMemberAndRotateWorkspaceKey({
         graphql,
         workspaceId: userData1.workspace.id,
-        revokedUserIds,
+        revokedUserId: userData2.user.id,
         creatorDeviceSigningPublicKey: userData1.device.signingPublicKey,
         deviceWorkspaceKeyBoxes,
         authorizationHeader: userData1.sessionKey,
+        serializedWorkspaceChainEvent: JSON.stringify(removeMemberEvent),
       }))()
   ).rejects.toThrowError(/BAD_USER_INPUT/);
 });
@@ -223,17 +272,32 @@ test("user can remove another user", async () => {
       receiverDeviceSigningPublicKey: userData1.webDevice.signingPublicKey,
     },
   ];
-  const revokedUserIds = [userData2.user.id];
-  const workspaceKeyResult = await removeMembersAndRotateWorkspaceKey({
+
+  const { lastChainEntry } = await getLastWorkspaceChainEvent({
+    workspaceId: userData1.workspace.id,
+  });
+  const removeMemberEvent = workspaceChain.removeMember(
+    workspaceChain.hashTransaction(lastChainEntry.transaction),
+    {
+      keyType: "ed25519",
+      privateKey: sodium.from_base64(userData1.mainDevice.signingPrivateKey),
+      publicKey: sodium.from_base64(userData1.mainDevice.signingPublicKey),
+    },
+    userData2.mainDevice.signingPublicKey
+  );
+
+  const workspaceKeyResult = await removeMemberAndRotateWorkspaceKey({
     graphql,
     workspaceId: userData1.workspace.id,
-    revokedUserIds,
+    revokedUserId: userData2.user.id,
     creatorDeviceSigningPublicKey: userData1.mainDevice.signingPublicKey,
     deviceWorkspaceKeyBoxes,
     authorizationHeader: userData1.sessionKey,
+    serializedWorkspaceChainEvent: JSON.stringify(removeMemberEvent),
   });
+
   const resultingWorkspaceKey =
-    workspaceKeyResult.removeMembersAndRotateWorkspaceKey.workspaceKey;
+    workspaceKeyResult.removeMemberAndRotateWorkspaceKey.workspaceKey;
   expect(resultingWorkspaceKey.generation).toBe(1);
   // workspaceKeyBoxes will only return the device the user used for login
   expect(resultingWorkspaceKey.workspaceKeyBoxes.length).toBe(2);
@@ -429,31 +493,45 @@ test("user can rotate key for multiple devices", async () => {
       receiverDeviceSigningPublicKey: newDevice.signingPublicKey,
     },
   ];
-  const revokedUserIds = [userData2.user.id];
-  const workspaceKeyResult = await removeMembersAndRotateWorkspaceKey({
+
+  const { lastChainEntry } = await getLastWorkspaceChainEvent({
+    workspaceId: userData1.workspace.id,
+  });
+  const removeMemberEvent = workspaceChain.removeMember(
+    workspaceChain.hashTransaction(lastChainEntry.transaction),
+    {
+      keyType: "ed25519",
+      privateKey: sodium.from_base64(userData1.mainDevice.signingPrivateKey),
+      publicKey: sodium.from_base64(userData1.mainDevice.signingPublicKey),
+    },
+    userData2.mainDevice.signingPublicKey
+  );
+
+  const workspaceKeyResult = await removeMemberAndRotateWorkspaceKey({
     graphql,
     workspaceId: userData1.workspace.id,
-    revokedUserIds,
+    revokedUserId: userData2.user.id,
     creatorDeviceSigningPublicKey: userData1.device.signingPublicKey,
     deviceWorkspaceKeyBoxes,
     authorizationHeader: userData1.sessionKey,
+    serializedWorkspaceChainEvent: JSON.stringify(removeMemberEvent),
   });
   const resultingWorkspaceKey =
-    workspaceKeyResult.removeMembersAndRotateWorkspaceKey.workspaceKey;
-  expect(resultingWorkspaceKey.generation).toBe(2);
+    workspaceKeyResult.removeMemberAndRotateWorkspaceKey.workspaceKey;
+  expect(resultingWorkspaceKey.generation).toBe(1);
   expect(resultingWorkspaceKey.workspaceKeyBoxes.length).toBe(3);
   for (let workspaceKeyBox of resultingWorkspaceKey.workspaceKeyBoxes) {
     expect(workspaceKeyBox.creatorDeviceSigningPublicKey).toBe(
       userData1.device.signingPublicKey
     );
-    const recevierKey = workspaceKeyBox.deviceSigningPublicKey;
-    if (recevierKey === userData1.device.signingPublicKey) {
+    const receiverKey = workspaceKeyBox.deviceSigningPublicKey;
+    if (receiverKey === userData1.device.signingPublicKey) {
       expect(workspaceKeyBox.ciphertext).toBe(keyData1.ciphertext);
       expect(workspaceKeyBox.nonce).toBe(keyData1.nonce);
-    } else if (recevierKey === userData1.webDevice.signingPublicKey) {
+    } else if (receiverKey === userData1.webDevice.signingPublicKey) {
       expect(workspaceKeyBox.ciphertext).toBe(keyData2.ciphertext);
       expect(workspaceKeyBox.nonce).toBe(keyData2.nonce);
-    } else if (recevierKey === newDevice.signingPublicKey) {
+    } else if (receiverKey === newDevice.signingPublicKey) {
       expect(workspaceKeyBox.ciphertext).toBe(keyData3.ciphertext);
       expect(workspaceKeyBox.nonce).toBe(keyData3.nonce);
     } else {
@@ -481,51 +559,46 @@ test("user can rotate key for multiple devices", async () => {
 
   const workspace = workspaceResult.workspace;
   expect(workspace.currentWorkspaceKey.id).toBe(resultingWorkspaceKey.id);
-  expect(workspace.workspaceKeys.length).toBe(3);
-  for (let i = 0; i < workspace.workspaceKeys.length; i++) {
-    const workspaceKey = workspace.workspaceKeys[i];
-    if (i === 0) {
-      expect(workspaceKey.generation).toBe(2);
-      expect(workspaceKey.id).toBe(workspace.currentWorkspaceKey.id);
-    } else if (i === 1) {
-      expect(workspaceKey.generation).toBe(1);
-      expect(workspaceKey.id).not.toBe(
-        userData1.workspace.currentWorkspaceKey.id
-      );
-      expect(workspaceKey.id).not.toBe(workspace.currentWorkspaceKey.id);
-    } else {
-      expect(workspaceKey.generation).toBe(0);
-      expect(workspaceKey.id).toBe(userData1.workspace.currentWorkspaceKey.id);
-    }
-    expect(workspaceKey.workspaceKeyBox).not.toBe(null);
-    const workspaceKeyBox = workspaceKey.workspaceKeyBox;
-    expect(workspaceKeyBox.deviceSigningPublicKey).toBe(
-      userData1.device.signingPublicKey
-    );
-  }
+  expect(workspace.workspaceKeys.length).toBe(2);
+  expect(workspace.workspaceKeys[0].generation).toBe(1);
+  expect(workspace.workspaceKeys[0].id).toBe(workspace.currentWorkspaceKey.id);
+  expect(workspace.workspaceKeys[0].workspaceKeyBox).toBeDefined();
+  expect(
+    workspace.workspaceKeys[0].workspaceKeyBox.deviceSigningPublicKey
+  ).toBe(userData1.device.signingPublicKey);
+
+  expect(workspace.workspaceKeys[1].generation).toBe(0);
+  expect(workspace.workspaceKeys[1].id).toBe(
+    userData1.workspace.currentWorkspaceKey.id
+  );
+  expect(workspace.workspaceKeys[1].workspaceKeyBox).toBeDefined();
+  expect(
+    workspace.workspaceKeys[1].workspaceKeyBox.deviceSigningPublicKey
+  ).toBe(userData1.device.signingPublicKey);
 });
 
 test("Unauthenticated", async () => {
   await expect(
     (async () =>
-      await removeMembersAndRotateWorkspaceKey({
+      await removeMemberAndRotateWorkspaceKey({
         graphql,
         workspaceId: userData1.workspace.id,
-        revokedUserIds: [],
+        revokedUserId: "someUserId",
         creatorDeviceSigningPublicKey: userData1.device.signingPublicKey,
         deviceWorkspaceKeyBoxes: [],
-        authorizationHeader: "badauthheader",
+        authorizationHeader: "badAuthHeader",
+        serializedWorkspaceChainEvent: "{}",
       }))()
   ).rejects.toThrowError(/UNAUTHENTICATED/);
 });
 
 describe("Input errors", () => {
   const authorizationHeaders = {
-    authorization: "somesessionkey",
+    authorization: "someSessionKey",
   };
   const query = gql`
-    mutation ($input: RemoveMembersAndRotateWorkspaceKeyInput!) {
-      removeMembersAndRotateWorkspaceKey(input: $input) {
+    mutation ($input: RemoveMemberAndRotateWorkspaceKeyInput!) {
+      removeMemberAndRotateWorkspaceKey(input: $input) {
         workspaceKey {
           id
           generation

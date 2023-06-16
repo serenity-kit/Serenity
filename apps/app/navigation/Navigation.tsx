@@ -221,6 +221,10 @@ function WorkspaceStackNavigator(props) {
     );
   }
 
+  const fetchAndApplyNewWorkspaceChainEntries = async () => {
+    reExecuteWorkspaceChainQuery();
+  };
+
   useInterval(() => {
     if (activeDevice && workspaceChainState) {
       authorizeMembersIfNecessary({ activeDevice, workspaceChainState });
@@ -232,7 +236,7 @@ function WorkspaceStackNavigator(props) {
       // TODO re-execute with a param of the last known event
       reExecuteWorkspaceChainQuery();
     }
-  }, 10 * 1000);
+  }, 30 * 1000);
 
   useEffect(() => {
     if (props.route.params.workspaceId) {
@@ -251,6 +255,7 @@ function WorkspaceStackNavigator(props) {
         workspaceQueryResult,
         workspaceChainState,
         lastChainEvent,
+        fetchAndApplyNewWorkspaceChainEntries,
       }}
     >
       <WorkspaceStack.Navigator

@@ -14,6 +14,7 @@ type WorkspaceContext = {
   >;
   workspaceChainState: workspaceChain.WorkspaceChainState | null;
   lastChainEvent: workspaceChain.WorkspaceChainEvent | null;
+  fetchAndApplyNewWorkspaceChainEntries: () => Promise<void>;
 };
 
 const workspaceContext = React.createContext<WorkspaceContext>({
@@ -27,6 +28,7 @@ const workspaceContext = React.createContext<WorkspaceContext>({
   // TODO refactor to either have null or a nested valid object
   workspaceChainState: null,
   lastChainEvent: null,
+  fetchAndApplyNewWorkspaceChainEntries: () => Promise.resolve(),
 });
 
 export const WorkspaceProvider = workspaceContext.Provider;

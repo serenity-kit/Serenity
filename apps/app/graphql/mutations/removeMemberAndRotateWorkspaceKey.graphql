@@ -1,7 +1,7 @@
-mutation removeMembersAndRotateWorkspaceKey(
-  $input: RemoveMembersAndRotateWorkspaceKeyInput!
+mutation removeMemberAndRotateWorkspaceKey(
+  $input: RemoveMemberAndRotateWorkspaceKeyInput!
 ) {
-  removeMembersAndRotateWorkspaceKey(input: $input) {
+  removeMemberAndRotateWorkspaceKey(input: $input) {
     workspaceKey {
       id
       generation

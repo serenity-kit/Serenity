@@ -641,7 +641,7 @@ export type Mutation = {
   initiateFileUpload?: Maybe<InitiateFileUploadResult>;
   logout?: Maybe<LogoutResult>;
   removeDocumentShareLink?: Maybe<RemoveDocumentShareLinkResult>;
-  removeMembersAndRotateWorkspaceKey?: Maybe<RemoveMembersAndRotateWorkspaceKeyResult>;
+  removeMemberAndRotateWorkspaceKey?: Maybe<RemoveMemberAndRotateWorkspaceKeyResult>;
   startLogin?: Maybe<StartLoginResult>;
   startRegistration?: Maybe<StartRegistrationResult>;
   updateDocumentName?: Maybe<UpdateDocumentNameResult>;
@@ -758,8 +758,8 @@ export type MutationRemoveDocumentShareLinkArgs = {
 };
 
 
-export type MutationRemoveMembersAndRotateWorkspaceKeyArgs = {
-  input: RemoveMembersAndRotateWorkspaceKeyInput;
+export type MutationRemoveMemberAndRotateWorkspaceKeyArgs = {
+  input: RemoveMemberAndRotateWorkspaceKeyInput;
 };
 
 
@@ -1024,16 +1024,16 @@ export type RemoveDocumentShareLinkResult = {
   success: Scalars['Boolean'];
 };
 
-export type RemoveMembersAndRotateWorkspaceKeyInput = {
+export type RemoveMemberAndRotateWorkspaceKeyInput = {
   creatorDeviceSigningPublicKey: Scalars['String'];
   deviceWorkspaceKeyBoxes: Array<WorkspaceDeviceInput>;
-  revokedUserId: Array<Scalars['String']>;
+  revokedUserId: Scalars['String'];
   serializedWorkspaceChainEvent: Scalars['String'];
   workspaceId: Scalars['String'];
 };
 
-export type RemoveMembersAndRotateWorkspaceKeyResult = {
-  __typename?: 'RemoveMembersAndRotateWorkspaceKeyResult';
+export type RemoveMemberAndRotateWorkspaceKeyResult = {
+  __typename?: 'RemoveMemberAndRotateWorkspaceKeyResult';
   workspaceKey: WorkspaceKey;
 };
 
@@ -1520,12 +1520,12 @@ export type RemoveDocumentShareLinkMutationVariables = Exact<{
 
 export type RemoveDocumentShareLinkMutation = { __typename?: 'Mutation', removeDocumentShareLink?: { __typename?: 'RemoveDocumentShareLinkResult', success: boolean } | null };
 
-export type RemoveMembersAndRotateWorkspaceKeyMutationVariables = Exact<{
-  input: RemoveMembersAndRotateWorkspaceKeyInput;
+export type RemoveMemberAndRotateWorkspaceKeyMutationVariables = Exact<{
+  input: RemoveMemberAndRotateWorkspaceKeyInput;
 }>;
 
 
-export type RemoveMembersAndRotateWorkspaceKeyMutation = { __typename?: 'Mutation', removeMembersAndRotateWorkspaceKey?: { __typename?: 'RemoveMembersAndRotateWorkspaceKeyResult', workspaceKey: { __typename?: 'WorkspaceKey', id: string, generation: number, workspaceId: string, workspaceKeyBoxes?: Array<{ __typename?: 'WorkspaceKeyBox', id: string, deviceSigningPublicKey: string, creatorDeviceSigningPublicKey: string, ciphertext: string, nonce: string }> | null } } | null };
+export type RemoveMemberAndRotateWorkspaceKeyMutation = { __typename?: 'Mutation', removeMemberAndRotateWorkspaceKey?: { __typename?: 'RemoveMemberAndRotateWorkspaceKeyResult', workspaceKey: { __typename?: 'WorkspaceKey', id: string, generation: number, workspaceId: string, workspaceKeyBoxes?: Array<{ __typename?: 'WorkspaceKeyBox', id: string, deviceSigningPublicKey: string, creatorDeviceSigningPublicKey: string, ciphertext: string, nonce: string }> | null } } | null };
 
 export type StartLoginMutationVariables = Exact<{
   input: StartLoginInput;
@@ -2134,9 +2134,9 @@ export const RemoveDocumentShareLinkDocument = gql`
 export function useRemoveDocumentShareLinkMutation() {
   return Urql.useMutation<RemoveDocumentShareLinkMutation, RemoveDocumentShareLinkMutationVariables>(RemoveDocumentShareLinkDocument);
 };
-export const RemoveMembersAndRotateWorkspaceKeyDocument = gql`
-    mutation removeMembersAndRotateWorkspaceKey($input: RemoveMembersAndRotateWorkspaceKeyInput!) {
-  removeMembersAndRotateWorkspaceKey(input: $input) {
+export const RemoveMemberAndRotateWorkspaceKeyDocument = gql`
+    mutation removeMemberAndRotateWorkspaceKey($input: RemoveMemberAndRotateWorkspaceKeyInput!) {
+  removeMemberAndRotateWorkspaceKey(input: $input) {
     workspaceKey {
       id
       generation
@@ -2153,8 +2153,8 @@ export const RemoveMembersAndRotateWorkspaceKeyDocument = gql`
 }
     `;
 
-export function useRemoveMembersAndRotateWorkspaceKeyMutation() {
-  return Urql.useMutation<RemoveMembersAndRotateWorkspaceKeyMutation, RemoveMembersAndRotateWorkspaceKeyMutationVariables>(RemoveMembersAndRotateWorkspaceKeyDocument);
+export function useRemoveMemberAndRotateWorkspaceKeyMutation() {
+  return Urql.useMutation<RemoveMemberAndRotateWorkspaceKeyMutation, RemoveMemberAndRotateWorkspaceKeyMutationVariables>(RemoveMemberAndRotateWorkspaceKeyDocument);
 };
 export const StartLoginDocument = gql`
     mutation startLogin($input: StartLoginInput!) {
@@ -3235,10 +3235,10 @@ export const runRemoveDocumentShareLinkMutation = async (variables: RemoveDocume
     .toPromise();
 };
 
-export const runRemoveMembersAndRotateWorkspaceKeyMutation = async (variables: RemoveMembersAndRotateWorkspaceKeyMutationVariables, options?: any) => {
+export const runRemoveMemberAndRotateWorkspaceKeyMutation = async (variables: RemoveMemberAndRotateWorkspaceKeyMutationVariables, options?: any) => {
   return await getUrqlClient()
-    .mutation<RemoveMembersAndRotateWorkspaceKeyMutation, RemoveMembersAndRotateWorkspaceKeyMutationVariables>(
-      RemoveMembersAndRotateWorkspaceKeyDocument,
+    .mutation<RemoveMemberAndRotateWorkspaceKeyMutation, RemoveMemberAndRotateWorkspaceKeyMutationVariables>(
+      RemoveMemberAndRotateWorkspaceKeyDocument,
       variables,
       {
         // better to be safe here and always refetch

@@ -4,28 +4,30 @@ import { WorkspaceDeviceParing } from "../../../src/types/workspaceDevice";
 type Params = {
   graphql: any;
   workspaceId: string;
-  revokedUserIds: string[];
+  revokedUserId: string;
   creatorDeviceSigningPublicKey: string;
   deviceWorkspaceKeyBoxes: WorkspaceDeviceParing[];
   authorizationHeader: string;
+  serializedWorkspaceChainEvent: string;
 };
 
-export const removeMembersAndRotateWorkspaceKey = async ({
+export const removeMemberAndRotateWorkspaceKey = async ({
   graphql,
   workspaceId,
-  revokedUserIds,
+  revokedUserId,
   creatorDeviceSigningPublicKey,
   deviceWorkspaceKeyBoxes,
   authorizationHeader,
+  serializedWorkspaceChainEvent,
 }: Params) => {
   const authorizationHeaders = {
     authorization: authorizationHeader,
   };
   const query = gql`
-    mutation removeMembersAndRotateWorkspaceKey(
-      $input: RemoveMembersAndRotateWorkspaceKeyInput!
+    mutation removeMemberAndRotateWorkspaceKey(
+      $input: RemoveMemberAndRotateWorkspaceKeyInput!
     ) {
-      removeMembersAndRotateWorkspaceKey(input: $input) {
+      removeMemberAndRotateWorkspaceKey(input: $input) {
         workspaceKey {
           id
           generation
@@ -46,9 +48,10 @@ export const removeMembersAndRotateWorkspaceKey = async ({
     {
       input: {
         creatorDeviceSigningPublicKey,
-        revokedUserIds,
+        revokedUserId,
         workspaceId,
         deviceWorkspaceKeyBoxes,
+        serializedWorkspaceChainEvent,
       },
     },
     authorizationHeaders
