@@ -44,6 +44,11 @@ export const RemoveMemberTransaction = z.object({
   memberMainDeviceSigningPublicKey: z.string(),
 });
 
+export const RemoveInvitationsTransaction = z.object({
+  type: z.literal("remove-invitations"),
+  invitationIds: z.array(z.string()),
+});
+
 export const Author = z.object({
   publicKey: z.string(),
   signature: z.string(),
@@ -81,12 +86,18 @@ export const RemoveMemberWorkspaceChainEvent = WorkspaceChainEventBase.extend({
   transaction: RemoveMemberTransaction,
 });
 
+export const RemoveInvitationsWorkspaceChainEvent =
+  WorkspaceChainEventBase.extend({
+    transaction: RemoveInvitationsTransaction,
+  });
+
 export const UpdateChainWorkspaceChainEvent = z.union([
   AddInvitationWorkspaceChainEvent,
   AcceptInvitationWorkspaceChainEvent,
   AddMemberWorkspaceChainEvent,
   UpdateMemberWorkspaceChainEvent,
   RemoveMemberWorkspaceChainEvent,
+  RemoveInvitationsWorkspaceChainEvent,
 ]);
 
 export const WorkspaceChainEvent = z.union([
@@ -130,6 +141,9 @@ export type AcceptInvitationTransaction = z.infer<
 export type AddMemberTransaction = z.infer<typeof AddMemberTransaction>;
 export type UpdateMemberTransaction = z.infer<typeof UpdateMemberTransaction>;
 export type RemoveMemberTransaction = z.infer<typeof RemoveMemberTransaction>;
+export type RemoveInvitationsTransaction = z.infer<
+  typeof RemoveInvitationsTransaction
+>;
 export type Author = z.infer<typeof Author>;
 export type CreateChainWorkspaceChainEvent = z.infer<
   typeof CreateChainWorkspaceChainEvent
@@ -148,6 +162,9 @@ export type UpdateMemberWorkspaceChainEvent = z.infer<
 >;
 export type RemoveMemberWorkspaceChainEvent = z.infer<
   typeof RemoveMemberWorkspaceChainEvent
+>;
+export type RemoveInvitationsWorkspaceChainEvent = z.infer<
+  typeof RemoveInvitationsWorkspaceChainEvent
 >;
 export type UpdateChainWorkspaceChainEvent = z.infer<
   typeof UpdateChainWorkspaceChainEvent

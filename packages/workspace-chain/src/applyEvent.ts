@@ -239,6 +239,22 @@ export const applyEvent = (
     delete members[event.transaction.memberMainDeviceSigningPublicKey];
   }
 
+  if (event.transaction.type === "remove-invitations") {
+    if (!isValidAdminDecision(state, event)) {
+      throw new InvalidWorkspaceChainError(
+        "Not allowed to remove invitations."
+      );
+    }
+    event.transaction.invitationIds.forEach((invitationId) => {
+      if (!invitations.hasOwnProperty(invitationId)) {
+        throw new InvalidWorkspaceChainError(
+          "Failed to remove non-existing invitation."
+        );
+      }
+      delete invitations[invitationId];
+    });
+  }
+
   return {
     id: state.id,
     invitations,
