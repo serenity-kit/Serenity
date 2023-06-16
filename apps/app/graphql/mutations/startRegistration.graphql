@@ -1,6 +1,5 @@
 mutation startRegistration($input: StartRegistrationInput!) {
   startRegistration(input: $input) {
     challengeResponse
-    registrationId
   }
 }

@@ -1,3 +1,4 @@
+import { clientRegistrationFinish } from "@serenity-kit/opaque";
 import {
   createAndEncryptDevice,
   encryptWorkspaceInvitationPrivateKey,
@@ -21,10 +22,11 @@ export const registerUser = async (
     username,
     password
   );
-  const message = result.registration.finish(
+  const clientRegistrationFinishResult = clientRegistrationFinish({
     password,
-    sodium.from_base64(result.data.challengeResponse)
-  );
+    clientRegistration: result.registration,
+    registrationResponse: result.data.challengeResponse,
+  });
 
   const query = gql`
     mutation finishRegistration($input: FinishRegistrationInput!) {
@@ -35,9 +37,9 @@ export const registerUser = async (
     }
   `;
 
-  const exportKey = result.registration.getExportKey();
+  const exportKey = clientRegistrationFinishResult.exportKey;
 
-  const mainDevice = createAndEncryptDevice(sodium.to_base64(exportKey));
+  const mainDevice = createAndEncryptDevice(exportKey);
   const {
     encryptionPrivateKey,
     signingPrivateKey,
@@ -67,8 +69,8 @@ export const registerUser = async (
 
   const registrationResponse = await graphql.client.request(query, {
     input: {
-      registrationId: result.data.registrationId,
-      message: sodium.to_base64(message),
+      message: clientRegistrationFinishResult.registrationUpload,
+      username,
       mainDevice: mainDeviceWithoutPrivateKeys,
       pendingWorkspaceInvitationId,
       pendingWorkspaceInvitationKeyCiphertext,

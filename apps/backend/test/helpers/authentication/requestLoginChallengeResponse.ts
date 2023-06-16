@@ -1,6 +1,5 @@
-import { Login } from "@serenity-tools/opaque-server";
+import { clientLoginStart } from "@serenity-kit/opaque";
 import { gql } from "graphql-request";
-import sodium from "libsodium-wrappers";
 
 type Params = {
   graphql: any;
@@ -13,14 +12,13 @@ export const requestLoginChallengeResponse = async ({
   username,
   password,
 }: Params) => {
-  const login = new Login();
-  const challenge = sodium.to_base64(login.start(password));
+  const clientLoginStartResult = clientLoginStart(password);
   const query = gql`
       mutation {
         startLogin(
           input: {
             username: "${username}"
-            challenge: "${challenge}"
+            challenge: "${clientLoginStartResult.credentialRequest}"
           }
         ) {
           loginId
@@ -31,6 +29,6 @@ export const requestLoginChallengeResponse = async ({
   const data = await graphql.client.request(query);
   return {
     data: data.startLogin,
-    login,
+    login: clientLoginStartResult.clientLogin,
   };
 };

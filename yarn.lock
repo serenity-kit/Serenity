@@ -7133,6 +7133,11 @@
     "@sendgrid/client" "^7.7.0"
     "@sendgrid/helpers" "^7.7.0"
 
+"@serenity-kit/opaque@^0.6.0":
+  version "0.6.0"
+  resolved "https://registry.yarnpkg.com/@serenity-kit/opaque/-/opaque-0.6.0.tgz#60d0255d3814c71e5e960a301e3714d1901bdbc8"
+  integrity sha512-0FMBP5CTKC0BdpKPUKEyGnP8g4jwvEqWbgUUAIC4uJKsresREObI4XMn1bfJokeBFCbUKHlly+IRJ7Jg85sTdQ==
+
 "@sideway/address@^4.1.3":
   version "4.1.3"
   resolved "https://registry.yarnpkg.com/@sideway/address/-/address-4.1.3.tgz#d93cce5d45c5daec92ad76db492cc2ee3c64ab27"
@@ -20051,6 +20056,13 @@ react-native-modal@^13.0.1:
     prop-types "^15.6.2"
     react-native-animatable "1.3.3"
 
+react-native-opaque@^0.2.5:
+  version "0.2.5"
+  resolved "https://registry.yarnpkg.com/react-native-opaque/-/react-native-opaque-0.2.5.tgz#323edebf4fae89c864ea964d461a330b65b6ad5d"
+  integrity sha512-iKWpuVKuuxxbYPcDqhy7+j6YqjwJ44hAYydYJtHdT65tBLei8wriA4DwpzOwCUKtz3Kjk4qeKPNoIX9DBh8NyQ==
+  dependencies:
+    "@serenity-kit/opaque" "^0.6.0"
+
 react-native-popper@^0.3.2:
   version "0.3.2"
   resolved "https://registry.yarnpkg.com/react-native-popper/-/react-native-popper-0.3.2.tgz#4582b3bccb85a043c2171c3326dce10f8f1e5c16"
@@ -20336,7 +20348,7 @@ regenerator-runtime@^0.13.11:
   resolved "https://registry.yarnpkg.com/regenerator-runtime/-/regenerator-runtime-0.13.11.tgz#f6dca3e7ceec20590d07ada785636a90cdca17f9"
   integrity sha512-kY1AZVr2Ra+t+piVaJ4gxaFaReZVH40AKNo7UCX6W+dEwBo/2oZJzqfuN1qLq1oL45o56cPaTXELwrTh8Fpggg==
 
-regenerator-runtime@^0.13.2, regenerator-runtime@^0.13.4, regenerator-runtime@^0.13.9:
+regenerator-runtime@^0.13.2, regenerator-runtime@^0.13.4:
   version "0.13.9"
   resolved "https://registry.yarnpkg.com/regenerator-runtime/-/regenerator-runtime-0.13.9.tgz#8925742a98ffd90814988d7566ad30ca3b263b52"
   integrity sha512-p3VT+cOEgxFsRRA9X4lkI1E+k2/CtnKtU4gcxyaCUreilL/vqI6CdZ3wxVUx3UOUg+gnUOQQcRI7BmSI656MYA==

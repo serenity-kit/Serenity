@@ -492,7 +492,7 @@ export type FinishRegistrationInput = {
   pendingWorkspaceInvitationKeyEncryptionSalt?: InputMaybe<Scalars['String']>;
   pendingWorkspaceInvitationKeyPublicNonce?: InputMaybe<Scalars['String']>;
   pendingWorkspaceInvitationKeySubkeyId?: InputMaybe<Scalars['Int']>;
-  registrationId: Scalars['String'];
+  username: Scalars['String'];
 };
 
 export type FinishRegistrationResult = {
@@ -1106,7 +1106,6 @@ export type StartRegistrationInput = {
 export type StartRegistrationResult = {
   __typename?: 'StartRegistrationResult';
   challengeResponse: Scalars['String'];
-  registrationId: Scalars['String'];
 };
 
 export type UnauthorizedDevicesForWorkspacesResult = {
@@ -1546,7 +1545,7 @@ export type StartRegistrationMutationVariables = Exact<{
 }>;
 
 
-export type StartRegistrationMutation = { __typename?: 'Mutation', startRegistration?: { __typename?: 'StartRegistrationResult', challengeResponse: string, registrationId: string } | null };
+export type StartRegistrationMutation = { __typename?: 'Mutation', startRegistration?: { __typename?: 'StartRegistrationResult', challengeResponse: string } | null };
 
 export type UpdateDocumentNameMutationVariables = Exact<{
   input: UpdateDocumentNameInput;
@@ -2196,7 +2195,6 @@ export const StartRegistrationDocument = gql`
     mutation startRegistration($input: StartRegistrationInput!) {
   startRegistration(input: $input) {
     challengeResponse
-    registrationId
   }
 }
     `;

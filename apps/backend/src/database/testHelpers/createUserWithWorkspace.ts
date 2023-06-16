@@ -1,3 +1,9 @@
+import {
+  clientRegistrationFinish,
+  clientRegistrationStart,
+  serverRegistrationFinish,
+  serverRegistrationStart,
+} from "@serenity-kit/opaque";
 import * as workspaceChain from "@serenity-kit/workspace-chain";
 import {
   createAndEncryptDevice,
@@ -12,10 +18,8 @@ import {
   generateId,
   snapshotDerivedKeyContext,
 } from "@serenity-tools/common";
-import { Registration } from "@serenity-tools/opaque-server";
 import sodium from "react-native-libsodium";
 import { createInitialWorkspaceStructure } from "../../database/workspace/createInitialWorkspaceStructure";
-import { finishRegistration, startRegistration } from "../../utils/opaque";
 import { attachDeviceToWorkspaces } from "../device/attachDeviceToWorkspaces";
 import { prisma } from "../prisma";
 import { createDeviceAndLogin } from "./createDeviceAndLogin";
@@ -35,22 +39,27 @@ export default async function createUserWithWorkspace({
   if (password) {
     thePassword = password;
   }
-  // setup server registration opaque
-  const registration = new Registration();
-  const challenge = registration.start(thePassword);
-  const { response, registrationId } = startRegistration({
-    username,
-    challenge: sodium.to_base64(challenge),
+
+  if (!process.env.OPAQUE_SERVER_SETUP) {
+    throw new Error("Missing process.env.OPAQUE_SERVER_SETUP");
+  }
+
+  const clientRegistrationStartResult = clientRegistrationStart(thePassword);
+  const serverRegistrationStartResult = serverRegistrationStart({
+    userIdentifier: username,
+    registrationRequest: clientRegistrationStartResult.registrationRequest,
+    serverSetup: process.env.OPAQUE_SERVER_SETUP,
   });
-  const message = registration.finish(
-    thePassword,
-    sodium.from_base64(response)
+  const clientRegistrationFinishResult = clientRegistrationFinish({
+    clientRegistration: clientRegistrationStartResult.clientRegistration,
+    password: thePassword,
+    registrationResponse: serverRegistrationStartResult,
+  });
+  const exportKey = clientRegistrationFinishResult.exportKey;
+
+  const passwordFile = serverRegistrationFinish(
+    clientRegistrationFinishResult.registrationUpload
   );
-  const exportKey = sodium.to_base64(registration.getExportKey());
-  const { envelope } = finishRegistration({
-    registrationId,
-    message: sodium.to_base64(message),
-  });
   const mainDevice = createAndEncryptDevice(exportKey);
 
   const result = await prisma.$transaction(async (prisma) => {
@@ -65,7 +74,7 @@ export default async function createUserWithWorkspace({
     const user = await prisma.user.create({
       data: {
         username,
-        opaqueEnvelope: envelope,
+        opaqueEnvelope: passwordFile,
         mainDeviceCiphertext: mainDevice.ciphertext,
         mainDeviceNonce: mainDevice.nonce,
         mainDeviceSigningPublicKey: mainDevice.signingPublicKey,
@@ -194,7 +203,7 @@ export default async function createUserWithWorkspace({
   const { session, sessionKey, webDevice } = await createDeviceAndLogin({
     username,
     password: thePassword,
-    envelope,
+    envelope: passwordFile,
   });
 
   const webDeviceWorkspaceKeyBox = encryptWorkspaceKeyForDevice({
@@ -237,7 +246,7 @@ export default async function createUserWithWorkspace({
     deviceSigningPrivateKey: mainDevice.signingPrivateKey,
     webDevice,
     user,
-    envelope,
+    envelope: passwordFile,
     workspace: createWorkspaceResult.workspace,
     folder: createWorkspaceResult.folder,
     document: createWorkspaceResult.document,

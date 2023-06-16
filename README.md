@@ -15,6 +15,8 @@ In addition fill out the FILE_STORAGE related secrets in the .env file. In case 
 yarn workspace backend r2:enable-cor
 ```
 
+You can create a new OPAQUE_SERVER_SETUP value, but make sure to update it in your `.env` and `.e2e-tests.env` files.
+
 ## Development
 
 ### Backend

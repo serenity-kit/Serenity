@@ -1,3 +1,4 @@
+import { clientLoginFinish } from "@serenity-kit/opaque";
 import {
   createDevice as createdDeviceHelper,
   generateId,
@@ -40,14 +41,15 @@ test("server should login a user", async () => {
     password,
   });
 
-  const finishMessage = sodium.to_base64(
-    result.login.finish(
-      password,
-      sodium.from_base64(result.data.challengeResponse)
-    )
-  );
-
-  const sessionKey = sodium.to_base64(result.login.getSessionKey());
+  const clientLoginFinishResult = clientLoginFinish({
+    password,
+    clientLogin: result.login,
+    credentialResponse: result.data.challengeResponse,
+  });
+  if (!clientLoginFinishResult) {
+    throw new Error("clientLoginFinishResult is null");
+  }
+  const sessionKey = clientLoginFinishResult.sessionKey;
 
   const device = createdDeviceHelper();
   const deviceInfoJson = {
@@ -77,7 +79,7 @@ test("server should login a user", async () => {
   const loginResponse = await graphql.client.request(query, {
     input: {
       loginId: result.data.loginId,
-      message: finishMessage,
+      message: clientLoginFinishResult.credentialFinalization,
       deviceSigningPublicKey: device.signingPublicKey,
       deviceEncryptionPublicKey: device.encryptionPublicKey,
       deviceEncryptionPublicKeySignature: device.encryptionPublicKeySignature,
@@ -114,18 +116,20 @@ describe("Input errors", () => {
       password,
     });
 
-    const finishMessage = sodium.to_base64(
-      result.login.finish(
-        password,
-        sodium.from_base64(result.data.challengeResponse)
-      )
-    );
+    const clientLoginFinishResult = clientLoginFinish({
+      password,
+      clientLogin: result.login,
+      credentialResponse: result.data.challengeResponse,
+    });
+    if (!clientLoginFinishResult) {
+      throw new Error("clientLoginFinishResult is null");
+    }
     await expect(
       (async () =>
         await graphql.client.request(query, {
           input: {
             loginId: null,
-            message: finishMessage,
+            message: clientLoginFinishResult.credentialFinalization,
           },
         }))()
     ).rejects.toThrowError(/GRAPHQL_VALIDATION_FAILED/);

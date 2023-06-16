@@ -1,3 +1,4 @@
+import { serverLoginStart } from "@serenity-kit/opaque";
 import { UserInputError } from "apollo-server-express";
 import {
   arg,
@@ -7,8 +8,8 @@ import {
   objectType,
 } from "nexus";
 import { z } from "zod";
+import { createLoginAttempt } from "../../../database/authentication/createLoginAttempt";
 import { getEnvelope } from "../../../database/authentication/getEnvelope";
-import { startLogin } from "../../../utils/opaque";
 
 export const StartLoginInput = inputObjectType({
   name: "StartLoginInput",
@@ -44,20 +45,32 @@ export const startLoginMutation = mutationField("startLogin", {
       throw new UserInputError("Input error: invalid email address");
     }
     let result: any = undefined;
+
+    if (!process.env.OPAQUE_SERVER_SETUP) {
+      throw new Error("Missing process.env.OPAQUE_SERVER_SETUP");
+    }
+
     try {
       result = await getEnvelope(username);
     } catch (error) {
       throw new Error("Failed to initiate login");
     }
     try {
-      const challengeResponse = startLogin({
-        envelope: result.envelop,
-        username,
-        challenge: args.input.challenge,
+      const serverLoginStartResult = serverLoginStart({
+        passwordFile: result.envelop,
+        userIdentifier: username,
+        serverSetup: process.env.OPAQUE_SERVER_SETUP,
+        credentialRequest: args.input.challenge,
       });
+
+      const loginAttempt = await createLoginAttempt({
+        username,
+        startLoginServerData: serverLoginStartResult.serverLogin,
+      });
+
       return {
-        loginId: challengeResponse.loginId,
-        challengeResponse: challengeResponse.message,
+        loginId: loginAttempt.id,
+        challengeResponse: serverLoginStartResult.credentialResponse,
       };
     } catch (err) {
       console.error(err);

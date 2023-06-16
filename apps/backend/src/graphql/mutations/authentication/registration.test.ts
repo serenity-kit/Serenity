@@ -1,3 +1,4 @@
+import { clientRegistrationFinish } from "@serenity-kit/opaque";
 import {
   createAndEncryptDevice,
   encryptWorkspaceInvitationPrivateKey,
@@ -27,15 +28,16 @@ test("server should create a registration challenge response", async () => {
     password
   );
   expect(result.data).toBeDefined();
-  expect(typeof result.data.registrationId).toBe("string");
   expect(typeof result.data.challengeResponse).toBe("string");
 });
 
 test("server should register a user", async () => {
-  const message = result.registration.finish(
+  const clientRegistrationFinishResult = clientRegistrationFinish({
     password,
-    sodium.from_base64(result.data.challengeResponse)
-  );
+    clientRegistration: result.registration,
+    registrationResponse: result.data.challengeResponse,
+  });
+
   const query = gql`
     mutation finishRegistration($input: FinishRegistrationInput!) {
       finishRegistration(input: $input) {
@@ -44,14 +46,14 @@ test("server should register a user", async () => {
     }
   `;
 
-  const exportKey = result.registration.getExportKey();
+  const exportKey = clientRegistrationFinishResult.exportKey;
   const { signingPrivateKey, encryptionPrivateKey, ...mainDevice } =
     createAndEncryptDevice(sodium.to_base64(exportKey));
 
   const registrationResponse = await graphql.client.request(query, {
     input: {
-      registrationId: result.data.registrationId,
-      message: sodium.to_base64(message),
+      message: clientRegistrationFinishResult.registrationUpload,
+      username,
       mainDevice,
     },
   });
@@ -59,7 +61,7 @@ test("server should register a user", async () => {
 });
 
 test("server should register a user with a pending workspace id", async () => {
-  const sigingKeyPair = sodium.crypto_sign_keypair();
+  const signingKeyPair = sodium.crypto_sign_keypair();
   const result = await requestRegistrationChallengeResponse(
     graphql,
     username,
@@ -67,10 +69,13 @@ test("server should register a user with a pending workspace id", async () => {
   );
 
   const pendingWorkspaceInvitationId = generateId();
-  const message = result.registration.finish(
+
+  const clientRegistrationFinishResult = clientRegistrationFinish({
     password,
-    sodium.from_base64(result.data.challengeResponse)
-  );
+    clientRegistration: result.registration,
+    registrationResponse: result.data.challengeResponse,
+  });
+
   const query = gql`
     mutation finishRegistration($input: FinishRegistrationInput!) {
       finishRegistration(input: $input) {
@@ -79,20 +84,20 @@ test("server should register a user with a pending workspace id", async () => {
     }
   `;
 
-  const exportKey = sodium.to_base64(result.registration.getExportKey());
+  const exportKey = clientRegistrationFinishResult.exportKey;
   const { signingPrivateKey, encryptionPrivateKey, ...mainDevice } =
     createAndEncryptDevice(exportKey);
   const workspaceInvitationKeyData = encryptWorkspaceInvitationPrivateKey({
     exportKey,
     workspaceInvitationSigningPrivateKey: sodium.to_base64(
-      sigingKeyPair.privateKey
+      signingKeyPair.privateKey
     ),
   });
 
   const registrationResponse = await graphql.client.request(query, {
     input: {
-      registrationId: result.data.registrationId,
-      message: sodium.to_base64(message),
+      message: clientRegistrationFinishResult.registrationUpload,
+      username,
       mainDevice,
       pendingWorkspaceInvitationId,
       pendingWorkspaceInvitationKeyCiphertext:
@@ -136,32 +141,7 @@ describe("Input errors", () => {
         ))()
     ).rejects.toThrowError(/BAD_USER_INPUT/);
   });
-  test("Invalid registrationId", async () => {
-    const result = await requestRegistrationChallengeResponse(
-      graphql,
-      username,
-      password
-    );
-    const pendingWorkspaceInvitationId = generateId();
-    const message = result.registration.finish(
-      password,
-      sodium.from_base64(result.data.challengeResponse)
-    );
-    const exportKey = result.registration.getExportKey();
-    const { signingPrivateKey, encryptionPrivateKey, ...mainDevice } =
-      createAndEncryptDevice(sodium.to_base64(exportKey));
-    await expect(
-      (async () =>
-        await graphql.client.request(query, {
-          input: {
-            registrationId: null,
-            message: sodium.to_base64(message),
-            mainDevice,
-            pendingWorkspaceInvitationId,
-          },
-        }))()
-    ).rejects.toThrowError(/BAD_USER_INPUT/);
-  });
+
   test("pendingWorkspaceInvitationId without other data", async () => {
     const result = await requestRegistrationChallengeResponse(
       graphql,
@@ -169,19 +149,20 @@ describe("Input errors", () => {
       password
     );
     const pendingWorkspaceInvitationId = generateId();
-    const message = result.registration.finish(
+    const clientRegistrationFinishResult = clientRegistrationFinish({
       password,
-      sodium.from_base64(result.data.challengeResponse)
-    );
-    const exportKey = result.registration.getExportKey();
+      clientRegistration: result.registration,
+      registrationResponse: result.data.challengeResponse,
+    });
+    const exportKey = clientRegistrationFinishResult.exportKey;
     const { signingPrivateKey, encryptionPrivateKey, ...mainDevice } =
       createAndEncryptDevice(sodium.to_base64(exportKey));
     await expect(
       (async () =>
         await graphql.client.request(query, {
           input: {
-            registrationId: generateId(),
-            message: sodium.to_base64(message),
+            message: clientRegistrationFinishResult.registrationUpload,
+            username,
             mainDevice,
             pendingWorkspaceInvitationId,
             pendingWorkspaceInvitationKeyCiphertext: null,
@@ -199,19 +180,20 @@ describe("Input errors", () => {
       password
     );
     const pendingWorkspaceInvitationId = generateId();
-    const message = result.registration.finish(
+    const clientRegistrationFinishResult = clientRegistrationFinish({
       password,
-      sodium.from_base64(result.data.challengeResponse)
-    );
-    const exportKey = result.registration.getExportKey();
+      clientRegistration: result.registration,
+      registrationResponse: result.data.challengeResponse,
+    });
+    const exportKey = clientRegistrationFinishResult.exportKey;
     const { signingPrivateKey, encryptionPrivateKey, ...mainDevice } =
       createAndEncryptDevice(sodium.to_base64(exportKey));
     await expect(
       (async () =>
         await graphql.client.request(query, {
           input: {
-            registrationId: result.data.registrationId,
             message: null,
+            username,
             mainDevice,
             pendingWorkspaceInvitationId,
           },
@@ -225,19 +207,20 @@ describe("Input errors", () => {
       password
     );
     const pendingWorkspaceInvitationId = generateId();
-    const message = result.registration.finish(
+    const clientRegistrationFinishResult = clientRegistrationFinish({
       password,
-      sodium.from_base64(result.data.challengeResponse)
-    );
-    const exportKey = result.registration.getExportKey();
+      clientRegistration: result.registration,
+      registrationResponse: result.data.challengeResponse,
+    });
+    const exportKey = clientRegistrationFinishResult.exportKey;
     const { signingPrivateKey, encryptionPrivateKey, ...mainDevice } =
       createAndEncryptDevice(sodium.to_base64(exportKey));
     await expect(
       (async () =>
         await graphql.client.request(query, {
           input: {
-            registrationId: result.data.registrationId,
-            message: sodium.to_base64(message),
+            message: clientRegistrationFinishResult.registrationUpload,
+            username,
             mainDevice: null,
             pendingWorkspaceInvitationId,
           },
@@ -251,11 +234,12 @@ describe("Input errors", () => {
       password
     );
     const pendingWorkspaceInvitationId = generateId();
-    const message = result.registration.finish(
+    const clientRegistrationFinishResult = clientRegistrationFinish({
       password,
-      sodium.from_base64(result.data.challengeResponse)
-    );
-    const exportKey = result.registration.getExportKey();
+      clientRegistration: result.registration,
+      registrationResponse: result.data.challengeResponse,
+    });
+    const exportKey = clientRegistrationFinishResult.exportKey;
     const {
       signingPrivateKey,
       encryptionPrivateKey,
@@ -266,8 +250,8 @@ describe("Input errors", () => {
       (async () =>
         await graphql.client.request(query, {
           input: {
-            registrationId: result.data.registrationId,
-            message: sodium.to_base64(message),
+            message: clientRegistrationFinishResult.registrationUpload,
+            username,
             mainDevice,
             pendingWorkspaceInvitationId,
           },
@@ -281,19 +265,20 @@ describe("Input errors", () => {
       password
     );
     const pendingWorkspaceInvitationId = generateId();
-    const message = result.registration.finish(
+    const clientRegistrationFinishResult = clientRegistrationFinish({
       password,
-      sodium.from_base64(result.data.challengeResponse)
-    );
-    const exportKey = result.registration.getExportKey();
+      clientRegistration: result.registration,
+      registrationResponse: result.data.challengeResponse,
+    });
+    const exportKey = clientRegistrationFinishResult.exportKey;
     const { signingPrivateKey, encryptionPrivateKey, nonce, ...mainDevice } =
       createAndEncryptDevice(sodium.to_base64(exportKey));
     await expect(
       (async () =>
         await graphql.client.request(query, {
           input: {
-            registrationId: result.data.registrationId,
-            message: sodium.to_base64(message),
+            message: clientRegistrationFinishResult.registrationUpload,
+            username,
             mainDevice,
             pendingWorkspaceInvitationId,
           },
@@ -307,11 +292,12 @@ describe("Input errors", () => {
       password
     );
     const pendingWorkspaceInvitationId = generateId();
-    const message = result.registration.finish(
+    const clientRegistrationFinishResult = clientRegistrationFinish({
       password,
-      sodium.from_base64(result.data.challengeResponse)
-    );
-    const exportKey = result.registration.getExportKey();
+      clientRegistration: result.registration,
+      registrationResponse: result.data.challengeResponse,
+    });
+    const exportKey = clientRegistrationFinishResult.exportKey;
     const {
       signingPrivateKey,
       encryptionPrivateKey,
@@ -322,8 +308,8 @@ describe("Input errors", () => {
       (async () =>
         await graphql.client.request(query, {
           input: {
-            registrationId: result.data.registrationId,
-            message: sodium.to_base64(message),
+            message: clientRegistrationFinishResult.registrationUpload,
+            username,
             mainDevice,
             pendingWorkspaceInvitationId,
           },
@@ -337,11 +323,12 @@ describe("Input errors", () => {
       password
     );
     const pendingWorkspaceInvitationId = generateId();
-    const message = result.registration.finish(
+    const clientRegistrationFinishResult = clientRegistrationFinish({
       password,
-      sodium.from_base64(result.data.challengeResponse)
-    );
-    const exportKey = result.registration.getExportKey();
+      clientRegistration: result.registration,
+      registrationResponse: result.data.challengeResponse,
+    });
+    const exportKey = clientRegistrationFinishResult.exportKey;
     const {
       signingPrivateKey,
       encryptionPrivateKey,
@@ -352,8 +339,8 @@ describe("Input errors", () => {
       (async () =>
         await graphql.client.request(query, {
           input: {
-            registrationId: result.data.registrationId,
-            message: sodium.to_base64(message),
+            message: clientRegistrationFinishResult.registrationUpload,
+            username,
             mainDevice,
             pendingWorkspaceInvitationId,
           },
@@ -367,11 +354,12 @@ describe("Input errors", () => {
       password
     );
     const pendingWorkspaceInvitationId = generateId();
-    const message = result.registration.finish(
+    const clientRegistrationFinishResult = clientRegistrationFinish({
       password,
-      sodium.from_base64(result.data.challengeResponse)
-    );
-    const exportKey = result.registration.getExportKey();
+      clientRegistration: result.registration,
+      registrationResponse: result.data.challengeResponse,
+    });
+    const exportKey = clientRegistrationFinishResult.exportKey;
     const {
       signingPrivateKey,
       encryptionPrivateKey,
@@ -382,8 +370,8 @@ describe("Input errors", () => {
       (async () =>
         await graphql.client.request(query, {
           input: {
-            registrationId: result.data.registrationId,
-            message: sodium.to_base64(message),
+            message: clientRegistrationFinishResult.registrationUpload,
+            username,
             mainDevice,
             pendingWorkspaceInvitationId,
           },
@@ -397,11 +385,12 @@ describe("Input errors", () => {
       password
     );
     const pendingWorkspaceInvitationId = generateId();
-    const message = result.registration.finish(
+    const clientRegistrationFinishResult = clientRegistrationFinish({
       password,
-      sodium.from_base64(result.data.challengeResponse)
-    );
-    const exportKey = result.registration.getExportKey();
+      clientRegistration: result.registration,
+      registrationResponse: result.data.challengeResponse,
+    });
+    const exportKey = clientRegistrationFinishResult.exportKey;
     const {
       signingPrivateKey,
       encryptionPrivateKey,
@@ -412,8 +401,8 @@ describe("Input errors", () => {
       (async () =>
         await graphql.client.request(query, {
           input: {
-            registrationId: result.data.registrationId,
-            message: sodium.to_base64(message),
+            message: clientRegistrationFinishResult.registrationUpload,
+            username,
             mainDevice,
             pendingWorkspaceInvitationId,
           },

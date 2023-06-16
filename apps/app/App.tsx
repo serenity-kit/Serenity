@@ -5,7 +5,6 @@ import {
   Inter_700Bold,
   useFonts,
 } from "@expo-google-fonts/inter"; // Inter options can be found here https://github.com/expo/google-fonts/tree/master/font-packages/inter
-import { OpaqueBridge } from "@serenity-tools/opaque";
 import {
   tw,
   useIsDesktopDevice,
@@ -13,7 +12,7 @@ import {
 } from "@serenity-tools/ui";
 import "expo-dev-client";
 import { StatusBar } from "expo-status-bar";
-import { extendTheme, NativeBaseProvider } from "native-base";
+import { NativeBaseProvider, extendTheme } from "native-base";
 import { OverlayProvider } from "react-native-popper";
 import { RootSiblingParent } from "react-native-root-siblings";
 import { SafeAreaProvider } from "react-native-safe-area-context";
@@ -27,7 +26,6 @@ import Navigation from "./navigation/Navigation";
 import { patchConsoleOutput } from "./utils/patchConsoleOutput/patchConsoleOutput";
 import { patchFileReader } from "./utils/patchFileReader/patchFileReader";
 import { patchGlobalStyles } from "./utils/patchGlobalStyles/patchGlobalStyles";
-import { source } from "./webviews/opaque/source";
 
 patchConsoleOutput();
 patchGlobalStyles();
@@ -168,7 +166,6 @@ export default function App() {
                   <OverlayProvider>
                     <Navigation colorScheme={colorScheme} />
                     <StatusBar />
-                    <OpaqueBridge source={source} />
                   </OverlayProvider>
                 </NativeBaseProvider>
               </SafeAreaProvider>

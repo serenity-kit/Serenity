@@ -1,3 +1,4 @@
+import { serverRegistrationFinish } from "@serenity-kit/opaque";
 import {
   arg,
   inputObjectType,
@@ -6,7 +7,6 @@ import {
   objectType,
 } from "nexus";
 import { finalizeRegistration } from "../../../database/authentication/finalizeRegistration";
-import { finishRegistration } from "../../../utils/opaque";
 
 export const FinishRegistrationDeviceInput = inputObjectType({
   name: "FinishRegistrationDeviceInput",
@@ -24,7 +24,7 @@ export const FinishRegistrationInput = inputObjectType({
   name: "FinishRegistrationInput",
   definition(t) {
     t.nonNull.string("message");
-    t.nonNull.string("registrationId");
+    t.nonNull.string("username");
     t.nonNull.field("mainDevice", { type: FinishRegistrationDeviceInput });
     t.string("pendingWorkspaceInvitationId");
     t.int("pendingWorkspaceInvitationKeySubkeyId");
@@ -52,14 +52,15 @@ export const finishRegistrationMutation = mutationField("finishRegistration", {
     ),
   },
   async resolve(root, args, context) {
-    const { envelope, username } = finishRegistration({
-      registrationId: args.input.registrationId,
-      message: args.input.message,
-    });
+    if (!process.env.OPAQUE_SERVER_SETUP) {
+      throw new Error("Missing process.env.OPAQUE_SERVER_SETUP");
+    }
+
+    const passwordFile = serverRegistrationFinish(args.input.message);
 
     const unverifiedUser = await finalizeRegistration({
-      username,
-      opaqueEnvelope: envelope,
+      username: args.input.username,
+      opaqueEnvelope: passwordFile,
       mainDevice: args.input.mainDevice,
       pendingWorkspaceInvitationId: args.input.pendingWorkspaceInvitationId,
       pendingWorkspaceInvitationKeySubkeyId:
