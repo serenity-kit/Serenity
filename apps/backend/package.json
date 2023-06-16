@@ -7,7 +7,7 @@
     "dev:e2e": "(export PORT=4001; export DATABASE_URL=postgres://prisma:prisma@localhost:5432/serenity_e2e_tests; yarn prisma migrate reset --force && yarn prisma migrate dev && ts-node-dev --transpile-only --no-notify ./src/index.ts)",
     "dev:mock": "yarn && yarn prisma generate && MOCK_GRAPHQL=true ts-node-dev --transpile-only --no-notify ./src/index.ts",
     "clean": "rm -rf build",
-    "build": "yarn && yarn clean && yarn prisma:prod:generate && yarn ncc build ./src/index.ts -o build",
+    "build": "yarn && yarn clean && yarn prisma:prod:generate && yarn ncc build ./src/index.ts -o build --external @serenity-kit/opaque",
     "deploy": "yarn build && fly launch",
     "prisma:prod:migrate": "yarn global add prisma@4 && DATABASE_URL=$DATABASE_URL prisma migrate deploy",
     "prisma:prod:generate": "DATABASE_URL=$DATABASE_URL prisma generate",

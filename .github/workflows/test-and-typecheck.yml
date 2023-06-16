@@ -102,6 +102,7 @@ jobs:
       - name: Echo SERENITY_ENV
         run: echo $SERENITY_ENV
       - name: Run e2e tests
+        # run: yarn workspace backend test:e2e test/e2e/authentication/login.e2e.ts
         run: yarn workspace backend test:e2e
       - name: Upload artifacts
         if: always() # to make sure it runs even if the e2e tests fail
