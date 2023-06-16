@@ -14,7 +14,7 @@ import {
   InvalidWorkspaceChainError,
   resolveState,
 } from "./index";
-import { removeInvitations } from "./removeInvitation";
+import { removeInvitations } from "./removeInvitations";
 import { hashTransaction } from "./utils";
 
 let keyPairA: sodium.KeyPair;

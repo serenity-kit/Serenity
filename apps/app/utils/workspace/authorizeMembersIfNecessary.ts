@@ -29,7 +29,6 @@ export const authorizeMembersIfNecessary = async ({
       const { workspaceId, devices, userMainDeviceSigningPublicKey } =
         unauthorizedMemberResult.data.unauthorizedMember;
 
-      console.log("weeee", workspaceChainState);
       if (
         !workspaceChainState.members.hasOwnProperty(
           userMainDeviceSigningPublicKey

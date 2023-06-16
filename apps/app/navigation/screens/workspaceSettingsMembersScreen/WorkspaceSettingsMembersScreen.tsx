@@ -195,7 +195,6 @@ export default function WorkspaceSettingsMembersScreen(
       if (!device) {
         continue;
       }
-      console.log("device", device.userId, userId);
       if (device.userId !== userId) {
         const { ciphertext, nonce } = encryptWorkspaceKeyForDevice({
           receiverDeviceEncryptionPublicKey: device.encryptionPublicKey,
@@ -267,7 +266,7 @@ export default function WorkspaceSettingsMembersScreen(
                     your invitation within 2 days.
                   </Description>
                 </View>
-                <CreateWorkspaceInvitation workspaceId={workspaceId} />
+                <CreateWorkspaceInvitation />
               </>
             )}
             <Heading lvl={3} style={tw`mt-3`}>
@@ -275,7 +274,11 @@ export default function WorkspaceSettingsMembersScreen(
             </Heading>
 
             <List
-              data={members}
+              data={
+                workspaceChainState
+                  ? Object.entries(workspaceChainState.members)
+                  : []
+              }
               emptyString={"No members available"}
               header={
                 <ListHeader data={["Name", "Email", "Role"]} mainIsIconText />

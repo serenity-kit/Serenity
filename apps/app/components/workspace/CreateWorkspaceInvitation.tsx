@@ -18,21 +18,18 @@ import {
   Role,
   runCreateWorkspaceInvitationMutation,
   useDeleteWorkspaceInvitationsMutation,
-  useWorkspaceInvitationsQuery,
 } from "../../generated/graphql";
 import { getMainDevice } from "../../utils/device/mainDeviceMemoryStore";
 import { VerifyPasswordModal } from "../verifyPasswordModal/VerifyPasswordModal";
 import { WorkspaceInvitationList } from "./WorkspaceInvitationList";
 
-type Props = {
-  workspaceId: string;
-};
+type Props = {};
 
 export function CreateWorkspaceInvitation(props: Props) {
   // TODO: propagate graphql error
-  const workspaceId = props.workspaceId;
-  const [workspaceInvitationsResult, refetchWorkspaceInvitationsResult] =
-    useWorkspaceInvitationsQuery({ variables: { workspaceId } });
+
+  const { workspaceId, lastChainEvent, fetchAndApplyNewWorkspaceChainEntries } =
+    useWorkspace();
   const [, deleteWorkspaceInvitationsMutation] =
     useDeleteWorkspaceInvitationsMutation();
   const [selectedWorkspaceInvitationId, setSelectedWorkspaceInvitationId] =
@@ -42,11 +39,18 @@ export function CreateWorkspaceInvitation(props: Props) {
     setSelectedWorkspaceInvitationSigningKeyPairSeed,
   ] = useState<string | null>(null);
   const [isPasswordModalVisible, setIsPasswordModalVisible] = useState(false);
+  const [invitationIdToDelete, setInvitationIdToDelete] = useState<
+    string | null
+  >(null);
+
+  const [
+    isPasswordModalVisibleForRemovingAnInvitation,
+    setIsPasswordModalVisibleForRemovingAnInvitation,
+  ] = useState(false);
   const [isClipboardNoticeActive, setIsClipboardNoticeActive] =
     useState<boolean>(false);
   const [sharingRole, _setSharingRole] = useState<Role>(Role.Viewer);
   const CLIPBOARD_NOTICE_TIMEOUT_SECONDS = 2;
-  const { lastChainEvent } = useWorkspace();
 
   const setSharingRole = (role: string) => {
     if (role === "admin") {
@@ -125,7 +129,7 @@ export function CreateWorkspaceInvitation(props: Props) {
           serializedWorkspaceChainEvent: JSON.stringify(invitation),
         },
       });
-    refetchWorkspaceInvitationsResult();
+    await fetchAndApplyNewWorkspaceChainEntries();
     if (createWorkspaceInvitationResult.data?.createWorkspaceInvitation) {
       setSelectedWorkspaceInvitationId(invitation.transaction.invitationId);
       setSelectedWorkspaceInvitationSigningKeyPairSeed(
@@ -134,14 +138,41 @@ export function CreateWorkspaceInvitation(props: Props) {
     }
   };
 
-  const deleteWorkspaceInvitation = async (id: string) => {
+  const deleteWorkspaceInvitation = async (invitationId: string) => {
+    const mainDevice = getMainDevice();
+    if (!mainDevice) {
+      throw new Error("No main device");
+    }
+    if (!lastChainEvent) {
+      throw new Error("No last chain event");
+    }
+    const removeInvitationEvent = workspaceChain.removeInvitations({
+      prevHash: workspaceChain.hashTransaction(lastChainEvent.transaction),
+      authorKeyPair: {
+        keyType: "ed25519",
+        privateKey: sodium.from_base64(mainDevice.signingPrivateKey),
+        publicKey: sodium.from_base64(mainDevice.signingPublicKey),
+      },
+      invitationIds: [invitationId],
+    });
+
     await deleteWorkspaceInvitationsMutation({
       input: {
-        ids: [id],
+        serializedWorkspaceChainEvent: JSON.stringify(removeInvitationEvent),
       },
     });
     setSelectedWorkspaceInvitationId(null);
-    refetchWorkspaceInvitationsResult();
+    await fetchAndApplyNewWorkspaceChainEntries();
+  };
+
+  const deleteWorkspaceInvitationPreflight = (invitationId) => {
+    const mainDevice = getMainDevice();
+    if (!mainDevice) {
+      setInvitationIdToDelete(invitationId);
+      setIsPasswordModalVisibleForRemovingAnInvitation(true);
+      return;
+    }
+    deleteWorkspaceInvitation(invitationId);
   };
 
   const copyInvitationText = () => {
@@ -201,20 +232,16 @@ export function CreateWorkspaceInvitation(props: Props) {
           sorted by time until expiration.
         </Description>
       </View>
-      {workspaceInvitationsResult.fetching ? (
-        <Button disabled>Loading...</Button>
-      ) : (
-        <WorkspaceInvitationList
-          testID="workspaceInviteeList"
-          workspaceInvitations={
-            workspaceInvitationsResult.data?.workspaceInvitations?.nodes || []
-          }
-          onDeletePress={deleteWorkspaceInvitation}
-          onSelect={(id: string) => {
-            setSelectedWorkspaceInvitationId(id);
-          }}
-        />
-      )}
+
+      <WorkspaceInvitationList
+        testID="workspaceInviteeList"
+        onDeletePress={(invitationId) => {
+          deleteWorkspaceInvitationPreflight(invitationId);
+        }}
+        onSelect={(id: string) => {
+          setSelectedWorkspaceInvitationId(id);
+        }}
+      />
       <VerifyPasswordModal
         isVisible={isPasswordModalVisible}
         description="Creating a workspace invitation requires access to the main account and therefore verifying your password is required"
@@ -224,6 +251,18 @@ export function CreateWorkspaceInvitation(props: Props) {
         }}
         onCancel={() => {
           setIsPasswordModalVisible(false);
+        }}
+      />
+
+      <VerifyPasswordModal
+        isVisible={isPasswordModalVisibleForRemovingAnInvitation}
+        description="Removing a workspace invitation requires access to the main account and therefore verifying your password is required"
+        onSuccess={() => {
+          setIsPasswordModalVisibleForRemovingAnInvitation(false);
+          deleteWorkspaceInvitation(invitationIdToDelete!);
+        }}
+        onCancel={() => {
+          setIsPasswordModalVisibleForRemovingAnInvitation(false);
         }}
       />
     </>

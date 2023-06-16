@@ -5,6 +5,7 @@ export * from "./addMember";
 export * from "./applyEvent";
 export * from "./createChain";
 export * from "./errors";
+export * from "./removeInvitations";
 export * from "./removeMember";
 export * from "./resolveState";
 export * from "./types";

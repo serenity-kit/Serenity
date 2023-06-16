@@ -1,10 +1,13 @@
+import * as workspaceChain from "@serenity-kit/workspace-chain";
 import { gql } from "graphql-request";
+import sodium from "react-native-libsodium";
 import { Role } from "../../../../prisma/generated/output";
 import deleteAllRecords from "../../../../test/helpers/deleteAllRecords";
 import setupGraphql from "../../../../test/helpers/setupGraphql";
+import { acceptWorkspaceInvitation } from "../../../../test/helpers/workspace/acceptWorkspaceInvitation";
 import { createWorkspaceInvitation } from "../../../../test/helpers/workspace/createWorkspaceInvitation";
 import { deleteWorkspaceInvitations } from "../../../../test/helpers/workspace/deleteWorkspaceInvitations";
-import { prisma } from "../../../database/prisma";
+import { getLastWorkspaceChainEvent } from "../../../../test/helpers/workspace/getLastWorkspaceChainEvent";
 import createUserWithWorkspace from "../../../database/testHelpers/createUserWithWorkspace";
 
 const graphql = setupGraphql();
@@ -13,7 +16,7 @@ const username2 = "user2";
 let userAndDevice1: any = null;
 let userAndDevice2: any = null;
 
-beforeAll(async () => {
+beforeEach(async () => {
   await deleteAllRecords();
   userAndDevice1 = await createUserWithWorkspace({
     username: username1,
@@ -33,10 +36,25 @@ test("user should be able to delete a workspace invitation they created", async 
   });
   const workspaceInvitationId =
     workspaceInvitationResult.createWorkspaceInvitation.workspaceInvitation.id;
-  const workspaceInvitationIds: string[] = [workspaceInvitationId];
+
+  const { lastChainEntry } = await getLastWorkspaceChainEvent({
+    workspaceId: userAndDevice1.workspace.id,
+  });
+  const removeInvitationsEvent = workspaceChain.removeInvitations({
+    prevHash: workspaceChain.hashTransaction(lastChainEntry.transaction),
+    authorKeyPair: {
+      keyType: "ed25519",
+      privateKey: sodium.from_base64(
+        userAndDevice1.mainDevice.signingPrivateKey
+      ),
+      publicKey: sodium.from_base64(userAndDevice1.mainDevice.signingPublicKey),
+    },
+    invitationIds: [workspaceInvitationId],
+  });
+
   const deleteWorkspaceInvitationResult = await deleteWorkspaceInvitations({
     graphql,
-    ids: workspaceInvitationIds,
+    serializedWorkspaceChainEvent: JSON.stringify(removeInvitationsEvent),
     authorizationHeader: userAndDevice1.sessionKey,
   });
   expect(deleteWorkspaceInvitationResult.deleteWorkspaceInvitations)
@@ -49,36 +67,44 @@ test("user should be able to delete a workspace invitation they created", async 
 
 test("user should be able to delete a workspace invitation they didn't create", async () => {
   // add user2 as an admin for workspace 1
-  // TODO should be an actual GraphQL call with a chain update
-  await prisma.usersToWorkspaces.create({
-    data: {
-      user: {
-        connect: {
-          username: username2,
-        },
-      },
-      workspace: {
-        connect: {
-          id: userAndDevice1.workspace.id,
-        },
-      },
-      role: Role.ADMIN,
-    },
-  });
   const workspaceInvitationResult = await createWorkspaceInvitation({
     graphql,
-    role: Role.VIEWER,
+    role: "ADMIN",
     workspaceId: userAndDevice1.workspace.id,
-    authorizationHeader: userAndDevice2.sessionKey,
-    mainDevice: userAndDevice2.mainDevice,
+    authorizationHeader: userAndDevice1.sessionKey,
+    mainDevice: userAndDevice1.mainDevice,
   });
-  const workspaceInvitationId =
+  const invitationId =
     workspaceInvitationResult.createWorkspaceInvitation.workspaceInvitation.id;
-  const workspaceInvitationIds: string[] = [workspaceInvitationId];
+
+  await acceptWorkspaceInvitation({
+    graphql,
+    invitationId,
+    inviteeMainDevice: userAndDevice2.mainDevice,
+    invitationSigningKeyPairSeed:
+      workspaceInvitationResult.invitationSigningKeyPairSeed,
+    authorizationHeader: userAndDevice2.sessionKey,
+  });
+
+  const { lastChainEntry } = await getLastWorkspaceChainEvent({
+    workspaceId: userAndDevice1.workspace.id,
+  });
+  const removeInvitationsEvent = workspaceChain.removeInvitations({
+    prevHash: workspaceChain.hashTransaction(lastChainEntry.transaction),
+    authorKeyPair: {
+      keyType: "ed25519",
+      privateKey: sodium.from_base64(
+        userAndDevice2.mainDevice.signingPrivateKey
+      ),
+      publicKey: sodium.from_base64(userAndDevice2.mainDevice.signingPublicKey),
+    },
+    invitationIds: [invitationId],
+  });
+
   const deleteWorkspaceInvitationResult = await deleteWorkspaceInvitations({
     graphql,
-    ids: workspaceInvitationIds,
-    authorizationHeader: userAndDevice1.sessionKey,
+    serializedWorkspaceChainEvent: JSON.stringify(removeInvitationsEvent),
+    authorizationHeader: userAndDevice2.sessionKey,
   });
   expect(deleteWorkspaceInvitationResult.deleteWorkspaceInvitations)
     .toMatchInlineSnapshot(`
@@ -89,44 +115,48 @@ test("user should be able to delete a workspace invitation they didn't create", 
 });
 
 test("user should not be able to delete a workspace invitation if they aren't admin", async () => {
-  // add user1 to workspace2
-  await prisma.usersToWorkspaces.create({
-    data: {
-      user: {
-        connect: {
-          username: username1,
-        },
-      },
-      workspace: {
-        connect: {
-          id: userAndDevice2.workspace.id,
-        },
-      },
-      role: Role.EDITOR,
-    },
-  });
-  // user2 shares workspace
+  // add user2 as an editor for workspace 1
   const workspaceInvitationResult = await createWorkspaceInvitation({
     graphql,
-    role: Role.VIEWER,
-    workspaceId: userAndDevice2.workspace.id,
-    authorizationHeader: userAndDevice2.sessionKey,
-    mainDevice: userAndDevice2.mainDevice,
-  });
-  const workspaceInvitationId =
-    workspaceInvitationResult.createWorkspaceInvitation.workspaceInvitation.id;
-  const workspaceInvitationIds: string[] = [workspaceInvitationId];
-  const deleteWorkspaceInvitationResult = await deleteWorkspaceInvitations({
-    graphql,
-    ids: workspaceInvitationIds,
+    role: "EDITOR",
+    workspaceId: userAndDevice1.workspace.id,
     authorizationHeader: userAndDevice1.sessionKey,
+    mainDevice: userAndDevice1.mainDevice,
   });
-  expect(deleteWorkspaceInvitationResult.deleteWorkspaceInvitations)
-    .toMatchInlineSnapshot(`
-    {
-      "status": "success",
-    }
-  `);
+  const invitationId =
+    workspaceInvitationResult.createWorkspaceInvitation.workspaceInvitation.id;
+
+  await acceptWorkspaceInvitation({
+    graphql,
+    invitationId,
+    inviteeMainDevice: userAndDevice2.mainDevice,
+    invitationSigningKeyPairSeed:
+      workspaceInvitationResult.invitationSigningKeyPairSeed,
+    authorizationHeader: userAndDevice2.sessionKey,
+  });
+  const { lastChainEntry } = await getLastWorkspaceChainEvent({
+    workspaceId: userAndDevice1.workspace.id,
+  });
+  const removeInvitationsEvent = workspaceChain.removeInvitations({
+    prevHash: workspaceChain.hashTransaction(lastChainEntry.transaction),
+    authorKeyPair: {
+      keyType: "ed25519",
+      privateKey: sodium.from_base64(
+        userAndDevice2.mainDevice.signingPrivateKey
+      ),
+      publicKey: sodium.from_base64(userAndDevice2.mainDevice.signingPublicKey),
+    },
+    invitationIds: [invitationId],
+  });
+
+  await expect(
+    (async () =>
+      await deleteWorkspaceInvitations({
+        graphql,
+        serializedWorkspaceChainEvent: JSON.stringify(removeInvitationsEvent),
+        authorizationHeader: userAndDevice2.sessionKey,
+      }))()
+  ).rejects.toThrowError();
 });
 
 test("Unauthenticated", async () => {
@@ -137,14 +167,30 @@ test("Unauthenticated", async () => {
     authorizationHeader: userAndDevice1.sessionKey,
     mainDevice: userAndDevice1.mainDevice,
   });
+
   const workspaceInvitationId =
     workspaceInvitationResult.createWorkspaceInvitation.workspaceInvitation.id;
-  const workspaceInvitationIds: string[] = [workspaceInvitationId];
+
+  const { lastChainEntry } = await getLastWorkspaceChainEvent({
+    workspaceId: userAndDevice1.workspace.id,
+  });
+  const removeInvitationsEvent = workspaceChain.removeInvitations({
+    prevHash: workspaceChain.hashTransaction(lastChainEntry.transaction),
+    authorKeyPair: {
+      keyType: "ed25519",
+      privateKey: sodium.from_base64(
+        userAndDevice1.mainDevice.signingPrivateKey
+      ),
+      publicKey: sodium.from_base64(userAndDevice1.mainDevice.signingPublicKey),
+    },
+    invitationIds: [workspaceInvitationId],
+  });
+
   await expect(
     (async () =>
       await deleteWorkspaceInvitations({
         graphql,
-        ids: workspaceInvitationIds,
+        serializedWorkspaceChainEvent: JSON.stringify(removeInvitationsEvent),
         authorizationHeader: "badauthheader",
       }))()
   ).rejects.toThrowError(/UNAUTHENTICATED/);
@@ -168,7 +214,11 @@ describe("Input Errors", () => {
       (async () =>
         await graphql.client.request(
           query,
-          { input: { ids: null } },
+          {
+            input: {
+              serializedWorkspaceChainEvent: null,
+            },
+          },
           authorizationHeaders
         ))()
     ).rejects.toThrowError(/GRAPHQL_VALIDATION_FAILED/);
