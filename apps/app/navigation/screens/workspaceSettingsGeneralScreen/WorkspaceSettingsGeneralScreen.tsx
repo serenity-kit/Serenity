@@ -15,15 +15,10 @@ import {
 } from "@serenity-tools/ui";
 import { useMachine } from "@xstate/react";
 import { useEffect, useState } from "react";
-import { StyleSheet } from "react-native";
 import { useWorkspace } from "../../../context/WorkspaceContext";
 import {
-  MeResult,
-  Role,
   useDeleteWorkspacesMutation,
   useUpdateWorkspaceNameMutation,
-  Workspace,
-  WorkspaceMember,
 } from "../../../generated/graphql";
 import { useAuthenticatedAppContext } from "../../../hooks/useAuthenticatedAppContext";
 import { workspaceSettingsLoadWorkspaceMachine } from "../../../machines/workspaceSettingsLoadWorkspaceMachine";
@@ -32,13 +27,14 @@ import {
   removeLastUsedDocumentId,
   removeLastUsedWorkspaceId,
 } from "../../../utils/lastUsedWorkspaceAndDocumentStore/lastUsedWorkspaceAndDocumentStore";
+import { showToast } from "../../../utils/toast/showToast";
 
 export default function WorkspaceSettingsGeneralScreen(
   props: WorkspaceStackScreenProps<"WorkspaceSettingsGeneral"> & {
     children?: React.ReactNode;
   }
 ) {
-  const { workspaceId } = useWorkspace();
+  const { workspaceId, workspaceChainState } = useWorkspace();
   const { activeDevice } = useAuthenticatedAppContext();
   const [state] = useMachine(workspaceSettingsLoadWorkspaceMachine, {
     context: {
@@ -50,15 +46,8 @@ export default function WorkspaceSettingsGeneralScreen(
   const [, deleteWorkspacesMutation] = useDeleteWorkspacesMutation();
   const [, updateWorkspaceNameMutation] = useUpdateWorkspaceNameMutation();
   const [workspaceName, setWorkspaceName] = useState<string>("");
-  const [isAdmin, setIsAdmin] = useState<boolean>(false);
-  const [members, setMembers] = useState<WorkspaceMember[]>([]);
-  const [memberLookup, setMemberLookup] = useState<{
-    [username: string]: number;
-  }>({});
   const [isLoadingWorkspaceData, setIsLoadingWorkspaceData] =
     useState<boolean>(false);
-  const [hasGraphqlError, setHasGraphqlError] = useState<boolean>(false);
-  const [graphqlError, setGraphqlError] = useState<string>("");
   const [showDeleteWorkspaceModal, setShowDeleteWorkspaceModal] =
     useState<boolean>(false);
   const [deletingWorkspaceName, setDeletingWorkspaceName] =
@@ -69,33 +58,11 @@ export default function WorkspaceSettingsGeneralScreen(
       state.value === "loadWorkspaceSuccess" &&
       state.context.workspaceQueryResult?.data?.workspace
     ) {
-      updateWorkspaceData(
-        state.context.meWithWorkspaceLoadingInfoQueryResult?.data?.me,
-        // @ts-expect-error need to fix the generation
-        state.context.workspaceQueryResult?.data?.workspace
+      setWorkspaceName(
+        state.context.workspaceQueryResult.data.workspace.name || ""
       );
     }
   }, [state]);
-
-  const updateWorkspaceData = async (
-    me: MeResult | null | undefined,
-    workspace: Workspace
-  ) => {
-    setIsLoadingWorkspaceData(true);
-    const workspaceName = workspace.name || "";
-    setWorkspaceName(workspaceName);
-    const members: WorkspaceMember[] = workspace.members || [];
-    setMembers(members);
-    const memberLookup = {} as { [username: string]: number };
-    members.forEach((member: WorkspaceMember, row: number) => {
-      memberLookup[member.userId] = row;
-      if (member.userId === me?.id) {
-        setIsAdmin(member.role === Role.Admin);
-      }
-    });
-    setMemberLookup(memberLookup);
-    setIsLoadingWorkspaceData(false);
-  };
 
   const deleteWorkspace = async () => {
     if (deletingWorkspaceName !== workspaceName) {
@@ -103,7 +70,6 @@ export default function WorkspaceSettingsGeneralScreen(
       return;
     }
     setIsLoadingWorkspaceData(true);
-    setHasGraphqlError(false);
     const deleteWorkspaceResult = await deleteWorkspacesMutation({
       input: {
         ids: [workspaceId],
@@ -114,8 +80,10 @@ export default function WorkspaceSettingsGeneralScreen(
       removeLastUsedWorkspaceId();
       props.navigation.navigate("Root");
     } else if (deleteWorkspaceResult?.error) {
-      setHasGraphqlError(true);
-      setGraphqlError(deleteWorkspaceResult?.error.message);
+      showToast(
+        "Failed to delete the workspace. Please try again or contact support.",
+        "error"
+      );
     }
     setIsLoadingWorkspaceData(false);
     setShowDeleteWorkspaceModal(false);
@@ -129,22 +97,38 @@ export default function WorkspaceSettingsGeneralScreen(
         name: workspaceName,
       },
     });
-    if (updateWorkspaceResult.data?.updateWorkspaceName?.workspace) {
-      updateWorkspaceData(
-        state.context.meWithWorkspaceLoadingInfoQueryResult?.data?.me,
-        updateWorkspaceResult.data?.updateWorkspaceName?.workspace
+    if (
+      typeof updateWorkspaceResult.data?.updateWorkspaceName?.workspace
+        ?.name === "string"
+    ) {
+      showToast("Workspace name updated.", "info");
+    } else {
+      showToast(
+        "Failed to update the workspace name. Please try again or contact support.",
+        "error"
       );
     }
     setIsLoadingWorkspaceData(false);
   };
 
+  let currentUserIsAdmin = false;
+  if (state.value === "loadWorkspaceSuccess" && workspaceChainState) {
+    Object.entries(workspaceChainState.members).forEach(
+      ([mainDeviceSigningPublicKey, memberInfo]) => {
+        if (
+          memberInfo.role === "ADMIN" &&
+          mainDeviceSigningPublicKey ===
+            state.context.meWithWorkspaceLoadingInfoQueryResult?.data?.me
+              ?.mainDeviceSigningPublicKey
+        ) {
+          currentUserIsAdmin = true;
+        }
+      }
+    );
+  }
+
   return (
     <>
-      {hasGraphqlError && (
-        <View style={styles.errorBanner}>
-          <Text style={styles.errorText}>{graphqlError}</Text>
-        </View>
-      )}
       <SettingsContentWrapper title="General">
         {state.value !== "loadWorkspaceSuccess" ? (
           <CenterContent>
@@ -170,10 +154,10 @@ export default function WorkspaceSettingsGeneralScreen(
               placeholder="New name"
               value={workspaceName}
               onChangeText={setWorkspaceName}
-              editable={isAdmin && !isLoadingWorkspaceData}
+              editable={currentUserIsAdmin && !isLoadingWorkspaceData}
               label={"Workspace name"}
             />
-            {isAdmin && (
+            {currentUserIsAdmin && (
               <Button
                 onPress={updateWorkspaceName}
                 disabled={isLoadingWorkspaceData}
@@ -181,12 +165,12 @@ export default function WorkspaceSettingsGeneralScreen(
                 Update
               </Button>
             )}
-            {isAdmin && (
+            {currentUserIsAdmin && (
               <Button onPress={() => setShowDeleteWorkspaceModal(true)}>
                 Delete workspace
               </Button>
             )}
-            {isAdmin && (
+            {currentUserIsAdmin && (
               <Modal
                 isVisible={showDeleteWorkspaceModal}
                 onBackdropPress={() => setShowDeleteWorkspaceModal(false)}
@@ -217,15 +201,3 @@ export default function WorkspaceSettingsGeneralScreen(
     </>
   );
 }
-
-const styles = StyleSheet.create({
-  formError: {
-    color: "red",
-  },
-  errorBanner: {
-    backgroundColor: "red",
-  },
-  errorText: {
-    color: "white",
-  },
-});

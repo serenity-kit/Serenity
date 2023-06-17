@@ -21,26 +21,33 @@ import {
   useIsDesktopDevice,
 } from "@serenity-tools/ui";
 import { useMachine } from "@xstate/react";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import sodium from "react-native-libsodium";
 import MemberMenu from "../../../components/memberMenu/MemberMenu";
 import { VerifyPasswordModal } from "../../../components/verifyPasswordModal/VerifyPasswordModal";
 import { CreateWorkspaceInvitation } from "../../../components/workspace/CreateWorkspaceInvitation";
 import { useWorkspace } from "../../../context/WorkspaceContext";
 import {
-  Role as GraphQlRole,
-  MeResult,
-  Workspace,
-  WorkspaceMember,
   runRemoveMemberAndRotateWorkspaceKeyMutation,
   runWorkspaceDevicesQuery,
-  useUpdateWorkspaceMembersRolesMutation,
+  useUpdateWorkspaceMemberRoleMutation,
 } from "../../../generated/graphql";
 import { useAuthenticatedAppContext } from "../../../hooks/useAuthenticatedAppContext";
 import { workspaceSettingsLoadWorkspaceMachine } from "../../../machines/workspaceSettingsLoadWorkspaceMachine";
 import { WorkspaceStackScreenProps } from "../../../types/navigationProps";
 import { WorkspaceDeviceParing } from "../../../types/workspaceDevice";
 import { getMainDevice } from "../../../utils/device/mainDeviceMemoryStore";
+import { showToast } from "../../../utils/toast/showToast";
+
+type UpdateMemberRoleInfo = {
+  mainDeviceSigningPublicKey: string;
+  role: workspaceChain.Role;
+};
+
+type RemoveMemberInfo = {
+  mainDeviceSigningPublicKey: string;
+  userId: string;
+};
 
 export default function WorkspaceSettingsMembersScreen(
   props: WorkspaceStackScreenProps<"WorkspaceSettingsMembers">
@@ -62,107 +69,74 @@ export default function WorkspaceSettingsMembersScreen(
     },
   });
 
-  const [, updateWorkspaceMembersRolesMutation] =
-    useUpdateWorkspaceMembersRolesMutation();
-  const [isAdmin, setIsAdmin] = useState(false);
-  const [members, setMembers] = useState<WorkspaceMember[]>([]);
+  const [, updateWorkspaceMemberRoleMutation] =
+    useUpdateWorkspaceMemberRoleMutation();
   const [isPasswordModalVisible, setIsPasswordModalVisible] = useState(false);
   const [memberToRemove, setMemberToRemove] = useState<
-    { userId: string; mainDeviceSigningPublicKey: string } | undefined
+    RemoveMemberInfo | undefined
   >(undefined);
 
-  useEffect(() => {
-    if (
-      state.value === "loadWorkspaceSuccess" &&
-      state.context.workspaceQueryResult?.data?.workspace
-    ) {
-      updateWorkspaceData(
-        state.context.meWithWorkspaceLoadingInfoQueryResult?.data?.me,
-        // @ts-expect-error need to fix the generation
-        state.context.workspaceQueryResult?.data?.workspace
-      );
-    }
-  }, [state]);
+  const [
+    isPasswordModalVisibleForMemberRoleUpdate,
+    setIsPasswordModalVisibleForMemberRoleUpdate,
+  ] = useState(false);
+  const [memberRoleInfoToUpdate, setMemberRoleInfoToUpdate] = useState<
+    UpdateMemberRoleInfo | undefined
+  >(undefined);
 
-  const updateWorkspaceData = async (
-    me: MeResult | null | undefined,
-    workspace: Workspace
-  ) => {
-    const members: WorkspaceMember[] = workspace.members || [];
-    setMembers(members);
-    members.forEach((member: WorkspaceMember) => {
-      if (member.userId === me?.id) {
-        setIsAdmin(member.role === GraphQlRole.Admin);
-      }
+  const updateMemberRole = async ({
+    mainDeviceSigningPublicKey,
+    role,
+  }: UpdateMemberRoleInfo) => {
+    const mainDevice = getMainDevice();
+    if (mainDevice === null) {
+      throw new Error("mainDevice is null");
+    }
+
+    if (lastChainEvent === null) {
+      throw new Error("lastChainEvent is null");
+    }
+
+    const updateMemberEvent = workspaceChain.updateMember(
+      workspaceChain.hashTransaction(lastChainEvent.transaction),
+      {
+        keyType: "ed25519",
+        privateKey: sodium.from_base64(mainDevice.signingPrivateKey),
+        publicKey: sodium.from_base64(mainDevice.signingPublicKey),
+      },
+      mainDeviceSigningPublicKey,
+      role
+    );
+
+    const updateWorkspaceResult = await updateWorkspaceMemberRoleMutation({
+      input: {
+        serializedWorkspaceChainEvent: JSON.stringify(updateMemberEvent),
+        workspaceId: workspaceId,
+      },
     });
+    if (updateWorkspaceResult.error) {
+      showToast("Failed to update the member role.", "error");
+    }
+    await fetchAndApplyNewWorkspaceChainEntries();
+    setMemberRoleInfoToUpdate(undefined);
   };
 
-  // const _updateWorkspaceMemberData = async (members: WorkspaceMember[]) => {
-  //   // do graphql stuff
-  //   const graphqlMembers: any[] = [];
-  //   members.forEach((member: Member) => {
-  //     graphqlMembers.push({
-  //       userId: member.userId,
-  //       role: member.role,
-  //     });
-  //   });
-  //   const updateWorkspaceResult = await updateWorkspaceMembersRolesMutation({
-  //     input: {
-  //       id: workspaceId,
-  //       members: graphqlMembers,
-  //     },
-  //   });
-  //   if (updateWorkspaceResult.data?.updateWorkspaceMembersRoles?.workspace) {
-  //     updateWorkspaceData(
-  //       state.context.meWithWorkspaceLoadingInfoQueryResult?.data?.me,
-  //       updateWorkspaceResult.data?.updateWorkspaceMembersRoles?.workspace
-  //     );
-  //   } else if (updateWorkspaceResult?.error) {
-  //     setHasGraphqlError(true);
-  //     setGraphqlError(updateWorkspaceResult?.error.message);
-  //   }
-  // };
-
-  // const updateMember = async (
-  //   member: WorkspaceMember,
-  //   role: workspaceChain.Role
-  // ) => {
-  //   const existingMemberRow = memberLookup[member.userId];
-  //   if (existingMemberRow >= 0) {
-  //     if (role === "ADMIN") {
-  //       members[existingMemberRow].role = GraphQlRole.Admin;
-  //     } else if (role === "EDITOR") {
-  //       members[existingMemberRow].role = GraphQlRole.Editor;
-  //     } else if (role === "VIEWER") {
-  //       members[existingMemberRow].role = GraphQlRole.Viewer;
-  //     } else if (role === "COMMENTER") {
-  //       members[existingMemberRow].role = GraphQlRole.Commenter;
-  //     }
-  //     setMembers(members);
-  //     await _updateWorkspaceMemberData(members);
-  //   }
-  // };
-
-  const removeMemberPreflight = (memberToRemove: {
-    mainDeviceSigningPublicKey: string;
-    userId: string;
-  }) => {
+  const updateMemberRolePreflight = (
+    updateMemberRoleInfo: UpdateMemberRoleInfo
+  ) => {
     const mainDevice = getMainDevice();
     if (mainDevice) {
-      removeMember(memberToRemove);
+      updateMemberRole(updateMemberRoleInfo);
       return;
     }
-    setMemberToRemove(memberToRemove);
-    setIsPasswordModalVisible(true);
+    setMemberRoleInfoToUpdate(updateMemberRoleInfo);
+    setIsPasswordModalVisibleForMemberRoleUpdate(true);
   };
 
   const removeMember = async ({
     mainDeviceSigningPublicKey,
     userId,
-  }: {
-    mainDeviceSigningPublicKey: string;
-    userId: string;
-  }) => {
+  }: RemoveMemberInfo) => {
     const mainDevice = getMainDevice();
     if (mainDevice === null) {
       throw new Error("mainDevice is null");
@@ -219,21 +193,51 @@ export default function WorkspaceSettingsMembersScreen(
       mainDeviceSigningPublicKey
     );
 
-    await runRemoveMemberAndRotateWorkspaceKeyMutation(
-      {
-        input: {
-          creatorDeviceSigningPublicKey: activeDevice.signingPublicKey,
-          deviceWorkspaceKeyBoxes,
-          revokedUserId: userId,
-          workspaceId,
-          serializedWorkspaceChainEvent: JSON.stringify(removeMemberEvent),
+    const removeMemberResult =
+      await runRemoveMemberAndRotateWorkspaceKeyMutation(
+        {
+          input: {
+            creatorDeviceSigningPublicKey: activeDevice.signingPublicKey,
+            deviceWorkspaceKeyBoxes,
+            revokedUserId: userId,
+            workspaceId,
+            serializedWorkspaceChainEvent: JSON.stringify(removeMemberEvent),
+          },
         },
-      },
-      { requestPolicy: "network-only" }
-    );
+        { requestPolicy: "network-only" }
+      );
+    if (removeMemberResult.error) {
+      showToast("Failed to remove the member.", "error");
+    }
     await fetchAndApplyNewWorkspaceChainEntries();
     setMemberToRemove(undefined);
   };
+
+  const removeMemberPreflight = (memberToRemove: RemoveMemberInfo) => {
+    const mainDevice = getMainDevice();
+    if (mainDevice) {
+      removeMember(memberToRemove);
+      return;
+    }
+    setMemberToRemove(memberToRemove);
+    setIsPasswordModalVisible(true);
+  };
+
+  let currentUserIsAdmin = false;
+  if (state.value === "loadWorkspaceSuccess" && workspaceChainState) {
+    Object.entries(workspaceChainState.members).forEach(
+      ([mainDeviceSigningPublicKey, memberInfo]) => {
+        if (
+          memberInfo.role === "ADMIN" &&
+          mainDeviceSigningPublicKey ===
+            state.context.meWithWorkspaceLoadingInfoQueryResult?.data?.me
+              ?.mainDeviceSigningPublicKey
+        ) {
+          currentUserIsAdmin = true;
+        }
+      }
+    );
+  }
 
   return (
     <>
@@ -254,7 +258,7 @@ export default function WorkspaceSettingsMembersScreen(
           </CenterContent>
         ) : (
           <>
-            {isAdmin && (
+            {currentUserIsAdmin && (
               <>
                 <View>
                   <Heading lvl={3} padded>
@@ -287,13 +291,17 @@ export default function WorkspaceSettingsMembersScreen(
               {workspaceChainState &&
                 Object.entries(workspaceChainState.members).map(
                   ([mainDeviceSigningPublicKey, memberInfo]) => {
-                    const member = members.find((member) => {
-                      return (
-                        member.mainDeviceSigningPublicKey ===
-                        mainDeviceSigningPublicKey
+                    const member =
+                      state.context.workspaceQueryResult?.data?.workspace?.members?.find(
+                        (member) => {
+                          return (
+                            member.mainDeviceSigningPublicKey ===
+                            mainDeviceSigningPublicKey
+                          );
+                        }
                       );
-                    });
 
+                    // TODO show a loading indicator here instead
                     if (!member) {
                       return null;
                     }
@@ -311,7 +319,7 @@ export default function WorkspaceSettingsMembersScreen(
                     const email = member.username;
 
                     const allowEditing =
-                      isAdmin && member.userId !== adminUserId;
+                      currentUserIsAdmin && member.userId !== adminUserId;
 
                     // capitalize by css doesn't work here as it will only affect the first letter
                     const roleName =
@@ -345,7 +353,10 @@ export default function WorkspaceSettingsMembersScreen(
                               memberId={member.userId}
                               role={memberInfo.role}
                               onUpdateRole={(role) => {
-                                // updateMember(member, role);
+                                updateMemberRolePreflight({
+                                  mainDeviceSigningPublicKey,
+                                  role,
+                                });
                               }}
                               onDeletePressed={() => {
                                 removeMemberPreflight({
@@ -377,6 +388,21 @@ export default function WorkspaceSettingsMembersScreen(
         onCancel={() => {
           setMemberToRemove(undefined);
           setIsPasswordModalVisible(false);
+        }}
+      />
+
+      <VerifyPasswordModal
+        isVisible={isPasswordModalVisibleForMemberRoleUpdate}
+        description="Updating a member role requires access to the main account and therefore verifying your password is required"
+        onSuccess={() => {
+          setIsPasswordModalVisibleForMemberRoleUpdate(false);
+          if (memberRoleInfoToUpdate) {
+            updateMemberRole(memberRoleInfoToUpdate);
+          }
+        }}
+        onCancel={() => {
+          setMemberRoleInfoToUpdate(undefined);
+          setIsPasswordModalVisibleForMemberRoleUpdate(false);
         }}
       />
     </>

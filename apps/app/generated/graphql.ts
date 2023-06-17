@@ -598,6 +598,7 @@ export type MainDeviceResult = {
 export type MeResult = {
   __typename?: 'MeResult';
   id: Scalars['String'];
+  mainDeviceSigningPublicKey: Scalars['String'];
   username: Scalars['String'];
   workspaceLoadingInfo?: Maybe<WorkspaceLoadingInfo>;
 };
@@ -647,7 +648,7 @@ export type Mutation = {
   updateDocumentName?: Maybe<UpdateDocumentNameResult>;
   updateFolderName?: Maybe<UpdateFolderNameResult>;
   updateWorkspaceInfo?: Maybe<UpdateWorkspaceInfoResult>;
-  updateWorkspaceMembersRoles?: Maybe<UpdateWorkspaceMembersRolesResult>;
+  updateWorkspaceMemberRole?: Maybe<UpdateWorkspaceMemberRoleResult>;
   updateWorkspaceName?: Maybe<UpdateWorkspaceNameResult>;
   verifyRegistration?: Maybe<VerifyRegistrationResult>;
 };
@@ -788,8 +789,8 @@ export type MutationUpdateWorkspaceInfoArgs = {
 };
 
 
-export type MutationUpdateWorkspaceMembersRolesArgs = {
-  input: UpdateWorkspaceMembersRolesInput;
+export type MutationUpdateWorkspaceMemberRoleArgs = {
+  input: UpdateWorkspaceMemberRoleInput;
 };
 
 
@@ -1159,13 +1160,13 @@ export type UpdateWorkspaceInfoResult = {
   workspace: Workspace;
 };
 
-export type UpdateWorkspaceMembersRolesInput = {
-  id: Scalars['String'];
-  members: Array<WorkspaceMemberInput>;
+export type UpdateWorkspaceMemberRoleInput = {
+  serializedWorkspaceChainEvent: Scalars['String'];
+  workspaceId: Scalars['String'];
 };
 
-export type UpdateWorkspaceMembersRolesResult = {
-  __typename?: 'UpdateWorkspaceMembersRolesResult';
+export type UpdateWorkspaceMemberRoleResult = {
+  __typename?: 'UpdateWorkspaceMemberRoleResult';
   workspace?: Maybe<Workspace>;
 };
 
@@ -1555,12 +1556,12 @@ export type UpdateFolderNameMutationVariables = Exact<{
 
 export type UpdateFolderNameMutation = { __typename?: 'Mutation', updateFolderName?: { __typename?: 'UpdateFolderNameResult', folder?: { __typename?: 'Folder', id: string, nameCiphertext: string, nameNonce: string, parentFolderId?: string | null, rootFolderId?: string | null, keyDerivationTrace: { __typename?: 'KeyDerivationTrace', workspaceKeyId: string, trace: Array<{ __typename?: 'KeyDerivationTraceEntry', entryId: string, subkeyId: number, parentId?: string | null, context: string }> } } | null } | null };
 
-export type UpdateWorkspaceMembersRolesMutationVariables = Exact<{
-  input: UpdateWorkspaceMembersRolesInput;
+export type UpdateWorkspaceMemberRoleMutationVariables = Exact<{
+  input: UpdateWorkspaceMemberRoleInput;
 }>;
 
 
-export type UpdateWorkspaceMembersRolesMutation = { __typename?: 'Mutation', updateWorkspaceMembersRoles?: { __typename?: 'UpdateWorkspaceMembersRolesResult', workspace?: { __typename?: 'Workspace', id: string, name?: string | null, members?: Array<{ __typename?: 'WorkspaceMember', userId: string, username: string, role: Role }> | null } | null } | null };
+export type UpdateWorkspaceMemberRoleMutation = { __typename?: 'Mutation', updateWorkspaceMemberRole?: { __typename?: 'UpdateWorkspaceMemberRoleResult', workspace?: { __typename?: 'Workspace', id: string, name?: string | null, members?: Array<{ __typename?: 'WorkspaceMember', userId: string, username: string, role: Role }> | null } | null } | null };
 
 export type UpdateWorkspaceNameMutationVariables = Exact<{
   input: UpdateWorkspaceNameInput;
@@ -1697,7 +1698,7 @@ export type MeWithWorkspaceLoadingInfoQueryVariables = Exact<{
 }>;
 
 
-export type MeWithWorkspaceLoadingInfoQuery = { __typename?: 'Query', me?: { __typename?: 'MeResult', id: string, username: string, workspaceLoadingInfo?: { __typename?: 'WorkspaceLoadingInfo', id: string, isAuthorized: boolean, documentId?: string | null, role: Role } | null } | null };
+export type MeWithWorkspaceLoadingInfoQuery = { __typename?: 'Query', me?: { __typename?: 'MeResult', id: string, username: string, mainDeviceSigningPublicKey: string, workspaceLoadingInfo?: { __typename?: 'WorkspaceLoadingInfo', id: string, isAuthorized: boolean, documentId?: string | null, role: Role } | null } | null };
 
 export type PendingWorkspaceInvitationQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -2223,9 +2224,9 @@ export const UpdateFolderNameDocument = gql`
 export function useUpdateFolderNameMutation() {
   return Urql.useMutation<UpdateFolderNameMutation, UpdateFolderNameMutationVariables>(UpdateFolderNameDocument);
 };
-export const UpdateWorkspaceMembersRolesDocument = gql`
-    mutation updateWorkspaceMembersRoles($input: UpdateWorkspaceMembersRolesInput!) {
-  updateWorkspaceMembersRoles(input: $input) {
+export const UpdateWorkspaceMemberRoleDocument = gql`
+    mutation updateWorkspaceMemberRole($input: UpdateWorkspaceMemberRoleInput!) {
+  updateWorkspaceMemberRole(input: $input) {
     workspace {
       id
       name
@@ -2239,8 +2240,8 @@ export const UpdateWorkspaceMembersRolesDocument = gql`
 }
     `;
 
-export function useUpdateWorkspaceMembersRolesMutation() {
-  return Urql.useMutation<UpdateWorkspaceMembersRolesMutation, UpdateWorkspaceMembersRolesMutationVariables>(UpdateWorkspaceMembersRolesDocument);
+export function useUpdateWorkspaceMemberRoleMutation() {
+  return Urql.useMutation<UpdateWorkspaceMemberRoleMutation, UpdateWorkspaceMemberRoleMutationVariables>(UpdateWorkspaceMemberRoleDocument);
 };
 export const UpdateWorkspaceNameDocument = gql`
     mutation updateWorkspaceName($input: UpdateWorkspaceNameInput!) {
@@ -2608,6 +2609,7 @@ export const MeWithWorkspaceLoadingInfoDocument = gql`
   me {
     id
     username
+    mainDeviceSigningPublicKey
     workspaceLoadingInfo(
       workspaceId: $workspaceId
       returnOtherWorkspaceIfNotFound: $returnOtherWorkspaceIfNotFound
@@ -3305,10 +3307,10 @@ export const runUpdateFolderNameMutation = async (variables: UpdateFolderNameMut
     .toPromise();
 };
 
-export const runUpdateWorkspaceMembersRolesMutation = async (variables: UpdateWorkspaceMembersRolesMutationVariables, options?: any) => {
+export const runUpdateWorkspaceMemberRoleMutation = async (variables: UpdateWorkspaceMemberRoleMutationVariables, options?: any) => {
   return await getUrqlClient()
-    .mutation<UpdateWorkspaceMembersRolesMutation, UpdateWorkspaceMembersRolesMutationVariables>(
-      UpdateWorkspaceMembersRolesDocument,
+    .mutation<UpdateWorkspaceMemberRoleMutation, UpdateWorkspaceMemberRoleMutationVariables>(
+      UpdateWorkspaceMemberRoleDocument,
       variables,
       {
         // better to be safe here and always refetch

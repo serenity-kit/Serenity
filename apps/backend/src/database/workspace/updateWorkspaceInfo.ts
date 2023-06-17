@@ -131,6 +131,7 @@ export async function updateWorkspaceInfo({
             user: {
               select: {
                 username: true,
+                mainDeviceSigningPublicKey: true,
                 devices: {
                   select: {
                     signingPublicKey: true,

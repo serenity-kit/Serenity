@@ -156,6 +156,7 @@ export async function createWorkspace({
         user: {
           select: {
             username: true,
+            mainDeviceSigningPublicKey: true,
             devices: {
               select: {
                 signingPublicKey: true,
@@ -178,6 +179,8 @@ export async function createWorkspace({
         username: userToWorkspace.user.username,
         role: userToWorkspace.role,
         devices: userToWorkspace.user.devices,
+        mainDeviceSigningPublicKey:
+          userToWorkspace.user.mainDeviceSigningPublicKey,
       });
     });
     const workspace: Workspace = {

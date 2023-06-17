@@ -27,6 +27,7 @@ const exchanges = [
       KeyDerivationTrace: () => null, // should not be normalized
       KeyDerivationTraceEntry: () => null, // should not be normalized
       WorkspaceKeyByDocumentIdResult: () => null, // should not be normalized
+      WorkspaceChainEvent: () => null, // should not be normalized
       // @ts-expect-error the type seems to be wrong,
       MainDeviceResult: (mainDevice) => {
         return mainDevice.signingPublicKey;
