@@ -5,6 +5,7 @@ import sodium from "react-native-libsodium";
 import { Role } from "../../../prisma/generated/output";
 import { WorkspaceInvitation } from "../../types/workspace";
 import { prisma } from "../prisma";
+import { getLastWorkspaceChainEventWithState } from "../workspaceChain/getLastWorkspaceChainEventWithState";
 
 type Params = {
   workspaceId: string;
@@ -85,25 +86,20 @@ export async function createWorkspaceInvitation({
       throw new ForbiddenError("Unauthorized");
     }
 
-    // TODO refactor to utility function
-    const prevWorkspaceChainEvent =
-      await prisma.workspaceChainEvent.findFirstOrThrow({
-        where: { workspaceId },
-        orderBy: { position: "desc" },
-      });
+    const { lastWorkspaceChainEvent, workspaceChainState } =
+      await getLastWorkspaceChainEventWithState({ prisma, workspaceId });
 
-    const prevState = workspaceChain.WorkspaceChainState.parse(
-      prevWorkspaceChainEvent.state
+    const newState = workspaceChain.applyEvent(
+      workspaceChainState,
+      workspaceChainEvent
     );
-
-    const newState = workspaceChain.applyEvent(prevState, workspaceChainEvent);
 
     await prisma.workspaceChainEvent.create({
       data: {
         content: workspaceChainEvent,
         state: newState,
         workspaceId,
-        position: prevWorkspaceChainEvent.position + 1,
+        position: lastWorkspaceChainEvent.position + 1,
       },
     });
 

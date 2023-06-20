@@ -1,5 +1,6 @@
 import * as workspaceChain from "@serenity-kit/workspace-chain";
 import { prisma } from "../prisma";
+import { getLastWorkspaceChainEventWithState } from "../workspaceChain/getLastWorkspaceChainEventWithState";
 
 type Params = {
   workspaceChainEvent: workspaceChain.RemoveInvitationsWorkspaceChainEvent;
@@ -23,23 +24,19 @@ export async function deleteWorkspaceInvitations({
     }
     const workspaceId = workspaceIds[0];
 
-    // TODO refactor to utility function
-    const prevWorkspaceChainEvent =
-      await prisma.workspaceChainEvent.findFirstOrThrow({
-        where: { workspaceId },
-        orderBy: { position: "desc" },
-      });
-    const prevState = workspaceChain.WorkspaceChainState.parse(
-      prevWorkspaceChainEvent.state
-    );
+    const { lastWorkspaceChainEvent, workspaceChainState } =
+      await getLastWorkspaceChainEventWithState({ prisma, workspaceId });
 
-    const newState = workspaceChain.applyEvent(prevState, workspaceChainEvent);
+    const newState = workspaceChain.applyEvent(
+      workspaceChainState,
+      workspaceChainEvent
+    );
     await prisma.workspaceChainEvent.create({
       data: {
         content: workspaceChainEvent,
         state: newState,
         workspaceId,
-        position: prevWorkspaceChainEvent.position + 1,
+        position: lastWorkspaceChainEvent.position + 1,
       },
     });
 

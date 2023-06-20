@@ -3,6 +3,7 @@ import { ForbiddenError, UserInputError } from "apollo-server-express";
 import { Role } from "../../../prisma/generated/output";
 import { WorkspaceDeviceParing } from "../../types/workspaceDevice";
 import { prisma } from "../prisma";
+import { getLastWorkspaceChainEventWithState } from "../workspaceChain/getLastWorkspaceChainEventWithState";
 import { rotateWorkspaceKey } from "./rotateWorkspaceKey";
 
 export type Props = {
@@ -47,23 +48,19 @@ export const removeMemberAndRotateWorkspaceKey = async ({
       throw new UserInputError("Invalid creatorDeviceSigningPublicKey");
     }
 
-    // TODO refactor to utility function
-    const prevWorkspaceChainEvent =
-      await prisma.workspaceChainEvent.findFirstOrThrow({
-        where: { workspaceId },
-        orderBy: { position: "desc" },
-      });
-    const prevState = workspaceChain.WorkspaceChainState.parse(
-      prevWorkspaceChainEvent.state
-    );
+    const { lastWorkspaceChainEvent, workspaceChainState } =
+      await getLastWorkspaceChainEventWithState({ prisma, workspaceId });
 
-    const newState = workspaceChain.applyEvent(prevState, workspaceChainEvent);
+    const newState = workspaceChain.applyEvent(
+      workspaceChainState,
+      workspaceChainEvent
+    );
     await prisma.workspaceChainEvent.create({
       data: {
         content: workspaceChainEvent,
         state: newState,
         workspaceId,
-        position: prevWorkspaceChainEvent.position + 1,
+        position: lastWorkspaceChainEvent.position + 1,
       },
     });
 
