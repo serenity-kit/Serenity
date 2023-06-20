@@ -12,8 +12,10 @@ type WorkspaceContext = {
       deviceSigningPublicKey: string;
     }>
   >;
-  workspaceChainState: workspaceChain.WorkspaceChainState | null;
-  lastChainEvent: workspaceChain.WorkspaceChainEvent | null;
+  workspaceChainData: {
+    state: workspaceChain.WorkspaceChainState;
+    lastChainEvent: workspaceChain.WorkspaceChainEvent;
+  } | null;
   fetchAndApplyNewWorkspaceChainEntries: () => Promise<void>;
 };
 
@@ -25,9 +27,7 @@ const workspaceContext = React.createContext<WorkspaceContext>({
     data: undefined,
     error: undefined,
   },
-  // TODO refactor to either have null or a nested valid object
-  workspaceChainState: null,
-  lastChainEvent: null,
+  workspaceChainData: null,
   fetchAndApplyNewWorkspaceChainEntries: () => Promise.resolve(),
 });
 

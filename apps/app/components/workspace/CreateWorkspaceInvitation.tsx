@@ -28,8 +28,11 @@ type Props = {};
 export function CreateWorkspaceInvitation(props: Props) {
   // TODO: propagate graphql error
 
-  const { workspaceId, lastChainEvent, fetchAndApplyNewWorkspaceChainEntries } =
-    useWorkspace();
+  const {
+    workspaceId,
+    workspaceChainData,
+    fetchAndApplyNewWorkspaceChainEntries,
+  } = useWorkspace();
   const [, deleteWorkspaceInvitationsMutation] =
     useDeleteWorkspaceInvitationsMutation();
   const [selectedWorkspaceInvitationId, setSelectedWorkspaceInvitationId] =
@@ -103,8 +106,8 @@ export function CreateWorkspaceInvitation(props: Props) {
     if (!mainDevice) {
       throw new Error("No main device");
     }
-    if (!lastChainEvent) {
-      throw new Error("No last chain event");
+    if (!workspaceChainData) {
+      throw new Error("Missing workspace chain data");
     }
     const invitation = workspaceChain.addInvitation({
       workspaceId,
@@ -115,7 +118,9 @@ export function CreateWorkspaceInvitation(props: Props) {
       },
       expiresAt,
       role: sharingRole,
-      prevHash: workspaceChain.hashTransaction(lastChainEvent.transaction),
+      prevHash: workspaceChain.hashTransaction(
+        workspaceChainData.lastChainEvent.transaction
+      ),
     });
 
     if (invitation.transaction.type !== "add-invitation") {
@@ -143,11 +148,13 @@ export function CreateWorkspaceInvitation(props: Props) {
     if (!mainDevice) {
       throw new Error("No main device");
     }
-    if (!lastChainEvent) {
-      throw new Error("No last chain event");
+    if (!workspaceChainData) {
+      throw new Error("Missing workspace chain data");
     }
     const removeInvitationEvent = workspaceChain.removeInvitations({
-      prevHash: workspaceChain.hashTransaction(lastChainEvent.transaction),
+      prevHash: workspaceChain.hashTransaction(
+        workspaceChainData.lastChainEvent.transaction
+      ),
       authorKeyPair: {
         keyType: "ed25519",
         privateKey: sodium.from_base64(mainDevice.signingPrivateKey),

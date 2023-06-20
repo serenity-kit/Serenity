@@ -253,8 +253,13 @@ function WorkspaceStackNavigator(props) {
       value={{
         workspaceId: props.route.params.workspaceId,
         workspaceQueryResult,
-        workspaceChainState,
-        lastChainEvent,
+        workspaceChainData:
+          workspaceChainState && lastChainEvent
+            ? {
+                state: workspaceChainState,
+                lastChainEvent,
+              }
+            : null,
         fetchAndApplyNewWorkspaceChainEntries,
       }}
     >

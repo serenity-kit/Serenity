@@ -34,7 +34,7 @@ export default function WorkspaceSettingsGeneralScreen(
     children?: React.ReactNode;
   }
 ) {
-  const { workspaceId, workspaceChainState } = useWorkspace();
+  const { workspaceId, workspaceChainData } = useWorkspace();
   const { activeDevice } = useAuthenticatedAppContext();
   const [state] = useMachine(workspaceSettingsLoadWorkspaceMachine, {
     context: {
@@ -112,8 +112,8 @@ export default function WorkspaceSettingsGeneralScreen(
   };
 
   let currentUserIsAdmin = false;
-  if (state.value === "loadWorkspaceSuccess" && workspaceChainState) {
-    Object.entries(workspaceChainState.members).forEach(
+  if (state.value === "loadWorkspaceSuccess" && workspaceChainData) {
+    Object.entries(workspaceChainData.state.members).forEach(
       ([mainDeviceSigningPublicKey, memberInfo]) => {
         if (
           memberInfo.role === "ADMIN" &&

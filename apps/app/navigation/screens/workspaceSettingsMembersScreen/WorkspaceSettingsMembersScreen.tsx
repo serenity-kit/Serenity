@@ -56,8 +56,7 @@ export default function WorkspaceSettingsMembersScreen(
 
   const {
     workspaceId,
-    lastChainEvent,
-    workspaceChainState,
+    workspaceChainData,
     fetchAndApplyNewWorkspaceChainEntries,
   } = useWorkspace();
   const { activeDevice } = useAuthenticatedAppContext();
@@ -92,13 +91,13 @@ export default function WorkspaceSettingsMembersScreen(
     if (mainDevice === null) {
       throw new Error("mainDevice is null");
     }
-
-    if (lastChainEvent === null) {
-      throw new Error("lastChainEvent is null");
+    if (!workspaceChainData) {
+      throw new Error("Missing workspace chain data");
     }
-
     const updateMemberEvent = workspaceChain.updateMember(
-      workspaceChain.hashTransaction(lastChainEvent.transaction),
+      workspaceChain.hashTransaction(
+        workspaceChainData.lastChainEvent.transaction
+      ),
       {
         keyType: "ed25519",
         privateKey: sodium.from_base64(mainDevice.signingPrivateKey),
@@ -141,9 +140,8 @@ export default function WorkspaceSettingsMembersScreen(
     if (mainDevice === null) {
       throw new Error("mainDevice is null");
     }
-
-    if (lastChainEvent === null) {
-      throw new Error("lastChainEvent is null");
+    if (!workspaceChainData) {
+      throw new Error("Missing workspace chain data");
     }
 
     const workspaceKeyString = sodium.to_base64(sodium.crypto_kdf_keygen());
@@ -184,7 +182,9 @@ export default function WorkspaceSettingsMembersScreen(
     }
 
     const removeMemberEvent = workspaceChain.removeMember(
-      workspaceChain.hashTransaction(lastChainEvent.transaction),
+      workspaceChain.hashTransaction(
+        workspaceChainData.lastChainEvent.transaction
+      ),
       {
         keyType: "ed25519",
         privateKey: sodium.from_base64(mainDevice.signingPrivateKey),
@@ -224,8 +224,8 @@ export default function WorkspaceSettingsMembersScreen(
   };
 
   let currentUserIsAdmin = false;
-  if (state.value === "loadWorkspaceSuccess" && workspaceChainState) {
-    Object.entries(workspaceChainState.members).forEach(
+  if (state.value === "loadWorkspaceSuccess" && workspaceChainData) {
+    Object.entries(workspaceChainData.state.members).forEach(
       ([mainDeviceSigningPublicKey, memberInfo]) => {
         if (
           memberInfo.role === "ADMIN" &&
@@ -279,8 +279,8 @@ export default function WorkspaceSettingsMembersScreen(
 
             <List
               data={
-                workspaceChainState
-                  ? Object.entries(workspaceChainState.members)
+                workspaceChainData
+                  ? Object.entries(workspaceChainData.state.members)
                   : []
               }
               emptyString={"No members available"}
@@ -288,8 +288,8 @@ export default function WorkspaceSettingsMembersScreen(
                 <ListHeader data={["Name", "Email", "Role"]} mainIsIconText />
               }
             >
-              {workspaceChainState &&
-                Object.entries(workspaceChainState.members).map(
+              {workspaceChainData &&
+                Object.entries(workspaceChainData.state.members).map(
                   ([mainDeviceSigningPublicKey, memberInfo]) => {
                     const member =
                       state.context.workspaceQueryResult?.data?.workspace?.members?.find(

@@ -20,21 +20,21 @@ type Props = {
 
 export function WorkspaceInvitationList(props: Props) {
   const isDesktopDevice = useIsDesktopDevice();
-  const { workspaceChainState } = useWorkspace();
+  const { workspaceChainData } = useWorkspace();
 
   return (
     <View testID={props.testID}>
       <List
         data={
-          workspaceChainState
-            ? Object.entries(workspaceChainState.invitations)
+          workspaceChainData
+            ? Object.entries(workspaceChainData.state.invitations)
             : []
         }
         emptyString={"No active invitations"}
         header={<ListHeader data={["Active Links"]} />}
       >
-        {workspaceChainState &&
-          Object.entries(workspaceChainState.invitations).map(
+        {workspaceChainData &&
+          Object.entries(workspaceChainData.state.invitations).map(
             ([invitationId, invitationDetails]) => {
               const expired = isPast(parseJSON(invitationDetails.expiresAt));
               return (
