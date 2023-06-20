@@ -46,6 +46,11 @@ export const updateWorkspaceMemberRoleMutation = mutationField(
           JSON.parse(args.input.serializedWorkspaceChainEvent)
         );
 
+      workspaceChain.assertAuthorOfEvent(
+        workspaceChainEvent,
+        context.user.mainDeviceSigningPublicKey
+      );
+
       const workspace = await updateWorkspaceMemberRole({
         workspaceId: args.input.workspaceId,
         userId: context.user.id,

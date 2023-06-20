@@ -57,17 +57,10 @@ export const removeMemberAndRotateWorkspaceKeyMutation = mutationField(
           JSON.parse(args.input.serializedWorkspaceChainEvent)
         );
 
-      // TODO create a utility function or move it to the DB function
-      // verify that the user and the invitation event match
-      // TODO THIS CHECK CAN'T WORK: publicKey vs user.id
-      if (
-        !workspaceChainEvent.authors.some((author) => author.publicKey) ===
-        context.user.id
-      ) {
-        throw new AuthenticationError(
-          "The user is not the author of the event"
-        );
-      }
+      workspaceChain.assertAuthorOfEvent(
+        workspaceChainEvent,
+        context.user.mainDeviceSigningPublicKey
+      );
 
       const workspaceKey = await removeMemberAndRotateWorkspaceKey({
         userId: context.user.id,

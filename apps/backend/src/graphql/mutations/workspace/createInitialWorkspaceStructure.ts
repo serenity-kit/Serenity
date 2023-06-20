@@ -103,6 +103,11 @@ export const createInitialWorkspaceStructureMutation = mutationField(
           JSON.parse(args.input.serializedWorkspaceChainEvent)
         );
 
+      workspaceChain.assertAuthorOfEvent(
+        workspaceChainEvent,
+        context.user.mainDeviceSigningPublicKey
+      );
+
       const workspaceState = workspaceChain.resolveState([workspaceChainEvent]);
       if (
         !workspaceState.members.hasOwnProperty(

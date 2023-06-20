@@ -3,6 +3,7 @@ export * from "./addAuthorToEvent";
 export * from "./addInvitation";
 export * from "./addMember";
 export * from "./applyEvent";
+export * from "./assertAuthorOfEvent";
 export * from "./createChain";
 export * from "./errors";
 export * from "./removeInvitations";

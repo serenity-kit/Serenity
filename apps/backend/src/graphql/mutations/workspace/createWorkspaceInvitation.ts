@@ -47,16 +47,10 @@ export const createWorkspaceInvitationMutation = mutationField(
           JSON.parse(args.input.serializedWorkspaceChainEvent)
         );
 
-      // TODO create a utility function or move it to the DB function
-      // verify that the user and the invitation event match
-      if (
-        !workspaceChainEvent.authors.some((author) => author.publicKey) ===
-        context.user.id
-      ) {
-        throw new AuthenticationError(
-          "The user is not the author of the event"
-        );
-      }
+      workspaceChain.assertAuthorOfEvent(
+        workspaceChainEvent,
+        context.user.mainDeviceSigningPublicKey
+      );
 
       const workspaceInvitation = await createWorkspaceInvitation({
         workspaceId: args.input.workspaceId,
