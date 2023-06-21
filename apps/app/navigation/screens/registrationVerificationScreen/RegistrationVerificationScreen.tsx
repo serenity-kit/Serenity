@@ -14,6 +14,7 @@ import { Platform } from "react-native";
 import { OnboardingScreenWrapper } from "../../../components/onboardingScreenWrapper/OnboardingScreenWrapper";
 import { useAppContext } from "../../../context/AppContext";
 import {
+  runWorkspaceInvitationQuery,
   useFinishLoginMutation,
   useStartLoginMutation,
   useVerifyRegistrationMutation,
@@ -83,6 +84,9 @@ export default function RegistrationVerificationScreen(
         );
         return;
       }
+      if (!pendingWorkspaceInvitation.id) {
+        throw new Error("pendingWorkspaceInvitation id missing");
+      }
       const signingKeyPairSeed = decryptWorkspaceInvitationKey({
         exportKey,
         subkeyId: pendingWorkspaceInvitation.subkeyId!,
@@ -90,11 +94,29 @@ export default function RegistrationVerificationScreen(
         publicNonce: pendingWorkspaceInvitation.publicNonce!,
         encryptionKeySalt: pendingWorkspaceInvitation.encryptionKeySalt!,
       });
+      const workspaceInvitation = await runWorkspaceInvitationQuery({
+        id: pendingWorkspaceInvitation.id,
+      });
+      if (
+        workspaceInvitation.data?.workspaceInvitation === null ||
+        workspaceInvitation.data?.workspaceInvitation === undefined
+      ) {
+        throw new Error("workspaceInvitation is missing");
+      }
       try {
         await acceptWorkspaceInvitation({
-          workspaceInvitationId: pendingWorkspaceInvitation.id!,
+          invitationId: pendingWorkspaceInvitation.id,
           mainDevice,
           signingKeyPairSeed,
+          expiresAt: workspaceInvitation.data.workspaceInvitation.expiresAt,
+          invitationDataSignature:
+            workspaceInvitation.data.workspaceInvitation
+              .invitationDataSignature,
+          invitationSigningPublicKey:
+            workspaceInvitation.data.workspaceInvitation
+              .invitationSigningPublicKey,
+          workspaceId: workspaceInvitation.data.workspaceInvitation.workspaceId,
+          role: workspaceInvitation.data.workspaceInvitation.role,
         });
       } catch (error) {
         setGraphqlError(error.message);

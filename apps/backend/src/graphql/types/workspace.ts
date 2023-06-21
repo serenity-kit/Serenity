@@ -59,8 +59,9 @@ export const WorkspaceMember = objectType({
   name: "WorkspaceMember",
   definition(t) {
     t.nonNull.string("userId");
-    t.string("username");
+    t.nonNull.string("username");
     t.nonNull.field("role", { type: MemberRoleEnum });
+    t.nonNull.string("mainDeviceSigningPublicKey");
     t.list.nonNull.field("devices", { type: MinimalDevice });
   },
 });
@@ -117,6 +118,8 @@ export const WorkspaceInvitation = objectType({
     t.nonNull.string("workspaceId");
     t.nonNull.string("inviterUserId");
     t.nonNull.string("inviterUsername");
+    t.nonNull.string("invitationDataSignature");
+    t.nonNull.string("invitationSigningPublicKey");
     t.nonNull.field("role", { type: MemberRoleEnum });
     t.string("workspaceName");
     t.field("expiresAt", { type: nonNull("Date") });

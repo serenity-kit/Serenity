@@ -2,7 +2,7 @@ import canonicalize from "canonicalize";
 import sodium from "react-native-libsodium";
 import {
   AddMemberTransaction,
-  DefaultWorkspaceChainEvent,
+  AddMemberWorkspaceChainEvent,
   Role,
 } from "./types";
 import { hashTransaction } from "./utils";
@@ -12,7 +12,7 @@ export const addMember = (
   authorKeyPair: sodium.KeyPair,
   memberMainDeviceSigningPublicKey: string,
   memberRole: Role
-): DefaultWorkspaceChainEvent => {
+): AddMemberWorkspaceChainEvent => {
   const transaction: AddMemberTransaction = {
     type: "add-member",
     memberMainDeviceSigningPublicKey,

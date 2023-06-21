@@ -31,7 +31,6 @@ let snapshotKey = "";
 
 const setup = async () => {
   userData1 = await createUserWithWorkspace({
-    id: generateId(),
     username: `${generateId()}@example.com`,
     password,
   });
@@ -125,7 +124,6 @@ test("Throw error when document doesn't exist", async () => {
 
 test("Throw error when user doesn't have access", async () => {
   const userData2 = await createUserWithWorkspace({
-    id: generateId(),
     username: `${generateId()}@example.com`,
     password,
   });

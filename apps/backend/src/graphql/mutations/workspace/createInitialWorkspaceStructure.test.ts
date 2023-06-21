@@ -29,7 +29,6 @@ beforeAll(async () => {
 test("create initial workspace structure", async () => {
   const authorizationHeader = userData1.sessionKey;
   const workspaceName = "My Worskpace";
-  console.log("userData1", userData1);
   const result = await createInitialWorkspaceStructure({
     graphql,
     workspaceName,

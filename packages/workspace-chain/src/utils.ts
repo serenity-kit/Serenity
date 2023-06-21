@@ -1,7 +1,7 @@
 import canonicalize from "canonicalize";
 import sodium from "react-native-libsodium";
 import {
-  DefaultWorkspaceChainEvent,
+  UpdateChainWorkspaceChainEvent,
   WorkspaceChainEvent,
   WorkspaceChainState,
 } from "./types";
@@ -37,7 +37,7 @@ export const isValidCreateChainEvent = (event: WorkspaceChainEvent) => {
 
 export const allAuthorsAreValidAdmins = (
   state: WorkspaceChainState,
-  event: DefaultWorkspaceChainEvent
+  event: UpdateChainWorkspaceChainEvent
 ) => {
   return event.authors.every((author) => {
     if (!state.members.hasOwnProperty(author.publicKey)) {
@@ -62,9 +62,9 @@ export const getAdminCount = (state: WorkspaceChainState) => {
 
 export const isValidAdminDecision = (
   state: WorkspaceChainState,
-  event: DefaultWorkspaceChainEvent
+  event: UpdateChainWorkspaceChainEvent
 ) => {
-  if (!allAuthorsAreValidAdmins(state, event as DefaultWorkspaceChainEvent)) {
+  if (!allAuthorsAreValidAdmins(state, event)) {
     return false;
   }
   if (event.authors.length > 0) {

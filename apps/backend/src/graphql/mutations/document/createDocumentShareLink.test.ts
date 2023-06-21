@@ -20,7 +20,6 @@ let user1Workspace: any = null;
 const setup = async () => {
   await sodium.ready;
   userData1 = await createUserWithWorkspace({
-    id: generateId(),
     username: `${generateId()}@example.com`,
     password,
   });
@@ -170,7 +169,6 @@ test("Invalid ownership", async () => {
 
 test("Invalid ownership", async () => {
   const otherUser = await createUserWithWorkspace({
-    id: generateId(),
     username: `${generateId()}@example.com`,
     password,
   });
@@ -228,7 +226,6 @@ describe("Input errors", () => {
   `;
   test("Invalid documentId", async () => {
     const userData1 = await createUserWithWorkspace({
-      id: generateId(),
       username: `${generateId()}@example.com`,
       password,
     });
@@ -256,7 +253,6 @@ describe("Input errors", () => {
   });
   test("Invalid sharing role", async () => {
     const userData1 = await createUserWithWorkspace({
-      id: generateId(),
       username: `${generateId()}@example.com`,
       password,
     });
@@ -284,12 +280,10 @@ describe("Input errors", () => {
   });
   test("Invalid creator device", async () => {
     const userData1 = await createUserWithWorkspace({
-      id: generateId(),
       username: `${generateId()}@example.com`,
       password,
     });
     const otherUser = await createUserWithWorkspace({
-      id: generateId(),
       username: `${generateId()}@example.com`,
       password,
     });
@@ -317,7 +311,6 @@ describe("Input errors", () => {
   });
   test("Invalid input", async () => {
     const userData1 = await createUserWithWorkspace({
-      id: generateId(),
       username: `${generateId()}@example.com`,
       password,
     });
@@ -334,7 +327,6 @@ describe("Input errors", () => {
   });
   test("No input", async () => {
     const userData1 = await createUserWithWorkspace({
-      id: generateId(),
       username: `${generateId()}@example.com`,
       password,
     });

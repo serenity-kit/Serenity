@@ -8,7 +8,6 @@ import { openDocumentShareLinkModal } from "../../helpers/e2e/documentShareLink/
 import { login } from "../../helpers/e2e/login";
 
 type UserData = {
-  id: string;
   username: string;
   password: string;
   data: any;
@@ -18,13 +17,11 @@ let user1: UserData;
 test.beforeAll(async () => {
   await sodium.ready;
   user1 = {
-    id: generateId(),
     username: `${generateId()}@example.com`,
     password: "password",
     data: undefined,
   };
   user1.data = await createUserWithWorkspace({
-    id: user1.id,
     username: user1.username,
     password: user1.password,
   });

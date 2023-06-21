@@ -1,0 +1,15 @@
+query unauthorizedMember {
+  unauthorizedMember {
+    userId
+    userMainDeviceSigningPublicKey
+    workspaceId
+    devices {
+      userId
+      signingPublicKey
+      encryptionPublicKey
+      info
+      createdAt
+      encryptionPublicKeySignature
+    }
+  }
+}

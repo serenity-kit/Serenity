@@ -13,7 +13,6 @@ let webDevice: Device | null = null;
 beforeAll(async () => {
   await deleteAllRecords();
   const result = await createUserWithWorkspace({
-    id: "5a3484e6-c46e-42ce-a285-088fc1fd6915",
     username,
   });
   webDevice = result.webDevice;

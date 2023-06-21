@@ -8,25 +8,20 @@ import { deleteDocument } from "../../helpers/e2e/deleteDocument";
 import { login } from "../../helpers/e2e/login";
 import { renameDocument } from "../../helpers/e2e/renameDocument";
 
-let userId: string;
 let username: string;
 const password = "password";
 let createdWorkspace: any = null;
-let workspaceId = "";
 let firstFolder: any = null;
 
 test.beforeAll(async () => {
   await sodium.ready;
-  userId = generateId();
   username = `${generateId()}@example.com`;
   const { workspace, folder } = await createUserWithWorkspace({
-    id: userId,
     username,
     password,
   });
   createdWorkspace = workspace;
   firstFolder = folder;
-  workspaceId = workspace.id;
 });
 
 test.describe("After login", () => {

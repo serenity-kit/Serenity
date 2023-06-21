@@ -70,7 +70,6 @@ const getFolders = async ({
 
 const setup = async () => {
   userData1 = await createUserWithWorkspace({
-    id: generateId(),
     username: `${generateId()}@example.com`,
     password,
   });
@@ -94,7 +93,6 @@ const setup = async () => {
   });
 
   userData2 = await createUserWithWorkspace({
-    id: generateId(),
     username: `${generateId()}@example.com`,
     password,
   });

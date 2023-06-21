@@ -1,10 +1,10 @@
 import {
   CreatorDevice as PrismaCreatorDevice,
-  Role,
-  UsersToWorkspaces,
   Workspace as PrismaWorkspace,
   WorkspaceKey as PrismaWorkspaceKey,
   WorkspaceKeyBox as PrismaWorkspaceKeyBox,
+  Role,
+  UsersToWorkspaces,
 } from "../../prisma/generated/output";
 import { CreatorDevice, Device, MinimalDevice } from "./device";
 
@@ -40,7 +40,12 @@ export type WorkspaceMember = {
   userId: string;
   username: string | undefined | null;
   role: Role;
+  mainDeviceSigningPublicKey: string;
   devices: MinimalDevice[];
+};
+
+type ChainEntry = {
+  serializedContent: string;
 };
 
 export type Workspace = {
@@ -54,6 +59,7 @@ export type Workspace = {
   members: WorkspaceMember[];
   workspaceKeys?: WorkspaceKey[];
   currentWorkspaceKey?: WorkspaceKey;
+  chain?: ChainEntry[];
 };
 
 export type WorkspaceInvitation = {
@@ -71,6 +77,7 @@ type DbWorkspace = PrismaWorkspace & {
   usersToWorkspaces: (UsersToWorkspaces & {
     user: {
       username: string;
+      mainDeviceSigningPublicKey: string;
       devices: {
         signingPublicKey: string;
         encryptionPublicKey: string;
@@ -91,6 +98,8 @@ type DbWorkspace = PrismaWorkspace & {
       })
     | undefined
     | null;
+
+  chain?: { content: any }[];
 };
 
 export const formatWorkspaceKey = (workspaceKey: any): WorkspaceKey => {
@@ -112,6 +121,7 @@ export const formatWorkspace = (workspace: DbWorkspace): Workspace => {
   workspace.usersToWorkspaces.forEach((member) => {
     const workspaceMember: WorkspaceMember = {
       userId: member.userId,
+      mainDeviceSigningPublicKey: member.user.mainDeviceSigningPublicKey,
       username: member.user.username,
       role: member.role,
       devices: member.user.devices,
@@ -147,5 +157,10 @@ export const formatWorkspace = (workspace: DbWorkspace): Workspace => {
     currentWorkspaceKey,
     infoWorkspaceKey,
     workspaceKeys,
+    chain: workspace.chain?.map((entry) => {
+      return {
+        serializedContent: JSON.stringify(entry.content),
+      };
+    }),
   };
 };

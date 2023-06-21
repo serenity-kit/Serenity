@@ -33,7 +33,6 @@ const otherDocumentId = "929ca262-f144-40f7-8fe2-d3147f415f26";
 
 const setup = async () => {
   userData1 = await createUserWithWorkspace({
-    id: generateId(),
     username: `${generateId()}@example.com`,
     password,
   });
@@ -93,7 +92,6 @@ const setup = async () => {
   });
 
   userData2 = await createUserWithWorkspace({
-    id: generateId(),
     username: `${generateId()}@example.com`,
     password,
   });

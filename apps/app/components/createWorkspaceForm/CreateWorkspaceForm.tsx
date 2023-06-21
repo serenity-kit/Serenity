@@ -174,7 +174,7 @@ export function CreateWorkspaceForm(props: CreateWorkspaceFormProps) {
               workspaceKeyId,
               deviceWorkspaceKeyBoxes,
             },
-            serializedWorkspaceChainEntry: JSON.stringify(event),
+            serializedWorkspaceChainEvent: JSON.stringify(event),
             folder: {
               id: folderId,
               idSignature: sodium.to_base64(folderIdSignature),

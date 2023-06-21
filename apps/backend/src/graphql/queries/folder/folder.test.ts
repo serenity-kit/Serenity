@@ -13,7 +13,7 @@ import { Device } from "../../../types/device";
 
 const graphql = setupGraphql();
 const username = "7dfb4dd9-88be-414c-8a40-b5c030003d89@example.com";
-const workspaceId = "5a3484e6-c46e-42ce-a285-088fc1fd6915";
+let workspaceId = "";
 let userId: string | null = null;
 let device: Device | null = null;
 let sessionKey = "";
@@ -25,13 +25,13 @@ let addedWorkspace: any = null;
 beforeAll(async () => {
   await deleteAllRecords();
   const result = await createUserWithWorkspace({
-    id: workspaceId,
     username,
   });
   userId = result.user.id;
   device = result.device;
   sessionKey = result.sessionKey;
   addedWorkspace = result.workspace;
+  workspaceId = addedWorkspace.id;
   const workspaceKeyBox = addedWorkspace.currentWorkspaceKey?.workspaceKeyBox;
   workspaceKey = decryptWorkspaceKey({
     ciphertext: workspaceKeyBox?.ciphertext!,

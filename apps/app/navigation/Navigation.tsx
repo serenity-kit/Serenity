@@ -7,6 +7,7 @@ import {
   NavigationContainer,
 } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
+import * as workspaceChain from "@serenity-kit/workspace-chain";
 import {
   Heading,
   Text,
@@ -25,7 +26,10 @@ import { PageHeaderLeft } from "../components/pageHeaderLeft/PageHeaderLeft";
 import Sidebar from "../components/sidebar/Sidebar";
 import WorkspaceSettingsSidebar from "../components/workspaceSettingsSidebar/WorkspaceSettingsSidebar";
 import { WorkspaceProvider } from "../context/WorkspaceContext";
-import { useWorkspaceQuery } from "../generated/graphql";
+import {
+  useWorkspaceChainQuery,
+  useWorkspaceQuery,
+} from "../generated/graphql";
 import { redirectToLoginIfMissingTheActiveDeviceOrSessionKey } from "../higherOrderComponents/redirectToLoginIfMissingTheActiveDeviceOrSessionKey";
 import { useAuthenticatedAppContext } from "../hooks/useAuthenticatedAppContext";
 import { useInterval } from "../hooks/useInterval";
@@ -35,9 +39,9 @@ import {
 } from "../types/navigation";
 import { setLastUsedWorkspaceId } from "../utils/lastUsedWorkspaceAndDocumentStore/lastUsedWorkspaceAndDocumentStore";
 import {
-  addNewMembersIfNecessary,
+  authorizeMembersIfNecessary,
   secondsBetweenNewMemberChecks,
-} from "../utils/workspace/addNewMembersIfNecessary";
+} from "../utils/workspace/authorizeMembersIfNecessary";
 import AcceptWorkspaceInvitationScreen from "./screens/acceptWorkspaceInvitationScreen/AcceptWorkspaceInvitationScreen";
 import AccountDevicesSettingsScreen from "./screens/accountDevicesSettingsScreen/AccountDevicesSettingsScreen";
 import AccountProfileSettingsScreen from "./screens/accountProfileSettingsScreen/AccountProfileSettingsScreen";
@@ -195,11 +199,44 @@ function WorkspaceStackNavigator(props) {
     },
   });
 
+  const [workspaceChainQueryResult, reExecuteWorkspaceChainQuery] =
+    useWorkspaceChainQuery({
+      variables: {
+        workspaceId: props.route.params.workspaceId,
+      },
+    });
+
+  let workspaceChainState: workspaceChain.WorkspaceChainState | null = null;
+  let lastChainEvent: workspaceChain.WorkspaceChainEvent | null = null;
+  if (workspaceChainQueryResult.data?.workspaceChain?.nodes) {
+    workspaceChainState = workspaceChain.resolveState(
+      workspaceChainQueryResult.data.workspaceChain.nodes.map((event) => {
+        const data = workspaceChain.WorkspaceChainEvent.parse(
+          // @ts-expect-error
+          JSON.parse(event.serializedContent)
+        );
+        lastChainEvent = data;
+        return data;
+      })
+    );
+  }
+
+  const fetchAndApplyNewWorkspaceChainEntries = async () => {
+    reExecuteWorkspaceChainQuery();
+  };
+
   useInterval(() => {
-    if (activeDevice) {
-      addNewMembersIfNecessary({ activeDevice });
+    if (activeDevice && workspaceChainState) {
+      authorizeMembersIfNecessary({ activeDevice, workspaceChainState });
     }
   }, secondsBetweenNewMemberChecks * 1000);
+
+  useInterval(() => {
+    if (workspaceChainState) {
+      // TODO re-execute with a param of the last known event
+      reExecuteWorkspaceChainQuery();
+    }
+  }, 30 * 1000);
 
   useEffect(() => {
     if (props.route.params.workspaceId) {
@@ -216,6 +253,14 @@ function WorkspaceStackNavigator(props) {
       value={{
         workspaceId: props.route.params.workspaceId,
         workspaceQueryResult,
+        workspaceChainData:
+          workspaceChainState && lastChainEvent
+            ? {
+                state: workspaceChainState,
+                lastChainEvent,
+              }
+            : null,
+        fetchAndApplyNewWorkspaceChainEntries,
       }}
     >
       <WorkspaceStack.Navigator
@@ -229,7 +274,7 @@ function WorkspaceStackNavigator(props) {
           options={{
             headerShown: false,
             animation: "none",
-            // necessary for comments sidear to not extend the screen view to the right
+            // necessary for comments sidebar to not extend the screen view to the right
             contentStyle: { overflow: "hidden" },
           }}
         />

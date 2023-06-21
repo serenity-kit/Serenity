@@ -19,7 +19,6 @@ const password = "password";
 
 const setup = async () => {
   userData1 = await createUserWithWorkspace({
-    id: generateId(),
     username: `${generateId()}@example.com`,
     password,
   });
@@ -105,7 +104,6 @@ test("bad document share token", async () => {
 
 test("no access to workspace", async () => {
   const userData2 = await createUserWithWorkspace({
-    id: generateId(),
     username: `${generateId()}@example.com`,
     password,
   });
@@ -122,7 +120,6 @@ test("no access to workspace", async () => {
 
 test("document share token", async () => {
   const userData2 = await createUserWithWorkspace({
-    id: generateId(),
     username: `${generateId()}@example.com`,
     password,
   });

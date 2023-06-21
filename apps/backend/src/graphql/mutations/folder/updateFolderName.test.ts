@@ -22,7 +22,6 @@ let workspaceKey = "";
 
 const setup = async () => {
   userData1 = await createUserWithWorkspace({
-    id: generateId(),
     username: `${generateId()}@example.com`,
     password,
   });
@@ -101,7 +100,6 @@ test("throw error when folder doesn't exist", async () => {
 test("throw error when user doesn't have access", async () => {
   // create a new user with access to different folders
   const userData2 = await createUserWithWorkspace({
-    id: generateId(),
     username: `${generateId()}@example.com`,
     password,
   });

@@ -8,30 +8,22 @@ import createUserWithWorkspace from "../../../database/testHelpers/createUserWit
 const graphql = setupGraphql();
 let userData1: any = undefined;
 let userData2: any = undefined;
-let userId1 = "";
-const username = "user";
-let userId2 = "";
-const username2 = "user1";
 const password = "password";
 let sessionKey1 = "";
 let sessionKey2 = "";
 
 const setup = async () => {
   userData1 = await createUserWithWorkspace({
-    id: generateId(),
     username: `${generateId()}@example.com`,
     password,
   });
   sessionKey1 = userData1.sessionKey;
-  userId1 = userData1.user.id;
 
   userData2 = await createUserWithWorkspace({
-    id: generateId(),
     username: `${generateId()}@example.com`,
     password,
   });
   sessionKey2 = userData1.sessionKey;
-  userId2 = userData1.user.id;
 };
 
 beforeAll(async () => {

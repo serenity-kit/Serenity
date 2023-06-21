@@ -8,6 +8,7 @@ export const MeResult = objectType({
   definition(t) {
     t.nonNull.string("id");
     t.nonNull.string("username");
+    t.nonNull.string("mainDeviceSigningPublicKey");
     t.field("workspaceLoadingInfo", {
       type: WorkspaceLoadingInfo,
       args: {
@@ -57,7 +58,9 @@ export const meQuery = queryField((t) => {
       }
       const id = context.user.id;
       const username = context.user.username;
-      return { id, username };
+      const mainDeviceSigningPublicKey =
+        context.user.mainDeviceSigningPublicKey;
+      return { id, username, mainDeviceSigningPublicKey };
     },
   });
 });

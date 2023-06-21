@@ -11,7 +11,6 @@ import { e2eLoginUser } from "../../helpers/e2e/e2eLoginUser";
 import { reloadPage } from "../../helpers/e2e/reloadPage";
 
 type UserData = {
-  id: string;
   username: string;
   password: string;
   data: any;
@@ -21,13 +20,11 @@ let user2: UserData;
 
 const setup = async () => {
   user1 = {
-    id: generateId(),
     username: `${generateId()}@example.com`,
     password: "password",
     data: undefined,
   };
   user2 = {
-    id: generateId(),
     username: `${generateId()}@example.com`,
     password: "password",
     data: undefined,
@@ -72,19 +69,21 @@ test.describe("Workspace Sharing", () => {
       sharedWorkspaceId: user1.data.workspace.id,
       password: user2.password,
     });
-    await delayForSeconds(5);
+    await delayForSeconds(1);
     await reloadPage({ page });
 
     // make user2 an admin
     await changeMemberRoleToAdmin({
       page,
       userId: user2.data.user.id,
+      password: user1.password,
       workspaceId: user1.data.workspace.id,
     });
     // make user2 a non-admin
     await changeMemberRoleToEditor({
       page,
       userId: user2.data.user.id,
+      password: user1.password,
       workspaceId: user1.data.workspace.id,
     });
   });

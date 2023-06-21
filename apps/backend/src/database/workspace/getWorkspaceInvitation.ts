@@ -8,7 +8,7 @@ export async function getWorkspaceInvitation({
   workspaceInvitationId,
 }: Params): Promise<WorkspaceInvitation | null> {
   const rawWorkspaceInvitation = await prisma.workspaceInvitations.findFirst({
-    where: { id: workspaceInvitationId },
+    where: { id: workspaceInvitationId, expiresAt: { gte: new Date() } },
     include: {
       inviterUser: { select: { username: true } },
       workspace: { select: { name: true } },

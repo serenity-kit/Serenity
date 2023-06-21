@@ -1,0 +1,5 @@
+mutation authorizeMember($input: AuthorizeMemberInput!) {
+  authorizeMember(input: $input) {
+    success
+  }
+}

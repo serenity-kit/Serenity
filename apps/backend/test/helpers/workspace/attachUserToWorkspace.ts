@@ -5,8 +5,7 @@ import {
 } from "@serenity-tools/common";
 import { Role } from "../../../prisma/generated/output";
 import { prisma } from "../../../src/database/prisma";
-import { WorkspaceMemberDevices } from "../../../src/types/workspaceDevice";
-import { attachDevicesToWorkspaces } from "../device/attachDevicesToWorkspaces";
+import { authorizeMember } from "../../../test/helpers/workspace/authorizeMember";
 import { TestContext } from "../setupGraphql";
 import { acceptWorkspaceInvitation } from "./acceptWorkspaceInvitation";
 import { createWorkspaceInvitation } from "./createWorkspaceInvitation";
@@ -29,6 +28,7 @@ export const attachUserToWorkspace = async ({
   hostUserId,
   hostSessionKey,
   hostWebDevice,
+  hostMainDevice,
   guestUserId,
   guestSessionKey,
   guestMainDevice,
@@ -47,18 +47,17 @@ export const attachUserToWorkspace = async ({
     role,
     workspaceId,
     authorizationHeader: hostSessionKey,
+    mainDevice: hostMainDevice,
   });
   const workspaceInvitation =
     workspaceInvitationResult.createWorkspaceInvitation.workspaceInvitation;
-  const invitationSigningPrivateKey =
-    workspaceInvitationResult.invitationSigningPrivateKey;
   await acceptWorkspaceInvitation({
     graphql,
-    workspaceInvitationId: workspaceInvitation.id,
-    invitationSigningPrivateKey,
-    inviteeUsername: guestUser.username,
+    invitationId: workspaceInvitation.id,
     inviteeMainDevice: guestMainDevice,
     authorizationHeader: guestSessionKey,
+    invitationSigningKeyPairSeed:
+      workspaceInvitationResult.invitationSigningKeyPairSeed,
   });
   const workspaceResult = await getWorkspace({
     graphql,
@@ -82,60 +81,38 @@ export const attachUserToWorkspace = async ({
     creatorDeviceEncryptionPrivateKey: hostWebDevice.encryptionPrivateKey,
     workspaceKey,
   });
-  const workspaceMemberDevices: WorkspaceMemberDevices[] = [];
-  workspaceMemberDevices.push({
-    id: workspaceId,
-    workspaceKeysMembers: [
-      {
-        id: workspace.currentWorkspaceKey.id,
-        members: [
-          {
-            id: guestUserId,
-            workspaceDevices: [
-              {
-                receiverDeviceSigningPublicKey:
-                  guestMainDevice.signingPublicKey,
-                nonce: guestUserWorkspaceKeyBoxMain.nonce,
-                ciphertext: guestUserWorkspaceKeyBoxMain.ciphertext,
-              },
-            ],
-          },
-        ],
-      },
-    ],
-  });
+
+  const workspaceKeys = [
+    {
+      workspaceKeyId: workspace.currentWorkspaceKey.id,
+      workspaceKeyBoxes: [
+        {
+          ciphertext: guestUserWorkspaceKeyBoxMain.ciphertext,
+          nonce: guestUserWorkspaceKeyBoxMain.nonce,
+          receiverDeviceSigningPublicKey: guestMainDevice.signingPublicKey,
+        },
+      ],
+    },
+  ];
+
   if (guestWebDevice) {
     const guestUserWorkspaceKeyBoxWeb = encryptWorkspaceKeyForDevice({
       receiverDeviceEncryptionPublicKey: guestWebDevice.encryptionPublicKey,
       creatorDeviceEncryptionPrivateKey: hostWebDevice.encryptionPrivateKey,
       workspaceKey,
     });
-    workspaceMemberDevices.push({
-      id: workspaceId,
-      workspaceKeysMembers: [
-        {
-          id: workspace.currentWorkspaceKey.id,
-          members: [
-            {
-              id: guestUserId,
-              workspaceDevices: [
-                {
-                  receiverDeviceSigningPublicKey:
-                    guestWebDevice.signingPublicKey,
-                  nonce: guestUserWorkspaceKeyBoxWeb.nonce,
-                  ciphertext: guestUserWorkspaceKeyBoxWeb.ciphertext,
-                },
-              ],
-            },
-          ],
-        },
-      ],
+    workspaceKeys[0].workspaceKeyBoxes.push({
+      ciphertext: guestUserWorkspaceKeyBoxWeb.ciphertext,
+      nonce: guestUserWorkspaceKeyBoxWeb.nonce,
+      receiverDeviceSigningPublicKey: guestWebDevice.signingPublicKey,
     });
   }
-  await attachDevicesToWorkspaces({
+
+  await authorizeMember({
     graphql,
+    workspaceId: workspace.id,
     creatorDeviceSigningPublicKey: hostWebDevice.signingPublicKey,
-    workspaceMemberDevices,
+    workspaceKeys,
     authorizationHeader: hostSessionKey,
   });
 };

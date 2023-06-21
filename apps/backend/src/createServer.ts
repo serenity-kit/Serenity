@@ -6,6 +6,7 @@ import {
   UpdateWithServerData,
   parseSnapshotWithClientData,
 } from "@naisho/core";
+import { InvalidAuthorWorkspaceChainError } from "@serenity-kit/workspace-chain";
 import { SerenitySnapshotPublicData } from "@serenity-tools/common";
 import {
   ApolloServerPluginLandingPageDisabled,
@@ -78,6 +79,9 @@ export default async function createServer() {
       if (process.env.NODE_ENV !== "test") {
         console.error(err);
         console.error(err.extensions?.exception?.stacktrace);
+      }
+      if (err.originalError instanceof InvalidAuthorWorkspaceChainError) {
+        throw new ForbiddenError("Unauthorized");
       }
       if (
         err.originalError instanceof AuthenticationError ||

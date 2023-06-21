@@ -1,3 +1,4 @@
+import * as workspaceChain from "@serenity-kit/workspace-chain";
 import { AuthenticationError } from "apollo-server-express";
 import {
   arg,
@@ -11,9 +12,7 @@ import { deleteWorkspaceInvitations } from "../../../database/workspace/deleteWo
 export const DeleteWorkspaceInvitationsInput = inputObjectType({
   name: "DeleteWorkspaceInvitationsInput",
   definition(t) {
-    t.nonNull.list.nonNull.field("ids", {
-      type: "String",
-    });
+    t.nonNull.string("serializedWorkspaceChainEvent");
   },
 });
 
@@ -39,10 +38,18 @@ export const deleteWorkspaceInvitationsMutation = mutationField(
       if (!context.user) {
         throw new AuthenticationError("Not authenticated");
       }
-      await deleteWorkspaceInvitations({
-        workspaceInvitationIds: args.input.ids,
-        userId: context.user.id,
-      });
+
+      const workspaceChainEvent =
+        workspaceChain.RemoveInvitationsWorkspaceChainEvent.parse(
+          JSON.parse(args.input.serializedWorkspaceChainEvent)
+        );
+
+      workspaceChain.assertAuthorOfEvent(
+        workspaceChainEvent,
+        context.user.mainDeviceSigningPublicKey
+      );
+
+      await deleteWorkspaceInvitations({ workspaceChainEvent });
       return { status: "success" };
     },
   }

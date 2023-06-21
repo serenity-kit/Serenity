@@ -67,15 +67,33 @@ export default function AcceptWorkspaceInvitationScreen(
       setIsPasswordModalVisible(true);
       return;
     }
+    if (
+      workspaceInvitationQueryResult.data?.workspaceInvitation === undefined ||
+      workspaceInvitationQueryResult.data?.workspaceInvitation === null
+    ) {
+      return;
+    }
+
     try {
       setIsSubmitting(true);
-      const workspace = await acceptWorkspaceInvitation({
-        workspaceInvitationId,
+      const workspaceId = await acceptWorkspaceInvitation({
+        invitationId: workspaceInvitationId,
         mainDevice,
         signingKeyPairSeed,
+        expiresAt:
+          workspaceInvitationQueryResult.data.workspaceInvitation.expiresAt,
+        role: workspaceInvitationQueryResult.data.workspaceInvitation.role,
+        workspaceId:
+          workspaceInvitationQueryResult.data.workspaceInvitation.workspaceId,
+        invitationDataSignature:
+          workspaceInvitationQueryResult.data.workspaceInvitation
+            .invitationDataSignature,
+        invitationSigningPublicKey:
+          workspaceInvitationQueryResult.data.workspaceInvitation
+            .invitationSigningPublicKey,
       });
       props.navigation.navigate("Workspace", {
-        workspaceId: workspace!.id,
+        workspaceId: workspaceId,
         screen: "WorkspaceDrawer",
         params: {
           screen: "WorkspaceRoot",

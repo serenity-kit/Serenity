@@ -1,4 +1,3 @@
-import { generateId } from "@serenity-tools/common";
 import deleteAllRecords from "../../../../test/helpers/deleteAllRecords";
 import setupGraphql from "../../../../test/helpers/setupGraphql";
 import { createInitialWorkspaceStructure } from "../../../../test/helpers/workspace/createInitialWorkspaceStructure";
@@ -19,7 +18,6 @@ const workspace2Id = "a0856379-ad08-4dc5-baf5-ab93c9f7b5e5";
 
 const setup = async () => {
   userData1 = await createUserWithWorkspace({
-    id: generateId(),
     username,
     password,
   });

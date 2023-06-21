@@ -16,16 +16,14 @@ beforeAll(async () => {
 });
 
 test("Invite admin", async () => {
-  const workspaceId = `${generateId()}`;
   const username = `${generateId()}@example.com`;
   const role = Role.ADMIN;
   const userAndDevice = await createUserWithWorkspace({
-    id: workspaceId,
     username,
   });
   const device = userAndDevice.device;
   const workspace = await getWorkspace({
-    id: workspaceId,
+    id: userAndDevice.workspace.id,
     userId: userAndDevice.user.id,
     deviceSigningPublicKey: device.signingPublicKey,
   });
@@ -35,29 +33,28 @@ test("Invite admin", async () => {
   const result = await createWorkspaceInvitation({
     graphql,
     role,
-    workspaceId,
+    workspaceId: userAndDevice.workspace.id,
     authorizationHeader: userAndDevice.sessionKey,
+    mainDevice: userAndDevice.mainDevice,
   });
   const workspaceInvitation =
     result.createWorkspaceInvitation.workspaceInvitation;
   expect(typeof workspaceInvitation.id).toBe("string");
-  expect(workspaceInvitation.workspaceId).toBe(workspaceId);
+  expect(workspaceInvitation.workspaceId).toBe(userAndDevice.workspace.id);
   expect(workspaceInvitation.inviterUserId).toBe(userAndDevice.user.id);
   expect(workspaceInvitation.role).toBe(role);
   expect(workspaceInvitation.expiresAt).toBeDefined();
 });
 
 test("invite editor", async () => {
-  const workspaceId = `${generateId()}`;
   const username = `${generateId()}@example.com`;
   const role = Role.EDITOR;
   const userAndDevice = await createUserWithWorkspace({
-    id: workspaceId,
     username,
   });
   const device = userAndDevice.device;
   const workspace = await getWorkspace({
-    id: workspaceId,
+    id: userAndDevice.workspace.id,
     userId: userAndDevice.user.id,
     deviceSigningPublicKey: device.signingPublicKey,
   });
@@ -67,29 +64,28 @@ test("invite editor", async () => {
   const result = await createWorkspaceInvitation({
     graphql,
     role,
-    workspaceId,
+    workspaceId: userAndDevice.workspace.id,
     authorizationHeader: userAndDevice.sessionKey,
+    mainDevice: userAndDevice.mainDevice,
   });
   const workspaceInvitation =
     result.createWorkspaceInvitation.workspaceInvitation;
   expect(typeof workspaceInvitation.id).toBe("string");
-  expect(workspaceInvitation.workspaceId).toBe(workspaceId);
+  expect(workspaceInvitation.workspaceId).toBe(userAndDevice.workspace.id);
   expect(workspaceInvitation.inviterUserId).toBe(userAndDevice.user.id);
   expect(workspaceInvitation.role).toBe(role);
   expect(workspaceInvitation.expiresAt).toBeDefined();
 });
 
 test("invite commenter", async () => {
-  const workspaceId = `${generateId()}`;
   const username = `${generateId()}@example.com`;
   const role = Role.COMMENTER;
   const userAndDevice = await createUserWithWorkspace({
-    id: workspaceId,
     username,
   });
   const device = userAndDevice.device;
   const workspace = await getWorkspace({
-    id: workspaceId,
+    id: userAndDevice.workspace.id,
     userId: userAndDevice.user.id,
     deviceSigningPublicKey: device.signingPublicKey,
   });
@@ -99,29 +95,28 @@ test("invite commenter", async () => {
   const result = await createWorkspaceInvitation({
     graphql,
     role,
-    workspaceId,
+    workspaceId: userAndDevice.workspace.id,
     authorizationHeader: userAndDevice.sessionKey,
+    mainDevice: userAndDevice.mainDevice,
   });
   const workspaceInvitation =
     result.createWorkspaceInvitation.workspaceInvitation;
   expect(typeof workspaceInvitation.id).toBe("string");
-  expect(workspaceInvitation.workspaceId).toBe(workspaceId);
+  expect(workspaceInvitation.workspaceId).toBe(userAndDevice.workspace.id);
   expect(workspaceInvitation.inviterUserId).toBe(userAndDevice.user.id);
   expect(workspaceInvitation.role).toBe(role);
   expect(workspaceInvitation.expiresAt).toBeDefined();
 });
 
 test("invite viewer", async () => {
-  const workspaceId = `${generateId()}`;
   const username = `${generateId()}@example.com`;
   const role = Role.VIEWER;
   const userAndDevice = await createUserWithWorkspace({
-    id: workspaceId,
     username,
   });
   const device = userAndDevice.device;
   const workspace = await getWorkspace({
-    id: workspaceId,
+    id: userAndDevice.workspace.id,
     userId: userAndDevice.user.id,
     deviceSigningPublicKey: device.signingPublicKey,
   });
@@ -131,57 +126,54 @@ test("invite viewer", async () => {
   const result = await createWorkspaceInvitation({
     graphql,
     role,
-    workspaceId,
+    workspaceId: userAndDevice.workspace.id,
     authorizationHeader: userAndDevice.sessionKey,
+    mainDevice: userAndDevice.mainDevice,
   });
   const workspaceInvitation =
     result.createWorkspaceInvitation.workspaceInvitation;
   expect(typeof workspaceInvitation.id).toBe("string");
-  expect(workspaceInvitation.workspaceId).toBe(workspaceId);
+  expect(workspaceInvitation.workspaceId).toBe(userAndDevice.workspace.id);
   expect(workspaceInvitation.inviterUserId).toBe(userAndDevice.user.id);
   expect(workspaceInvitation.role).toBe(role);
   expect(workspaceInvitation.expiresAt).toBeDefined();
 });
 
 test("fail on unknown role", async () => {
-  const workspaceId = `${generateId()}`;
   const username = `${generateId()}@example.com`;
   const userAndDevice = await createUserWithWorkspace({
-    id: workspaceId,
     username: username,
   });
   await expect(
     (async () =>
       await createWorkspaceInvitation({
         graphql,
-        workspaceId,
+        workspaceId: userAndDevice.workspace.id,
         //@ts-expect-error: bad role type
         role: "bad-role",
         authorizationHeader: userAndDevice.sessionKey,
+        mainDevice: userAndDevice.mainDevice,
       }))()
-  ).rejects.toThrow(/BAD_USER_INPUT/);
+  ).rejects.toThrow();
 });
 
 test("user should not be able to invite from a workspace they don't own", async () => {
-  const workspaceId1 = "workspace2";
-  const workspaceId2 = "otherWorkspace";
   const username1 = "adam@example.com";
   const username2 = "betty@example.com";
   const userAndDevice1 = await createUserWithWorkspace({
-    id: workspaceId1,
     username: username1,
   });
   userAndDevice2 = await createUserWithWorkspace({
-    id: workspaceId2,
     username: username2,
   });
   await expect(
     (async () =>
       await createWorkspaceInvitation({
         graphql,
-        workspaceId: workspaceId2,
+        workspaceId: userAndDevice2.workspace.id,
         role: Role.EDITOR,
         authorizationHeader: userAndDevice1.sessionKey,
+        mainDevice: userAndDevice1.mainDevice,
       }))()
   ).rejects.toThrow("Unauthorized");
 });
@@ -192,27 +184,28 @@ test("user should not be able to invite from a workspace that doesn't exist", as
     (async () =>
       await createWorkspaceInvitation({
         graphql,
-        workspaceId: "nonexistantWorkspace",
+        workspaceId: "nonExistentWorkspace",
         role: Role.EDITOR,
         authorizationHeader: userAndDevice2.sessionKey,
+        mainDevice: userAndDevice2.mainDevice,
+        overwritePrevHash: "wrongHash",
       }))()
   ).rejects.toThrow("Unauthorized");
 });
 
 test("Unauthenticated", async () => {
-  const workspaceId = generateId();
   const username = "a@a.com";
-  await createUserWithWorkspace({
-    id: workspaceId,
+  const userAndDevice = await createUserWithWorkspace({
     username: username,
   });
   await expect(
     (async () =>
       await createWorkspaceInvitation({
         graphql,
-        workspaceId,
+        workspaceId: userAndDevice.workspace.id,
         role: Role.EDITOR,
         authorizationHeader: "badauthheader",
+        mainDevice: userAndDevice.mainDevice,
       }))()
   ).rejects.toThrowError(/UNAUTHENTICATED/);
 });

@@ -17,12 +17,10 @@ let user2Comment: any;
 
 const setup = async () => {
   userData1 = await createUserWithWorkspace({
-    id: generateId(),
     username: `${generateId()}@example.com`,
     password: "password",
   });
   userData2 = await createUserWithWorkspace({
-    id: generateId(),
     username: `${generateId()}@example.com`,
     password: "password",
   });
@@ -31,6 +29,7 @@ const setup = async () => {
     hostUserId: userData1.user.id,
     hostSessionKey: userData1.sessionKey,
     hostWebDevice: userData1.webDevice,
+    hostMainDevice: userData1.mainDevice,
     guestUserId: userData2.user.id,
     guestSessionKey: userData2.sessionKey,
     guestMainDevice: {

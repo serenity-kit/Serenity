@@ -8,7 +8,6 @@ test("Login without remembering web keys", async ({ page }) => {
   const username = `${generateId()}@example.com`;
   const password = "password";
   const { workspace, document } = await createUserWithWorkspace({
-    id: generateId(),
     username,
     password,
   });
@@ -24,7 +23,6 @@ test("Login and remember web keys", async ({ page }) => {
   const username = `${generateId()}@example.com`;
   const password = "password";
   const { workspace, document } = await createUserWithWorkspace({
-    id: generateId(),
     username,
     password,
   });

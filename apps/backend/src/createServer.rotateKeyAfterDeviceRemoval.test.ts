@@ -32,7 +32,7 @@ let server;
 
 const graphql = setupGraphql();
 const username = "f6ac741d-73ba-4f83-84cc-211a750ca775@example.com";
-const workspaceId = "64968c7d-cdb3-4844-a029-b0052af7bfc5";
+let workspaceId = "";
 const documentId = "160e9589-2a32-437a-ab88-be8756a4edab";
 let userId: string | null = null;
 let device: Device | null = null;
@@ -52,9 +52,9 @@ let secondSnapshot: Snapshot;
 
 const setup = async () => {
   const userAndWorkspaceData = await createUserWithWorkspace({
-    id: workspaceId,
     username,
   });
+  workspaceId = userAndWorkspaceData.workspace.id;
   userId = userAndWorkspaceData.user.id;
   device = userAndWorkspaceData.device;
   webDevice = userAndWorkspaceData.webDevice;

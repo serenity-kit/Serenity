@@ -17,7 +17,6 @@ test.beforeAll(async () => {
 test.describe("After temporary login", () => {
   test("Create, rename, delete root folder", async ({ page }) => {
     const { user, workspace } = await createUserWithWorkspace({
-      id: generateId(),
       username: `${generateId()}@example.com`,
       password,
     });
@@ -39,7 +38,6 @@ test.describe("After temporary login", () => {
 
   test("Create, rename, delete a subfolder", async ({ page }) => {
     const { user, workspace, folder } = await createUserWithWorkspace({
-      id: generateId(),
       username: `${generateId()}@example.com`,
       password,
     });

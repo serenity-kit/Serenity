@@ -19,20 +19,22 @@ export type Scalars = {
 };
 
 export type AcceptWorkspaceInvitationInput = {
-  inviteeMainDevice: ReducedDeviceInput;
-  inviteeUsername: Scalars['String'];
-  inviteeUsernameAndDeviceSignature: Scalars['String'];
-  workspaceInvitationId: Scalars['String'];
+  serializedWorkspaceChainEvent: Scalars['String'];
 };
 
 export type AcceptWorkspaceInvitationResult = {
   __typename?: 'AcceptWorkspaceInvitationResult';
-  workspace?: Maybe<Workspace>;
+  workspaceId: Scalars['String'];
 };
 
 export type ActiveWorkspaceKeysResult = {
   __typename?: 'ActiveWorkspaceKeysResult';
   activeWorkspaceKeys: Array<WorkspaceKey>;
+};
+
+export type AddMemberWorkspaceKeyInput = {
+  workspaceKeyBoxes: Array<WorkspaceDeviceInput>;
+  workspaceKeyId: Scalars['String'];
 };
 
 export type AttachDeviceToWorkspacesInput = {
@@ -46,14 +48,15 @@ export type AttachDeviceToWorkspacesResult = {
   workspaceKeys: Array<WorkspaceKey>;
 };
 
-export type AttachDevicesToWorkspacesInput = {
+export type AuthorizeMemberInput = {
   creatorDeviceSigningPublicKey: Scalars['String'];
-  workspaceMemberDevices: Array<WorkspaceDevicePairingInput>;
+  workspaceId: Scalars['String'];
+  workspaceKeys: Array<AddMemberWorkspaceKeyInput>;
 };
 
-export type AttachDevicesToWorkspacesResult = {
-  __typename?: 'AttachDevicesToWorkspacesResult';
-  workspaces: Array<WorkspaceWithWorkspaceKeys>;
+export type AuthorizeMemberResult = {
+  __typename?: 'AuthorizeMemberResult';
+  success: Scalars['Boolean'];
 };
 
 export type Comment = {
@@ -202,7 +205,7 @@ export type CreateInitialWorkspaceStructureInput = {
   creatorDeviceSigningPublicKey: Scalars['String'];
   document: CreateInitialDocumentInput;
   folder: CreateInitialFolderInput;
-  serializedWorkspaceChainEntry: Scalars['String'];
+  serializedWorkspaceChainEvent: Scalars['String'];
   workspace: CreateInitialWorkspaceInput;
 };
 
@@ -215,11 +218,7 @@ export type CreateInitialWorkspaceStructureResult = {
 };
 
 export type CreateWorkspaceInvitationInput = {
-  expiresAt: Scalars['Date'];
-  invitationDataSignature: Scalars['String'];
-  invitationId: Scalars['String'];
-  invitationSigningPublicKey: Scalars['String'];
-  role: Role;
+  serializedWorkspaceChainEvent: Scalars['String'];
   workspaceId: Scalars['String'];
 };
 
@@ -287,7 +286,7 @@ export type DeleteFoldersResult = {
 };
 
 export type DeleteWorkspaceInvitationsInput = {
-  ids: Array<Scalars['String']>;
+  serializedWorkspaceChainEvent: Scalars['String'];
 };
 
 export type DeleteWorkspaceInvitationsResult = {
@@ -599,6 +598,7 @@ export type MainDeviceResult = {
 export type MeResult = {
   __typename?: 'MeResult';
   id: Scalars['String'];
+  mainDeviceSigningPublicKey: Scalars['String'];
   username: Scalars['String'];
   workspaceLoadingInfo?: Maybe<WorkspaceLoadingInfo>;
 };
@@ -609,17 +609,6 @@ export type MeResultWorkspaceLoadingInfoArgs = {
   returnOtherDocumentIfNotFound?: InputMaybe<Scalars['Boolean']>;
   returnOtherWorkspaceIfNotFound?: InputMaybe<Scalars['Boolean']>;
   workspaceId?: InputMaybe<Scalars['ID']>;
-};
-
-export type MemberDeviceParingInput = {
-  id: Scalars['String'];
-  workspaceDevices: Array<WorkspaceDeviceInput>;
-};
-
-export type MemberWithWorkspaceKeyBoxes = {
-  __typename?: 'MemberWithWorkspaceKeyBoxes';
-  id: Scalars['String'];
-  workspaceKeyBoxes: Array<WorkspaceKeyBox>;
 };
 
 export type MinimalDevice = {
@@ -633,7 +622,7 @@ export type Mutation = {
   __typename?: 'Mutation';
   acceptWorkspaceInvitation?: Maybe<AcceptWorkspaceInvitationResult>;
   attachDeviceToWorkspaces?: Maybe<AttachDeviceToWorkspacesResult>;
-  attachDevicesToWorkspaces?: Maybe<AttachDevicesToWorkspacesResult>;
+  authorizeMember?: Maybe<AuthorizeMemberResult>;
   createComment?: Maybe<CreateCommentResult>;
   createCommentReply?: Maybe<CreateCommentReplyResult>;
   createDocument?: Maybe<CreateDocumentResult>;
@@ -653,13 +642,13 @@ export type Mutation = {
   initiateFileUpload?: Maybe<InitiateFileUploadResult>;
   logout?: Maybe<LogoutResult>;
   removeDocumentShareLink?: Maybe<RemoveDocumentShareLinkResult>;
-  removeMembersAndRotateWorkspaceKey?: Maybe<RemoveMembersAndRotateWorkspaceKeyResult>;
+  removeMemberAndRotateWorkspaceKey?: Maybe<RemoveMemberAndRotateWorkspaceKeyResult>;
   startLogin?: Maybe<StartLoginResult>;
   startRegistration?: Maybe<StartRegistrationResult>;
   updateDocumentName?: Maybe<UpdateDocumentNameResult>;
   updateFolderName?: Maybe<UpdateFolderNameResult>;
   updateWorkspaceInfo?: Maybe<UpdateWorkspaceInfoResult>;
-  updateWorkspaceMembersRoles?: Maybe<UpdateWorkspaceMembersRolesResult>;
+  updateWorkspaceMemberRole?: Maybe<UpdateWorkspaceMemberRoleResult>;
   updateWorkspaceName?: Maybe<UpdateWorkspaceNameResult>;
   verifyRegistration?: Maybe<VerifyRegistrationResult>;
 };
@@ -675,8 +664,8 @@ export type MutationAttachDeviceToWorkspacesArgs = {
 };
 
 
-export type MutationAttachDevicesToWorkspacesArgs = {
-  input: AttachDevicesToWorkspacesInput;
+export type MutationAuthorizeMemberArgs = {
+  input: AuthorizeMemberInput;
 };
 
 
@@ -770,8 +759,8 @@ export type MutationRemoveDocumentShareLinkArgs = {
 };
 
 
-export type MutationRemoveMembersAndRotateWorkspaceKeyArgs = {
-  input: RemoveMembersAndRotateWorkspaceKeyInput;
+export type MutationRemoveMemberAndRotateWorkspaceKeyArgs = {
+  input: RemoveMemberAndRotateWorkspaceKeyInput;
 };
 
 
@@ -800,8 +789,8 @@ export type MutationUpdateWorkspaceInfoArgs = {
 };
 
 
-export type MutationUpdateWorkspaceMembersRolesArgs = {
-  input: UpdateWorkspaceMembersRolesInput;
+export type MutationUpdateWorkspaceMemberRoleArgs = {
+  input: UpdateWorkspaceMemberRoleInput;
 };
 
 
@@ -857,10 +846,11 @@ export type Query = {
   pendingWorkspaceInvitation?: Maybe<PendingWorkspaceInvitationResult>;
   rootFolders?: Maybe<FolderConnection>;
   snapshot?: Maybe<Snapshot>;
-  unauthorizedDevicesForWorkspaces?: Maybe<UnauthorizedDevicesForWorkspacesResult>;
-  unauthorizedMembers?: Maybe<UnauthorizedMembersResult>;
+  unauthorizedMember?: Maybe<UnauthorizedMemberResult>;
   userIdFromUsername?: Maybe<UserIdFromUsernameResult>;
   workspace?: Maybe<Workspace>;
+  workspaceChain?: Maybe<WorkspaceChainEventConnection>;
+  workspaceChainByInvitationId?: Maybe<WorkspaceChainEventConnection>;
   workspaceDevices?: Maybe<DeviceConnection>;
   workspaceInvitation?: Maybe<WorkspaceInvitation>;
   workspaceInvitations?: Maybe<WorkspaceInvitationConnection>;
@@ -970,11 +960,6 @@ export type QuerySnapshotArgs = {
 };
 
 
-export type QueryUnauthorizedMembersArgs = {
-  workspaceIds: Array<Scalars['ID']>;
-};
-
-
 export type QueryUserIdFromUsernameArgs = {
   username: Scalars['String'];
 };
@@ -983,6 +968,20 @@ export type QueryUserIdFromUsernameArgs = {
 export type QueryWorkspaceArgs = {
   deviceSigningPublicKey: Scalars['String'];
   id?: InputMaybe<Scalars['ID']>;
+};
+
+
+export type QueryWorkspaceChainArgs = {
+  after?: InputMaybe<Scalars['String']>;
+  first: Scalars['Int'];
+  workspaceId: Scalars['ID'];
+};
+
+
+export type QueryWorkspaceChainByInvitationIdArgs = {
+  after?: InputMaybe<Scalars['String']>;
+  first: Scalars['Int'];
+  invitationId: Scalars['ID'];
 };
 
 
@@ -1017,13 +1016,6 @@ export type QueryWorkspacesArgs = {
   first: Scalars['Int'];
 };
 
-export type ReducedDeviceInput = {
-  encryptionPublicKey: Scalars['String'];
-  encryptionPublicKeySignature: Scalars['String'];
-  signingPublicKey: Scalars['String'];
-  userId: Scalars['String'];
-};
-
 export type RemoveDocumentShareLinkInput = {
   token: Scalars['String'];
 };
@@ -1033,15 +1025,16 @@ export type RemoveDocumentShareLinkResult = {
   success: Scalars['Boolean'];
 };
 
-export type RemoveMembersAndRotateWorkspaceKeyInput = {
+export type RemoveMemberAndRotateWorkspaceKeyInput = {
   creatorDeviceSigningPublicKey: Scalars['String'];
   deviceWorkspaceKeyBoxes: Array<WorkspaceDeviceInput>;
-  revokedUserIds: Array<Scalars['String']>;
+  revokedUserId: Scalars['String'];
+  serializedWorkspaceChainEvent: Scalars['String'];
   workspaceId: Scalars['String'];
 };
 
-export type RemoveMembersAndRotateWorkspaceKeyResult = {
-  __typename?: 'RemoveMembersAndRotateWorkspaceKeyResult';
+export type RemoveMemberAndRotateWorkspaceKeyResult = {
+  __typename?: 'RemoveMemberAndRotateWorkspaceKeyResult';
   workspaceKey: WorkspaceKey;
 };
 
@@ -1108,14 +1101,12 @@ export type StartRegistrationResult = {
   challengeResponse: Scalars['String'];
 };
 
-export type UnauthorizedDevicesForWorkspacesResult = {
-  __typename?: 'UnauthorizedDevicesForWorkspacesResult';
-  unauthorizedMemberDevices: Array<WorkspaceIdWithMemberDevices>;
-};
-
-export type UnauthorizedMembersResult = {
-  __typename?: 'UnauthorizedMembersResult';
-  userIds: Array<Maybe<Scalars['String']>>;
+export type UnauthorizedMemberResult = {
+  __typename?: 'UnauthorizedMemberResult';
+  devices: Array<Device>;
+  userId: Scalars['String'];
+  userMainDeviceSigningPublicKey: Scalars['String'];
+  workspaceId: Scalars['String'];
 };
 
 export type Update = {
@@ -1169,13 +1160,13 @@ export type UpdateWorkspaceInfoResult = {
   workspace: Workspace;
 };
 
-export type UpdateWorkspaceMembersRolesInput = {
-  id: Scalars['String'];
-  members: Array<WorkspaceMemberInput>;
+export type UpdateWorkspaceMemberRoleInput = {
+  serializedWorkspaceChainEvent: Scalars['String'];
+  workspaceId: Scalars['String'];
 };
 
-export type UpdateWorkspaceMembersRolesResult = {
-  __typename?: 'UpdateWorkspaceMembersRolesResult';
+export type UpdateWorkspaceMemberRoleResult = {
+  __typename?: 'UpdateWorkspaceMemberRoleResult';
   workspace?: Maybe<Workspace>;
 };
 
@@ -1218,6 +1209,30 @@ export type Workspace = {
   workspaceKeys?: Maybe<Array<WorkspaceKey>>;
 };
 
+export type WorkspaceChainEvent = {
+  __typename?: 'WorkspaceChainEvent';
+  position: Scalars['String'];
+  serializedContent: Scalars['String'];
+};
+
+export type WorkspaceChainEventConnection = {
+  __typename?: 'WorkspaceChainEventConnection';
+  /** https://facebook.github.io/relay/graphql/connections.htm#sec-Edge-Types */
+  edges?: Maybe<Array<Maybe<WorkspaceChainEventEdge>>>;
+  /** Flattened list of WorkspaceChainEvent type */
+  nodes?: Maybe<Array<Maybe<WorkspaceChainEvent>>>;
+  /** https://facebook.github.io/relay/graphql/connections.htm#sec-undefined.PageInfo */
+  pageInfo: PageInfo;
+};
+
+export type WorkspaceChainEventEdge = {
+  __typename?: 'WorkspaceChainEventEdge';
+  /** https://facebook.github.io/relay/graphql/connections.htm#sec-Cursor */
+  cursor: Scalars['String'];
+  /** https://facebook.github.io/relay/graphql/connections.htm#sec-Node */
+  node?: Maybe<WorkspaceChainEvent>;
+};
+
 export type WorkspaceConnection = {
   __typename?: 'WorkspaceConnection';
   /** https://facebook.github.io/relay/graphql/connections.htm#sec-Edge-Types */
@@ -1232,11 +1247,6 @@ export type WorkspaceDeviceInput = {
   ciphertext: Scalars['String'];
   nonce: Scalars['String'];
   receiverDeviceSigningPublicKey: Scalars['String'];
-};
-
-export type WorkspaceDevicePairingInput = {
-  id: Scalars['String'];
-  workspaceKeysMembers: Array<WorkspaceKeyDeviceInput>;
 };
 
 export type WorkspaceEdge = {
@@ -1269,6 +1279,8 @@ export type WorkspaceInvitation = {
   __typename?: 'WorkspaceInvitation';
   expiresAt: Scalars['Date'];
   id: Scalars['String'];
+  invitationDataSignature: Scalars['String'];
+  invitationSigningPublicKey: Scalars['String'];
   inviterUserId: Scalars['String'];
   inviterUsername: Scalars['String'];
   role: Role;
@@ -1324,22 +1336,10 @@ export type WorkspaceKeyByDocumentIdResult = {
   nameWorkspaceKey: WorkspaceKey;
 };
 
-export type WorkspaceKeyDeviceInput = {
-  id: Scalars['String'];
-  members: Array<MemberDeviceParingInput>;
-};
-
 export type WorkspaceKeyDevicePair = {
   ciphertext: Scalars['String'];
   nonce: Scalars['String'];
   workspaceKeyId: Scalars['String'];
-};
-
-export type WorkspaceKeyWithMembers = {
-  __typename?: 'WorkspaceKeyWithMembers';
-  generation: Scalars['Int'];
-  id: Scalars['String'];
-  members: Array<MemberWithWorkspaceKeyBoxes>;
 };
 
 export type WorkspaceLoadingInfo = {
@@ -1353,9 +1353,10 @@ export type WorkspaceLoadingInfo = {
 export type WorkspaceMember = {
   __typename?: 'WorkspaceMember';
   devices?: Maybe<Array<MinimalDevice>>;
+  mainDeviceSigningPublicKey: Scalars['String'];
   role: Role;
   userId: Scalars['String'];
-  username?: Maybe<Scalars['String']>;
+  username: Scalars['String'];
 };
 
 export type WorkspaceMemberInput = {
@@ -1368,18 +1369,12 @@ export type WorkspaceWithWorkspaceDevicesParingInput = {
   workspaceDevices: Array<WorkspaceDeviceInput>;
 };
 
-export type WorkspaceWithWorkspaceKeys = {
-  __typename?: 'WorkspaceWithWorkspaceKeys';
-  id: Scalars['String'];
-  workspaceKeys: Array<WorkspaceKeyWithMembers>;
-};
-
 export type AcceptWorkspaceInvitationMutationVariables = Exact<{
   input: AcceptWorkspaceInvitationInput;
 }>;
 
 
-export type AcceptWorkspaceInvitationMutation = { __typename?: 'Mutation', acceptWorkspaceInvitation?: { __typename?: 'AcceptWorkspaceInvitationResult', workspace?: { __typename?: 'Workspace', id: string, name?: string | null, members?: Array<{ __typename?: 'WorkspaceMember', userId: string, username?: string | null, role: Role }> | null } | null } | null };
+export type AcceptWorkspaceInvitationMutation = { __typename?: 'Mutation', acceptWorkspaceInvitation?: { __typename?: 'AcceptWorkspaceInvitationResult', workspaceId: string } | null };
 
 export type AttachDeviceToWorkspacesMutationVariables = Exact<{
   input: AttachDeviceToWorkspacesInput;
@@ -1388,12 +1383,12 @@ export type AttachDeviceToWorkspacesMutationVariables = Exact<{
 
 export type AttachDeviceToWorkspacesMutation = { __typename?: 'Mutation', attachDeviceToWorkspaces?: { __typename?: 'AttachDeviceToWorkspacesResult', workspaceKeys: Array<{ __typename?: 'WorkspaceKey', id: string, generation: number, workspaceId: string, workspaceKeyBox?: { __typename?: 'WorkspaceKeyBox', id: string, deviceSigningPublicKey: string, creatorDeviceSigningPublicKey: string, ciphertext: string, nonce: string, creatorDevice: { __typename?: 'CreatorDevice', signingPublicKey: string, encryptionPublicKey: string } } | null }> } | null };
 
-export type AttachDevicesToWorkspacesMutationVariables = Exact<{
-  input: AttachDevicesToWorkspacesInput;
+export type AuthorizeMemberMutationVariables = Exact<{
+  input: AuthorizeMemberInput;
 }>;
 
 
-export type AttachDevicesToWorkspacesMutation = { __typename?: 'Mutation', attachDevicesToWorkspaces?: { __typename?: 'AttachDevicesToWorkspacesResult', workspaces: Array<{ __typename?: 'WorkspaceWithWorkspaceKeys', id: string, workspaceKeys: Array<{ __typename?: 'WorkspaceKeyWithMembers', id: string, generation: number, members: Array<{ __typename?: 'MemberWithWorkspaceKeyBoxes', id: string, workspaceKeyBoxes: Array<{ __typename?: 'WorkspaceKeyBox', id: string, deviceSigningPublicKey: string, creatorDeviceSigningPublicKey: string, ciphertext: string, nonce: string }> }> }> }> } | null };
+export type AuthorizeMemberMutation = { __typename?: 'Mutation', authorizeMember?: { __typename?: 'AuthorizeMemberResult', success: boolean } | null };
 
 export type CreateCommentMutationVariables = Exact<{
   input: CreateCommentInput;
@@ -1526,12 +1521,12 @@ export type RemoveDocumentShareLinkMutationVariables = Exact<{
 
 export type RemoveDocumentShareLinkMutation = { __typename?: 'Mutation', removeDocumentShareLink?: { __typename?: 'RemoveDocumentShareLinkResult', success: boolean } | null };
 
-export type RemoveMembersAndRotateWorkspaceKeyMutationVariables = Exact<{
-  input: RemoveMembersAndRotateWorkspaceKeyInput;
+export type RemoveMemberAndRotateWorkspaceKeyMutationVariables = Exact<{
+  input: RemoveMemberAndRotateWorkspaceKeyInput;
 }>;
 
 
-export type RemoveMembersAndRotateWorkspaceKeyMutation = { __typename?: 'Mutation', removeMembersAndRotateWorkspaceKey?: { __typename?: 'RemoveMembersAndRotateWorkspaceKeyResult', workspaceKey: { __typename?: 'WorkspaceKey', id: string, generation: number, workspaceId: string, workspaceKeyBoxes?: Array<{ __typename?: 'WorkspaceKeyBox', id: string, deviceSigningPublicKey: string, creatorDeviceSigningPublicKey: string, ciphertext: string, nonce: string }> | null } } | null };
+export type RemoveMemberAndRotateWorkspaceKeyMutation = { __typename?: 'Mutation', removeMemberAndRotateWorkspaceKey?: { __typename?: 'RemoveMemberAndRotateWorkspaceKeyResult', workspaceKey: { __typename?: 'WorkspaceKey', id: string, generation: number, workspaceId: string, workspaceKeyBoxes?: Array<{ __typename?: 'WorkspaceKeyBox', id: string, deviceSigningPublicKey: string, creatorDeviceSigningPublicKey: string, ciphertext: string, nonce: string }> | null } } | null };
 
 export type StartLoginMutationVariables = Exact<{
   input: StartLoginInput;
@@ -1561,19 +1556,19 @@ export type UpdateFolderNameMutationVariables = Exact<{
 
 export type UpdateFolderNameMutation = { __typename?: 'Mutation', updateFolderName?: { __typename?: 'UpdateFolderNameResult', folder?: { __typename?: 'Folder', id: string, nameCiphertext: string, nameNonce: string, parentFolderId?: string | null, rootFolderId?: string | null, keyDerivationTrace: { __typename?: 'KeyDerivationTrace', workspaceKeyId: string, trace: Array<{ __typename?: 'KeyDerivationTraceEntry', entryId: string, subkeyId: number, parentId?: string | null, context: string }> } } | null } | null };
 
-export type UpdateWorkspaceMembersRolesMutationVariables = Exact<{
-  input: UpdateWorkspaceMembersRolesInput;
+export type UpdateWorkspaceMemberRoleMutationVariables = Exact<{
+  input: UpdateWorkspaceMemberRoleInput;
 }>;
 
 
-export type UpdateWorkspaceMembersRolesMutation = { __typename?: 'Mutation', updateWorkspaceMembersRoles?: { __typename?: 'UpdateWorkspaceMembersRolesResult', workspace?: { __typename?: 'Workspace', id: string, name?: string | null, members?: Array<{ __typename?: 'WorkspaceMember', userId: string, username?: string | null, role: Role }> | null } | null } | null };
+export type UpdateWorkspaceMemberRoleMutation = { __typename?: 'Mutation', updateWorkspaceMemberRole?: { __typename?: 'UpdateWorkspaceMemberRoleResult', workspace?: { __typename?: 'Workspace', id: string, name?: string | null, members?: Array<{ __typename?: 'WorkspaceMember', userId: string, username: string, role: Role }> | null } | null } | null };
 
 export type UpdateWorkspaceNameMutationVariables = Exact<{
   input: UpdateWorkspaceNameInput;
 }>;
 
 
-export type UpdateWorkspaceNameMutation = { __typename?: 'Mutation', updateWorkspaceName?: { __typename?: 'UpdateWorkspaceNameResult', workspace?: { __typename?: 'Workspace', id: string, name?: string | null, members?: Array<{ __typename?: 'WorkspaceMember', userId: string, username?: string | null, role: Role }> | null } | null } | null };
+export type UpdateWorkspaceNameMutation = { __typename?: 'Mutation', updateWorkspaceName?: { __typename?: 'UpdateWorkspaceNameResult', workspace?: { __typename?: 'Workspace', id: string, name?: string | null, members?: Array<{ __typename?: 'WorkspaceMember', userId: string, username: string, role: Role }> | null } | null } | null };
 
 export type VerifyRegistrationMutationVariables = Exact<{
   input: VerifyRegistrationInput;
@@ -1703,7 +1698,7 @@ export type MeWithWorkspaceLoadingInfoQueryVariables = Exact<{
 }>;
 
 
-export type MeWithWorkspaceLoadingInfoQuery = { __typename?: 'Query', me?: { __typename?: 'MeResult', id: string, username: string, workspaceLoadingInfo?: { __typename?: 'WorkspaceLoadingInfo', id: string, isAuthorized: boolean, documentId?: string | null, role: Role } | null } | null };
+export type MeWithWorkspaceLoadingInfoQuery = { __typename?: 'Query', me?: { __typename?: 'MeResult', id: string, username: string, mainDeviceSigningPublicKey: string, workspaceLoadingInfo?: { __typename?: 'WorkspaceLoadingInfo', id: string, isAuthorized: boolean, documentId?: string | null, role: Role } | null } | null };
 
 export type PendingWorkspaceInvitationQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -1726,17 +1721,10 @@ export type SnapshotQueryVariables = Exact<{
 
 export type SnapshotQuery = { __typename?: 'Query', snapshot?: { __typename?: 'Snapshot', id: string, latestVersion: number, data: string, documentId: string, keyDerivationTrace: { __typename?: 'KeyDerivationTrace', workspaceKeyId: string, trace: Array<{ __typename?: 'KeyDerivationTraceEntry', entryId: string, subkeyId: number, parentId?: string | null, context: string }> } } | null };
 
-export type UnauthorizedDevicesForWorkspacesQueryVariables = Exact<{ [key: string]: never; }>;
+export type UnauthorizedMemberQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type UnauthorizedDevicesForWorkspacesQuery = { __typename?: 'Query', unauthorizedDevicesForWorkspaces?: { __typename?: 'UnauthorizedDevicesForWorkspacesResult', unauthorizedMemberDevices: Array<{ __typename?: 'WorkspaceIdWithMemberDevices', id: string, members: Array<{ __typename?: 'WorkspaceIdWithDevices', id: string, devices: Array<{ __typename?: 'Device', userId?: string | null, signingPublicKey: string, encryptionPublicKey: string, info?: string | null, createdAt?: any | null, encryptionPublicKeySignature: string }> }> }> } | null };
-
-export type UnauthorizedMembersQueryVariables = Exact<{
-  workspaceIds: Array<Scalars['ID']> | Scalars['ID'];
-}>;
-
-
-export type UnauthorizedMembersQuery = { __typename?: 'Query', unauthorizedMembers?: { __typename?: 'UnauthorizedMembersResult', userIds: Array<string | null> } | null };
+export type UnauthorizedMemberQuery = { __typename?: 'Query', unauthorizedMember?: { __typename?: 'UnauthorizedMemberResult', userId: string, userMainDeviceSigningPublicKey: string, workspaceId: string, devices: Array<{ __typename?: 'Device', userId?: string | null, signingPublicKey: string, encryptionPublicKey: string, info?: string | null, createdAt?: any | null, encryptionPublicKeySignature: string }> } | null };
 
 export type UserIdFromUsernameQueryVariables = Exact<{
   username: Scalars['String'];
@@ -1751,7 +1739,21 @@ export type WorkspaceQueryVariables = Exact<{
 }>;
 
 
-export type WorkspaceQuery = { __typename?: 'Query', workspace?: { __typename?: 'Workspace', id: string, name?: string | null, members?: Array<{ __typename?: 'WorkspaceMember', userId: string, username?: string | null, role: Role, devices?: Array<{ __typename?: 'MinimalDevice', signingPublicKey: string, encryptionPublicKey: string, encryptionPublicKeySignature: string }> | null }> | null, currentWorkspaceKey?: { __typename?: 'WorkspaceKey', id: string, workspaceId: string, workspaceKeyBox?: { __typename?: 'WorkspaceKeyBox', id: string, workspaceKeyId: string, deviceSigningPublicKey: string, ciphertext: string, nonce: string, creatorDevice: { __typename?: 'CreatorDevice', signingPublicKey: string, encryptionPublicKey: string } } | null } | null, workspaceKeys?: Array<{ __typename?: 'WorkspaceKey', id: string, workspaceId: string, generation: number, workspaceKeyBox?: { __typename?: 'WorkspaceKeyBox', id: string, workspaceKeyId: string, deviceSigningPublicKey: string, ciphertext: string, nonce: string, creatorDevice: { __typename?: 'CreatorDevice', signingPublicKey: string, encryptionPublicKey: string } } | null }> | null } | null };
+export type WorkspaceQuery = { __typename?: 'Query', workspace?: { __typename?: 'Workspace', id: string, name?: string | null, members?: Array<{ __typename?: 'WorkspaceMember', userId: string, username: string, role: Role, mainDeviceSigningPublicKey: string, devices?: Array<{ __typename?: 'MinimalDevice', signingPublicKey: string, encryptionPublicKey: string, encryptionPublicKeySignature: string }> | null }> | null, currentWorkspaceKey?: { __typename?: 'WorkspaceKey', id: string, workspaceId: string, workspaceKeyBox?: { __typename?: 'WorkspaceKeyBox', id: string, workspaceKeyId: string, deviceSigningPublicKey: string, ciphertext: string, nonce: string, creatorDevice: { __typename?: 'CreatorDevice', signingPublicKey: string, encryptionPublicKey: string } } | null } | null, workspaceKeys?: Array<{ __typename?: 'WorkspaceKey', id: string, workspaceId: string, generation: number, workspaceKeyBox?: { __typename?: 'WorkspaceKeyBox', id: string, workspaceKeyId: string, deviceSigningPublicKey: string, ciphertext: string, nonce: string, creatorDevice: { __typename?: 'CreatorDevice', signingPublicKey: string, encryptionPublicKey: string } } | null }> | null } | null };
+
+export type WorkspaceChainQueryVariables = Exact<{
+  workspaceId: Scalars['ID'];
+}>;
+
+
+export type WorkspaceChainQuery = { __typename?: 'Query', workspaceChain?: { __typename?: 'WorkspaceChainEventConnection', nodes?: Array<{ __typename?: 'WorkspaceChainEvent', serializedContent: string, position: string } | null> | null } | null };
+
+export type WorkspaceChainByInvitationIdQueryVariables = Exact<{
+  invitationId: Scalars['ID'];
+}>;
+
+
+export type WorkspaceChainByInvitationIdQuery = { __typename?: 'Query', workspaceChainByInvitationId?: { __typename?: 'WorkspaceChainEventConnection', nodes?: Array<{ __typename?: 'WorkspaceChainEvent', serializedContent: string, position: string } | null> | null } | null };
 
 export type WorkspaceDevicesQueryVariables = Exact<{
   workspaceId: Scalars['ID'];
@@ -1765,7 +1767,7 @@ export type WorkspaceInvitationQueryVariables = Exact<{
 }>;
 
 
-export type WorkspaceInvitationQuery = { __typename?: 'Query', me?: { __typename?: 'MeResult', id: string, username: string } | null, workspaceInvitation?: { __typename?: 'WorkspaceInvitation', id: string, workspaceId: string, inviterUserId: string, inviterUsername: string, workspaceName?: string | null, role: Role, expiresAt: any } | null };
+export type WorkspaceInvitationQuery = { __typename?: 'Query', me?: { __typename?: 'MeResult', id: string, username: string } | null, workspaceInvitation?: { __typename?: 'WorkspaceInvitation', id: string, workspaceId: string, inviterUserId: string, inviterUsername: string, workspaceName?: string | null, role: Role, expiresAt: any, invitationDataSignature: string, invitationSigningPublicKey: string } | null };
 
 export type WorkspaceInvitationsQueryVariables = Exact<{
   workspaceId: Scalars['ID'];
@@ -1785,15 +1787,7 @@ export type WorkspacesQuery = { __typename?: 'Query', workspaces?: { __typename?
 export const AcceptWorkspaceInvitationDocument = gql`
     mutation acceptWorkspaceInvitation($input: AcceptWorkspaceInvitationInput!) {
   acceptWorkspaceInvitation(input: $input) {
-    workspace {
-      id
-      name
-      members {
-        userId
-        username
-        role
-      }
-    }
+    workspaceId
   }
 }
     `;
@@ -1827,32 +1821,16 @@ export const AttachDeviceToWorkspacesDocument = gql`
 export function useAttachDeviceToWorkspacesMutation() {
   return Urql.useMutation<AttachDeviceToWorkspacesMutation, AttachDeviceToWorkspacesMutationVariables>(AttachDeviceToWorkspacesDocument);
 };
-export const AttachDevicesToWorkspacesDocument = gql`
-    mutation attachDevicesToWorkspaces($input: AttachDevicesToWorkspacesInput!) {
-  attachDevicesToWorkspaces(input: $input) {
-    workspaces {
-      id
-      workspaceKeys {
-        id
-        generation
-        members {
-          id
-          workspaceKeyBoxes {
-            id
-            deviceSigningPublicKey
-            creatorDeviceSigningPublicKey
-            ciphertext
-            nonce
-          }
-        }
-      }
-    }
+export const AuthorizeMemberDocument = gql`
+    mutation authorizeMember($input: AuthorizeMemberInput!) {
+  authorizeMember(input: $input) {
+    success
   }
 }
     `;
 
-export function useAttachDevicesToWorkspacesMutation() {
-  return Urql.useMutation<AttachDevicesToWorkspacesMutation, AttachDevicesToWorkspacesMutationVariables>(AttachDevicesToWorkspacesDocument);
+export function useAuthorizeMemberMutation() {
+  return Urql.useMutation<AuthorizeMemberMutation, AuthorizeMemberMutationVariables>(AuthorizeMemberDocument);
 };
 export const CreateCommentDocument = gql`
     mutation createComment($input: CreateCommentInput!) {
@@ -2157,9 +2135,9 @@ export const RemoveDocumentShareLinkDocument = gql`
 export function useRemoveDocumentShareLinkMutation() {
   return Urql.useMutation<RemoveDocumentShareLinkMutation, RemoveDocumentShareLinkMutationVariables>(RemoveDocumentShareLinkDocument);
 };
-export const RemoveMembersAndRotateWorkspaceKeyDocument = gql`
-    mutation removeMembersAndRotateWorkspaceKey($input: RemoveMembersAndRotateWorkspaceKeyInput!) {
-  removeMembersAndRotateWorkspaceKey(input: $input) {
+export const RemoveMemberAndRotateWorkspaceKeyDocument = gql`
+    mutation removeMemberAndRotateWorkspaceKey($input: RemoveMemberAndRotateWorkspaceKeyInput!) {
+  removeMemberAndRotateWorkspaceKey(input: $input) {
     workspaceKey {
       id
       generation
@@ -2176,8 +2154,8 @@ export const RemoveMembersAndRotateWorkspaceKeyDocument = gql`
 }
     `;
 
-export function useRemoveMembersAndRotateWorkspaceKeyMutation() {
-  return Urql.useMutation<RemoveMembersAndRotateWorkspaceKeyMutation, RemoveMembersAndRotateWorkspaceKeyMutationVariables>(RemoveMembersAndRotateWorkspaceKeyDocument);
+export function useRemoveMemberAndRotateWorkspaceKeyMutation() {
+  return Urql.useMutation<RemoveMemberAndRotateWorkspaceKeyMutation, RemoveMemberAndRotateWorkspaceKeyMutationVariables>(RemoveMemberAndRotateWorkspaceKeyDocument);
 };
 export const StartLoginDocument = gql`
     mutation startLogin($input: StartLoginInput!) {
@@ -2246,9 +2224,9 @@ export const UpdateFolderNameDocument = gql`
 export function useUpdateFolderNameMutation() {
   return Urql.useMutation<UpdateFolderNameMutation, UpdateFolderNameMutationVariables>(UpdateFolderNameDocument);
 };
-export const UpdateWorkspaceMembersRolesDocument = gql`
-    mutation updateWorkspaceMembersRoles($input: UpdateWorkspaceMembersRolesInput!) {
-  updateWorkspaceMembersRoles(input: $input) {
+export const UpdateWorkspaceMemberRoleDocument = gql`
+    mutation updateWorkspaceMemberRole($input: UpdateWorkspaceMemberRoleInput!) {
+  updateWorkspaceMemberRole(input: $input) {
     workspace {
       id
       name
@@ -2262,8 +2240,8 @@ export const UpdateWorkspaceMembersRolesDocument = gql`
 }
     `;
 
-export function useUpdateWorkspaceMembersRolesMutation() {
-  return Urql.useMutation<UpdateWorkspaceMembersRolesMutation, UpdateWorkspaceMembersRolesMutationVariables>(UpdateWorkspaceMembersRolesDocument);
+export function useUpdateWorkspaceMemberRoleMutation() {
+  return Urql.useMutation<UpdateWorkspaceMemberRoleMutation, UpdateWorkspaceMemberRoleMutationVariables>(UpdateWorkspaceMemberRoleDocument);
 };
 export const UpdateWorkspaceNameDocument = gql`
     mutation updateWorkspaceName($input: UpdateWorkspaceNameInput!) {
@@ -2631,6 +2609,7 @@ export const MeWithWorkspaceLoadingInfoDocument = gql`
   me {
     id
     username
+    mainDeviceSigningPublicKey
     workspaceLoadingInfo(
       workspaceId: $workspaceId
       returnOtherWorkspaceIfNotFound: $returnOtherWorkspaceIfNotFound
@@ -2718,40 +2697,26 @@ export const SnapshotDocument = gql`
 export function useSnapshotQuery(options: Omit<Urql.UseQueryArgs<SnapshotQueryVariables>, 'query'>) {
   return Urql.useQuery<SnapshotQuery, SnapshotQueryVariables>({ query: SnapshotDocument, ...options });
 };
-export const UnauthorizedDevicesForWorkspacesDocument = gql`
-    query unauthorizedDevicesForWorkspaces {
-  unauthorizedDevicesForWorkspaces {
-    unauthorizedMemberDevices {
-      id
-      members {
-        id
-        devices {
-          userId
-          signingPublicKey
-          encryptionPublicKey
-          info
-          createdAt
-          encryptionPublicKeySignature
-        }
-      }
+export const UnauthorizedMemberDocument = gql`
+    query unauthorizedMember {
+  unauthorizedMember {
+    userId
+    userMainDeviceSigningPublicKey
+    workspaceId
+    devices {
+      userId
+      signingPublicKey
+      encryptionPublicKey
+      info
+      createdAt
+      encryptionPublicKeySignature
     }
   }
 }
     `;
 
-export function useUnauthorizedDevicesForWorkspacesQuery(options?: Omit<Urql.UseQueryArgs<UnauthorizedDevicesForWorkspacesQueryVariables>, 'query'>) {
-  return Urql.useQuery<UnauthorizedDevicesForWorkspacesQuery, UnauthorizedDevicesForWorkspacesQueryVariables>({ query: UnauthorizedDevicesForWorkspacesDocument, ...options });
-};
-export const UnauthorizedMembersDocument = gql`
-    query unauthorizedMembers($workspaceIds: [ID!]!) {
-  unauthorizedMembers(workspaceIds: $workspaceIds) {
-    userIds
-  }
-}
-    `;
-
-export function useUnauthorizedMembersQuery(options: Omit<Urql.UseQueryArgs<UnauthorizedMembersQueryVariables>, 'query'>) {
-  return Urql.useQuery<UnauthorizedMembersQuery, UnauthorizedMembersQueryVariables>({ query: UnauthorizedMembersDocument, ...options });
+export function useUnauthorizedMemberQuery(options?: Omit<Urql.UseQueryArgs<UnauthorizedMemberQueryVariables>, 'query'>) {
+  return Urql.useQuery<UnauthorizedMemberQuery, UnauthorizedMemberQueryVariables>({ query: UnauthorizedMemberDocument, ...options });
 };
 export const UserIdFromUsernameDocument = gql`
     query userIdFromUsername($username: String!) {
@@ -2773,6 +2738,7 @@ export const WorkspaceDocument = gql`
       userId
       username
       role
+      mainDeviceSigningPublicKey
       devices {
         signingPublicKey
         encryptionPublicKey
@@ -2817,6 +2783,34 @@ export const WorkspaceDocument = gql`
 export function useWorkspaceQuery(options: Omit<Urql.UseQueryArgs<WorkspaceQueryVariables>, 'query'>) {
   return Urql.useQuery<WorkspaceQuery, WorkspaceQueryVariables>({ query: WorkspaceDocument, ...options });
 };
+export const WorkspaceChainDocument = gql`
+    query workspaceChain($workspaceId: ID!) {
+  workspaceChain(workspaceId: $workspaceId, first: 5000) {
+    nodes {
+      serializedContent
+      position
+    }
+  }
+}
+    `;
+
+export function useWorkspaceChainQuery(options: Omit<Urql.UseQueryArgs<WorkspaceChainQueryVariables>, 'query'>) {
+  return Urql.useQuery<WorkspaceChainQuery, WorkspaceChainQueryVariables>({ query: WorkspaceChainDocument, ...options });
+};
+export const WorkspaceChainByInvitationIdDocument = gql`
+    query workspaceChainByInvitationId($invitationId: ID!) {
+  workspaceChainByInvitationId(invitationId: $invitationId, first: 5000) {
+    nodes {
+      serializedContent
+      position
+    }
+  }
+}
+    `;
+
+export function useWorkspaceChainByInvitationIdQuery(options: Omit<Urql.UseQueryArgs<WorkspaceChainByInvitationIdQueryVariables>, 'query'>) {
+  return Urql.useQuery<WorkspaceChainByInvitationIdQuery, WorkspaceChainByInvitationIdQueryVariables>({ query: WorkspaceChainByInvitationIdDocument, ...options });
+};
 export const WorkspaceDevicesDocument = gql`
     query workspaceDevices($workspaceId: ID!) {
   workspaceDevices(workspaceId: $workspaceId, first: 500) {
@@ -2853,6 +2847,8 @@ export const WorkspaceInvitationDocument = gql`
     workspaceName
     role
     expiresAt
+    invitationDataSignature
+    invitationSigningPublicKey
   }
 }
     `;
@@ -2961,10 +2957,10 @@ export const runAttachDeviceToWorkspacesMutation = async (variables: AttachDevic
     .toPromise();
 };
 
-export const runAttachDevicesToWorkspacesMutation = async (variables: AttachDevicesToWorkspacesMutationVariables, options?: any) => {
+export const runAuthorizeMemberMutation = async (variables: AuthorizeMemberMutationVariables, options?: any) => {
   return await getUrqlClient()
-    .mutation<AttachDevicesToWorkspacesMutation, AttachDevicesToWorkspacesMutationVariables>(
-      AttachDevicesToWorkspacesDocument,
+    .mutation<AuthorizeMemberMutation, AuthorizeMemberMutationVariables>(
+      AuthorizeMemberDocument,
       variables,
       {
         // better to be safe here and always refetch
@@ -3241,10 +3237,10 @@ export const runRemoveDocumentShareLinkMutation = async (variables: RemoveDocume
     .toPromise();
 };
 
-export const runRemoveMembersAndRotateWorkspaceKeyMutation = async (variables: RemoveMembersAndRotateWorkspaceKeyMutationVariables, options?: any) => {
+export const runRemoveMemberAndRotateWorkspaceKeyMutation = async (variables: RemoveMemberAndRotateWorkspaceKeyMutationVariables, options?: any) => {
   return await getUrqlClient()
-    .mutation<RemoveMembersAndRotateWorkspaceKeyMutation, RemoveMembersAndRotateWorkspaceKeyMutationVariables>(
-      RemoveMembersAndRotateWorkspaceKeyDocument,
+    .mutation<RemoveMemberAndRotateWorkspaceKeyMutation, RemoveMemberAndRotateWorkspaceKeyMutationVariables>(
+      RemoveMemberAndRotateWorkspaceKeyDocument,
       variables,
       {
         // better to be safe here and always refetch
@@ -3311,10 +3307,10 @@ export const runUpdateFolderNameMutation = async (variables: UpdateFolderNameMut
     .toPromise();
 };
 
-export const runUpdateWorkspaceMembersRolesMutation = async (variables: UpdateWorkspaceMembersRolesMutationVariables, options?: any) => {
+export const runUpdateWorkspaceMemberRoleMutation = async (variables: UpdateWorkspaceMemberRoleMutationVariables, options?: any) => {
   return await getUrqlClient()
-    .mutation<UpdateWorkspaceMembersRolesMutation, UpdateWorkspaceMembersRolesMutationVariables>(
-      UpdateWorkspaceMembersRolesDocument,
+    .mutation<UpdateWorkspaceMemberRoleMutation, UpdateWorkspaceMemberRoleMutationVariables>(
+      UpdateWorkspaceMemberRoleDocument,
       variables,
       {
         // better to be safe here and always refetch
@@ -5310,10 +5306,10 @@ export const snapshotQueryService =
 
 
 
-export const runUnauthorizedDevicesForWorkspacesQuery = async (variables: UnauthorizedDevicesForWorkspacesQueryVariables, options?: any) => {
+export const runUnauthorizedMemberQuery = async (variables: UnauthorizedMemberQueryVariables, options?: any) => {
   return await getUrqlClient()
-    .query<UnauthorizedDevicesForWorkspacesQuery, UnauthorizedDevicesForWorkspacesQueryVariables>(
-      UnauthorizedDevicesForWorkspacesDocument,
+    .query<UnauthorizedMemberQuery, UnauthorizedMemberQueryVariables>(
+      UnauthorizedMemberDocument,
       variables,
       {
         // better to be safe here and always refetch
@@ -5324,41 +5320,41 @@ export const runUnauthorizedDevicesForWorkspacesQuery = async (variables: Unauth
     .toPromise();
 };
 
-export type UnauthorizedDevicesForWorkspacesQueryResult = Urql.OperationResult<UnauthorizedDevicesForWorkspacesQuery, UnauthorizedDevicesForWorkspacesQueryVariables>;
+export type UnauthorizedMemberQueryResult = Urql.OperationResult<UnauthorizedMemberQuery, UnauthorizedMemberQueryVariables>;
 
-export type UnauthorizedDevicesForWorkspacesQueryUpdateResultEvent = {
-  type: "UnauthorizedDevicesForWorkspacesQuery.UPDATE_RESULT";
-  result: UnauthorizedDevicesForWorkspacesQueryResult;
+export type UnauthorizedMemberQueryUpdateResultEvent = {
+  type: "UnauthorizedMemberQuery.UPDATE_RESULT";
+  result: UnauthorizedMemberQueryResult;
 };
 
-export type UnauthorizedDevicesForWorkspacesQueryErrorEvent = {
-  type: "UnauthorizedDevicesForWorkspacesQuery.ERROR";
-  result: UnauthorizedDevicesForWorkspacesQueryResult;
+export type UnauthorizedMemberQueryErrorEvent = {
+  type: "UnauthorizedMemberQuery.ERROR";
+  result: UnauthorizedMemberQueryResult;
 };
 
-export type UnauthorizedDevicesForWorkspacesQueryServiceEvent = UnauthorizedDevicesForWorkspacesQueryUpdateResultEvent | UnauthorizedDevicesForWorkspacesQueryErrorEvent;
+export type UnauthorizedMemberQueryServiceEvent = UnauthorizedMemberQueryUpdateResultEvent | UnauthorizedMemberQueryErrorEvent;
 
-type UnauthorizedDevicesForWorkspacesQueryServiceSubscribersEntry = {
-  variables: UnauthorizedDevicesForWorkspacesQueryVariables;
-  callbacks: ((event: UnauthorizedDevicesForWorkspacesQueryServiceEvent) => void)[];
+type UnauthorizedMemberQueryServiceSubscribersEntry = {
+  variables: UnauthorizedMemberQueryVariables;
+  callbacks: ((event: UnauthorizedMemberQueryServiceEvent) => void)[];
   intervalId: NodeJS.Timer | null;
 };
 
-type UnauthorizedDevicesForWorkspacesQueryServiceSubscribers = {
-  [variables: string]: UnauthorizedDevicesForWorkspacesQueryServiceSubscribersEntry;
+type UnauthorizedMemberQueryServiceSubscribers = {
+  [variables: string]: UnauthorizedMemberQueryServiceSubscribersEntry;
 };
 
-const unauthorizedDevicesForWorkspacesQueryServiceSubscribers: UnauthorizedDevicesForWorkspacesQueryServiceSubscribers = {};
+const unauthorizedMemberQueryServiceSubscribers: UnauthorizedMemberQueryServiceSubscribers = {};
 
-const triggerUnauthorizedDevicesForWorkspacesQuery = (variablesString: string, variables: UnauthorizedDevicesForWorkspacesQueryVariables) => {
+const triggerUnauthorizedMemberQuery = (variablesString: string, variables: UnauthorizedMemberQueryVariables) => {
   getUrqlClient()
-    .query<UnauthorizedDevicesForWorkspacesQuery, UnauthorizedDevicesForWorkspacesQueryVariables>(UnauthorizedDevicesForWorkspacesDocument, variables)
+    .query<UnauthorizedMemberQuery, UnauthorizedMemberQueryVariables>(UnauthorizedMemberDocument, variables)
     .toPromise()
     .then((result) => {
-      unauthorizedDevicesForWorkspacesQueryServiceSubscribers[variablesString].callbacks.forEach(
+      unauthorizedMemberQueryServiceSubscribers[variablesString].callbacks.forEach(
         (callback) => {
           callback({
-            type: result.error ? "UnauthorizedDevicesForWorkspacesQuery.ERROR" : "UnauthorizedDevicesForWorkspacesQuery.UPDATE_RESULT",
+            type: result.error ? "UnauthorizedMemberQuery.ERROR" : "UnauthorizedMemberQuery.UPDATE_RESULT",
             result: result,
           });
         }
@@ -5375,141 +5371,38 @@ const triggerUnauthorizedDevicesForWorkspacesQuery = (variablesString: string, v
  * When the last subscription is stopped, the interval will be cleared.
  * It also considers the variables passed to the service.
  */
-export const unauthorizedDevicesForWorkspacesQueryService =
-  (variables: UnauthorizedDevicesForWorkspacesQueryVariables, intervalInMs?: number) => (callback, onReceive) => {
+export const unauthorizedMemberQueryService =
+  (variables: UnauthorizedMemberQueryVariables, intervalInMs?: number) => (callback, onReceive) => {
     const variablesString = canonicalize(variables) as string;
-    if (unauthorizedDevicesForWorkspacesQueryServiceSubscribers[variablesString]) {
-      unauthorizedDevicesForWorkspacesQueryServiceSubscribers[variablesString].callbacks.push(callback);
+    if (unauthorizedMemberQueryServiceSubscribers[variablesString]) {
+      unauthorizedMemberQueryServiceSubscribers[variablesString].callbacks.push(callback);
     } else {
-      unauthorizedDevicesForWorkspacesQueryServiceSubscribers[variablesString] = {
+      unauthorizedMemberQueryServiceSubscribers[variablesString] = {
         variables,
         callbacks: [callback],
         intervalId: null,
       };
     }
 
-    triggerUnauthorizedDevicesForWorkspacesQuery(variablesString, variables);
-    if (!unauthorizedDevicesForWorkspacesQueryServiceSubscribers[variablesString].intervalId) {
-      unauthorizedDevicesForWorkspacesQueryServiceSubscribers[variablesString].intervalId = setInterval(
+    triggerUnauthorizedMemberQuery(variablesString, variables);
+    if (!unauthorizedMemberQueryServiceSubscribers[variablesString].intervalId) {
+      unauthorizedMemberQueryServiceSubscribers[variablesString].intervalId = setInterval(
         () => {
-          triggerUnauthorizedDevicesForWorkspacesQuery(variablesString, variables);
+          triggerUnauthorizedMemberQuery(variablesString, variables);
         },
         intervalInMs || 4000
       );
     }
 
-    const intervalId = unauthorizedDevicesForWorkspacesQueryServiceSubscribers[variablesString].intervalId;
+    const intervalId = unauthorizedMemberQueryServiceSubscribers[variablesString].intervalId;
     return () => {
       if (
-        unauthorizedDevicesForWorkspacesQueryServiceSubscribers[variablesString].callbacks.length === 0 &&
+        unauthorizedMemberQueryServiceSubscribers[variablesString].callbacks.length === 0 &&
         intervalId
       ) {
         // perform cleanup
         clearInterval(intervalId);
-        unauthorizedDevicesForWorkspacesQueryServiceSubscribers[variablesString].intervalId = null;
-      }
-    };
-  };
-
-
-
-export const runUnauthorizedMembersQuery = async (variables: UnauthorizedMembersQueryVariables, options?: any) => {
-  return await getUrqlClient()
-    .query<UnauthorizedMembersQuery, UnauthorizedMembersQueryVariables>(
-      UnauthorizedMembersDocument,
-      variables,
-      {
-        // better to be safe here and always refetch
-        requestPolicy: "network-only",
-        ...options
-      }
-    )
-    .toPromise();
-};
-
-export type UnauthorizedMembersQueryResult = Urql.OperationResult<UnauthorizedMembersQuery, UnauthorizedMembersQueryVariables>;
-
-export type UnauthorizedMembersQueryUpdateResultEvent = {
-  type: "UnauthorizedMembersQuery.UPDATE_RESULT";
-  result: UnauthorizedMembersQueryResult;
-};
-
-export type UnauthorizedMembersQueryErrorEvent = {
-  type: "UnauthorizedMembersQuery.ERROR";
-  result: UnauthorizedMembersQueryResult;
-};
-
-export type UnauthorizedMembersQueryServiceEvent = UnauthorizedMembersQueryUpdateResultEvent | UnauthorizedMembersQueryErrorEvent;
-
-type UnauthorizedMembersQueryServiceSubscribersEntry = {
-  variables: UnauthorizedMembersQueryVariables;
-  callbacks: ((event: UnauthorizedMembersQueryServiceEvent) => void)[];
-  intervalId: NodeJS.Timer | null;
-};
-
-type UnauthorizedMembersQueryServiceSubscribers = {
-  [variables: string]: UnauthorizedMembersQueryServiceSubscribersEntry;
-};
-
-const unauthorizedMembersQueryServiceSubscribers: UnauthorizedMembersQueryServiceSubscribers = {};
-
-const triggerUnauthorizedMembersQuery = (variablesString: string, variables: UnauthorizedMembersQueryVariables) => {
-  getUrqlClient()
-    .query<UnauthorizedMembersQuery, UnauthorizedMembersQueryVariables>(UnauthorizedMembersDocument, variables)
-    .toPromise()
-    .then((result) => {
-      unauthorizedMembersQueryServiceSubscribers[variablesString].callbacks.forEach(
-        (callback) => {
-          callback({
-            type: result.error ? "UnauthorizedMembersQuery.ERROR" : "UnauthorizedMembersQuery.UPDATE_RESULT",
-            result: result,
-          });
-        }
-      );
-    });
-};
-
-/**
- * This service is used to query results every 4 seconds.
- *
- * It allows machines to spawn a service that will fetch the query
- * and send the result to the machine.
- * It will share the same interval for all machines.
- * When the last subscription is stopped, the interval will be cleared.
- * It also considers the variables passed to the service.
- */
-export const unauthorizedMembersQueryService =
-  (variables: UnauthorizedMembersQueryVariables, intervalInMs?: number) => (callback, onReceive) => {
-    const variablesString = canonicalize(variables) as string;
-    if (unauthorizedMembersQueryServiceSubscribers[variablesString]) {
-      unauthorizedMembersQueryServiceSubscribers[variablesString].callbacks.push(callback);
-    } else {
-      unauthorizedMembersQueryServiceSubscribers[variablesString] = {
-        variables,
-        callbacks: [callback],
-        intervalId: null,
-      };
-    }
-
-    triggerUnauthorizedMembersQuery(variablesString, variables);
-    if (!unauthorizedMembersQueryServiceSubscribers[variablesString].intervalId) {
-      unauthorizedMembersQueryServiceSubscribers[variablesString].intervalId = setInterval(
-        () => {
-          triggerUnauthorizedMembersQuery(variablesString, variables);
-        },
-        intervalInMs || 4000
-      );
-    }
-
-    const intervalId = unauthorizedMembersQueryServiceSubscribers[variablesString].intervalId;
-    return () => {
-      if (
-        unauthorizedMembersQueryServiceSubscribers[variablesString].callbacks.length === 0 &&
-        intervalId
-      ) {
-        // perform cleanup
-        clearInterval(intervalId);
-        unauthorizedMembersQueryServiceSubscribers[variablesString].intervalId = null;
+        unauthorizedMemberQueryServiceSubscribers[variablesString].intervalId = null;
       }
     };
   };
@@ -5716,6 +5609,212 @@ export const workspaceQueryService =
         // perform cleanup
         clearInterval(intervalId);
         workspaceQueryServiceSubscribers[variablesString].intervalId = null;
+      }
+    };
+  };
+
+
+
+export const runWorkspaceChainQuery = async (variables: WorkspaceChainQueryVariables, options?: any) => {
+  return await getUrqlClient()
+    .query<WorkspaceChainQuery, WorkspaceChainQueryVariables>(
+      WorkspaceChainDocument,
+      variables,
+      {
+        // better to be safe here and always refetch
+        requestPolicy: "network-only",
+        ...options
+      }
+    )
+    .toPromise();
+};
+
+export type WorkspaceChainQueryResult = Urql.OperationResult<WorkspaceChainQuery, WorkspaceChainQueryVariables>;
+
+export type WorkspaceChainQueryUpdateResultEvent = {
+  type: "WorkspaceChainQuery.UPDATE_RESULT";
+  result: WorkspaceChainQueryResult;
+};
+
+export type WorkspaceChainQueryErrorEvent = {
+  type: "WorkspaceChainQuery.ERROR";
+  result: WorkspaceChainQueryResult;
+};
+
+export type WorkspaceChainQueryServiceEvent = WorkspaceChainQueryUpdateResultEvent | WorkspaceChainQueryErrorEvent;
+
+type WorkspaceChainQueryServiceSubscribersEntry = {
+  variables: WorkspaceChainQueryVariables;
+  callbacks: ((event: WorkspaceChainQueryServiceEvent) => void)[];
+  intervalId: NodeJS.Timer | null;
+};
+
+type WorkspaceChainQueryServiceSubscribers = {
+  [variables: string]: WorkspaceChainQueryServiceSubscribersEntry;
+};
+
+const workspaceChainQueryServiceSubscribers: WorkspaceChainQueryServiceSubscribers = {};
+
+const triggerWorkspaceChainQuery = (variablesString: string, variables: WorkspaceChainQueryVariables) => {
+  getUrqlClient()
+    .query<WorkspaceChainQuery, WorkspaceChainQueryVariables>(WorkspaceChainDocument, variables)
+    .toPromise()
+    .then((result) => {
+      workspaceChainQueryServiceSubscribers[variablesString].callbacks.forEach(
+        (callback) => {
+          callback({
+            type: result.error ? "WorkspaceChainQuery.ERROR" : "WorkspaceChainQuery.UPDATE_RESULT",
+            result: result,
+          });
+        }
+      );
+    });
+};
+
+/**
+ * This service is used to query results every 4 seconds.
+ *
+ * It allows machines to spawn a service that will fetch the query
+ * and send the result to the machine.
+ * It will share the same interval for all machines.
+ * When the last subscription is stopped, the interval will be cleared.
+ * It also considers the variables passed to the service.
+ */
+export const workspaceChainQueryService =
+  (variables: WorkspaceChainQueryVariables, intervalInMs?: number) => (callback, onReceive) => {
+    const variablesString = canonicalize(variables) as string;
+    if (workspaceChainQueryServiceSubscribers[variablesString]) {
+      workspaceChainQueryServiceSubscribers[variablesString].callbacks.push(callback);
+    } else {
+      workspaceChainQueryServiceSubscribers[variablesString] = {
+        variables,
+        callbacks: [callback],
+        intervalId: null,
+      };
+    }
+
+    triggerWorkspaceChainQuery(variablesString, variables);
+    if (!workspaceChainQueryServiceSubscribers[variablesString].intervalId) {
+      workspaceChainQueryServiceSubscribers[variablesString].intervalId = setInterval(
+        () => {
+          triggerWorkspaceChainQuery(variablesString, variables);
+        },
+        intervalInMs || 4000
+      );
+    }
+
+    const intervalId = workspaceChainQueryServiceSubscribers[variablesString].intervalId;
+    return () => {
+      if (
+        workspaceChainQueryServiceSubscribers[variablesString].callbacks.length === 0 &&
+        intervalId
+      ) {
+        // perform cleanup
+        clearInterval(intervalId);
+        workspaceChainQueryServiceSubscribers[variablesString].intervalId = null;
+      }
+    };
+  };
+
+
+
+export const runWorkspaceChainByInvitationIdQuery = async (variables: WorkspaceChainByInvitationIdQueryVariables, options?: any) => {
+  return await getUrqlClient()
+    .query<WorkspaceChainByInvitationIdQuery, WorkspaceChainByInvitationIdQueryVariables>(
+      WorkspaceChainByInvitationIdDocument,
+      variables,
+      {
+        // better to be safe here and always refetch
+        requestPolicy: "network-only",
+        ...options
+      }
+    )
+    .toPromise();
+};
+
+export type WorkspaceChainByInvitationIdQueryResult = Urql.OperationResult<WorkspaceChainByInvitationIdQuery, WorkspaceChainByInvitationIdQueryVariables>;
+
+export type WorkspaceChainByInvitationIdQueryUpdateResultEvent = {
+  type: "WorkspaceChainByInvitationIdQuery.UPDATE_RESULT";
+  result: WorkspaceChainByInvitationIdQueryResult;
+};
+
+export type WorkspaceChainByInvitationIdQueryErrorEvent = {
+  type: "WorkspaceChainByInvitationIdQuery.ERROR";
+  result: WorkspaceChainByInvitationIdQueryResult;
+};
+
+export type WorkspaceChainByInvitationIdQueryServiceEvent = WorkspaceChainByInvitationIdQueryUpdateResultEvent | WorkspaceChainByInvitationIdQueryErrorEvent;
+
+type WorkspaceChainByInvitationIdQueryServiceSubscribersEntry = {
+  variables: WorkspaceChainByInvitationIdQueryVariables;
+  callbacks: ((event: WorkspaceChainByInvitationIdQueryServiceEvent) => void)[];
+  intervalId: NodeJS.Timer | null;
+};
+
+type WorkspaceChainByInvitationIdQueryServiceSubscribers = {
+  [variables: string]: WorkspaceChainByInvitationIdQueryServiceSubscribersEntry;
+};
+
+const workspaceChainByInvitationIdQueryServiceSubscribers: WorkspaceChainByInvitationIdQueryServiceSubscribers = {};
+
+const triggerWorkspaceChainByInvitationIdQuery = (variablesString: string, variables: WorkspaceChainByInvitationIdQueryVariables) => {
+  getUrqlClient()
+    .query<WorkspaceChainByInvitationIdQuery, WorkspaceChainByInvitationIdQueryVariables>(WorkspaceChainByInvitationIdDocument, variables)
+    .toPromise()
+    .then((result) => {
+      workspaceChainByInvitationIdQueryServiceSubscribers[variablesString].callbacks.forEach(
+        (callback) => {
+          callback({
+            type: result.error ? "WorkspaceChainByInvitationIdQuery.ERROR" : "WorkspaceChainByInvitationIdQuery.UPDATE_RESULT",
+            result: result,
+          });
+        }
+      );
+    });
+};
+
+/**
+ * This service is used to query results every 4 seconds.
+ *
+ * It allows machines to spawn a service that will fetch the query
+ * and send the result to the machine.
+ * It will share the same interval for all machines.
+ * When the last subscription is stopped, the interval will be cleared.
+ * It also considers the variables passed to the service.
+ */
+export const workspaceChainByInvitationIdQueryService =
+  (variables: WorkspaceChainByInvitationIdQueryVariables, intervalInMs?: number) => (callback, onReceive) => {
+    const variablesString = canonicalize(variables) as string;
+    if (workspaceChainByInvitationIdQueryServiceSubscribers[variablesString]) {
+      workspaceChainByInvitationIdQueryServiceSubscribers[variablesString].callbacks.push(callback);
+    } else {
+      workspaceChainByInvitationIdQueryServiceSubscribers[variablesString] = {
+        variables,
+        callbacks: [callback],
+        intervalId: null,
+      };
+    }
+
+    triggerWorkspaceChainByInvitationIdQuery(variablesString, variables);
+    if (!workspaceChainByInvitationIdQueryServiceSubscribers[variablesString].intervalId) {
+      workspaceChainByInvitationIdQueryServiceSubscribers[variablesString].intervalId = setInterval(
+        () => {
+          triggerWorkspaceChainByInvitationIdQuery(variablesString, variables);
+        },
+        intervalInMs || 4000
+      );
+    }
+
+    const intervalId = workspaceChainByInvitationIdQueryServiceSubscribers[variablesString].intervalId;
+    return () => {
+      if (
+        workspaceChainByInvitationIdQueryServiceSubscribers[variablesString].callbacks.length === 0 &&
+        intervalId
+      ) {
+        // perform cleanup
+        clearInterval(intervalId);
+        workspaceChainByInvitationIdQueryServiceSubscribers[variablesString].intervalId = null;
       }
     };
   };

@@ -7,6 +7,7 @@ query meWithWorkspaceLoadingInfo(
   me {
     id
     username
+    mainDeviceSigningPublicKey
     workspaceLoadingInfo(
       workspaceId: $workspaceId
       returnOtherWorkspaceIfNotFound: $returnOtherWorkspaceIfNotFound

@@ -1,3 +1,4 @@
+import * as workspaceChain from "@serenity-kit/workspace-chain";
 import React, { useContext } from "react";
 import { UseQueryState } from "urql";
 import { Exact, InputMaybe, WorkspaceQuery } from "../generated/graphql";
@@ -11,6 +12,11 @@ type WorkspaceContext = {
       deviceSigningPublicKey: string;
     }>
   >;
+  workspaceChainData: {
+    state: workspaceChain.WorkspaceChainState;
+    lastChainEvent: workspaceChain.WorkspaceChainEvent;
+  } | null;
+  fetchAndApplyNewWorkspaceChainEntries: () => Promise<void>;
 };
 
 const workspaceContext = React.createContext<WorkspaceContext>({
@@ -21,6 +27,8 @@ const workspaceContext = React.createContext<WorkspaceContext>({
     data: undefined,
     error: undefined,
   },
+  workspaceChainData: null,
+  fetchAndApplyNewWorkspaceChainEntries: () => Promise.resolve(),
 });
 
 export const WorkspaceProvider = workspaceContext.Provider;

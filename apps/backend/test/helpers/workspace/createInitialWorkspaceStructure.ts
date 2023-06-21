@@ -236,7 +236,7 @@ export const createInitialWorkspaceStructure = async ({
     {
       input: {
         workspace: readyWorkspace,
-        serializedWorkspaceChainEntry: JSON.stringify(event),
+        serializedWorkspaceChainEvent: JSON.stringify(event),
         folder: readyFolder,
         document: readyDocument,
         creatorDeviceSigningPublicKey: creatorDevice.signingPublicKey,

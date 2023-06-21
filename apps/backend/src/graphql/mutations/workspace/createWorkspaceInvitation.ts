@@ -1,4 +1,5 @@
-import { AuthenticationError, UserInputError } from "apollo-server-express";
+import * as workspaceChain from "@serenity-kit/workspace-chain";
+import { AuthenticationError } from "apollo-server-express";
 import {
   arg,
   inputObjectType,
@@ -6,35 +7,15 @@ import {
   nonNull,
   objectType,
 } from "nexus";
-import { Role } from "../../../../prisma/generated/output";
 import { createWorkspaceInvitation } from "../../../database/workspace/createWorkspaceInvitation";
 import { formatWorkspaceInvitation } from "../../../types/workspace";
-import { MemberRoleEnum, WorkspaceInvitation } from "../../types/workspace";
-
-const getRoleFromString = (role: string): Role | undefined => {
-  const lowercaseRole = role.toLowerCase();
-  if (lowercaseRole === "admin") {
-    return Role.ADMIN;
-  } else if (lowercaseRole === "editor") {
-    return Role.EDITOR;
-  } else if (lowercaseRole === "commenter") {
-    return Role.COMMENTER;
-  } else if (lowercaseRole === "viewer") {
-    return Role.VIEWER;
-  } else {
-    return undefined;
-  }
-};
+import { WorkspaceInvitation } from "../../types/workspace";
 
 export const CreateWorkspaceInvitationInput = inputObjectType({
   name: "CreateWorkspaceInvitationInput",
   definition(t) {
     t.nonNull.string("workspaceId");
-    t.nonNull.string("invitationId");
-    t.nonNull.string("invitationSigningPublicKey");
-    t.nonNull.string("invitationDataSignature");
-    t.nonNull.field("role", { type: MemberRoleEnum });
-    t.nonNull.field("expiresAt", { type: "Date" });
+    t.nonNull.string("serializedWorkspaceChainEvent");
   },
 });
 
@@ -60,18 +41,21 @@ export const createWorkspaceInvitationMutation = mutationField(
       if (!context.user) {
         throw new AuthenticationError("Not authenticated");
       }
-      const role = getRoleFromString(args.input.role);
-      if (!role) {
-        throw new UserInputError("Invalid sharing role");
-      }
+
+      const workspaceChainEvent =
+        workspaceChain.AddInvitationWorkspaceChainEvent.parse(
+          JSON.parse(args.input.serializedWorkspaceChainEvent)
+        );
+
+      workspaceChain.assertAuthorOfEvent(
+        workspaceChainEvent,
+        context.user.mainDeviceSigningPublicKey
+      );
+
       const workspaceInvitation = await createWorkspaceInvitation({
         workspaceId: args.input.workspaceId,
-        invitationId: args.input.invitationId,
-        invitationSigningPublicKey: args.input.invitationSigningPublicKey,
-        expiresAt: args.input.expiresAt,
-        invitationDataSignature: args.input.invitationDataSignature,
-        role,
         inviterUserId: context.user.id,
+        workspaceChainEvent,
       });
       return {
         workspaceInvitation: formatWorkspaceInvitation(workspaceInvitation),

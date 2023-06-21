@@ -33,6 +33,7 @@ export async function getWorkspace({
           user: {
             select: {
               username: true,
+              mainDeviceSigningPublicKey: true,
               devices: {
                 select: {
                   signingPublicKey: true,

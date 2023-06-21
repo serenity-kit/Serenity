@@ -15,7 +15,6 @@ let userData: any = undefined;
 
 const setup = async () => {
   userData = await createUserWithWorkspace({
-    id: generateId(),
     username: `${generateId()}@example.com`,
     password,
   });
@@ -152,10 +151,8 @@ describe("Input errors", () => {
       }
     }
   `;
-  const id = generateId();
   test("Invalid document id", async () => {
     const userData = await createUserWithWorkspace({
-      id: generateId(),
       username: `${generateId()}@example.com`,
       password,
     });
@@ -175,7 +172,6 @@ describe("Input errors", () => {
   });
   test("Invalid document id", async () => {
     const userData = await createUserWithWorkspace({
-      id: generateId(),
       username: `${generateId()}@example.com`,
       password,
     });
@@ -195,7 +191,6 @@ describe("Input errors", () => {
   });
   test("Invalid input", async () => {
     const userData = await createUserWithWorkspace({
-      id: generateId(),
       username: `${generateId()}@example.com`,
       password,
     });

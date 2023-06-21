@@ -1,4 +1,3 @@
-import { generateId } from "@serenity-tools/common";
 import { gql } from "graphql-request";
 import { Role } from "../../../../prisma/generated/output";
 import deleteAllRecords from "../../../../test/helpers/deleteAllRecords";
@@ -12,7 +11,6 @@ import { Workspace } from "../../../types/workspace";
 const graphql = setupGraphql();
 let userData1: any = undefined;
 let otherWorkspace: any = undefined;
-let userId = "";
 let sessionKey = "";
 const username = "user";
 const password = "password";
@@ -27,7 +25,6 @@ let firstWorkspaceCursor = "";
 
 const setup = async () => {
   userData1 = await createUserWithWorkspace({
-    id: generateId(),
     username,
     password,
   });

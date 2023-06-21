@@ -11,5 +11,7 @@ query workspaceInvitation($id: ID!) {
     workspaceName
     role
     expiresAt
+    invitationDataSignature
+    invitationSigningPublicKey
   }
 }

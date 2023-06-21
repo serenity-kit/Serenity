@@ -1,61 +1,48 @@
-import { Role } from "../../../prisma/generated/output";
+import * as workspaceChain from "@serenity-kit/workspace-chain";
 import { prisma } from "../prisma";
+import { getLastWorkspaceChainEventWithState } from "../workspaceChain/getLastWorkspaceChainEventWithState";
 
 type Params = {
-  workspaceInvitationIds: string[];
-  userId: string;
+  workspaceChainEvent: workspaceChain.RemoveInvitationsWorkspaceChainEvent;
 };
 
 export async function deleteWorkspaceInvitations({
-  workspaceInvitationIds,
-  userId,
+  workspaceChainEvent,
 }: Params) {
-  try {
-    await prisma.$transaction(async (prisma) => {
-      // TODO: delete usersToWorkspace?
-      // can only delete workspace invitations where the user is the admin
-      // 1. get the workspaces referenced by the invitation ids
-      const workspaceInvitations = await prisma.workspaceInvitations.findMany({
-        where: {
-          id: {
-            in: workspaceInvitationIds,
-          },
-        },
-      });
-      const requestedWorkspaceIds: string[] = [];
-      workspaceInvitations.forEach((invitation) => {
-        requestedWorkspaceIds.push(invitation.workspaceId);
-      });
-      // 2. get the relevant workspaces where the user is an admin
-      const userWorkspaces = await prisma.usersToWorkspaces.findMany({
-        where: {
-          userId: userId,
-          role: Role.ADMIN,
-          workspaceId: {
-            in: requestedWorkspaceIds,
-          },
-        },
-      });
-      let userWorkspaceIds: string[] = [];
-      for (const userWorkspace of userWorkspaces) {
-        userWorkspaceIds.push(userWorkspace.workspaceId);
-      }
-      // 3. delete workspace invitations where the workspace is in the list of workspaces
-      await prisma.workspaceInvitations.deleteMany({
-        where: {
-          workspaceId: {
-            in: userWorkspaceIds,
-          },
-          id: {
-            in: workspaceInvitationIds,
-          },
-          expiresAt: {
-            gt: new Date(),
-          },
-        },
-      });
+  await prisma.$transaction(async (prisma) => {
+    // get the invitations to find to check they only belong to one workspace
+    // and then apply the event
+    const workspaceInvitations = await prisma.workspaceInvitations.findMany({
+      where: { id: { in: workspaceChainEvent.transaction.invitationIds } },
     });
-  } catch (error) {
-    throw new Error("Invalid workspaceInvitationIds");
-  }
+    const workspaceIds = workspaceInvitations.map(
+      (invitation) => invitation.workspaceId
+    );
+    const workspaceIdSet = new Set(workspaceIds);
+    if (workspaceIdSet.size > 1) {
+      throw new Error("Can only delete invitations from one workspace");
+    }
+    const workspaceId = workspaceIds[0];
+
+    const { lastWorkspaceChainEvent, workspaceChainState } =
+      await getLastWorkspaceChainEventWithState({ prisma, workspaceId });
+
+    const newState = workspaceChain.applyEvent(
+      workspaceChainState,
+      workspaceChainEvent
+    );
+    await prisma.workspaceChainEvent.create({
+      data: {
+        content: workspaceChainEvent,
+        state: newState,
+        workspaceId,
+        position: lastWorkspaceChainEvent.position + 1,
+      },
+    });
+
+    // delete workspace invitations
+    await prisma.workspaceInvitations.deleteMany({
+      where: { id: { in: workspaceChainEvent.transaction.invitationIds } },
+    });
+  });
 }

@@ -17,6 +17,7 @@ export const resolveState = (
     events[0] as CreateChainWorkspaceChainEvent
   );
   events.slice(1).forEach((event) => {
+    // @ts-expect-error alternatively we could add a type guard here
     state = applyEvent(state, event);
   });
   return state;

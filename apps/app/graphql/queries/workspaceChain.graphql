@@ -1,0 +1,8 @@
+query workspaceChain($workspaceId: ID!) {
+  workspaceChain(workspaceId: $workspaceId, first: 5000) {
+    nodes {
+      serializedContent
+      position
+    }
+  }
+}

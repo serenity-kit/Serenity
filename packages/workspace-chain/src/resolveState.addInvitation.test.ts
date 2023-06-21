@@ -1,5 +1,6 @@
 import sodium from "react-native-libsodium";
 import {
+  getDateIn2Min,
   getKeyPairA,
   getKeyPairB,
   getKeyPairsA,
@@ -33,9 +34,9 @@ test("should be able to add a invitation as ADMIN", async () => {
   const addInvitationEvent = addInvitation({
     prevHash: hashTransaction(createEvent.transaction),
     authorKeyPair: keyPairA,
-    expiresAt: new Date(),
+    expiresAt: getDateIn2Min(),
     role: "EDITOR",
-    workspaceId: "test",
+    workspaceId: createEvent.transaction.id,
   });
   const state = resolveState([createEvent, addInvitationEvent]);
   if (addInvitationEvent.transaction.type !== "add-invitation") {
@@ -61,9 +62,9 @@ test("should not be able to add an invitation as editor", async () => {
   const addInvitationEvent = addInvitation({
     prevHash: hashTransaction(addMemberEvent.transaction),
     authorKeyPair: keyPairB,
-    expiresAt: new Date(),
+    expiresAt: getDateIn2Min(),
     role: "EDITOR",
-    workspaceId: "test",
+    workspaceId: createEvent.transaction.id,
   });
   const chain = [createEvent, addMemberEvent, addInvitationEvent];
   expect(() => resolveState(chain)).toThrow(InvalidWorkspaceChainError);
@@ -72,4 +73,31 @@ test("should not be able to add an invitation as editor", async () => {
   );
 });
 
-// TODO should fail in case the invitation can't be verified
+test("should not be able to add an invitation with a wrong workspaceId", async () => {
+  const createEvent = createChain(keyPairsA.sign);
+  const addInvitationEvent = addInvitation({
+    prevHash: hashTransaction(createEvent.transaction),
+    authorKeyPair: keyPairA,
+    expiresAt: getDateIn2Min(),
+    role: "EDITOR",
+    workspaceId: "WRONG_ID",
+  });
+  const chain = [createEvent, addInvitationEvent];
+  expect(() => resolveState(chain)).toThrow(InvalidWorkspaceChainError);
+  expect(() => resolveState(chain)).toThrow("Invalid invitation signature.");
+});
+
+test("should not be able to add an invitation with a wrong role", async () => {
+  const createEvent = createChain(keyPairsA.sign);
+  const addInvitationEvent = addInvitation({
+    prevHash: hashTransaction(createEvent.transaction),
+    authorKeyPair: keyPairA,
+    expiresAt: getDateIn2Min(),
+    // @ts-expect-error
+    role: "WOW",
+    workspaceId: "WRONG_ID",
+  });
+  const chain = [createEvent, addInvitationEvent];
+  expect(() => resolveState(chain)).toThrow(InvalidWorkspaceChainError);
+  expect(() => resolveState(chain)).toThrow("Invalid invitation signature.");
+});

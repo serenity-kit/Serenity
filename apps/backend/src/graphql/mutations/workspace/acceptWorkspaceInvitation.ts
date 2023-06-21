@@ -1,3 +1,4 @@
+import * as workspaceChain from "@serenity-kit/workspace-chain";
 import { AuthenticationError } from "apollo-server-express";
 import {
   arg,
@@ -7,23 +8,18 @@ import {
   objectType,
 } from "nexus";
 import { acceptWorkspaceInvitation } from "../../../database/workspace/acceptWorkspaceInvitation";
-import { ReducedDeviceInput } from "../../types/device";
-import { Workspace } from "../../types/workspace";
 
 export const AcceptWorkspaceInvitationInput = inputObjectType({
   name: "AcceptWorkspaceInvitationInput",
   definition(t) {
-    t.nonNull.string("workspaceInvitationId");
-    t.nonNull.string("inviteeUsername");
-    t.nonNull.field("inviteeMainDevice", { type: ReducedDeviceInput });
-    t.nonNull.string("inviteeUsernameAndDeviceSignature");
+    t.nonNull.string("serializedWorkspaceChainEvent");
   },
 });
 
 export const AcceptWorkspaceInvitationResult = objectType({
   name: "AcceptWorkspaceInvitationResult",
   definition(t) {
-    t.field("workspace", { type: Workspace });
+    t.nonNull.string("workspaceId");
   },
 });
 
@@ -42,15 +38,22 @@ export const createWorkspaceInvitationMutation = mutationField(
       if (!context.user) {
         throw new AuthenticationError("Not authenticated");
       }
-      const workspace = await acceptWorkspaceInvitation({
-        workspaceInvitationId: args.input.workspaceInvitationId,
-        inviteeUsername: args.input.inviteeUsername,
-        inviteeMainDevice: args.input.inviteeMainDevice,
-        inviteeUsernameAndDeviceSignature:
-          args.input.inviteeUsernameAndDeviceSignature,
-        userId: context.user.id,
+
+      const workspaceChainEvent =
+        workspaceChain.AcceptInvitationWorkspaceChainEvent.parse(
+          JSON.parse(args.input.serializedWorkspaceChainEvent)
+        );
+
+      workspaceChain.assertAuthorOfEvent(
+        workspaceChainEvent,
+        context.user.mainDeviceSigningPublicKey
+      );
+
+      const workspaceId = await acceptWorkspaceInvitation({
+        workspaceChainEvent,
+        currentUserId: context.user.id,
       });
-      return { workspace };
+      return { workspaceId };
     },
   }
 );

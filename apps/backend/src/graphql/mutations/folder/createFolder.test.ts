@@ -24,7 +24,6 @@ let sessionKey = "";
 
 const setup = async () => {
   userData1 = await createUserWithWorkspace({
-    id: generateId(),
     username: `${generateId()}@example.com`,
     password,
   });
@@ -253,7 +252,6 @@ test("Throw error when the parent folder doesn't exist", async () => {
 
 test("Throw error when user doesn't have access", async () => {
   const userData2 = await createUserWithWorkspace({
-    id: generateId(),
     username: `${generateId()}@example.com`,
     password,
   });

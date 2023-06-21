@@ -1,0 +1,18 @@
+mutation removeMemberAndRotateWorkspaceKey(
+  $input: RemoveMemberAndRotateWorkspaceKeyInput!
+) {
+  removeMemberAndRotateWorkspaceKey(input: $input) {
+    workspaceKey {
+      id
+      generation
+      workspaceId
+      workspaceKeyBoxes {
+        id
+        deviceSigningPublicKey
+        creatorDeviceSigningPublicKey
+        ciphertext
+        nonce
+      }
+    }
+  }
+}
