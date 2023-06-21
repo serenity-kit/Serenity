@@ -69,19 +69,21 @@ test.describe("Workspace Sharing", () => {
       sharedWorkspaceId: user1.data.workspace.id,
       password: user2.password,
     });
-    await delayForSeconds(5);
+    await delayForSeconds(1);
     await reloadPage({ page });
 
     // make user2 an admin
     await changeMemberRoleToAdmin({
       page,
       userId: user2.data.user.id,
+      password: user1.password,
       workspaceId: user1.data.workspace.id,
     });
     // make user2 a non-admin
     await changeMemberRoleToEditor({
       page,
       userId: user2.data.user.id,
+      password: user1.password,
       workspaceId: user1.data.workspace.id,
     });
   });
