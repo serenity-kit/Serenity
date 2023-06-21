@@ -12,9 +12,8 @@ const password = "password";
 const workspaceName = "a workspace";
 
 test.beforeAll(async () => {
-  username = `${generateId()}@example.com`;
-
   await sodium.ready;
+  username = `${generateId()}@example.com`;
 });
 
 test.describe("After register", () => {

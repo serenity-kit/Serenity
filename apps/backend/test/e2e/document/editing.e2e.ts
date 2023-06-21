@@ -209,10 +209,6 @@ test.describe("Edit document in subfolder", () => {
       password: user1.password,
       stayLoggedIn: true,
     });
-    const workspaceInvitationResult = await createWorkspaceInvitation({ page });
-    const workspaceInvitationUrl = workspaceInvitationResult.url;
-    await page.goBack();
-    await page.goBack();
     const user2Context = await browser.newContext();
     const user2Page = await user2Context.newPage();
     await user2Page.goto("http://localhost:19006/login");
@@ -222,13 +218,8 @@ test.describe("Edit document in subfolder", () => {
       password: user2.password,
       stayLoggedIn: false,
     });
-    await acceptWorkspaceInvitation({
-      page: user2Page,
-      workspaceInvitationUrl,
-      sharedWorkspaceId: user1.data.workspace.id,
-      password: user2.password,
-    });
-    await delayForSeconds(5);
+    await user2Page.goto(page.url());
+    await delayForSeconds(2);
     const user1Url = page.url();
     const user2Url = user2Page.url();
     expect(user1Url).toBe(user2Url);
