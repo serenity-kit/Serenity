@@ -1,4 +1,4 @@
-import { decryptAead as naishoDecryptAead } from "@naisho/core";
+import { decryptAead as secSyncDecryptAead } from "@serenity-tools/secsync";
 import sodium from "react-native-libsodium";
 
 export const decryptAead = (
@@ -6,4 +6,4 @@ export const decryptAead = (
   additionalData: string,
   key: Uint8Array,
   publicNonce: string
-) => naishoDecryptAead(ciphertext, additionalData, key, publicNonce, sodium);
+) => secSyncDecryptAead(ciphertext, additionalData, key, publicNonce, sodium);

@@ -1,4 +1,4 @@
-import { DocumentDecryptionState } from "@naisho/core";
+import { DocumentDecryptionState } from "@serenity-tools/secsync";
 import create from "zustand";
 import { DocumentState } from "../../types/documentState";
 

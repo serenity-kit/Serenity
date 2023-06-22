@@ -1,4 +1,3 @@
-import { createInitialSnapshot } from "@naisho/core";
 import {
   decryptWorkspaceKey,
   deriveKeysFromKeyDerivationTrace,
@@ -6,6 +5,7 @@ import {
   generateId,
   snapshotDerivedKeyContext,
 } from "@serenity-tools/common";
+import { createInitialSnapshot } from "@serenity-tools/secsync";
 import sodium, { KeyPair } from "react-native-libsodium";
 import { Role } from "../../../../prisma/generated/output";
 import deleteAllRecords from "../../../../test/helpers/deleteAllRecords";

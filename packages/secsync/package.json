@@ -1,5 +1,5 @@
 {
-  "name": "@naisho/core",
+  "name": "@serenity-tools/secsync",
   "version": "0.0.1",
   "main": "src/index",
   "scripts": {

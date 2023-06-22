@@ -1,4 +1,3 @@
-import { useYjsSyncMachine } from "@naisho/core";
 import {
   KeyDerivationTrace,
   LocalDevice,
@@ -8,6 +7,7 @@ import {
 } from "@serenity-tools/common";
 import { decryptDocumentTitleBasedOnSnapshotKey } from "@serenity-tools/common/src/decryptDocumentTitleBasedOnSnapshotKey/decryptDocumentTitleBasedOnSnapshotKey";
 import { AwarenessUserInfo } from "@serenity-tools/editor";
+import { useYjsSyncMachine } from "@serenity-tools/secsync";
 import {
   Button,
   Description,

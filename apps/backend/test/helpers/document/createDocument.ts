@@ -1,9 +1,4 @@
 import {
-  createInitialSnapshot,
-  Snapshot,
-  SnapshotPublicData,
-} from "@naisho/core";
-import {
   createDocumentTitleKey,
   createSnapshotKey,
   deriveKeysFromKeyDerivationTrace,
@@ -14,6 +9,11 @@ import {
   SerenitySnapshotPublicData,
   snapshotDerivedKeyContext,
 } from "@serenity-tools/common";
+import {
+  createInitialSnapshot,
+  Snapshot,
+  SnapshotPublicData,
+} from "@serenity-tools/secsync";
 import { gql } from "graphql-request";
 import { KeyPair } from "libsodium-wrappers";
 import sodium from "react-native-libsodium";

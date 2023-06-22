@@ -8,7 +8,7 @@
     "lint": "eslint --ext .tsx --ext .ts ./"
   },
   "dependencies": {
-    "@naisho/core": "*",
+    "@serenity-tools/secsync": "*",
     "@serenity-tools/libsodium": "*",
     "date-fns": "^2.29.3"
   },

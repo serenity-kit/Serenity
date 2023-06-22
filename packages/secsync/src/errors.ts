@@ -1,4 +1,4 @@
-export class NaishoSnapshotBasedOnOutdatedSnapshotError extends Error {
+export class SecSyncSnapshotBasedOnOutdatedSnapshotError extends Error {
   constructor(message) {
     super(message);
 
@@ -10,7 +10,7 @@ export class NaishoSnapshotBasedOnOutdatedSnapshotError extends Error {
   }
 }
 
-export class NaishoSnapshotMissesUpdatesError extends Error {
+export class SecSyncSnapshotMissesUpdatesError extends Error {
   constructor(message) {
     super(message);
 
@@ -22,7 +22,7 @@ export class NaishoSnapshotMissesUpdatesError extends Error {
   }
 }
 
-export class NaishoNewSnapshotRequiredError extends Error {
+export class SecSyncNewSnapshotRequiredError extends Error {
   constructor(message) {
     super(message);
 
@@ -34,7 +34,7 @@ export class NaishoNewSnapshotRequiredError extends Error {
   }
 }
 
-export class NaishoProcessingEphemeralUpdateError extends Error {
+export class SecSyncProcessingEphemeralUpdateError extends Error {
   originalError: Error;
 
   constructor(message, originalError: Error) {

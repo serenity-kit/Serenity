@@ -44,11 +44,11 @@ export const useYjsSyncMachine = (config: YjsSyncMachineConfig) => {
     context: {
       ...rest,
       applySnapshot: (decryptedSnapshotData) => {
-        Yjs.applyUpdate(config.yDoc, decryptedSnapshotData, "naisho-remote");
+        Yjs.applyUpdate(config.yDoc, decryptedSnapshotData, "sec-sync-remote");
       },
       applyChanges: (decryptedChanges) => {
         decryptedChanges.map((change) => {
-          Yjs.applyUpdate(config.yDoc, change, "naisho-remote");
+          Yjs.applyUpdate(config.yDoc, change, "sec-sync-remote");
         });
       },
       applyEphemeralUpdates: (decryptedEphemeralUpdates) => {
