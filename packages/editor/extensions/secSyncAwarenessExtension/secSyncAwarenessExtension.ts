@@ -2,21 +2,21 @@ import { Extension } from "@tiptap/core";
 import { yCursorPlugin } from "y-prosemirror";
 import { Awareness } from "y-protocols/awareness";
 
-export interface AwarnessExtensionOptions {
+export interface AwarenessExtensionOptions {
   awareness?: Awareness;
   // user: Record<string, any>;
   render(user: Record<string, any>): HTMLElement;
 }
 
-type AwarnessExtensionStorage = {
+type AwarenessExtensionStorage = {
   users: { clientId: number; [key: string]: any }[];
 };
 
-export const AwarnessExtension = Extension.create<
-  AwarnessExtensionOptions,
-  AwarnessExtensionStorage
+export const AwarenessExtension = Extension.create<
+  AwarenessExtensionOptions,
+  AwarenessExtensionStorage
 >({
-  name: "awarnessExtension",
+  name: "awarenessExtension",
 
   addOptions() {
     return {

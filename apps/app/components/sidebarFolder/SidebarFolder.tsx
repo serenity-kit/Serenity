@@ -1,4 +1,3 @@
-import { createInitialSnapshot } from "@naisho/core";
 import { useFocusRing } from "@react-native-aria/focus";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import {
@@ -14,6 +13,7 @@ import {
   generateId,
   snapshotDerivedKeyContext,
 } from "@serenity-tools/common";
+import { createInitialSnapshot } from "@serenity-tools/secsync";
 import {
   Icon,
   IconButton,

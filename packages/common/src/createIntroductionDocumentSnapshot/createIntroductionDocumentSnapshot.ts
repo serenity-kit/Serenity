@@ -1,4 +1,7 @@
-import { createInitialSnapshot, SnapshotPublicData } from "@naisho/core";
+import {
+  createInitialSnapshot,
+  SnapshotPublicData,
+} from "@serenity-tools/secsync";
 import sodium, { KeyPair } from "react-native-libsodium";
 import { generateId } from "../generateId/generateId";
 import { LocalDevice } from "../types";

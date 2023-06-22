@@ -10,7 +10,7 @@ import {
 import { z } from "zod";
 import { hash } from "./crypto/hash";
 import { verifyAndDecryptEphemeralUpdate } from "./ephemeralUpdate/verifyAndDecryptEphemeralUpdate";
-import { NaishoProcessingEphemeralUpdateError } from "./errors";
+import { SecSyncProcessingEphemeralUpdateError } from "./errors";
 import { createSnapshot } from "./snapshot/createSnapshot";
 import { isValidAncestorSnapshot } from "./snapshot/isValidAncestorSnapshot";
 import { parseEphemeralUpdateWithServerData } from "./snapshot/parseEphemeralUpdateWithServerData";
@@ -129,7 +129,7 @@ type ProcessQueueData = {
   pendingChangesQueue: any[];
   updateClocks: UpdateClocks;
   mostRecentEphemeralUpdateDatePerPublicSigningKey: MostRecentEphemeralUpdateDatePerPublicSigningKey;
-  ephemeralUpdateErrors: NaishoProcessingEphemeralUpdateError[];
+  ephemeralUpdateErrors: SecSyncProcessingEphemeralUpdateError[];
   documentDecryptionState: DocumentDecryptionState;
 };
 
@@ -959,7 +959,7 @@ export const createSyncMachine = () =>
                       ephemeralUpdateResult.content,
                     ]);
                   } catch (err) {
-                    throw new NaishoProcessingEphemeralUpdateError(
+                    throw new SecSyncProcessingEphemeralUpdateError(
                       "Failed to process ephemeral update",
                       err
                     );
@@ -1013,7 +1013,7 @@ export const createSyncMachine = () =>
             };
           } catch (error) {
             console.error("Processing queue error:", error);
-            if (error instanceof NaishoProcessingEphemeralUpdateError) {
+            if (error instanceof SecSyncProcessingEphemeralUpdateError) {
               const newEphemeralUpdateErrors = [
                 ...context._ephemeralUpdateErrors,
               ];

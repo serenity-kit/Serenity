@@ -1,4 +1,4 @@
-import { generateId as naishoGenerateId } from "@naisho/core";
+import { generateId as secSyncGenerateId } from "@serenity-tools/secsync";
 import sodium from "react-native-libsodium";
 
-export const generateId = () => naishoGenerateId(sodium);
+export const generateId = () => secSyncGenerateId(sodium);

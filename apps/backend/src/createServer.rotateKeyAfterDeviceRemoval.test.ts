@@ -1,10 +1,4 @@
 import {
-  createInitialSnapshot,
-  createSnapshot,
-  createUpdate,
-  Snapshot,
-} from "@naisho/core";
-import {
   createSnapshotKey,
   decryptWorkspaceKey,
   encryptWorkspaceKeyForDevice,
@@ -13,6 +7,12 @@ import {
   snapshotDerivedKeyContext,
 } from "@serenity-tools/common";
 import { kdfDeriveFromKey } from "@serenity-tools/common/src/kdfDeriveFromKey/kdfDeriveFromKey";
+import {
+  createInitialSnapshot,
+  createSnapshot,
+  createUpdate,
+  Snapshot,
+} from "@serenity-tools/secsync";
 import sodium, { KeyPair } from "react-native-libsodium";
 import deleteAllRecords from "../test/helpers/deleteAllRecords";
 import { deleteDevices } from "../test/helpers/device/deleteDevices";

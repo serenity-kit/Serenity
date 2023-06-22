@@ -1,4 +1,7 @@
-import { SnapshotWithServerData, UpdateWithServerData } from "@naisho/core";
+import {
+  SnapshotWithServerData,
+  UpdateWithServerData,
+} from "@serenity-tools/secsync";
 import { Snapshot, Update } from "../../prisma/generated/output";
 
 export function serializeSnapshot(snapshot: Snapshot): SnapshotWithServerData {

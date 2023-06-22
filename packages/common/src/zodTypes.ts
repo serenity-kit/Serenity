@@ -1,4 +1,4 @@
-import { Snapshot } from "@naisho/core";
+import { Snapshot } from "@serenity-tools/secsync";
 import { z } from "zod";
 
 export const KeyDerivationTraceEntry = z.object({

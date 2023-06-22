@@ -1,13 +1,13 @@
 import {
-  NaishoNewSnapshotRequiredError,
-  NaishoSnapshotBasedOnOutdatedSnapshotError,
-  NaishoSnapshotMissesUpdatesError,
-} from "@naisho/core";
-import {
   KeyDerivationTrace,
   SerenitySnapshot,
   hash,
 } from "@serenity-tools/common";
+import {
+  SecSyncNewSnapshotRequiredError,
+  SecSyncSnapshotBasedOnOutdatedSnapshotError,
+  SecSyncSnapshotMissesUpdatesError,
+} from "@serenity-tools/secsync";
 import { prisma } from "./prisma";
 
 type ActiveSnapshotInfo = {
@@ -61,7 +61,7 @@ export async function createSnapshot({
       // workspaceKey has been rotated
       snapshotKeyDerivationTrace.workspaceKeyId !== currentWorkspaceKey.id
     ) {
-      throw new NaishoNewSnapshotRequiredError("Key roration is required");
+      throw new SecSyncNewSnapshotRequiredError("Key roration is required");
     }
 
     // function sleep(ms) {
@@ -71,14 +71,14 @@ export async function createSnapshot({
 
     // const random = Math.floor(Math.random() * 10);
     // if (random < 8) {
-    //   throw new NaishoSnapshotBasedOnOutdatedSnapshotError(
+    //   throw new SecSyncSnapshotBasedOnOutdatedSnapshotError(
     //     "Snapshot is out of date."
     //   );
     // }
 
     // const random = Math.floor(Math.random() * 10);
     // if (random < 8) {
-    //   throw new NaishoSnapshotMissesUpdatesError(
+    //   throw new SecSyncSnapshotMissesUpdatesError(
     //     "Snapshot does not include the latest changes."
     //   );
     // }
@@ -88,7 +88,7 @@ export async function createSnapshot({
       activeSnapshotInfo !== undefined &&
       document.activeSnapshot.id !== activeSnapshotInfo.snapshotId
     ) {
-      throw new NaishoSnapshotBasedOnOutdatedSnapshotError(
+      throw new SecSyncSnapshotBasedOnOutdatedSnapshotError(
         "Snapshot is out of date."
       );
     }
@@ -98,7 +98,7 @@ export async function createSnapshot({
       activeSnapshotInfo !== undefined &&
       document.activeSnapshot.latestVersion !== activeSnapshotInfo.latestVersion
     ) {
-      throw new NaishoSnapshotMissesUpdatesError(
+      throw new SecSyncSnapshotMissesUpdatesError(
         "Snapshot does not include the latest changes."
       );
     }

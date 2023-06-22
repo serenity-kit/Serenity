@@ -179,11 +179,11 @@ Update app name inside fly.toml
 ```sh
 fly postgres create
 # store the connection string
-flyctl secrets set DATABASE_URL=<db_connection_url>/naisho
+flyctl secrets set DATABASE_URL=<db_connection_url>/serenity
 # set all other secrets usually defined in the .env file
 ```
 
-Update DATABASE_URL in Github secrets with <db_connection_url>/naisho
+Update DATABASE_URL in Github secrets with <db_connection_url>/serenity
 
 ### Wipe the Staging DB @ fly.io
 

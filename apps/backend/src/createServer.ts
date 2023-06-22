@@ -1,13 +1,13 @@
+import { InvalidAuthorWorkspaceChainError } from "@serenity-kit/workspace-chain";
+import { SerenitySnapshotPublicData } from "@serenity-tools/common";
 import {
-  NaishoNewSnapshotRequiredError,
-  NaishoSnapshotBasedOnOutdatedSnapshotError,
-  NaishoSnapshotMissesUpdatesError,
+  SecSyncNewSnapshotRequiredError,
+  SecSyncSnapshotBasedOnOutdatedSnapshotError,
+  SecSyncSnapshotMissesUpdatesError,
   SnapshotWithServerData,
   UpdateWithServerData,
   parseSnapshotWithClientData,
-} from "@naisho/core";
-import { InvalidAuthorWorkspaceChainError } from "@serenity-kit/workspace-chain";
-import { SerenitySnapshotPublicData } from "@serenity-tools/common";
+} from "@serenity-tools/secsync";
 import {
   ApolloServerPluginLandingPageDisabled,
   ApolloServerPluginLandingPageGraphQLPlayground,
@@ -237,7 +237,7 @@ export default async function createServer() {
             );
           } catch (error) {
             console.log("SNAPSHOT FAILED ERROR:", error);
-            if (error instanceof NaishoSnapshotBasedOnOutdatedSnapshotError) {
+            if (error instanceof SecSyncSnapshotBasedOnOutdatedSnapshotError) {
               let doc = await getDocument(documentId, data.lastKnownSnapshotId);
               if (!doc) return; // should never be the case?
               connection.send(
@@ -248,7 +248,7 @@ export default async function createServer() {
                   snapshotProofChain: doc.snapshotProofChain,
                 })
               );
-            } else if (error instanceof NaishoSnapshotMissesUpdatesError) {
+            } else if (error instanceof SecSyncSnapshotMissesUpdatesError) {
               const result = await getUpdatesForDocument(
                 documentId,
                 data.lastKnownSnapshotId,
@@ -260,7 +260,7 @@ export default async function createServer() {
                   updates: result.updates,
                 })
               );
-            } else if (error instanceof NaishoNewSnapshotRequiredError) {
+            } else if (error instanceof SecSyncNewSnapshotRequiredError) {
               connection.send(
                 JSON.stringify({
                   type: "snapshotFailed",
@@ -292,7 +292,7 @@ export default async function createServer() {
                   update: data,
                   workspaceId: userToWorkspace.workspaceId,
                 }),
-              [NaishoNewSnapshotRequiredError]
+              [SecSyncNewSnapshotRequiredError]
             );
             if (savedUpdate === undefined) {
               throw new Error("Update could not be saved.");
@@ -323,7 +323,7 @@ export default async function createServer() {
                   snapshotId: data.publicData.refSnapshotId,
                   clock: data.publicData.clock,
                   requiresNewSnapshot:
-                    err instanceof NaishoNewSnapshotRequiredError,
+                    err instanceof SecSyncNewSnapshotRequiredError,
                 })
               );
             }
