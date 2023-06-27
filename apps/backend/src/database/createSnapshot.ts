@@ -1,19 +1,16 @@
 import {
   KeyDerivationTrace,
-  SerenitySnapshot,
+  SerenitySnapshotWithClientData,
   hash,
 } from "@serenity-tools/common";
 import {
-  SecSyncNewSnapshotRequiredError,
-  SecSyncSnapshotBasedOnOutdatedSnapshotError,
-  SecSyncSnapshotMissesUpdatesError,
+  CreateSnapshotParams,
+  SecsyncNewSnapshotRequiredError,
+  SecsyncSnapshotBasedOnOutdatedSnapshotError,
+  SecsyncSnapshotMissesUpdatesError,
 } from "@serenity-tools/secsync";
+import { serializeSnapshot } from "../utils/serialize";
 import { prisma } from "./prisma";
-
-type ActiveSnapshotInfo = {
-  latestVersion: number;
-  snapshotId: string;
-};
 
 export type CreateSnapshotDocumentTitleData = {
   ciphertext: string;
@@ -23,20 +20,22 @@ export type CreateSnapshotDocumentTitleData = {
   subkeyId: number;
 };
 
-type CreateSnapshotParams = {
-  snapshot: SerenitySnapshot;
+type Params = CreateSnapshotParams & {
+  snapshot: SerenitySnapshotWithClientData;
   workspaceId: string;
-  activeSnapshotInfo?: ActiveSnapshotInfo;
-  documentTitle?: CreateSnapshotDocumentTitleData;
 };
 
 export async function createSnapshot({
   snapshot,
-  activeSnapshotInfo,
   workspaceId,
-  documentTitle,
-}: CreateSnapshotParams) {
+  activeSnapshotInfo,
+}: Params) {
   return await prisma.$transaction(async (prisma) => {
+    // TODO parse it with zod?
+    const documentTitle: CreateSnapshotDocumentTitleData =
+      // @ts-expect-error need to better type it
+      snapshot.additionalServerData?.documentTitleData;
+
     const documentPromise = prisma.document.findUniqueOrThrow({
       where: { id: snapshot.publicData.docId },
       select: {
@@ -61,7 +60,7 @@ export async function createSnapshot({
       // workspaceKey has been rotated
       snapshotKeyDerivationTrace.workspaceKeyId !== currentWorkspaceKey.id
     ) {
-      throw new SecSyncNewSnapshotRequiredError("Key roration is required");
+      throw new SecsyncNewSnapshotRequiredError("Key roration is required");
     }
 
     // function sleep(ms) {
@@ -71,14 +70,14 @@ export async function createSnapshot({
 
     // const random = Math.floor(Math.random() * 10);
     // if (random < 8) {
-    //   throw new SecSyncSnapshotBasedOnOutdatedSnapshotError(
+    //   throw new SecsyncSnapshotBasedOnOutdatedSnapshotError(
     //     "Snapshot is out of date."
     //   );
     // }
 
     // const random = Math.floor(Math.random() * 10);
     // if (random < 8) {
-    //   throw new SecSyncSnapshotMissesUpdatesError(
+    //   throw new SecsyncSnapshotMissesUpdatesError(
     //     "Snapshot does not include the latest changes."
     //   );
     // }
@@ -88,7 +87,7 @@ export async function createSnapshot({
       activeSnapshotInfo !== undefined &&
       document.activeSnapshot.id !== activeSnapshotInfo.snapshotId
     ) {
-      throw new SecSyncSnapshotBasedOnOutdatedSnapshotError(
+      throw new SecsyncSnapshotBasedOnOutdatedSnapshotError(
         "Snapshot is out of date."
       );
     }
@@ -98,7 +97,7 @@ export async function createSnapshot({
       activeSnapshotInfo !== undefined &&
       document.activeSnapshot.latestVersion !== activeSnapshotInfo.latestVersion
     ) {
-      throw new SecSyncSnapshotMissesUpdatesError(
+      throw new SecsyncSnapshotMissesUpdatesError(
         "Snapshot does not include the latest changes."
       );
     }
@@ -123,7 +122,7 @@ export async function createSnapshot({
       });
     }
 
-    return await prisma.snapshot.create({
+    const newSnapshot = await prisma.snapshot.create({
       data: {
         id: snapshot.publicData.snapshotId,
         latestVersion: 0,
@@ -140,5 +139,6 @@ export async function createSnapshot({
         parentSnapshotClocks: snapshot.publicData.parentSnapshotClocks,
       },
     });
+    return serializeSnapshot(newSnapshot);
   });
 }

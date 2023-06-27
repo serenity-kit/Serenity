@@ -1,4 +1,4 @@
-import { Snapshot } from "@serenity-tools/secsync";
+import { Snapshot, SnapshotWithClientData } from "@serenity-tools/secsync";
 import { z } from "zod";
 
 export const KeyDerivationTraceEntry = z.object({
@@ -45,4 +45,8 @@ export type SerenitySnapshotPublicData = z.infer<
 
 export type SerenitySnapshot = Snapshot & {
   publicData: Snapshot["publicData"] & SerenitySnapshotPublicData;
+};
+
+export type SerenitySnapshotWithClientData = SnapshotWithClientData & {
+  publicData: SnapshotWithClientData["publicData"] & SerenitySnapshotPublicData;
 };

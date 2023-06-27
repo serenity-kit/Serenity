@@ -1,12 +1,10 @@
 import { InvalidAuthorWorkspaceChainError } from "@serenity-kit/workspace-chain";
 import { SerenitySnapshotPublicData } from "@serenity-tools/common";
 import {
-  SecSyncNewSnapshotRequiredError,
-  SecSyncSnapshotBasedOnOutdatedSnapshotError,
-  SecSyncSnapshotMissesUpdatesError,
-  SnapshotWithServerData,
-  UpdateWithServerData,
-  parseSnapshotWithClientData,
+  CreateSnapshotParams,
+  CreateUpdateParams,
+  GetDocumentParams,
+  createWebSocketConnection,
 } from "@serenity-tools/secsync";
 import {
   ApolloServerPluginLandingPageDisabled,
@@ -25,18 +23,14 @@ import express from "express";
 import { createServer as httpCreateServer } from "http";
 import { URLSearchParams } from "url";
 import { WebSocketServer } from "ws";
-import { Role } from "../prisma/generated/output";
 import { getSessionIncludingUser } from "./database/authentication/getSessionIncludingUser";
 import { createSnapshot } from "./database/createSnapshot";
 import { createUpdate } from "./database/createUpdate";
 import { getDocument } from "./database/getDocument";
 import { getUpdatesForDocument } from "./database/getUpdatesForDocument";
 import { prisma } from "./database/prisma";
-import { retryAsyncFunction } from "./retryAsyncFunction";
 import { schema } from "./schema";
-import { addConnection, addUpdate, removeConnection } from "./store";
 import { ExpectedGraphqlError } from "./utils/expectedGraphqlError/expectedGraphqlError";
-import { getKnownSnapshotIdFromUrl } from "./utils/getKnownSnapshotIdFromUrl/getKnownSnapshotIdFromUrl";
 
 export default async function createServer() {
   const apolloServer = new ApolloServer({
@@ -134,217 +128,74 @@ export default async function createServer() {
   const webSocketServer = new WebSocketServer({ noServer: true });
   webSocketServer.on(
     "connection",
-    async function connection(connection, request, context) {
-      // unique id for each client connection
+    createWebSocketConnection({
+      getDocument: async (params: GetDocumentParams) => {
+        return getUpdatesForDocument(params);
+      },
+      createSnapshot: async (params: CreateSnapshotParams) => {
+        let doc = await getDocument(params.snapshot.publicData.docId);
+        if (!doc) {
+          throw new Error("Document not found");
+        }
+        // @ts-expect-error TODO fix types via generics in the future
+        return createSnapshot({ ...params, workspaceId: doc.doc.workspaceId });
+      },
+      createUpdate: async (params: CreateUpdateParams) => {
+        let doc = await getDocument(params.update.publicData.docId);
+        if (!doc) {
+          throw new Error("Document not found");
+        }
+        return createUpdate({ ...params, workspaceId: doc.doc.workspaceId });
+      },
+      hasAccess: async (params) => {
+        if (!params.context.user) {
+          return false;
+        }
 
-      console.log("connected");
+        let doc = await getDocument(params.documentId);
+        if (!doc) {
+          return false;
+        }
+        const userToWorkspace = await prisma.usersToWorkspaces.findFirst({
+          where: {
+            userId: params.context.user.id,
+            workspaceId: doc.doc.workspaceId,
+            isAuthorizedMember: true,
+          },
+        });
 
-      if (!context.user) {
-        // TODO close connection properly
-        connection.send(JSON.stringify({ type: "unauthorized" }));
-        connection.close();
-        return;
-      }
+        if (!userToWorkspace) {
+          return false;
+        }
 
-      const documentId = request.url?.slice(1)?.split("?")[0] || "";
-      const knownSnapshotId = getKnownSnapshotIdFromUrl(request.url);
-
-      let doc = await getDocument(documentId, knownSnapshotId);
-
-      if (!doc) {
-        // TODO close connection properly
-        connection.send(JSON.stringify({ type: "documentNotFound" }));
-        connection.close();
-        return;
-      }
-
-      // if the user doesn't have access to the workspace,
-      // throw an error
-      const userToWorkspace = await prisma.usersToWorkspaces.findFirst({
-        where: {
-          userId: context.user.id,
-          workspaceId: doc.doc.workspaceId,
-          isAuthorizedMember: true,
-        },
-      });
-      if (!userToWorkspace) {
-        // TODO close connection properly
-        connection.send(JSON.stringify({ type: "unauthorized" }));
-        connection.close();
-        return;
-      }
-
-      addConnection(documentId, connection);
-      // TODO define type and only pass down the relevant data
-      connection.send(JSON.stringify({ type: "document", ...doc }));
-
-      connection.on("message", async function message(messageContent) {
-        // messages from non-authorized users (viewer & commenters) are ignored
         if (
-          userToWorkspace.role !== Role.ADMIN &&
-          userToWorkspace.role !== Role.EDITOR
+          params.action === "write-update" &&
+          (userToWorkspace.role === "ADMIN" ||
+            userToWorkspace.role === "EDITOR")
         ) {
-          return;
+          return true;
+        }
+        if (
+          params.action === "write-snapshot" &&
+          (userToWorkspace.role === "ADMIN" ||
+            userToWorkspace.role === "EDITOR")
+        ) {
+          return true;
+        }
+        if (
+          params.action === "read" ||
+          params.action === "send-ephemeral-update"
+        ) {
+          return true;
         }
 
-        const data = JSON.parse(messageContent.toString());
-
-        // new snapshot
-        if (data?.publicData?.snapshotId) {
-          const snapshotMessage = parseSnapshotWithClientData(
-            data,
-            // @ts-expect-error no idea why the types don't match
-            SerenitySnapshotPublicData
-          );
-          try {
-            const activeSnapshotInfo =
-              snapshotMessage.lastKnownSnapshotId &&
-              snapshotMessage.latestServerVersion
-                ? {
-                    latestVersion: snapshotMessage.latestServerVersion,
-                    snapshotId: snapshotMessage.lastKnownSnapshotId,
-                  }
-                : undefined;
-            const snapshot = await createSnapshot({
-              // @ts-expect-error missing the SerenitySnapshotPublicData type
-              snapshot: snapshotMessage,
-              activeSnapshotInfo,
-              workspaceId: userToWorkspace.workspaceId,
-              documentTitle:
-                // @ts-expect-error
-                snapshotMessage.additionalServerData?.documentTitleData,
-            });
-            console.log("add snapshot");
-            connection.send(
-              JSON.stringify({
-                type: "snapshotSaved",
-                snapshotId: snapshot.id,
-              })
-            );
-            const snapshotMsgForOtherClients: SnapshotWithServerData = {
-              ciphertext: snapshotMessage.ciphertext,
-              nonce: snapshotMessage.nonce,
-              publicData: snapshotMessage.publicData,
-              signature: snapshotMessage.signature,
-              serverData: {
-                latestVersion: snapshot.latestVersion,
-              },
-            };
-            addUpdate(
-              documentId,
-              { type: "snapshot", snapshot: snapshotMsgForOtherClients },
-              connection
-            );
-          } catch (error) {
-            console.log("SNAPSHOT FAILED ERROR:", error);
-            if (error instanceof SecSyncSnapshotBasedOnOutdatedSnapshotError) {
-              let doc = await getDocument(documentId, data.lastKnownSnapshotId);
-              if (!doc) return; // should never be the case?
-              connection.send(
-                JSON.stringify({
-                  type: "snapshotFailed",
-                  snapshot: doc.snapshot,
-                  updates: doc.updates,
-                  snapshotProofChain: doc.snapshotProofChain,
-                })
-              );
-            } else if (error instanceof SecSyncSnapshotMissesUpdatesError) {
-              const result = await getUpdatesForDocument(
-                documentId,
-                data.lastKnownSnapshotId,
-                data.latestServerVersion
-              );
-              connection.send(
-                JSON.stringify({
-                  type: "snapshotFailed",
-                  updates: result.updates,
-                })
-              );
-            } else if (error instanceof SecSyncNewSnapshotRequiredError) {
-              connection.send(
-                JSON.stringify({
-                  type: "snapshotFailed",
-                })
-              );
-            } else {
-              // log since it's an unexpected error
-              console.error(error);
-              connection.send(
-                JSON.stringify({
-                  type: "snapshotFailed",
-                })
-              );
-            }
-          }
-          // new update
-        } else if (data?.publicData?.refSnapshotId) {
-          let savedUpdate: undefined | UpdateWithServerData = undefined;
-          try {
-            // const random = Math.floor(Math.random() * 10);
-            // if (random < 8) {
-            //   throw new Error("CUSTOM ERROR");
-            // }
-
-            // TODO add a smart queue to create an offset based on the version?
-            savedUpdate = await retryAsyncFunction(
-              () =>
-                createUpdate({
-                  update: data,
-                  workspaceId: userToWorkspace.workspaceId,
-                }),
-              [SecSyncNewSnapshotRequiredError]
-            );
-            if (savedUpdate === undefined) {
-              throw new Error("Update could not be saved.");
-            }
-
-            connection.send(
-              JSON.stringify({
-                type: "updateSaved",
-                snapshotId: data.publicData.refSnapshotId,
-                clock: data.publicData.clock,
-                // @ts-expect-error not sure why savedUpdate is "never"
-                serverVersion: savedUpdate.serverData.version,
-              })
-            );
-            console.log("add update");
-            addUpdate(
-              documentId,
-              // @ts-expect-error not sure why savedUpdate is "never"
-              { ...savedUpdate, type: "update" },
-              connection
-            );
-          } catch (err) {
-            console.log("update failed", err);
-            if (savedUpdate === null || savedUpdate === undefined) {
-              connection.send(
-                JSON.stringify({
-                  type: "updateFailed",
-                  snapshotId: data.publicData.refSnapshotId,
-                  clock: data.publicData.clock,
-                  requiresNewSnapshot:
-                    err instanceof SecSyncNewSnapshotRequiredError,
-                })
-              );
-            }
-          }
-          // new ephemeral update
-        } else {
-          console.log("add ephemeralUpdate");
-          // TODO check if user still has access to the document
-          addUpdate(
-            documentId,
-            { ...data, type: "ephemeralUpdate" },
-            connection
-          );
-        }
-      });
-
-      connection.on("close", function () {
-        console.log("close connection");
-        removeConnection(documentId, connection);
-      });
-    }
+        return false;
+      },
+      additionalAuthenticationDataValidations: {
+        // @ts-expect-error TODO investigate how to fix types
+        snapshot: SerenitySnapshotPublicData,
+      },
+    })
   );
 
   server.on("upgrade", async (request, socket, head) => {

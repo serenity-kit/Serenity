@@ -44,11 +44,15 @@ export const useYjsSync = (config: YjsSyncMachineConfig) => {
     context: {
       ...rest,
       applySnapshot: (decryptedSnapshotData) => {
-        Yjs.applyUpdate(config.yDoc, decryptedSnapshotData, "sec-sync-remote");
+        Yjs.applyUpdateV2(
+          config.yDoc,
+          decryptedSnapshotData,
+          "sec-sync-remote"
+        );
       },
       applyChanges: (decryptedChanges) => {
         decryptedChanges.map((change) => {
-          Yjs.applyUpdate(config.yDoc, change, "sec-sync-remote");
+          Yjs.applyUpdateV2(config.yDoc, change, "sec-sync-remote");
         });
       },
       applyEphemeralUpdates: (decryptedEphemeralUpdates) => {
@@ -71,8 +75,7 @@ export const useYjsSync = (config: YjsSyncMachineConfig) => {
         send({ type: "ADD_CHANGES", data: [update] });
       }
     };
-    // TODO switch to v2 updates
-    yDoc.on("update", onUpdate);
+    yDoc.on("updateV2", onUpdate);
 
     // only connect the awareness after the document loaded
     if (state.context._documentDecryptionState !== "complete") {
@@ -93,7 +96,7 @@ export const useYjsSync = (config: YjsSyncMachineConfig) => {
     return () => {
       removeAwarenessStates(yAwareness, [yDoc.clientID], "document unmount");
       yAwareness.off("update", onAwarenessUpdate);
-      yDoc.off("update", onUpdate);
+      yDoc.off("updateV2", onUpdate);
     };
     // causes issues if ran multiple times e.g. awareness sharing to not work anymore
     // eslint-disable-next-line react-hooks/exhaustive-deps

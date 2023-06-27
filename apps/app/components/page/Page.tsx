@@ -7,7 +7,7 @@ import {
 } from "@serenity-tools/common";
 import { decryptDocumentTitleBasedOnSnapshotKey } from "@serenity-tools/common/src/decryptDocumentTitleBasedOnSnapshotKey/decryptDocumentTitleBasedOnSnapshotKey";
 import { AwarenessUserInfo } from "@serenity-tools/editor";
-import { useYjsSyncMachine } from "@serenity-tools/secsync";
+import { useYjsSync } from "@serenity-tools/secsync";
 import {
   Button,
   Description,
@@ -114,7 +114,7 @@ export default function Page({
   }
   const { workspaceQueryResult } = useWorkspace();
 
-  const [state] = useYjsSyncMachine({
+  const [state] = useYjsSync({
     yDoc: yDocRef.current,
     yAwareness: yAwarenessRef.current,
     documentId: docId,
@@ -171,7 +171,7 @@ export default function Page({
 
       return {
         id: snapshotId,
-        data: Yjs.encodeStateAsUpdate(yDocRef.current),
+        data: Yjs.encodeStateAsUpdateV2(yDocRef.current),
         key: sodium.from_base64(snapshotKeyData.key),
         publicData: {
           keyDerivationTrace: snapshotKeyData.keyDerivationTrace,
@@ -263,7 +263,7 @@ export default function Page({
 
       const localDocument = await getLocalDocument(docId);
       if (localDocument) {
-        Yjs.applyUpdate(
+        Yjs.applyUpdateV2(
           yDocRef.current,
           localDocument.content,
           "serenity-local-sqlite"
@@ -308,12 +308,12 @@ export default function Page({
       // });
 
       // TODO switch to v2 updates
-      yDocRef.current.on("update", async (update, origin) => {
+      yDocRef.current.on("updateV2", async (update, origin) => {
         // TODO pending updates should be stored in the local db if possible (not possible on web)
         // TODO pending updates should be sent when the websocket connection is re-established
         setLocalDocument({
           id: docId,
-          content: Yjs.encodeStateAsUpdate(yDocRef.current),
+          content: Yjs.encodeStateAsUpdateV2(yDocRef.current),
         });
       });
     }
