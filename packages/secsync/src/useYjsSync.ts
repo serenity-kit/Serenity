@@ -24,7 +24,7 @@ export type YjsSyncMachineConfig = Omit<
   yAwareness: Awareness;
 };
 
-export const useYjsSyncMachine = (config: YjsSyncMachineConfig) => {
+export const useYjsSync = (config: YjsSyncMachineConfig) => {
   const { yDoc, yAwareness, ...rest } = config;
   // necessary to avoid that the same machine context is re-used for different or remounted pages
   // more info here:
@@ -56,8 +56,8 @@ export const useYjsSyncMachine = (config: YjsSyncMachineConfig) => {
           applyAwarenessUpdate(config.yAwareness, ephemeralUpdate, null);
         });
       },
-      serializeChanges: (updates: Uint8Array[]) =>
-        serializeUint8ArrayUpdates(updates, config.sodium),
+      serializeChanges: (changes: Uint8Array[]) =>
+        serializeUint8ArrayUpdates(changes, config.sodium),
       deserializeChanges: (serialized: string) =>
         deserializeUint8ArrayUpdates(serialized, config.sodium),
     },
@@ -66,9 +66,9 @@ export const useYjsSyncMachine = (config: YjsSyncMachineConfig) => {
 
   useEffect(() => {
     // always listen to updates from the document itself
-    const onUpdate = (update, origin) => {
+    const onUpdate = (update: any, origin: any) => {
       if (origin?.key === "y-sync$" || origin === "mobile-webview") {
-        send({ type: "ADD_CHANGE", data: update });
+        send({ type: "ADD_CHANGES", data: [update] });
       }
     };
     // TODO switch to v2 updates
@@ -79,7 +79,7 @@ export const useYjsSyncMachine = (config: YjsSyncMachineConfig) => {
       return;
     }
 
-    const onAwarenessUpdate = ({ added, updated, removed }) => {
+    const onAwarenessUpdate = ({ added, updated, removed }: any) => {
       const changedClients = added.concat(updated).concat(removed);
       const yAwarenessUpdate = encodeAwarenessUpdate(
         yAwareness,
