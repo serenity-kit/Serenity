@@ -307,7 +307,6 @@ export default function Page({
       // );
       // });
 
-      // TODO switch to v2 updates
       yDocRef.current.on("updateV2", async (update, origin) => {
         // TODO pending updates should be stored in the local db if possible (not possible on web)
         // TODO pending updates should be sent when the websocket connection is re-established
