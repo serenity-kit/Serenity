@@ -27,7 +27,7 @@ const setup = async () => {
   // create two comments
   const comment1Result = await createComment({
     graphql,
-    snapshotId: userData1.snapshot.id,
+    snapshotId: userData1.snapshot.publicData.snapshotId,
     snapshotKey: userData1.snapshotKey.key,
     comment: "comment 1",
     creatorDevice: userData1.webDevice,
@@ -38,7 +38,7 @@ const setup = async () => {
   comment1 = comment1Result.createComment.comment;
   const comment2Result = await createComment({
     graphql,
-    snapshotId: userData1.snapshot.id,
+    snapshotId: userData1.snapshot.publicData.snapshotId,
     snapshotKey: userData1.snapshotKey.key,
     comment: "comment 2",
     creatorDevice: userData1.webDevice,

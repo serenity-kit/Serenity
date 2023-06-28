@@ -76,13 +76,13 @@ beforeAll(async () => {
   await setup();
 });
 
-test("unauthorized if no id is provided", async () => {
+test("document-error if no id is provided", async () => {
   const { client, messages } = await createSocketClient(graphql.port, "", 1);
   await waitForClientState(client, client.CLOSED);
   expect(messages).toMatchInlineSnapshot(`
     [
       {
-        "type": "unauthorized",
+        "type": "document-error",
       },
     ]
   `);
@@ -130,9 +130,6 @@ test("successfully retrieves a document", async () => {
     1
   );
   await waitForClientState(client, client.CLOSED);
-  expect(messages[0].doc.id).toEqual(documentId);
-  expect(messages[0].doc.parentFolderId).toEqual(addedFolder.id);
-  expect(messages[0].doc.workspaceId).toEqual(workspaceId);
   expect(messages[0].snapshot.publicData.docId).toBe(documentId);
   expect(messages[0].type).toEqual("document");
 });
@@ -193,7 +190,7 @@ test("successfully creates a snapshot", async () => {
   );
 
   await waitForClientState(client, client.CLOSED);
-  expect(messages[1].type).toEqual("snapshotSaved");
+  expect(messages[1].type).toEqual("snapshot-saved");
   expect(messages[1].snapshotId).toEqual(snapshotId);
 });
 
@@ -231,7 +228,7 @@ test("successfully creates an update", async () => {
 
   await waitForClientState(client, client.CLOSED);
 
-  expect(messages[1].type).toEqual("updateSaved");
+  expect(messages[1].type).toEqual("update-saved");
   expect(messages[1].clock).toEqual(0);
   expect(messages[1].snapshotId).toEqual(snapshotId);
   expect(messages[1].serverVersion).toEqual(1);

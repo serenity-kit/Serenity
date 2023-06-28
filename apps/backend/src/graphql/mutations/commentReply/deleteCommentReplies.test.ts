@@ -43,7 +43,7 @@ const setup = async () => {
   });
   const user1CommentResult = await createComment({
     graphql,
-    snapshotId: userData1.snapshot.id,
+    snapshotId: userData1.snapshot.publicData.snapshotId,
     snapshotKey: userData1.snapshotKey.key,
     comment: "comment 1",
     creatorDevice: userData1.webDevice,
@@ -54,7 +54,7 @@ const setup = async () => {
   user1Comment = user1CommentResult.createComment.comment;
   const user2CommentResult = await createComment({
     graphql,
-    snapshotId: userData1.snapshot.id,
+    snapshotId: userData1.snapshot.publicData.snapshotId,
     snapshotKey: userData1.snapshotKey.key,
     comment: "comment 1",
     creatorDevice: userData2.webDevice,
@@ -74,7 +74,7 @@ test("commenter deletes own reply", async () => {
   const commentReplyResult = await createCommentReply({
     graphql,
     commentId: user1Comment.id,
-    snapshotId: userData1.snapshot.id,
+    snapshotId: userData1.snapshot.publicData.snapshotId,
     snapshotKey: userData1.snapshotKey.key,
     comment: "good point",
     creatorDevice: userData1.webDevice,
@@ -114,7 +114,7 @@ test("admin deletes reply", async () => {
   const commentReplyResult = await createCommentReply({
     graphql,
     commentId: user1Comment.id,
-    snapshotId: userData1.snapshot.id,
+    snapshotId: userData1.snapshot.publicData.snapshotId,
     snapshotKey: userData1.snapshotKey.key,
     comment: "comment 1",
     creatorDevice: userData2.webDevice,
@@ -154,7 +154,7 @@ test("editor deletes reply", async () => {
   const commentReplyResult = await createCommentReply({
     graphql,
     commentId: user1Comment.id,
-    snapshotId: userData1.snapshot.id,
+    snapshotId: userData1.snapshot.publicData.snapshotId,
     snapshotKey: userData1.snapshotKey.key,
     comment: "comment 1",
     creatorDevice: userData2.webDevice,
@@ -194,7 +194,7 @@ test("commentor tries to delete other reply", async () => {
   const commentReplyResult = await createCommentReply({
     graphql,
     commentId: user1Comment.id,
-    snapshotId: userData1.snapshot.id,
+    snapshotId: userData1.snapshot.publicData.snapshotId,
     snapshotKey: userData1.snapshotKey.key,
     comment: "comment 1",
     creatorDevice: userData2.webDevice,
@@ -227,7 +227,7 @@ test("viewer tries to delete other reply", async () => {
   const commentReplyResult = await createCommentReply({
     graphql,
     commentId: user1Comment.id,
-    snapshotId: userData1.snapshot.id,
+    snapshotId: userData1.snapshot.publicData.snapshotId,
     snapshotKey: userData1.snapshotKey.key,
     comment: "comment 1",
     creatorDevice: userData2.webDevice,
@@ -251,7 +251,7 @@ test("delete some replies", async () => {
   const commentReplyResult = await createCommentReply({
     graphql,
     commentId: user1Comment.id,
-    snapshotId: userData1.snapshot.id,
+    snapshotId: userData1.snapshot.publicData.snapshotId,
     snapshotKey: userData1.snapshotKey.key,
     comment: "comment three",
     creatorDevice: userData2.webDevice,
@@ -283,7 +283,7 @@ test("cant delete replies on outside document", async () => {
   const commentReplyResult = await createCommentReply({
     graphql,
     commentId: user1Comment.id,
-    snapshotId: userData1.snapshot.id,
+    snapshotId: userData1.snapshot.publicData.snapshotId,
     snapshotKey: userData1.snapshotKey.key,
     comment: "comment three",
     creatorDevice: userData2.webDevice,
