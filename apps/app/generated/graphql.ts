@@ -213,7 +213,6 @@ export type CreateInitialWorkspaceStructureResult = {
   __typename?: 'CreateInitialWorkspaceStructureResult';
   document?: Maybe<Document>;
   folder?: Maybe<Folder>;
-  snapshot?: Maybe<Snapshot>;
   workspace?: Maybe<Workspace>;
 };
 
@@ -1430,7 +1429,7 @@ export type CreateInitialWorkspaceStructureMutationVariables = Exact<{
 }>;
 
 
-export type CreateInitialWorkspaceStructureMutation = { __typename?: 'Mutation', createInitialWorkspaceStructure?: { __typename?: 'CreateInitialWorkspaceStructureResult', workspace?: { __typename?: 'Workspace', id: string, name?: string | null, members?: Array<{ __typename?: 'WorkspaceMember', userId: string, role: Role }> | null, currentWorkspaceKey?: { __typename?: 'WorkspaceKey', id: string, workspaceId: string, generation: number, workspaceKeyBox?: { __typename?: 'WorkspaceKeyBox', id: string, workspaceKeyId: string, deviceSigningPublicKey: string, ciphertext: string, creatorDevice: { __typename?: 'CreatorDevice', signingPublicKey: string, encryptionPublicKey: string } } | null } | null } | null, folder?: { __typename?: 'Folder', id: string, nameCiphertext: string, nameNonce: string, parentFolderId?: string | null, rootFolderId?: string | null, workspaceId?: string | null, keyDerivationTrace: { __typename?: 'KeyDerivationTrace', workspaceKeyId: string, trace: Array<{ __typename?: 'KeyDerivationTraceEntry', entryId: string, subkeyId: number, parentId?: string | null, context: string }> } } | null, document?: { __typename?: 'Document', id: string } | null, snapshot?: { __typename?: 'Snapshot', id: string, latestVersion: number, data: string, documentId: string, keyDerivationTrace: { __typename?: 'KeyDerivationTrace', workspaceKeyId: string, trace: Array<{ __typename?: 'KeyDerivationTraceEntry', entryId: string, subkeyId: number, parentId?: string | null, context: string }> } } | null } | null };
+export type CreateInitialWorkspaceStructureMutation = { __typename?: 'Mutation', createInitialWorkspaceStructure?: { __typename?: 'CreateInitialWorkspaceStructureResult', workspace?: { __typename?: 'Workspace', id: string, name?: string | null, members?: Array<{ __typename?: 'WorkspaceMember', userId: string, role: Role }> | null, currentWorkspaceKey?: { __typename?: 'WorkspaceKey', id: string, workspaceId: string, generation: number, workspaceKeyBox?: { __typename?: 'WorkspaceKeyBox', id: string, workspaceKeyId: string, deviceSigningPublicKey: string, ciphertext: string, creatorDevice: { __typename?: 'CreatorDevice', signingPublicKey: string, encryptionPublicKey: string } } | null } | null } | null, folder?: { __typename?: 'Folder', id: string, nameCiphertext: string, nameNonce: string, parentFolderId?: string | null, rootFolderId?: string | null, workspaceId?: string | null, keyDerivationTrace: { __typename?: 'KeyDerivationTrace', workspaceKeyId: string, trace: Array<{ __typename?: 'KeyDerivationTraceEntry', entryId: string, subkeyId: number, parentId?: string | null, context: string }> } } | null, document?: { __typename?: 'Document', id: string } | null } | null };
 
 export type CreateWorkspaceInvitationMutationVariables = Exact<{
   input: CreateWorkspaceInvitationInput;
@@ -1962,21 +1961,6 @@ export const CreateInitialWorkspaceStructureDocument = gql`
     }
     document {
       id
-    }
-    snapshot {
-      id
-      latestVersion
-      data
-      documentId
-      keyDerivationTrace {
-        workspaceKeyId
-        trace {
-          entryId
-          subkeyId
-          parentId
-          context
-        }
-      }
     }
   }
 }
