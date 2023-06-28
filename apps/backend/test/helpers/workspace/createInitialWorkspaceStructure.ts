@@ -70,21 +70,6 @@ const query = gql`
         workspaceId
         subkeyId
       }
-      snapshot {
-        id
-        latestVersion
-        data
-        documentId
-        keyDerivationTrace {
-          workspaceKeyId
-          trace {
-            entryId
-            subkeyId
-            parentId
-            context
-          }
-        }
-      }
     }
   }
 `;

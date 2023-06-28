@@ -11,7 +11,6 @@ import { createInitialWorkspaceStructure } from "../../../database/workspace/cre
 import { Document, DocumentSnapshotInput } from "../../types/document";
 import { Folder } from "../../types/folder";
 import { KeyDerivationTraceInput } from "../../types/keyDerivation";
-import { Snapshot } from "../../types/snapshot";
 import { Workspace } from "../../types/workspace";
 
 export const DeviceWorkspaceKeyBoxInput = inputObjectType({
@@ -75,7 +74,6 @@ export const CreateInitialWorkspaceStructureResult = objectType({
     t.field("workspace", { type: Workspace });
     t.field("folder", { type: Folder });
     t.field("document", { type: Document });
-    t.field("snapshot", { type: Snapshot });
   },
 });
 

@@ -12,6 +12,7 @@ import { Role } from "../../../../prisma/generated/output";
 import { registerUser } from "../../../../test/helpers/authentication/registerUser";
 import deleteAllRecords from "../../../../test/helpers/deleteAllRecords";
 import setupGraphql from "../../../../test/helpers/setupGraphql";
+import { getSnapshot } from "../../../../test/helpers/snapshot/getSnapshot";
 import { createInitialWorkspaceStructure } from "../../../../test/helpers/workspace/createInitialWorkspaceStructure";
 
 const graphql = setupGraphql();
@@ -45,7 +46,6 @@ test("create initial workspace structure", async () => {
   const workspace = result.createInitialWorkspaceStructure.workspace;
   const document = result.createInitialWorkspaceStructure.document;
   const folder = result.createInitialWorkspaceStructure.folder;
-  const snapshot = result.createInitialWorkspaceStructure.snapshot;
   workspace.currentWorkspaceKey.workspaceKeyBox.creatorDevice =
     userData1.mainDevice;
   expect(workspace.id).not.toBeNull();
@@ -94,6 +94,14 @@ test("create initial workspace structure", async () => {
   });
   // TODO: derive document key from trace
   expect(decryptedFolderName).toBe("Getting Started");
+
+  const { snapshot } = await getSnapshot({
+    graphql,
+    documentId: document.id,
+    authorizationHeader,
+  });
+
+  console.log(snapshot);
 
   const snapshotKeyTrace = deriveKeysFromKeyDerivationTrace({
     keyDerivationTrace: snapshot.keyDerivationTrace,
