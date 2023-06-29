@@ -303,7 +303,6 @@ export default function SidebarFolder(props: Props) {
       docId: documentId,
       pubKey: sodium.to_base64(signatureKeyPair.publicKey),
       keyDerivationTrace: snapshotKeyDerivationTrace,
-      subkeyId: snapshotKey.subkeyId,
       parentSnapshotClocks: {},
     };
     // created using:

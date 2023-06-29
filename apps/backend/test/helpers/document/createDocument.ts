@@ -174,7 +174,6 @@ export const createDocument = async ({
     snapshotId: generateId(),
     docId: id,
     pubKey: sodium.to_base64(signatureKeyPair.publicKey),
-    subkeyId: snapshotKey.subkeyId,
     keyDerivationTrace: snapshotKeyDerivationTrace,
     parentSnapshotClocks: {},
   };

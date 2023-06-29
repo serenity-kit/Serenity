@@ -21,7 +21,6 @@ const createDummySnapshot = (
     publicData: {
       parentSnapshotProof,
       docId: "docId",
-      subkeyId: 1,
       snapshotId: "snapshotId",
       pubKey: "pubKey",
       keyDerivationTrace: {

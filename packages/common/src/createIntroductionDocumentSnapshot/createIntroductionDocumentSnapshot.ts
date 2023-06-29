@@ -15,13 +15,11 @@ const introductionDocument = `AAMAAw8QzpCuyBJPsPm1iBCOkK7IElABAAREHgJCOnq-AQJCTA
 export const createIntroductionDocumentSnapshot = ({
   documentId,
   snapshotEncryptionKey,
-  subkeyId,
   keyDerivationTrace,
   device,
 }: {
   documentId: string;
   snapshotEncryptionKey: Uint8Array;
-  subkeyId: number;
   keyDerivationTrace: KeyDerivationTrace;
   device: LocalDevice;
 }) => {
@@ -35,7 +33,6 @@ export const createIntroductionDocumentSnapshot = ({
     snapshotId: generateId(),
     docId: documentId,
     pubKey: sodium.to_base64(signatureKeyPair.publicKey),
-    subkeyId,
     keyDerivationTrace,
     parentSnapshotClocks: {},
   };
