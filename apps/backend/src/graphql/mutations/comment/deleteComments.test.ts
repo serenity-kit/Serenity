@@ -50,7 +50,7 @@ beforeAll(async () => {
 test("commenter deletes own comment", async () => {
   const commentResult = await createComment({
     graphql,
-    snapshotId: userData1.snapshot.id,
+    snapshotId: userData1.snapshot.publicData.snapshotId,
     snapshotKey: userData1.snapshotKey.key,
     comment: "comment 1",
     creatorDevice: userData1.webDevice,
@@ -87,7 +87,7 @@ test("admin deletes comment", async () => {
   });
   const commentResult = await createComment({
     graphql,
-    snapshotId: userData1.snapshot.id,
+    snapshotId: userData1.snapshot.publicData.snapshotId,
     snapshotKey: userData1.snapshotKey.key,
     comment: "comment 1",
     creatorDevice: userData2.webDevice,
@@ -124,7 +124,7 @@ test("editor deletes comment", async () => {
   });
   const commentResult = await createComment({
     graphql,
-    snapshotId: userData1.snapshot.id,
+    snapshotId: userData1.snapshot.publicData.snapshotId,
     snapshotKey: userData1.snapshotKey.key,
     comment: "comment 1",
     creatorDevice: userData2.webDevice,
@@ -161,7 +161,7 @@ test("commentor tries to delete other comment", async () => {
   });
   const commentResult = await createComment({
     graphql,
-    snapshotId: userData1.snapshot.id,
+    snapshotId: userData1.snapshot.publicData.snapshotId,
     snapshotKey: userData1.snapshotKey.key,
     comment: "comment 1",
     creatorDevice: userData2.webDevice,
@@ -192,7 +192,7 @@ test("viewer tries to delete other comment", async () => {
   });
   const commentResult = await createComment({
     graphql,
-    snapshotId: userData1.snapshot.id,
+    snapshotId: userData1.snapshot.publicData.snapshotId,
     snapshotKey: userData1.snapshotKey.key,
     comment: "comment 1",
     creatorDevice: userData2.webDevice,
@@ -224,7 +224,7 @@ test("viewer tries to delete other comment", async () => {
 test("delete some comments", async () => {
   const commentResult = await createComment({
     graphql,
-    snapshotId: userData1.snapshot.id,
+    snapshotId: userData1.snapshot.publicData.snapshotId,
     snapshotKey: userData1.snapshotKey.key,
     comment: "comment three",
     creatorDevice: userData2.webDevice,
@@ -253,7 +253,7 @@ test("delete some comments", async () => {
 test("editor share token", async () => {
   const commentResult = await createComment({
     graphql,
-    snapshotId: userData1.snapshot.id,
+    snapshotId: userData1.snapshot.publicData.snapshotId,
     snapshotKey: userData1.snapshotKey.key,
     comment: "comment",
     creatorDevice: userData1.webDevice,
@@ -297,7 +297,7 @@ test("editor share token", async () => {
 test("commenter share token", async () => {
   const commentResult = await createComment({
     graphql,
-    snapshotId: userData1.snapshot.id,
+    snapshotId: userData1.snapshot.publicData.snapshotId,
     snapshotKey: userData1.snapshotKey.key,
     comment: "comment",
     creatorDevice: userData1.webDevice,
@@ -337,7 +337,7 @@ test("commenter share token", async () => {
 test("viewer share token can't delete", async () => {
   const commentResult = await createComment({
     graphql,
-    snapshotId: userData1.snapshot.id,
+    snapshotId: userData1.snapshot.publicData.snapshotId,
     snapshotKey: userData1.snapshotKey.key,
     comment: "comment",
     creatorDevice: userData1.webDevice,
@@ -377,7 +377,7 @@ test("viewer share token can't delete", async () => {
 test("can't delete comments on outside document", async () => {
   const commentResult = await createComment({
     graphql,
-    snapshotId: userData1.snapshot.id,
+    snapshotId: userData1.snapshot.publicData.snapshotId,
     snapshotKey: userData1.snapshotKey.key,
     comment: "comment three",
     creatorDevice: userData2.webDevice,

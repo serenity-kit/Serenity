@@ -24,7 +24,7 @@ export type YjsSyncMachineConfig = Omit<
   yAwareness: Awareness;
 };
 
-export const useYjsSyncMachine = (config: YjsSyncMachineConfig) => {
+export const useYjsSync = (config: YjsSyncMachineConfig) => {
   const { yDoc, yAwareness, ...rest } = config;
   // necessary to avoid that the same machine context is re-used for different or remounted pages
   // more info here:
@@ -44,11 +44,15 @@ export const useYjsSyncMachine = (config: YjsSyncMachineConfig) => {
     context: {
       ...rest,
       applySnapshot: (decryptedSnapshotData) => {
-        Yjs.applyUpdate(config.yDoc, decryptedSnapshotData, "sec-sync-remote");
+        Yjs.applyUpdateV2(
+          config.yDoc,
+          decryptedSnapshotData,
+          "sec-sync-remote"
+        );
       },
       applyChanges: (decryptedChanges) => {
         decryptedChanges.map((change) => {
-          Yjs.applyUpdate(config.yDoc, change, "sec-sync-remote");
+          Yjs.applyUpdateV2(config.yDoc, change, "sec-sync-remote");
         });
       },
       applyEphemeralUpdates: (decryptedEphemeralUpdates) => {
@@ -56,8 +60,8 @@ export const useYjsSyncMachine = (config: YjsSyncMachineConfig) => {
           applyAwarenessUpdate(config.yAwareness, ephemeralUpdate, null);
         });
       },
-      serializeChanges: (updates: Uint8Array[]) =>
-        serializeUint8ArrayUpdates(updates, config.sodium),
+      serializeChanges: (changes: Uint8Array[]) =>
+        serializeUint8ArrayUpdates(changes, config.sodium),
       deserializeChanges: (serialized: string) =>
         deserializeUint8ArrayUpdates(serialized, config.sodium),
     },
@@ -66,20 +70,19 @@ export const useYjsSyncMachine = (config: YjsSyncMachineConfig) => {
 
   useEffect(() => {
     // always listen to updates from the document itself
-    const onUpdate = (update, origin) => {
+    const onUpdate = (update: any, origin: any) => {
       if (origin?.key === "y-sync$" || origin === "mobile-webview") {
-        send({ type: "ADD_CHANGE", data: update });
+        send({ type: "ADD_CHANGES", data: [update] });
       }
     };
-    // TODO switch to v2 updates
-    yDoc.on("update", onUpdate);
+    yDoc.on("updateV2", onUpdate);
 
     // only connect the awareness after the document loaded
     if (state.context._documentDecryptionState !== "complete") {
       return;
     }
 
-    const onAwarenessUpdate = ({ added, updated, removed }) => {
+    const onAwarenessUpdate = ({ added, updated, removed }: any) => {
       const changedClients = added.concat(updated).concat(removed);
       const yAwarenessUpdate = encodeAwarenessUpdate(
         yAwareness,
@@ -93,7 +96,7 @@ export const useYjsSyncMachine = (config: YjsSyncMachineConfig) => {
     return () => {
       removeAwarenessStates(yAwareness, [yDoc.clientID], "document unmount");
       yAwareness.off("update", onAwarenessUpdate);
-      yDoc.off("update", onUpdate);
+      yDoc.off("updateV2", onUpdate);
     };
     // causes issues if ran multiple times e.g. awareness sharing to not work anymore
     // eslint-disable-next-line react-hooks/exhaustive-deps

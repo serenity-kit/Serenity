@@ -7,15 +7,14 @@ import {
   sendTo,
   spawn,
 } from "xstate";
-import { z } from "zod";
 import { hash } from "./crypto/hash";
+import { parseEphemeralUpdateWithServerData } from "./ephemeralUpdate/parseEphemeralUpdateWithServerData";
 import { verifyAndDecryptEphemeralUpdate } from "./ephemeralUpdate/verifyAndDecryptEphemeralUpdate";
-import { SecSyncProcessingEphemeralUpdateError } from "./errors";
+import { SecsyncProcessingEphemeralUpdateError } from "./errors";
+import { createInitialSnapshot } from "./snapshot/createInitialSnapshot";
 import { createSnapshot } from "./snapshot/createSnapshot";
 import { isValidAncestorSnapshot } from "./snapshot/isValidAncestorSnapshot";
-import { parseEphemeralUpdateWithServerData } from "./snapshot/parseEphemeralUpdateWithServerData";
 import { parseSnapshotWithServerData } from "./snapshot/parseSnapshotWithServerData";
-import { parseUpdatesWithServerData } from "./snapshot/parseUpdatesWithServerData";
 import { verifyAndDecryptSnapshot } from "./snapshot/verifyAndDecryptSnapshot";
 import {
   ParentSnapshotProofInfo,
@@ -25,8 +24,9 @@ import {
   UpdateWithServerData,
 } from "./types";
 import { createUpdate } from "./update/createUpdate";
+import { parseUpdatesWithServerData } from "./update/parseUpdatesWithServerData";
 import { verifyAndDecryptUpdate } from "./update/verifyAndDecryptUpdate";
-import { websocketService } from "./websocketService";
+import { websocketService } from "./utils/websocketService";
 
 // The sync machine is responsible for syncing the document with the server.
 // Specifically it is responsible for:
@@ -129,7 +129,7 @@ type ProcessQueueData = {
   pendingChangesQueue: any[];
   updateClocks: UpdateClocks;
   mostRecentEphemeralUpdateDatePerPublicSigningKey: MostRecentEphemeralUpdateDatePerPublicSigningKey;
-  ephemeralUpdateErrors: SecSyncProcessingEphemeralUpdateError[];
+  ephemeralUpdateErrors: SecsyncProcessingEphemeralUpdateError[];
   documentDecryptionState: DocumentDecryptionState;
 };
 
@@ -181,11 +181,13 @@ export const createSyncMachine = () =>
           | { type: "WEBSOCKET_DISCONNECTED" }
           | { type: "WEBSOCKET_DOCUMENT_NOT_FOUND" }
           | { type: "WEBSOCKET_UNAUTHORIZED" }
+          | { type: "WEBSOCKET_DOCUMENT_ERROR" }
           | { type: "WEBSOCKET_ADD_TO_INCOMING_QUEUE"; data: any }
           | { type: "WEBSOCKET_ADD_TO_CUSTOM_MESSAGE_QUEUE"; data: any }
           | { type: "WEBSOCKET_RETRY" }
           | { type: "DISCONNECT" }
-          | { type: "ADD_CHANGE"; data: any }
+          | { type: "CONNECT" }
+          | { type: "ADD_CHANGES"; data: any[] }
           | { type: "ADD_EPHEMERAL_UPDATE"; data: any }
           | {
               type: "SEND_EPHEMERAL_UPDATE";
@@ -283,7 +285,7 @@ export const createSyncMachine = () =>
             WEBSOCKET_CONNECTED: {
               target: "connected",
             },
-            ADD_CHANGE: {
+            ADD_CHANGES: {
               actions: ["addToPendingUpdatesQueue"],
             },
           },
@@ -301,7 +303,7 @@ export const createSyncMachine = () =>
                   actions: ["addToCustomMessageQueue"],
                   target: "processingQueues",
                 },
-                ADD_CHANGE: {
+                ADD_CHANGES: {
                   actions: ["addToPendingUpdatesQueue"],
                   target: "processingQueues",
                 },
@@ -315,7 +317,7 @@ export const createSyncMachine = () =>
                 WEBSOCKET_ADD_TO_CUSTOM_MESSAGE_QUEUE: {
                   actions: ["addToCustomMessageQueue"],
                 },
-                ADD_CHANGE: {
+                ADD_CHANGES: {
                   actions: ["addToPendingUpdatesQueue"],
                 },
               },
@@ -341,7 +343,7 @@ export const createSyncMachine = () =>
                 WEBSOCKET_ADD_TO_CUSTOM_MESSAGE_QUEUE: {
                   actions: ["addToCustomMessageQueue"],
                 },
-                ADD_CHANGE: {
+                ADD_CHANGES: {
                   actions: ["addToPendingUpdatesQueue"],
                 },
               },
@@ -360,6 +362,7 @@ export const createSyncMachine = () =>
           on: {
             WEBSOCKET_DOCUMENT_NOT_FOUND: { target: "noAccess" },
             WEBSOCKET_UNAUTHORIZED: { target: "noAccess" },
+            WEBSOCKET_DOCUMENT_ERROR: { target: "failed" },
           },
 
           initial: "idle",
@@ -372,8 +375,11 @@ export const createSyncMachine = () =>
             cond: "shouldReconnect",
           },
           on: {
-            ADD_CHANGE: {
+            ADD_CHANGES: {
               actions: ["addToPendingUpdatesQueue"],
+            },
+            CONNECT: {
+              target: "connecting",
             },
           },
         },
@@ -432,7 +438,10 @@ export const createSyncMachine = () =>
         addToPendingUpdatesQueue: assign((context, event) => {
           console.debug("addToPendingUpdatesQueue", event.data);
           return {
-            _pendingChangesQueue: [...context._pendingChangesQueue, event.data],
+            _pendingChangesQueue: [
+              ...context._pendingChangesQueue,
+              ...event.data,
+            ],
           };
         }),
         removeOldestItemFromQueueAndUpdateContext: assign((context, event) => {
@@ -506,6 +515,7 @@ export const createSyncMachine = () =>
           }, delay);
         },
         processQueues: (context, event) => async (send) => {
+          console.debug("clocks", JSON.stringify(context._updateClocks));
           console.debug("processQueues event", event);
           console.debug("_incomingQueue", context._incomingQueue.length);
           console.debug(
@@ -534,49 +544,85 @@ export const createSyncMachine = () =>
 
           try {
             const createAndSendSnapshot = async () => {
-              if (activeSnapshotInfo === null) {
-                throw new Error("No active snapshot");
-              }
               const snapshotData = await context.getNewSnapshotData();
               console.log("createAndSendSnapshot", snapshotData);
 
-              const publicData: SnapshotPublicData = {
-                ...snapshotData.publicData,
-                snapshotId: snapshotData.id,
-                docId: context.documentId,
-                pubKey: context.sodium.to_base64(
-                  context.signatureKeyPair.publicKey
-                ),
-                parentSnapshotClocks: updateClocks[activeSnapshotInfo.id] || {},
-              };
-              const snapshot = createSnapshot(
-                snapshotData.data,
-                publicData,
-                snapshotData.key,
-                context.signatureKeyPair,
-                activeSnapshotInfo.ciphertext,
-                activeSnapshotInfo.parentSnapshotProof,
-                context.sodium
-              );
+              if (activeSnapshotInfo === null) {
+                const publicData: SnapshotPublicData = {
+                  ...snapshotData.publicData,
+                  snapshotId: snapshotData.id,
+                  docId: context.documentId,
+                  pubKey: context.sodium.to_base64(
+                    context.signatureKeyPair.publicKey
+                  ),
+                  parentSnapshotClocks: {},
+                };
+                const snapshot = createInitialSnapshot(
+                  snapshotData.data,
+                  publicData,
+                  snapshotData.key,
+                  context.signatureKeyPair,
+                  context.sodium
+                );
 
-              activeSendingSnapshotInfo = {
-                id: snapshot.publicData.snapshotId,
-                ciphertext: snapshot.ciphertext,
-                parentSnapshotProof: snapshot.publicData.parentSnapshotProof,
-              };
-              pendingChangesQueue = [];
+                activeSendingSnapshotInfo = {
+                  id: snapshot.publicData.snapshotId,
+                  ciphertext: snapshot.ciphertext,
+                  parentSnapshotProof: snapshot.publicData.parentSnapshotProof,
+                };
+                pendingChangesQueue = [];
 
-              send({
-                type: "SEND",
-                message: JSON.stringify({
-                  ...snapshot,
-                  // Note: send a faulty message to test the error handling
-                  // ciphertext: "lala",
-                  lastKnownSnapshotId: activeSnapshotInfo.id,
-                  latestServerVersion,
-                  additionalServerData: snapshotData.additionalServerData,
-                }),
-              });
+                send({
+                  type: "SEND",
+                  message: JSON.stringify({
+                    ...snapshot,
+                    // Note: send a faulty message to test the error handling
+                    // ciphertext: "lala",
+                    lastKnownSnapshotId: null,
+                    latestServerVersion,
+                    additionalServerData: snapshotData.additionalServerData,
+                  }),
+                });
+              } else {
+                const publicData: SnapshotPublicData = {
+                  ...snapshotData.publicData,
+                  snapshotId: snapshotData.id,
+                  docId: context.documentId,
+                  pubKey: context.sodium.to_base64(
+                    context.signatureKeyPair.publicKey
+                  ),
+                  parentSnapshotClocks:
+                    updateClocks[activeSnapshotInfo.id] || {},
+                };
+                const snapshot = createSnapshot(
+                  snapshotData.data,
+                  publicData,
+                  snapshotData.key,
+                  context.signatureKeyPair,
+                  activeSnapshotInfo.ciphertext,
+                  activeSnapshotInfo.parentSnapshotProof,
+                  context.sodium
+                );
+
+                activeSendingSnapshotInfo = {
+                  id: snapshot.publicData.snapshotId,
+                  ciphertext: snapshot.ciphertext,
+                  parentSnapshotProof: snapshot.publicData.parentSnapshotProof,
+                };
+                pendingChangesQueue = [];
+
+                send({
+                  type: "SEND",
+                  message: JSON.stringify({
+                    ...snapshot,
+                    // Note: send a faulty message to test the error handling
+                    // ciphertext: "lala",
+                    lastKnownSnapshotId: activeSnapshotInfo.id,
+                    latestServerVersion,
+                    additionalServerData: snapshotData.additionalServerData,
+                  }),
+                });
+              }
             };
 
             const createAndSendUpdate = (
@@ -624,8 +670,7 @@ export const createSyncMachine = () =>
               console.debug("processSnapshot", rawSnapshot);
               const snapshot = parseSnapshotWithServerData(
                 rawSnapshot,
-                context.additionalAuthenticationDataValidations?.snapshot ??
-                  z.object({})
+                context.additionalAuthenticationDataValidations?.snapshot
               );
 
               const isValidCollaborator = await context.isValidCollaborator(
@@ -679,8 +724,7 @@ export const createSyncMachine = () =>
             ) => {
               const updates = parseUpdatesWithServerData(
                 rawUpdates,
-                context.additionalAuthenticationDataValidations?.update ??
-                  z.object({})
+                context.additionalAuthenticationDataValidations?.update
               );
               let changes: unknown[] = [];
 
@@ -742,6 +786,7 @@ export const createSyncMachine = () =>
                 }
                 context.applyChanges(changes);
               } catch (error) {
+                console.debug("APPLYING CHANGES in catch", error);
                 // still try to apply all existing changes
                 context.applyChanges(changes);
                 throw error;
@@ -777,18 +822,27 @@ export const createSyncMachine = () =>
                     }
                   }
 
-                  activeSnapshotInfo = {
-                    id: event.snapshot.publicData.snapshotId,
-                    ciphertext: event.snapshot.ciphertext,
-                    parentSnapshotProof:
-                      event.snapshot.publicData.parentSnapshotProof,
-                  };
+                  if (
+                    !event.snapshot &&
+                    event.updates &&
+                    event.updates.length > 0
+                  ) {
+                    throw new Error("Document has no snapshot but has updates");
+                  }
+                  if (event.snapshot) {
+                    activeSnapshotInfo = {
+                      id: event.snapshot.publicData.snapshotId,
+                      ciphertext: event.snapshot.ciphertext,
+                      parentSnapshotProof:
+                        event.snapshot.publicData.parentSnapshotProof,
+                    };
 
-                  await processSnapshot(event.snapshot);
-                  documentDecryptionState = "partial";
+                    await processSnapshot(event.snapshot);
+                    documentDecryptionState = "partial";
 
-                  if (event.updates) {
-                    await processUpdates(event.updates);
+                    if (event.updates) {
+                      await processUpdates(event.updates);
+                    }
                   }
                   documentDecryptionState = "complete";
 
@@ -803,14 +857,14 @@ export const createSyncMachine = () =>
 
                   break;
 
-                case "snapshotSaved":
+                case "snapshot-saved":
                   console.log("snapshot saved", event);
                   // in case the event is received for a snapshot that was not active in sending
                   // we remove the activeSendingSnapshotInfo since any activeSendingSnapshotInfo
                   // that is in flight will fail
                   if (event.snapshotId !== activeSendingSnapshotInfo?.id) {
                     throw new Error(
-                      "Received snapshotSaved for other than the current activeSendingSnapshotInfo"
+                      "Received snapshot-saved for other than the current activeSendingSnapshotInfo"
                     );
                   }
                   activeSnapshotInfo = activeSendingSnapshotInfo;
@@ -822,13 +876,12 @@ export const createSyncMachine = () =>
                     context.onSnapshotSaved();
                   }
                   break;
-                case "snapshotFailed": // TODO rename to snapshotSaveFailed or similar
+                case "snapshot-save-failed": // TODO rename to snapshotSaveFailed or similar
                   console.log("snapshot saving failed", event);
                   if (event.snapshot) {
                     const snapshot = parseSnapshotWithServerData(
                       event.snapshot,
-                      context.additionalAuthenticationDataValidations
-                        ?.snapshot ?? z.object({})
+                      context.additionalAuthenticationDataValidations?.snapshot
                     );
 
                     if (activeSnapshotInfo) {
@@ -847,7 +900,7 @@ export const createSyncMachine = () =>
                       });
                       if (!isValid) {
                         throw new Error(
-                          "Invalid ancestor snapshot after snapshotFailed event"
+                          "Invalid ancestor snapshot after snapshot-save-failed event"
                         );
                       }
                     }
@@ -868,7 +921,7 @@ export const createSyncMachine = () =>
                 case "update":
                   await processUpdates([event]);
                   break;
-                case "updateSaved":
+                case "update-saved":
                   console.debug("update saved", event);
                   latestServerVersion = event.serverVersion;
                   confirmedUpdatesClock = event.clock;
@@ -877,7 +930,7 @@ export const createSyncMachine = () =>
                   );
 
                   break;
-                case "updateFailed":
+                case "update-save-failed":
                   console.log(
                     "update saving failed",
                     event.snapshotId,
@@ -920,12 +973,12 @@ export const createSyncMachine = () =>
                   }
 
                   break;
-                case "ephemeralUpdate":
+                case "ephemeral-update":
                   try {
                     const ephemeralUpdate = parseEphemeralUpdateWithServerData(
                       event,
                       context.additionalAuthenticationDataValidations
-                        ?.ephemeralUpdate ?? z.object({})
+                        ?.ephemeralUpdate
                     );
 
                     const ephemeralUpdateKey =
@@ -959,7 +1012,7 @@ export const createSyncMachine = () =>
                       ephemeralUpdateResult.content,
                     ]);
                   } catch (err) {
-                    throw new SecSyncProcessingEphemeralUpdateError(
+                    throw new SecsyncProcessingEphemeralUpdateError(
                       "Failed to process ephemeral update",
                       err
                     );
@@ -973,6 +1026,7 @@ export const createSyncMachine = () =>
               handledQueue = "pending";
 
               if (
+                activeSnapshotInfo === null ||
                 context.shouldSendSnapshot({
                   activeSnapshotId: activeSnapshotInfo?.id || null,
                   latestServerVersion,
@@ -1013,7 +1067,7 @@ export const createSyncMachine = () =>
             };
           } catch (error) {
             console.error("Processing queue error:", error);
-            if (error instanceof SecSyncProcessingEphemeralUpdateError) {
+            if (error instanceof SecsyncProcessingEphemeralUpdateError) {
               const newEphemeralUpdateErrors = [
                 ...context._ephemeralUpdateErrors,
               ];
@@ -1033,6 +1087,7 @@ export const createSyncMachine = () =>
                 documentDecryptionState,
               };
             } else {
+              // @ts-ignore fails on some environments and not in others
               error.documentDecryptionState = documentDecryptionState;
               throw error;
             }

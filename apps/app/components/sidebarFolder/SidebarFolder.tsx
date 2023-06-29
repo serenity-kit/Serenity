@@ -307,12 +307,12 @@ export default function SidebarFolder(props: Props) {
       parentSnapshotClocks: {},
     };
     // created using:
-    // const yDocState = Yjs.encodeStateAsUpdate(yDocRef.current);
+    // const yDocState = Yjs.encodeStateAsUpdateV2(yDocRef.current);
     // console.log(sodium.to_base64(yDocState));
     //
     // to do so create an initial document without any yDoc ref and set the first
     // line to have a H1 header
-    const initialDocument = `AQLGkrivDwAHAQRwYWdlAwdoZWFkaW5nKADGkrivDwAFbGV2ZWwBfQEA`;
+    const initialDocument = `AAEABsal8N4eAAEAAAMHACgUEHBhZ2VoZWFkaW5nbGV2ZWwEBwUDAQAAAQMBAQECAH0BAA`;
     const snapshot = createInitialSnapshot<SerenitySnapshotPublicData>(
       sodium.from_base64(initialDocument),
       publicData,

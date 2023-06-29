@@ -301,8 +301,7 @@ export default function Editor({
           if (message.type === "update") {
             const update = new Uint8Array(message.content);
             if (yDocRef.current) {
-              // TODO switch to applyUpdateV2
-              Y.applyUpdate(yDocRef.current, update, "mobile-webview");
+              Y.applyUpdateV2(yDocRef.current, update, "mobile-webview");
               console.log("apply update");
             }
           }

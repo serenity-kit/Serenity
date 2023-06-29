@@ -1,6 +1,6 @@
 import { KeyDerivationTrace } from "@serenity-tools/common";
 import {
-  SecSyncNewSnapshotRequiredError,
+  SecsyncNewSnapshotRequiredError,
   Update,
 } from "@serenity-tools/secsync";
 import { Prisma } from "../../prisma/generated/output";
@@ -52,7 +52,7 @@ export async function createUpdate({
       // workspaceKey has been rotated
       snapshotKeyDerivationTrace.workspaceKeyId !== currentWorkspaceKey.id
     ) {
-      throw new SecSyncNewSnapshotRequiredError("Key roration is required");
+      throw new SecsyncNewSnapshotRequiredError("Key roration is required");
     }
 
     if (

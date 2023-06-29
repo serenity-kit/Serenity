@@ -26,12 +26,12 @@ const setup = async () => {
   });
   documentId1 = userData1.document.id;
   sessionKey = userData1.sessionKey;
-  snapshotId1 = userData1.snapshot.id;
+  snapshotId1 = userData1.snapshot.publicData.snapshotId;
   snapshotKey1 = userData1.snapshotKey.key;
 
   const createCommentResult = await createComment({
     graphql,
-    snapshotId: userData1.snapshot.id,
+    snapshotId: userData1.snapshot.publicData.snapshotId,
     snapshotKey: userData1.snapshotKey.key,
     comment: "nice job",
     creatorDevice: userData1.webDevice,

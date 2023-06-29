@@ -1,5 +1,5 @@
-export class SecSyncSnapshotBasedOnOutdatedSnapshotError extends Error {
-  constructor(message) {
+export class SecsyncSnapshotBasedOnOutdatedSnapshotError extends Error {
+  constructor(message: any) {
     super(message);
 
     this.name = this.constructor.name;
@@ -10,8 +10,8 @@ export class SecSyncSnapshotBasedOnOutdatedSnapshotError extends Error {
   }
 }
 
-export class SecSyncSnapshotMissesUpdatesError extends Error {
-  constructor(message) {
+export class SecsyncSnapshotMissesUpdatesError extends Error {
+  constructor(message: any) {
     super(message);
 
     this.name = this.constructor.name;
@@ -22,8 +22,8 @@ export class SecSyncSnapshotMissesUpdatesError extends Error {
   }
 }
 
-export class SecSyncNewSnapshotRequiredError extends Error {
-  constructor(message) {
+export class SecsyncNewSnapshotRequiredError extends Error {
+  constructor(message: any) {
     super(message);
 
     this.name = this.constructor.name;
@@ -34,10 +34,10 @@ export class SecSyncNewSnapshotRequiredError extends Error {
   }
 }
 
-export class SecSyncProcessingEphemeralUpdateError extends Error {
-  originalError: Error;
+export class SecsyncProcessingEphemeralUpdateError extends Error {
+  originalError: unknown;
 
-  constructor(message, originalError: Error) {
+  constructor(message: any, originalError: unknown) {
     super(message);
 
     this.name = this.constructor.name;

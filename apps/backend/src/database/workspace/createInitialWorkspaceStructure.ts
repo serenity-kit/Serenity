@@ -1,12 +1,6 @@
 import * as workspaceChain from "@serenity-kit/workspace-chain";
 import { KeyDerivationTrace, SerenitySnapshot } from "@serenity-tools/common";
-import { Document } from "../../types/document";
-import { Folder, formatFolder } from "../../types/folder";
-import {
-  Snapshot as SnapshotModel,
-  formatSnapshot,
-} from "../../types/snapshot";
-import { Workspace } from "../../types/workspace";
+import { formatFolder } from "../../types/folder";
 import { createSnapshot } from "../createSnapshot";
 import { createFolder } from "../folder/createFolder";
 import { prisma } from "../prisma";
@@ -14,13 +8,6 @@ import {
   DeviceWorkspaceKeyBoxParams,
   createWorkspace,
 } from "./createWorkspace";
-
-export type CreateWorkspaceResult = {
-  workspace: Workspace;
-  document: Document;
-  folder: Folder;
-  snapshot: SnapshotModel;
-};
 
 export type WorkspaceParams = {
   id: string;
@@ -61,7 +48,7 @@ export async function createInitialWorkspaceStructure({
   folder,
   document,
   creatorDeviceSigningPublicKey,
-}: Params): Promise<CreateWorkspaceResult> {
+}: Params) {
   const createdWorkspace = await createWorkspace({
     id: workspace.id,
     name: workspace.name,
@@ -104,6 +91,6 @@ export async function createInitialWorkspaceStructure({
     workspace: createdWorkspace,
     document: createdDocument,
     folder: formatFolder(createdFolder),
-    snapshot: formatSnapshot(snapshot),
+    snapshot,
   };
 }

@@ -114,7 +114,7 @@ const createTestEphemeralUpdate = () => {
 };
 
 it("should set _documentDecryptionState to failed if not even the snapshot can be loaded", (done) => {
-  const websocketServiceMock = (context) => () => {};
+  const websocketServiceMock = (context: any) => () => {};
 
   let docValue = "";
 
@@ -178,7 +178,7 @@ it("should set _documentDecryptionState to failed if not even the snapshot can b
 });
 
 it("should set _documentDecryptionState to partial and apply the first update, if document snapshot decrypts but the second update fails", (done) => {
-  const websocketServiceMock = (context) => () => {};
+  const websocketServiceMock = (context: any) => () => {};
 
   let docValue = "";
 
@@ -245,7 +245,7 @@ it("should set _documentDecryptionState to partial and apply the first update, i
 });
 
 it("should set _documentDecryptionState to partial, if document snapshot decrypts but the first update fails", (done) => {
-  const websocketServiceMock = (context) => () => {};
+  const websocketServiceMock = (context: any) => () => {};
 
   let docValue = "";
 
@@ -309,7 +309,7 @@ it("should set _documentDecryptionState to partial, if document snapshot decrypt
 });
 
 it("should process three additional ephemeral updates where the second one fails", (done) => {
-  const websocketServiceMock = (context) => () => {};
+  const websocketServiceMock = (context: any) => () => {};
 
   let docValue = "";
   let ephemeralUpdatesValue = new Uint8Array();
@@ -384,7 +384,7 @@ it("should process three additional ephemeral updates where the second one fails
     type: "WEBSOCKET_ADD_TO_INCOMING_QUEUE",
     data: {
       ...ephemeralUpdate,
-      type: "ephemeralUpdate",
+      type: "ephemeral-update",
     },
   });
   setTimeout(() => {
@@ -397,7 +397,7 @@ it("should process three additional ephemeral updates where the second one fails
           ...ephemeralUpdate2.publicData,
           docId: "wrongDocId",
         },
-        type: "ephemeralUpdate",
+        type: "ephemeral-update",
       },
     });
     setTimeout(() => {
@@ -406,7 +406,7 @@ it("should process three additional ephemeral updates where the second one fails
         type: "WEBSOCKET_ADD_TO_INCOMING_QUEUE",
         data: {
           ...ephemeralUpdate3,
-          type: "ephemeralUpdate",
+          type: "ephemeral-update",
         },
       });
     }, 1);
@@ -414,7 +414,7 @@ it("should process three additional ephemeral updates where the second one fails
 });
 
 it("should store not more than 20 failed ephemeral update errors", (done) => {
-  const websocketServiceMock = (context) => () => {};
+  const websocketServiceMock = (context: any) => () => {};
 
   let docValue = "";
   let ephemeralUpdatesValue = new Uint8Array();
@@ -490,7 +490,7 @@ it("should store not more than 20 failed ephemeral update errors", (done) => {
       type: "WEBSOCKET_ADD_TO_INCOMING_QUEUE",
       data: {
         ...ephemeralUpdate,
-        type: "ephemeralUpdate",
+        type: "ephemeral-update",
       },
     });
   }
@@ -501,14 +501,14 @@ it("should store not more than 20 failed ephemeral update errors", (done) => {
       type: "WEBSOCKET_ADD_TO_INCOMING_QUEUE",
       data: {
         ...ephemeralUpdate2,
-        type: "ephemeralUpdate",
+        type: "ephemeral-update",
       },
     });
   }, 1);
 });
 
 it("should reset the context entries after websocket disconnect", (done) => {
-  const websocketServiceMock = (context) => () => {};
+  const websocketServiceMock = (context: any) => () => {};
 
   let docValue = "";
   let ephemeralUpdatesValue = new Uint8Array();
@@ -598,7 +598,7 @@ it("should reset the context entries after websocket disconnect", (done) => {
 });
 
 it("should reconnect and reload the document", (done) => {
-  const websocketServiceMock = (context) => () => {};
+  const websocketServiceMock = (context: any) => () => {};
 
   let docValue = "";
   let ephemeralUpdatesValue = new Uint8Array();

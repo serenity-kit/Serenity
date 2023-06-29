@@ -16,8 +16,6 @@ import createUserWithWorkspace from "../../../database/testHelpers/createUserWit
 
 const graphql = setupGraphql();
 let userData1: any = null;
-let workspaceKey = "";
-let snapshot: any = null;
 let snapshotKey = "";
 let sessionKey = "";
 
@@ -25,16 +23,17 @@ const setup = async () => {
   userData1 = await createUserWithWorkspace({
     username: `${generateId()}@example.com`,
   });
+
   const workspaceKeyBox =
     userData1.workspace.currentWorkspaceKey?.workspaceKeyBox;
-  workspaceKey = decryptWorkspaceKey({
+  decryptWorkspaceKey({
     ciphertext: workspaceKeyBox?.ciphertext!,
     nonce: workspaceKeyBox?.nonce!,
     creatorDeviceEncryptionPublicKey: userData1.device.encryptionPublicKey,
     receiverDeviceEncryptionPrivateKey: userData1.encryptionPrivateKey,
   });
   const snapshotKeyTrace = deriveKeysFromKeyDerivationTrace({
-    keyDerivationTrace: userData1.snapshot.keyDerivationTrace,
+    keyDerivationTrace: userData1.snapshot.publicData.keyDerivationTrace,
     activeDevice: userData1.mainDevice,
     workspaceKeyBox: userData1.workspace.currentWorkspaceKey.workspaceKeyBox,
   });
@@ -77,7 +76,7 @@ const setup = async () => {
     subkeyId: snapshotSubkeyId,
     parentSnapshotClocks: {},
   };
-  snapshot = createInitialSnapshot(
+  createInitialSnapshot(
     "CONTENT DUMMY",
     publicData,
     sodium.from_base64(snapshotKey),
@@ -98,27 +97,28 @@ test("retrieve a snapshot", async () => {
     authorizationHeader,
   });
   const snapshot = result.snapshot;
-  expect(snapshot.id).toBe(userData1.snapshot.id);
-  expect(snapshot.latestVersion).toBe(userData1.snapshot.latestVersion);
-  expect(snapshot.data).toBe(userData1.snapshot.data);
-  expect(snapshot.documentId).toBe(userData1.snapshot.documentId);
+  expect(snapshot.id).toBe(userData1.snapshot.publicData.snapshotId);
+  expect(snapshot.latestVersion).toBe(
+    userData1.snapshot.serverData.latestVersion
+  );
+  expect(snapshot.documentId).toBe(userData1.snapshot.publicData.docId);
   expect(snapshot.keyDerivationTrace.workspaceKeyId).toBe(
-    userData1.snapshot.keyDerivationTrace.workspaceKeyId
+    userData1.snapshot.publicData.keyDerivationTrace.workspaceKeyId
   );
   expect(snapshot.keyDerivationTrace.trace.length).toBe(
-    userData1.snapshot.keyDerivationTrace.trace.length
+    userData1.snapshot.publicData.keyDerivationTrace.trace.length
   );
   expect(snapshot.keyDerivationTrace.trace[0].entityId).toBe(
-    userData1.snapshot.keyDerivationTrace.trace[0].entityId
+    userData1.snapshot.publicData.keyDerivationTrace.trace[0].entityId
   );
   expect(snapshot.keyDerivationTrace.trace[0].parentId).toBe(
-    userData1.snapshot.keyDerivationTrace.trace[0].parentId
+    userData1.snapshot.publicData.keyDerivationTrace.trace[0].parentId
   );
   expect(snapshot.keyDerivationTrace.trace[0].subkeyId).toBe(
-    userData1.snapshot.keyDerivationTrace.trace[0].subkeyId
+    userData1.snapshot.publicData.keyDerivationTrace.trace[0].subkeyId
   );
   expect(snapshot.keyDerivationTrace.trace[0].context).toBe(
-    userData1.snapshot.keyDerivationTrace.trace[0].context
+    userData1.snapshot.publicData.keyDerivationTrace.trace[0].context
   );
 });
 
@@ -141,27 +141,28 @@ test("retrieve a snapshot from documentShareLinkToken", async () => {
     authorizationHeader,
   });
   const snapshot = result.snapshot;
-  expect(snapshot.id).toBe(userData1.snapshot.id);
-  expect(snapshot.latestVersion).toBe(userData1.snapshot.latestVersion);
-  expect(snapshot.data).toBe(userData1.snapshot.data);
-  expect(snapshot.documentId).toBe(userData1.snapshot.documentId);
+  expect(snapshot.id).toBe(userData1.snapshot.publicData.snapshotId);
+  expect(snapshot.latestVersion).toBe(
+    userData1.snapshot.serverData.latestVersion
+  );
+  expect(snapshot.documentId).toBe(userData1.snapshot.publicData.docId);
   expect(snapshot.keyDerivationTrace.workspaceKeyId).toBe(
-    userData1.snapshot.keyDerivationTrace.workspaceKeyId
+    userData1.snapshot.publicData.keyDerivationTrace.workspaceKeyId
   );
   expect(snapshot.keyDerivationTrace.trace.length).toBe(
-    userData1.snapshot.keyDerivationTrace.trace.length
+    userData1.snapshot.publicData.keyDerivationTrace.trace.length
   );
   expect(snapshot.keyDerivationTrace.trace[0].entityId).toBe(
-    userData1.snapshot.keyDerivationTrace.trace[0].entityId
+    userData1.snapshot.publicData.keyDerivationTrace.trace[0].entityId
   );
   expect(snapshot.keyDerivationTrace.trace[0].parentId).toBe(
-    userData1.snapshot.keyDerivationTrace.trace[0].parentId
+    userData1.snapshot.publicData.keyDerivationTrace.trace[0].parentId
   );
   expect(snapshot.keyDerivationTrace.trace[0].subkeyId).toBe(
-    userData1.snapshot.keyDerivationTrace.trace[0].subkeyId
+    userData1.snapshot.publicData.keyDerivationTrace.trace[0].subkeyId
   );
   expect(snapshot.keyDerivationTrace.trace[0].context).toBe(
-    userData1.snapshot.keyDerivationTrace.trace[0].context
+    userData1.snapshot.publicData.keyDerivationTrace.trace[0].context
   );
 });
 

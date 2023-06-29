@@ -40,7 +40,7 @@ window.applyYjsUpdate = function (updateArray) {
     Y.applyUpdateV2(window.ydoc, update, "react-native-bridge");
   }
 };
-ydoc.on("update", (update: any, origin: string) => {
+ydoc.on("updateV2", (update: any, origin: string) => {
   if (window.ReactNativeWebView && origin !== "react-native-bridge") {
     window.ReactNativeWebView.postMessage(
       JSON.stringify({ type: "update", content: Array.from(update) })

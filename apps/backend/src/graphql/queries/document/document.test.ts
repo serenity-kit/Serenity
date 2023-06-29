@@ -31,7 +31,7 @@ const setup = async () => {
     receiverDeviceEncryptionPrivateKey: userData1.encryptionPrivateKey,
   });
   const snapshotKeyTrace = deriveKeysFromKeyDerivationTrace({
-    keyDerivationTrace: userData1.snapshot.keyDerivationTrace,
+    keyDerivationTrace: userData1.snapshot.publicData.keyDerivationTrace,
     activeDevice: userData1.mainDevice,
     workspaceKeyBox: userData1.workspace.currentWorkspaceKey.workspaceKeyBox,
   });

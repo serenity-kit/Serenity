@@ -17,20 +17,17 @@ let snapshotId1 = "";
 let snapshotKey1 = "";
 const password = "password";
 
-const setup = async () => {
+beforeAll(async () => {
+  await deleteAllRecords();
   userData1 = await createUserWithWorkspace({
     username: `${generateId()}@example.com`,
     password,
   });
+
   documentId1 = userData1.document.id;
-  snapshotId1 = userData1.snapshot.id;
+  snapshotId1 = userData1.snapshot.publicData.snapshotId;
   sessionKey = userData1.sessionKey;
   snapshotKey1 = userData1.snapshotKey.key;
-};
-
-beforeAll(async () => {
-  await deleteAllRecords();
-  await setup();
 });
 
 test("owner comments", async () => {
