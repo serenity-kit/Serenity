@@ -138,7 +138,6 @@ test("successfully creates a snapshot", async () => {
     docId: documentId,
     pubKey: sodium.to_base64(signatureKeyPair.publicKey),
     keyDerivationTrace,
-    subkeyId: snapshotKey.subkeyId,
     parentSnapshotClocks: {},
   };
   firstSnapshot = createInitialSnapshot(
@@ -317,7 +316,6 @@ test("snapshot based on old workspace key fails", async () => {
     docId: documentId,
     pubKey: sodium.to_base64(signatureKeyPair.publicKey),
     keyDerivationTrace,
-    subkeyId: snapshotKey.subkeyId,
     parentSnapshotClocks: {},
   };
   secondSnapshot = createSnapshot(
@@ -404,7 +402,6 @@ test("successfully creates a snapshot", async () => {
     docId: documentId,
     pubKey: sodium.to_base64(signatureKeyPair.publicKey),
     keyDerivationTrace,
-    subkeyId: snapshotKey.subkeyId,
     parentSnapshotClocks: {},
   };
   const snapshot = createSnapshot(

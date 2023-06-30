@@ -444,7 +444,6 @@ export type DocumentSnapshotPublicDataInput = {
   parentSnapshotProof: Scalars['String'];
   pubKey: Scalars['String'];
   snapshotId?: InputMaybe<Scalars['String']>;
-  subkeyId?: InputMaybe<Scalars['Int']>;
 };
 
 export type DocumentSnapshotPublicDataParentSnapshotClocksInput = {

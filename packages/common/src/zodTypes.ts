@@ -35,7 +35,6 @@ export type KeyDerivationTraceWithKeys = z.infer<
 export type KeyDerivationTrace = z.infer<typeof KeyDerivationTrace>;
 
 export const SerenitySnapshotPublicData = z.object({
-  subkeyId: z.number(),
   keyDerivationTrace: KeyDerivationTrace,
 });
 

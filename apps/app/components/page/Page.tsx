@@ -73,12 +73,10 @@ export default function Page({
   const yDocRef = useRef<Yjs.Doc>(new Yjs.Doc());
   const snapshotKeyRef = useRef<{
     keyDerivationTrace: KeyDerivationTrace;
-    subkeyId: number;
     key: Uint8Array;
   } | null>(null);
   const snapshotInFlightKeyRef = useRef<{
     keyDerivationTrace: KeyDerivationTrace;
-    subkeyId: number;
     key: Uint8Array;
   } | null>(null);
   const yAwarenessRef = useRef<Awareness>(new Awareness(yDocRef.current));
@@ -140,7 +138,6 @@ export default function Page({
       });
       snapshotInFlightKeyRef.current = {
         keyDerivationTrace: snapshotKeyData.keyDerivationTrace,
-        subkeyId: snapshotKeyData.subkeyId,
         key: sodium.from_base64(snapshotKeyData.key),
       };
 
@@ -190,7 +187,6 @@ export default function Page({
       const key = sodium.from_base64(snapshotKeyData.key);
       snapshotKeyRef.current = {
         keyDerivationTrace: snapshot.publicData.keyDerivationTrace,
-        subkeyId: snapshot.publicData.subkeyId,
         key,
       };
       setActiveSnapshotAndCommentKeys(

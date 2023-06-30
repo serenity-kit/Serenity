@@ -73,7 +73,6 @@ const setup = async () => {
     docId: userData1.document.id,
     pubKey: sodium.to_base64(signatureKeyPair.publicKey),
     keyDerivationTrace,
-    subkeyId: snapshotSubkeyId,
     parentSnapshotClocks: {},
   };
   createInitialSnapshot(

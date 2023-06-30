@@ -182,7 +182,6 @@ export const createInitialWorkspaceStructure = async ({
   const snapshot = createIntroductionDocumentSnapshot({
     documentId,
     snapshotEncryptionKey: sodium.from_base64(snapshotKey.key),
-    subkeyId: snapshotKey.subkeyId,
     keyDerivationTrace: {
       workspaceKeyId,
       trace: [
