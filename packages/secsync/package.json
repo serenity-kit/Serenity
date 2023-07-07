@@ -11,7 +11,7 @@
     "build:xstate-types": "xstate typegen \"./**/*.ts?(x)\""
   },
   "dependencies": {
-    "canonicalize": "^1.0.8",
+    "canonicalize": "^2.0.0",
     "libsodium-wrappers": "^0.7.10",
     "zod": "^3.21.4"
   },
