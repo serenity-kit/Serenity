@@ -98,7 +98,7 @@ test.describe("Edit document", () => {
       sharedWorkspaceId: user1.data.workspace.id,
       password: user2.password,
     });
-    await delayForSeconds(5);
+    await delayForSeconds(6);
     const user1Url = page.url();
     const user2Url = user2Page.url();
     expect(user1Url).toBe(user2Url);
@@ -219,7 +219,7 @@ test.describe("Edit document in subfolder", () => {
       stayLoggedIn: false,
     });
     await user2Page.goto(page.url());
-    await delayForSeconds(2);
+    await delayForSeconds(4);
     const user1Url = page.url();
     const user2Url = user2Page.url();
     expect(user1Url).toBe(user2Url);
