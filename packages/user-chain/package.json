@@ -10,7 +10,7 @@
     "lint": "eslint --ext .tsx --ext .ts ./"
   },
   "dependencies": {
-    "canonicalize": "^1.0.8",
+    "canonicalize": "^2.0.0",
     "zod": "^3.21.4"
   },
   "devDependencies": {
