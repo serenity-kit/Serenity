@@ -243,7 +243,7 @@ export default function Page({
     //   console.log("CUSTOM MESSAGE:", message);
     // },
     additionalAuthenticationDataValidations: {
-      // @ts-expect-error should actually match the type?
+      // @ts-ignore works on the ci, but not locally
       snapshot: SerenitySnapshotPublicData,
     },
     sodium,

@@ -192,7 +192,7 @@ export default async function createServer() {
         return false;
       },
       additionalAuthenticationDataValidations: {
-        // @ts-expect-error TODO investigate how to fix types
+        // @ts-ignore works on the ci, but not locally
         snapshot: SerenitySnapshotPublicData,
       },
     })

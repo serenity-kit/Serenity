@@ -7,9 +7,9 @@ import {
 } from "./types";
 
 export const hashTransaction = (transaction) => {
-  return sodium.to_base64(
-    sodium.crypto_generichash(64, canonicalize(transaction)!)
-  );
+  const value = canonicalize(transaction);
+  if (!value) throw new Error("Failed to hash the transaction");
+  return sodium.to_base64(sodium.crypto_generichash(64, value));
 };
 
 export const isValidCreateChainEvent = (event: WorkspaceChainEvent) => {
