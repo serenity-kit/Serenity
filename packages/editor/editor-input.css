@@ -301,6 +301,10 @@
     margin-bottom: 1.75rem;
   }
 
+  .table-wrapper > *:first-child {
+    position: relative;
+  }
+
   .table-extension {
     border-collapse: collapse;
     margin: 0;
