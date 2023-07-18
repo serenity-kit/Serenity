@@ -1,8 +1,4 @@
-import {
-  clientLoginFinish,
-  clientLoginStart,
-  serverLoginStart,
-} from "@serenity-kit/opaque";
+import { client, server } from "@serenity-kit/opaque";
 import { createDevice } from "@serenity-tools/common";
 import { addDays } from "../../utils/addDays/addDays";
 import { createSession } from "../authentication/createSession";
@@ -22,16 +18,16 @@ export const createDeviceAndLogin = async ({
     throw new Error("OPAQUE_SERVER_SETUP is not set");
   }
 
-  const clientLoginStartResult = clientLoginStart(password);
-  const serverLoginStartResult = serverLoginStart({
-    passwordFile: envelope,
-    credentialRequest: clientLoginStartResult.credentialRequest,
+  const clientLoginStartResult = client.startLogin({ password });
+  const serverLoginStartResult = server.startLogin({
+    registrationRecord: envelope,
+    startLoginRequest: clientLoginStartResult.startLoginRequest,
     serverSetup: process.env.OPAQUE_SERVER_SETUP,
     userIdentifier: username,
   });
-  const loginStartResponse = clientLoginFinish({
-    credentialResponse: serverLoginStartResult.credentialResponse,
-    clientLogin: clientLoginStartResult.clientLogin,
+  const loginStartResponse = client.finishLogin({
+    loginResponse: serverLoginStartResult.loginResponse,
+    clientLoginState: clientLoginStartResult.clientLoginState,
     password,
   });
 

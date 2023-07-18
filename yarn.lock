@@ -7179,11 +7179,6 @@
     "@sendgrid/client" "^7.7.0"
     "@sendgrid/helpers" "^7.7.0"
 
-"@serenity-kit/opaque@^0.6.0":
-  version "0.6.0"
-  resolved "https://registry.yarnpkg.com/@serenity-kit/opaque/-/opaque-0.6.0.tgz#60d0255d3814c71e5e960a301e3714d1901bdbc8"
-  integrity sha512-0FMBP5CTKC0BdpKPUKEyGnP8g4jwvEqWbgUUAIC4uJKsresREObI4XMn1bfJokeBFCbUKHlly+IRJ7Jg85sTdQ==
-
 "@serenity-kit/opaque@^0.7.0":
   version "0.7.0"
   resolved "https://registry.yarnpkg.com/@serenity-kit/opaque/-/opaque-0.7.0.tgz#58e90e4c56a3152e664670ef2876b833f96832d5"

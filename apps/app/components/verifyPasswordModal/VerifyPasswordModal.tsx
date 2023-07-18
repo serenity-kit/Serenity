@@ -11,7 +11,7 @@ import {
 } from "@serenity-tools/ui";
 import { useEffect, useRef, useState } from "react";
 import { TextInput } from "react-native";
-import { clientLoginFinish, clientLoginStart } from "react-native-opaque";
+import { client } from "react-native-opaque";
 import { runMeQuery, useStartLoginMutation } from "../../generated/graphql";
 import { fetchMainDevice } from "../../utils/authentication/loginHelper";
 
@@ -63,11 +63,11 @@ export function VerifyPasswordModal(props: Props) {
         throw new Error("Could not query me. Probably not logged in");
       }
       const username = meResult.data.me.username;
-      const clientLoginStartResult = clientLoginStart(password);
+      const clientLoginStartResult = client.startLogin({ password });
       const startLoginResult = await startLoginMutation({
         input: {
           username,
-          challenge: clientLoginStartResult.credentialRequest,
+          challenge: clientLoginStartResult.startLoginRequest,
         },
       });
       if (!startLoginResult.data?.startLogin) {
@@ -77,11 +77,10 @@ export function VerifyPasswordModal(props: Props) {
       }
       let finishLoginResponse;
       try {
-        finishLoginResponse = clientLoginFinish({
+        finishLoginResponse = client.finishLogin({
           password,
-          clientLogin: clientLoginStartResult.clientLogin,
-          credentialResponse:
-            startLoginResult.data.startLogin.challengeResponse,
+          clientLoginState: clientLoginStartResult.clientLoginState,
+          loginResponse: startLoginResult.data.startLogin.challengeResponse,
         });
       } catch (error) {
         throw error;

@@ -1,4 +1,4 @@
-import { clientRegistrationFinish } from "@serenity-kit/opaque";
+import { client } from "@serenity-kit/opaque";
 import { createAndEncryptDevice } from "@serenity-tools/common";
 import { gql } from "graphql-request";
 import sodium from "libsodium-wrappers";
@@ -17,9 +17,9 @@ export const finalizeRegistration = async ({
   password,
   username,
 }: Props) => {
-  const clientRegistrationFinishResult = clientRegistrationFinish({
+  const clientRegistrationFinishResult = client.finishRegistration({
     password,
-    clientRegistration: registration,
+    clientRegistrationState: registration,
     registrationResponse: challengeResponse,
   });
 
@@ -37,13 +37,13 @@ export const finalizeRegistration = async ({
 
   const registrationResponse = await graphql.client.request(query, {
     input: {
-      message: clientRegistrationFinishResult.registrationUpload,
+      message: clientRegistrationFinishResult.registrationRecord,
       username,
       mainDevice,
     },
   });
   return {
-    message: clientRegistrationFinishResult.registrationUpload,
+    message: clientRegistrationFinishResult.registrationRecord,
     exportKey,
     mainDevice,
     signingPrivateKey,

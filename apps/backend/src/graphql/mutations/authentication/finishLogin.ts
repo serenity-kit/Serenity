@@ -1,4 +1,4 @@
-import { serverLoginFinish } from "@serenity-kit/opaque";
+import { server } from "@serenity-kit/opaque";
 import { verifyDevice } from "@serenity-tools/common";
 import { UserInputError } from "apollo-server-express";
 import {
@@ -80,9 +80,9 @@ export const finishLoginMutation = mutationField("finishLogin", {
       loginAttemptId: args.input.loginId,
     });
 
-    const sessionKey = serverLoginFinish({
-      credentialFinalization: args.input.message,
-      serverLogin: loginAttempt.startLoginServerData,
+    const { sessionKey } = server.finishLogin({
+      finishLoginRequest: args.input.message,
+      serverLoginState: loginAttempt.startLoginServerData,
     });
 
     const isValidSessionTokenSignature = sodium.crypto_sign_verify_detached(

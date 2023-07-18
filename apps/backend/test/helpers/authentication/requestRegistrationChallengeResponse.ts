@@ -1,17 +1,17 @@
-import { clientRegistrationStart } from "@serenity-kit/opaque";
+import { client } from "@serenity-kit/opaque";
 import { gql } from "graphql-request";
 
-export type RegistrationChallengeResponseType = {
+export type RegistrationChallengeResponse = {
   data: any;
-  registration: string;
+  clientRegistrationState: string;
 };
 
 export const requestRegistrationChallengeResponse = async (
   graphql: any,
   username: string,
   password: string
-): Promise<RegistrationChallengeResponseType> => {
-  const clientRegistrationStartResult = clientRegistrationStart(password);
+): Promise<RegistrationChallengeResponse> => {
+  const clientRegistrationStartResult = client.startRegistration({ password });
   const query = gql`
     mutation startRegistration($input: StartRegistrationInput!) {
       startRegistration(input: $input) {
@@ -27,6 +27,7 @@ export const requestRegistrationChallengeResponse = async (
   });
   return {
     data: data.startRegistration,
-    registration: clientRegistrationStartResult.clientRegistration,
+    clientRegistrationState:
+      clientRegistrationStartResult.clientRegistrationState,
   };
 };

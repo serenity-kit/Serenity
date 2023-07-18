@@ -1,9 +1,4 @@
-import {
-  clientRegistrationFinish,
-  clientRegistrationStart,
-  serverRegistrationFinish,
-  serverRegistrationStart,
-} from "@serenity-kit/opaque";
+import { client, server } from "@serenity-kit/opaque";
 import * as workspaceChain from "@serenity-kit/workspace-chain";
 import {
   createAndEncryptDevice,
@@ -42,22 +37,22 @@ export default async function createUserWithWorkspace({
     throw new Error("Missing process.env.OPAQUE_SERVER_SETUP");
   }
 
-  const clientRegistrationStartResult = clientRegistrationStart(thePassword);
-  const serverRegistrationStartResult = serverRegistrationStart({
+  const clientRegistrationStartResult = client.startRegistration({
+    password: thePassword,
+  });
+  const serverRegistrationStartResult = server.createRegistrationResponse({
     userIdentifier: username,
     registrationRequest: clientRegistrationStartResult.registrationRequest,
     serverSetup: process.env.OPAQUE_SERVER_SETUP,
   });
-  const clientRegistrationFinishResult = clientRegistrationFinish({
-    clientRegistration: clientRegistrationStartResult.clientRegistration,
+  const clientRegistrationFinishResult = client.finishRegistration({
+    clientRegistrationState:
+      clientRegistrationStartResult.clientRegistrationState,
     password: thePassword,
-    registrationResponse: serverRegistrationStartResult,
+    registrationResponse: serverRegistrationStartResult.registrationResponse,
   });
   const exportKey = clientRegistrationFinishResult.exportKey;
 
-  const passwordFile = serverRegistrationFinish(
-    clientRegistrationFinishResult.registrationUpload
-  );
   const mainDevice = createAndEncryptDevice(exportKey);
 
   const result = await prisma.$transaction(async (prisma) => {
@@ -72,7 +67,7 @@ export default async function createUserWithWorkspace({
     const user = await prisma.user.create({
       data: {
         username,
-        opaqueEnvelope: passwordFile,
+        opaqueEnvelope: clientRegistrationFinishResult.registrationRecord,
         mainDeviceCiphertext: mainDevice.ciphertext,
         mainDeviceNonce: mainDevice.nonce,
         mainDeviceSigningPublicKey: mainDevice.signingPublicKey,
@@ -200,7 +195,7 @@ export default async function createUserWithWorkspace({
   const { session, sessionKey, webDevice } = await createDeviceAndLogin({
     username,
     password: thePassword,
-    envelope: passwordFile,
+    envelope: clientRegistrationFinishResult.registrationRecord,
   });
 
   const webDeviceWorkspaceKeyBox = encryptWorkspaceKeyForDevice({
@@ -243,7 +238,7 @@ export default async function createUserWithWorkspace({
     deviceSigningPrivateKey: mainDevice.signingPrivateKey,
     webDevice,
     user,
-    envelope: passwordFile,
+    envelope: clientRegistrationFinishResult.registrationRecord,
     workspace: createWorkspaceResult.workspace,
     folder: createWorkspaceResult.folder,
     document: createWorkspaceResult.document,

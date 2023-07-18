@@ -1,4 +1,4 @@
-import { clientLoginStart } from "@serenity-kit/opaque";
+import { client } from "@serenity-kit/opaque";
 import { gql } from "graphql-request";
 
 type Params = {
@@ -12,13 +12,13 @@ export const requestLoginChallengeResponse = async ({
   username,
   password,
 }: Params) => {
-  const clientLoginStartResult = clientLoginStart(password);
+  const clientLoginStartResult = client.startLogin({ password });
   const query = gql`
       mutation {
         startLogin(
           input: {
             username: "${username}"
-            challenge: "${clientLoginStartResult.credentialRequest}"
+            challenge: "${clientLoginStartResult.startLoginRequest}"
           }
         ) {
           loginId
@@ -29,6 +29,6 @@ export const requestLoginChallengeResponse = async ({
   const data = await graphql.client.request(query);
   return {
     data: data.startLogin,
-    login: clientLoginStartResult.clientLogin,
+    clientLoginState: clientLoginStartResult.clientLoginState,
   };
 };

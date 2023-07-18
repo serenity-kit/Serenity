@@ -1,4 +1,4 @@
-import { serverLoginStart } from "@serenity-kit/opaque";
+import { server } from "@serenity-kit/opaque";
 import { UserInputError } from "apollo-server-express";
 import {
   arg,
@@ -56,21 +56,21 @@ export const startLoginMutation = mutationField("startLogin", {
       throw new Error("Failed to initiate login");
     }
     try {
-      const serverLoginStartResult = serverLoginStart({
-        passwordFile: result.envelop,
+      const serverLoginStartResult = server.startLogin({
+        registrationRecord: result.envelop,
         userIdentifier: username,
         serverSetup: process.env.OPAQUE_SERVER_SETUP,
-        credentialRequest: args.input.challenge,
+        startLoginRequest: args.input.challenge,
       });
 
       const loginAttempt = await createLoginAttempt({
         username,
-        startLoginServerData: serverLoginStartResult.serverLogin,
+        startLoginServerData: serverLoginStartResult.serverLoginState,
       });
 
       return {
         loginId: loginAttempt.id,
-        challengeResponse: serverLoginStartResult.credentialResponse,
+        challengeResponse: serverLoginStartResult.loginResponse,
       };
     } catch (err) {
       console.error(err);

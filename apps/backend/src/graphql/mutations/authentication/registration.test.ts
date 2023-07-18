@@ -1,4 +1,4 @@
-import { clientRegistrationFinish } from "@serenity-kit/opaque";
+import { client } from "@serenity-kit/opaque";
 import {
   createAndEncryptDevice,
   encryptWorkspaceInvitationPrivateKey,
@@ -32,9 +32,9 @@ test("server should create a registration challenge response", async () => {
 });
 
 test("server should register a user", async () => {
-  const clientRegistrationFinishResult = clientRegistrationFinish({
+  const clientRegistrationFinishResult = client.finishRegistration({
     password,
-    clientRegistration: result.registration,
+    clientRegistrationState: result.clientRegistrationState,
     registrationResponse: result.data.challengeResponse,
   });
 
@@ -52,7 +52,7 @@ test("server should register a user", async () => {
 
   const registrationResponse = await graphql.client.request(query, {
     input: {
-      message: clientRegistrationFinishResult.registrationUpload,
+      message: clientRegistrationFinishResult.registrationRecord,
       username,
       mainDevice,
     },
@@ -70,9 +70,9 @@ test("server should register a user with a pending workspace id", async () => {
 
   const pendingWorkspaceInvitationId = generateId();
 
-  const clientRegistrationFinishResult = clientRegistrationFinish({
+  const clientRegistrationFinishResult = client.finishRegistration({
     password,
-    clientRegistration: result.registration,
+    clientRegistrationState: result.clientRegistrationState,
     registrationResponse: result.data.challengeResponse,
   });
 
@@ -96,7 +96,7 @@ test("server should register a user with a pending workspace id", async () => {
 
   const registrationResponse = await graphql.client.request(query, {
     input: {
-      message: clientRegistrationFinishResult.registrationUpload,
+      message: clientRegistrationFinishResult.registrationRecord,
       username,
       mainDevice,
       pendingWorkspaceInvitationId,
@@ -149,9 +149,9 @@ describe("Input errors", () => {
       password
     );
     const pendingWorkspaceInvitationId = generateId();
-    const clientRegistrationFinishResult = clientRegistrationFinish({
+    const clientRegistrationFinishResult = client.finishRegistration({
       password,
-      clientRegistration: result.registration,
+      clientRegistrationState: result.clientRegistrationState,
       registrationResponse: result.data.challengeResponse,
     });
     const exportKey = clientRegistrationFinishResult.exportKey;
@@ -161,7 +161,7 @@ describe("Input errors", () => {
       (async () =>
         await graphql.client.request(query, {
           input: {
-            message: clientRegistrationFinishResult.registrationUpload,
+            message: clientRegistrationFinishResult.registrationRecord,
             username,
             mainDevice,
             pendingWorkspaceInvitationId,
@@ -180,9 +180,9 @@ describe("Input errors", () => {
       password
     );
     const pendingWorkspaceInvitationId = generateId();
-    const clientRegistrationFinishResult = clientRegistrationFinish({
+    const clientRegistrationFinishResult = client.finishRegistration({
       password,
-      clientRegistration: result.registration,
+      clientRegistrationState: result.clientRegistrationState,
       registrationResponse: result.data.challengeResponse,
     });
     const exportKey = clientRegistrationFinishResult.exportKey;
@@ -207,9 +207,9 @@ describe("Input errors", () => {
       password
     );
     const pendingWorkspaceInvitationId = generateId();
-    const clientRegistrationFinishResult = clientRegistrationFinish({
+    const clientRegistrationFinishResult = client.finishRegistration({
       password,
-      clientRegistration: result.registration,
+      clientRegistrationState: result.clientRegistrationState,
       registrationResponse: result.data.challengeResponse,
     });
     const exportKey = clientRegistrationFinishResult.exportKey;
@@ -219,7 +219,7 @@ describe("Input errors", () => {
       (async () =>
         await graphql.client.request(query, {
           input: {
-            message: clientRegistrationFinishResult.registrationUpload,
+            message: clientRegistrationFinishResult.registrationRecord,
             username,
             mainDevice: null,
             pendingWorkspaceInvitationId,
@@ -234,9 +234,9 @@ describe("Input errors", () => {
       password
     );
     const pendingWorkspaceInvitationId = generateId();
-    const clientRegistrationFinishResult = clientRegistrationFinish({
+    const clientRegistrationFinishResult = client.finishRegistration({
       password,
-      clientRegistration: result.registration,
+      clientRegistrationState: result.clientRegistrationState,
       registrationResponse: result.data.challengeResponse,
     });
     const exportKey = clientRegistrationFinishResult.exportKey;
@@ -250,7 +250,7 @@ describe("Input errors", () => {
       (async () =>
         await graphql.client.request(query, {
           input: {
-            message: clientRegistrationFinishResult.registrationUpload,
+            message: clientRegistrationFinishResult.registrationRecord,
             username,
             mainDevice,
             pendingWorkspaceInvitationId,
@@ -265,9 +265,9 @@ describe("Input errors", () => {
       password
     );
     const pendingWorkspaceInvitationId = generateId();
-    const clientRegistrationFinishResult = clientRegistrationFinish({
+    const clientRegistrationFinishResult = client.finishRegistration({
       password,
-      clientRegistration: result.registration,
+      clientRegistrationState: result.clientRegistrationState,
       registrationResponse: result.data.challengeResponse,
     });
     const exportKey = clientRegistrationFinishResult.exportKey;
@@ -277,7 +277,7 @@ describe("Input errors", () => {
       (async () =>
         await graphql.client.request(query, {
           input: {
-            message: clientRegistrationFinishResult.registrationUpload,
+            message: clientRegistrationFinishResult.registrationRecord,
             username,
             mainDevice,
             pendingWorkspaceInvitationId,
@@ -292,9 +292,9 @@ describe("Input errors", () => {
       password
     );
     const pendingWorkspaceInvitationId = generateId();
-    const clientRegistrationFinishResult = clientRegistrationFinish({
+    const clientRegistrationFinishResult = client.finishRegistration({
       password,
-      clientRegistration: result.registration,
+      clientRegistrationState: result.clientRegistrationState,
       registrationResponse: result.data.challengeResponse,
     });
     const exportKey = clientRegistrationFinishResult.exportKey;
@@ -308,7 +308,7 @@ describe("Input errors", () => {
       (async () =>
         await graphql.client.request(query, {
           input: {
-            message: clientRegistrationFinishResult.registrationUpload,
+            message: clientRegistrationFinishResult.registrationRecord,
             username,
             mainDevice,
             pendingWorkspaceInvitationId,
@@ -323,9 +323,9 @@ describe("Input errors", () => {
       password
     );
     const pendingWorkspaceInvitationId = generateId();
-    const clientRegistrationFinishResult = clientRegistrationFinish({
+    const clientRegistrationFinishResult = client.finishRegistration({
       password,
-      clientRegistration: result.registration,
+      clientRegistrationState: result.clientRegistrationState,
       registrationResponse: result.data.challengeResponse,
     });
     const exportKey = clientRegistrationFinishResult.exportKey;
@@ -339,7 +339,7 @@ describe("Input errors", () => {
       (async () =>
         await graphql.client.request(query, {
           input: {
-            message: clientRegistrationFinishResult.registrationUpload,
+            message: clientRegistrationFinishResult.registrationRecord,
             username,
             mainDevice,
             pendingWorkspaceInvitationId,
@@ -354,9 +354,9 @@ describe("Input errors", () => {
       password
     );
     const pendingWorkspaceInvitationId = generateId();
-    const clientRegistrationFinishResult = clientRegistrationFinish({
+    const clientRegistrationFinishResult = client.finishRegistration({
       password,
-      clientRegistration: result.registration,
+      clientRegistrationState: result.clientRegistrationState,
       registrationResponse: result.data.challengeResponse,
     });
     const exportKey = clientRegistrationFinishResult.exportKey;
@@ -370,7 +370,7 @@ describe("Input errors", () => {
       (async () =>
         await graphql.client.request(query, {
           input: {
-            message: clientRegistrationFinishResult.registrationUpload,
+            message: clientRegistrationFinishResult.registrationRecord,
             username,
             mainDevice,
             pendingWorkspaceInvitationId,
@@ -385,9 +385,9 @@ describe("Input errors", () => {
       password
     );
     const pendingWorkspaceInvitationId = generateId();
-    const clientRegistrationFinishResult = clientRegistrationFinish({
+    const clientRegistrationFinishResult = client.finishRegistration({
       password,
-      clientRegistration: result.registration,
+      clientRegistrationState: result.clientRegistrationState,
       registrationResponse: result.data.challengeResponse,
     });
     const exportKey = clientRegistrationFinishResult.exportKey;
@@ -401,7 +401,7 @@ describe("Input errors", () => {
       (async () =>
         await graphql.client.request(query, {
           input: {
-            message: clientRegistrationFinishResult.registrationUpload,
+            message: clientRegistrationFinishResult.registrationRecord,
             username,
             mainDevice,
             pendingWorkspaceInvitationId,

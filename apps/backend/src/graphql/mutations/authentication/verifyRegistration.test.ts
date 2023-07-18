@@ -21,7 +21,7 @@ const setup = async () => {
   const registrationChallengeResponse =
     await requestRegistrationChallengeResponse(graphql, username, password);
 
-  const registration = registrationChallengeResponse.registration;
+  const registration = registrationChallengeResponse.clientRegistrationState;
   await finalizeRegistration({
     username,
     graphql,

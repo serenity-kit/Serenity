@@ -1,4 +1,4 @@
-import { clientRegistrationFinish } from "@serenity-kit/opaque";
+import { client } from "@serenity-kit/opaque";
 import {
   createAndEncryptDevice,
   encryptWorkspaceInvitationPrivateKey,
@@ -6,10 +6,13 @@ import {
 import { gql } from "graphql-request";
 import sodium from "react-native-libsodium";
 import { loginUser } from "./loginUser";
-import { requestRegistrationChallengeResponse } from "./requestRegistrationChallengeResponse";
+import {
+  RegistrationChallengeResponse,
+  requestRegistrationChallengeResponse,
+} from "./requestRegistrationChallengeResponse";
 import { verifyUser } from "./verifyUser";
 
-let result: any = null;
+let result: RegistrationChallengeResponse;
 
 export const registerUser = async (
   graphql: any,
@@ -22,9 +25,9 @@ export const registerUser = async (
     username,
     password
   );
-  const clientRegistrationFinishResult = clientRegistrationFinish({
+  const clientRegistrationFinishResult = client.finishRegistration({
     password,
-    clientRegistration: result.registration,
+    clientRegistrationState: result.clientRegistrationState,
     registrationResponse: result.data.challengeResponse,
   });
 
@@ -69,7 +72,7 @@ export const registerUser = async (
 
   const registrationResponse = await graphql.client.request(query, {
     input: {
-      message: clientRegistrationFinishResult.registrationUpload,
+      message: clientRegistrationFinishResult.registrationRecord,
       username,
       mainDevice: mainDeviceWithoutPrivateKeys,
       pendingWorkspaceInvitationId,

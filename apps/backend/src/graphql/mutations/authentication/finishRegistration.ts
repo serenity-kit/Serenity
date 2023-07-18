@@ -1,4 +1,3 @@
-import { serverRegistrationFinish } from "@serenity-kit/opaque";
 import {
   arg,
   inputObjectType,
@@ -56,11 +55,9 @@ export const finishRegistrationMutation = mutationField("finishRegistration", {
       throw new Error("Missing process.env.OPAQUE_SERVER_SETUP");
     }
 
-    const passwordFile = serverRegistrationFinish(args.input.message);
-
     const unverifiedUser = await finalizeRegistration({
       username: args.input.username,
-      opaqueEnvelope: passwordFile,
+      opaqueEnvelope: args.input.message,
       mainDevice: args.input.mainDevice,
       pendingWorkspaceInvitationId: args.input.pendingWorkspaceInvitationId,
       pendingWorkspaceInvitationKeySubkeyId:
