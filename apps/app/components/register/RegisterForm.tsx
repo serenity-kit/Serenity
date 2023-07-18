@@ -13,10 +13,7 @@ import {
 } from "@serenity-tools/ui";
 import { useEffect, useState } from "react";
 import { useWindowDimensions } from "react-native";
-import {
-  clientRegistrationFinish,
-  clientRegistrationStart,
-} from "react-native-opaque";
+import { client } from "react-native-opaque";
 import { z } from "zod";
 import { useAppContext } from "../../context/AppContext";
 import {
@@ -89,7 +86,9 @@ export default function RegisterForm(props: Props) {
       // the server public to make sure it wasn't tampered with
       await updateAuthentication(null);
 
-      const clientRegistrationStartResult = clientRegistrationStart(password);
+      const clientRegistrationStartResult = client.startRegistration({
+        password,
+      });
       const startRegistrationResult = await startRegistrationMutation({
         input: {
           username,
@@ -97,11 +96,12 @@ export default function RegisterForm(props: Props) {
         },
       });
       if (startRegistrationResult.data?.startRegistration) {
-        const { registrationUpload, exportKey } = clientRegistrationFinish({
+        const { exportKey, registrationRecord } = client.finishRegistration({
           password,
+          clientRegistrationState:
+            clientRegistrationStartResult.clientRegistrationState,
           registrationResponse:
             startRegistrationResult.data.startRegistration.challengeResponse,
-          clientRegistration: clientRegistrationStartResult.clientRegistration,
         });
         const { encryptionPrivateKey, signingPrivateKey, ...mainDevice } =
           createAndEncryptDevice(exportKey);
@@ -137,7 +137,7 @@ export default function RegisterForm(props: Props) {
         }
         const finishRegistrationResult = await finishRegistrationMutation({
           input: {
-            message: registrationUpload,
+            message: registrationRecord,
             username,
             mainDevice,
             pendingWorkspaceInvitationId: props.pendingWorkspaceInvitationId,

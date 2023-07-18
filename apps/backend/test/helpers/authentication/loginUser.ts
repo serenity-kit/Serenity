@@ -1,4 +1,4 @@
-import { clientLoginFinish } from "@serenity-kit/opaque";
+import { client } from "@serenity-kit/opaque";
 import { createDevice } from "@serenity-tools/common";
 import { gql } from "graphql-request";
 import sodium from "react-native-libsodium";
@@ -17,10 +17,10 @@ export const loginUser = async ({ graphql, username, password }: Params) => {
     password,
   });
 
-  const clientLoginFinishResult = clientLoginFinish({
+  const clientLoginFinishResult = client.finishLogin({
     password,
-    clientLogin: startLoginResult.login,
-    credentialResponse: startLoginResult.data.challengeResponse,
+    clientLoginState: startLoginResult.clientLoginState,
+    loginResponse: startLoginResult.data.challengeResponse,
   });
   if (!clientLoginFinishResult) {
     throw new Error("clientLoginFinishResult is null");
@@ -54,7 +54,7 @@ export const loginUser = async ({ graphql, username, password }: Params) => {
   await graphql.client.request(finishLoginQuery, {
     input: {
       loginId: startLoginResult.data.loginId,
-      message: clientLoginFinishResult.credentialFinalization,
+      message: clientLoginFinishResult.finishLoginRequest,
       deviceSigningPublicKey: device.signingPublicKey,
       deviceEncryptionPublicKey: device.encryptionPublicKey,
       deviceEncryptionPublicKeySignature: device.encryptionPublicKeySignature,

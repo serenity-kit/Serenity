@@ -1,4 +1,4 @@
-import { clientRegistrationFinish } from "@serenity-kit/opaque";
+import { client } from "@serenity-kit/opaque";
 import {
   createAndEncryptDevice,
   encryptWorkspaceInvitationPrivateKey,
@@ -25,9 +25,9 @@ export const registerUnverifiedUser = async ({
     username,
     password
   );
-  const clientRegistrationFinishResult = clientRegistrationFinish({
+  const clientRegistrationFinishResult = client.finishRegistration({
     password,
-    clientRegistration: result.registration,
+    clientRegistrationState: result.clientRegistrationState,
     registrationResponse: result.data.challengeResponse,
   });
 
@@ -66,7 +66,7 @@ export const registerUnverifiedUser = async ({
 
   const registrationResponse = await graphql.client.request(query, {
     input: {
-      message: clientRegistrationFinishResult.registrationUpload,
+      message: clientRegistrationFinishResult.registrationRecord,
       username,
       mainDevice,
       pendingWorkspaceInvitationId,

@@ -1,4 +1,4 @@
-import { clientLoginFinish } from "@serenity-kit/opaque";
+import { client } from "@serenity-kit/opaque";
 import {
   createDevice as createdDeviceHelper,
   generateId,
@@ -41,10 +41,10 @@ test("server should login a user", async () => {
     password,
   });
 
-  const clientLoginFinishResult = clientLoginFinish({
+  const clientLoginFinishResult = client.finishLogin({
     password,
-    clientLogin: result.login,
-    credentialResponse: result.data.challengeResponse,
+    clientLoginState: result.clientLoginState,
+    loginResponse: result.data.challengeResponse,
   });
   if (!clientLoginFinishResult) {
     throw new Error("clientLoginFinishResult is null");
@@ -79,7 +79,7 @@ test("server should login a user", async () => {
   const loginResponse = await graphql.client.request(query, {
     input: {
       loginId: result.data.loginId,
-      message: clientLoginFinishResult.credentialFinalization,
+      message: clientLoginFinishResult.finishLoginRequest,
       deviceSigningPublicKey: device.signingPublicKey,
       deviceEncryptionPublicKey: device.encryptionPublicKey,
       deviceEncryptionPublicKeySignature: device.encryptionPublicKeySignature,
@@ -116,10 +116,10 @@ describe("Input errors", () => {
       password,
     });
 
-    const clientLoginFinishResult = clientLoginFinish({
+    const clientLoginFinishResult = client.finishLogin({
       password,
-      clientLogin: result.login,
-      credentialResponse: result.data.challengeResponse,
+      clientLoginState: result.clientLoginState,
+      loginResponse: result.data.challengeResponse,
     });
     if (!clientLoginFinishResult) {
       throw new Error("clientLoginFinishResult is null");
@@ -129,7 +129,7 @@ describe("Input errors", () => {
         await graphql.client.request(query, {
           input: {
             loginId: null,
-            message: clientLoginFinishResult.credentialFinalization,
+            message: clientLoginFinishResult.finishLoginRequest,
           },
         }))()
     ).rejects.toThrowError(/GRAPHQL_VALIDATION_FAILED/);
