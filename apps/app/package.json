@@ -72,7 +72,7 @@
     "react-native-drawer-layout": "^3.1.0",
     "react-native-gesture-handler": "~2.8.0",
     "react-native-get-random-values": "~1.8.0",
-    "react-native-libsodium": "^0.7.0",
+    "react-native-libsodium": "^1.1.0",
     "react-native-modal": "^13.0.1",
     "react-native-opaque": "^0.2.6",
     "react-native-popper": "^0.3.2",
