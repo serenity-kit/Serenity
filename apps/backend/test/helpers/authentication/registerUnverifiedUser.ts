@@ -46,7 +46,6 @@ export const registerUnverifiedUser = async ({
   let pendingWorkspaceInvitationKeyCiphertext: string | null = null;
   let pendingWorkspaceInvitationKeyPublicNonce: string | null = null;
   let pendingWorkspaceInvitationKeySubkeyId: number | null = null;
-  let pendingWorkspaceInvitationKeyEncryptionSalt: string | null = null;
   if (pendingWorkspaceInvitationId) {
     const signingKeyPair = sodium.crypto_sign_keypair();
     const workspaceInvitationKeyData = encryptWorkspaceInvitationPrivateKey({
@@ -60,8 +59,6 @@ export const registerUnverifiedUser = async ({
     pendingWorkspaceInvitationKeyPublicNonce =
       workspaceInvitationKeyData.publicNonce;
     pendingWorkspaceInvitationKeySubkeyId = workspaceInvitationKeyData.subkeyId;
-    pendingWorkspaceInvitationKeyEncryptionSalt =
-      workspaceInvitationKeyData.encryptionKeySalt;
   }
 
   const registrationResponse = await graphql.client.request(query, {
@@ -73,7 +70,6 @@ export const registerUnverifiedUser = async ({
       pendingWorkspaceInvitationKeyCiphertext,
       pendingWorkspaceInvitationKeyPublicNonce,
       pendingWorkspaceInvitationKeySubkeyId,
-      pendingWorkspaceInvitationKeyEncryptionSalt,
     },
   });
   return registrationResponse;

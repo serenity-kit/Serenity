@@ -71,7 +71,6 @@ export default async function createUserWithWorkspace({
         mainDeviceCiphertext: mainDevice.ciphertext,
         mainDeviceNonce: mainDevice.nonce,
         mainDeviceSigningPublicKey: mainDevice.signingPublicKey,
-        mainDeviceEncryptionKeySalt: mainDevice.encryptionKeySalt,
         devices: {
           connect: {
             signingPublicKey: device.signingPublicKey,

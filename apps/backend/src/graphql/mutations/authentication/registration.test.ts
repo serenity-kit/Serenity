@@ -106,8 +106,6 @@ test("server should register a user with a pending workspace id", async () => {
         workspaceInvitationKeyData.publicNonce,
       pendingWorkspaceInvitationKeySubkeyId:
         workspaceInvitationKeyData.subkeyId,
-      pendingWorkspaceInvitationKeyEncryptionSalt:
-        workspaceInvitationKeyData.encryptionKeySalt,
     },
   });
   expect(typeof registrationResponse.finishRegistration.id).toBe("string");
@@ -168,7 +166,6 @@ describe("Input errors", () => {
             pendingWorkspaceInvitationKeyCiphertext: null,
             pendingWorkspaceInvitationKeyPublicNonce: null,
             pendingWorkspaceInvitationKeySubkeyId: null,
-            pendingWorkspaceInvitationKeyEncryptionSalt: null,
           },
         }))()
     ).rejects.toThrowError();
@@ -273,37 +270,6 @@ describe("Input errors", () => {
     const exportKey = clientRegistrationFinishResult.exportKey;
     const { signingPrivateKey, encryptionPrivateKey, nonce, ...mainDevice } =
       createAndEncryptDevice(sodium.to_base64(exportKey));
-    await expect(
-      (async () =>
-        await graphql.client.request(query, {
-          input: {
-            message: clientRegistrationFinishResult.registrationRecord,
-            username,
-            mainDevice,
-            pendingWorkspaceInvitationId,
-          },
-        }))()
-    ).rejects.toThrowError(/BAD_USER_INPUT/);
-  });
-  test("Invalid mainDevice.encryptionKeySalt", async () => {
-    const result = await requestRegistrationChallengeResponse(
-      graphql,
-      username,
-      password
-    );
-    const pendingWorkspaceInvitationId = generateId();
-    const clientRegistrationFinishResult = client.finishRegistration({
-      password,
-      clientRegistrationState: result.clientRegistrationState,
-      registrationResponse: result.data.challengeResponse,
-    });
-    const exportKey = clientRegistrationFinishResult.exportKey;
-    const {
-      signingPrivateKey,
-      encryptionPrivateKey,
-      encryptionKeySalt,
-      ...mainDevice
-    } = createAndEncryptDevice(sodium.to_base64(exportKey));
     await expect(
       (async () =>
         await graphql.client.request(query, {

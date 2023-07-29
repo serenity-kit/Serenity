@@ -3,8 +3,7 @@ import { createDevice } from "../createDevice/createDevice";
 import { createEncryptionKeyFromOpaqueExportKey } from "../createEncryptionKeyFromOpaqueExportKey/createEncryptionKeyFromOpaqueExportKey";
 
 export const createAndEncryptDevice = (exportKey: string) => {
-  const { encryptionKey, encryptionKeySalt } =
-    createEncryptionKeyFromOpaqueExportKey(exportKey);
+  const { encryptionKey } = createEncryptionKeyFromOpaqueExportKey(exportKey);
   const {
     signingPublicKey,
     signingPrivateKey,
@@ -31,6 +30,5 @@ export const createAndEncryptDevice = (exportKey: string) => {
     signingPrivateKey,
     encryptionPublicKey,
     encryptionPrivateKey,
-    encryptionKeySalt,
   };
 };

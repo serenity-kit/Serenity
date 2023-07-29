@@ -20,7 +20,6 @@ export const getMainDevice = async ({
         encryptionPublicKeySignature
         nonce
         ciphertext
-        encryptionKeySalt
         info
       }
     }

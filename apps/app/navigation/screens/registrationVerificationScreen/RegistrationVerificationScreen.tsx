@@ -92,7 +92,6 @@ export default function RegistrationVerificationScreen(
         subkeyId: pendingWorkspaceInvitation.subkeyId!,
         ciphertext: pendingWorkspaceInvitation.ciphertext!,
         publicNonce: pendingWorkspaceInvitation.publicNonce!,
-        encryptionKeySalt: pendingWorkspaceInvitation.encryptionKeySalt!,
       });
       const workspaceInvitation = await runWorkspaceInvitationQuery({
         id: pendingWorkspaceInvitation.id,

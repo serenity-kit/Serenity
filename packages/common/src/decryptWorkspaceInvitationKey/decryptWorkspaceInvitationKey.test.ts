@@ -20,7 +20,6 @@ test("decryptWorkspaceInvitationId", () => {
     ciphertext: encryptedData.ciphertext,
     publicNonce: encryptedData.publicNonce,
     subkeyId: encryptedData.subkeyId,
-    encryptionKeySalt: encryptedData.encryptionKeySalt,
   });
   expect(decryptFolderResult).toBe(sodium.to_base64(keyPair.privateKey));
 });
@@ -37,7 +36,6 @@ test("decryptFolderName with publicData fails for wrong key", () => {
       ciphertext: encryptedData.ciphertext,
       publicNonce: encryptedData.publicNonce,
       subkeyId: encryptedData.subkeyId,
-      encryptionKeySalt: encryptedData.encryptionKeySalt,
     })
   ).toThrowError(/ciphertext cannot be decrypted using that key/);
 });

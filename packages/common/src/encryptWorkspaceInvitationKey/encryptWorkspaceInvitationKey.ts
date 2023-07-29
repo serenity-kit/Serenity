@@ -17,8 +17,7 @@ export const encryptWorkspaceInvitationPrivateKey = ({
   workspaceInvitationSigningPrivateKey,
 }: Params) => {
   const publicData = "";
-  const { encryptionKey, encryptionKeySalt } =
-    createEncryptionKeyFromOpaqueExportKey(exportKey);
+  const { encryptionKey } = createEncryptionKeyFromOpaqueExportKey(exportKey);
 
   const derivedEncryptionKey = kdfDeriveFromKey({
     key: encryptionKey,
@@ -35,6 +34,5 @@ export const encryptWorkspaceInvitationPrivateKey = ({
     ciphertext: result.ciphertext,
     publicNonce: result.publicNonce,
     publicData,
-    encryptionKeySalt,
   };
 };

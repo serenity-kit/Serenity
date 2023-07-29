@@ -12,7 +12,6 @@ export const FinishRegistrationDeviceInput = inputObjectType({
   definition(t) {
     t.nonNull.string("ciphertext");
     t.nonNull.string("nonce");
-    t.nonNull.string("encryptionKeySalt");
     t.nonNull.string("signingPublicKey");
     t.nonNull.string("encryptionPublicKey");
     t.nonNull.string("encryptionPublicKeySignature");
@@ -29,7 +28,6 @@ export const FinishRegistrationInput = inputObjectType({
     t.int("pendingWorkspaceInvitationKeySubkeyId");
     t.string("pendingWorkspaceInvitationKeyCiphertext");
     t.string("pendingWorkspaceInvitationKeyPublicNonce");
-    t.string("pendingWorkspaceInvitationKeyEncryptionSalt");
   },
 });
 
@@ -66,8 +64,6 @@ export const finishRegistrationMutation = mutationField("finishRegistration", {
         args.input.pendingWorkspaceInvitationKeyCiphertext,
       pendingWorkspaceInvitationKeyPublicNonce:
         args.input.pendingWorkspaceInvitationKeyPublicNonce,
-      pendingWorkspaceInvitationKeyEncryptionSalt:
-        args.input.pendingWorkspaceInvitationKeyEncryptionSalt,
     });
     return {
       id: unverifiedUser.id,

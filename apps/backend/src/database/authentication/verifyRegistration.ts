@@ -57,7 +57,6 @@ const createDevicesAndUser = async (
       mainDeviceCiphertext: unverifiedUser.mainDeviceCiphertext,
       mainDeviceNonce: unverifiedUser.mainDeviceNonce,
       mainDeviceSigningPublicKey: unverifiedUser.mainDeviceSigningPublicKey,
-      mainDeviceEncryptionKeySalt: unverifiedUser.mainDeviceEncryptionKeySalt,
       devices: {
         connect: {
           signingPublicKey: device.signingPublicKey,
@@ -70,8 +69,6 @@ const createDevicesAndUser = async (
         unverifiedUser.pendingWorkspaceInvitationKeyCiphertext,
       pendingWorkspaceInvitationKeyPublicNonce:
         unverifiedUser.pendingWorkspaceInvitationKeyPublicNonce,
-      pendingWorkspaceInvitationKeyEncryptionSalt:
-        unverifiedUser.pendingWorkspaceInvitationKeyEncryptionSalt,
     },
   });
   await prisma.unverifiedUser.delete({

@@ -9,7 +9,6 @@ type Params = {
   subkeyId: number;
   ciphertext: string;
   publicNonce: string;
-  encryptionKeySalt: string;
 };
 
 export const decryptWorkspaceInvitationKey = ({
@@ -17,13 +16,9 @@ export const decryptWorkspaceInvitationKey = ({
   subkeyId,
   ciphertext,
   publicNonce,
-  encryptionKeySalt,
 }: Params) => {
   const publicData = "";
-  const { encryptionKey } = createEncryptionKeyFromOpaqueExportKey(
-    exportKey,
-    encryptionKeySalt
-  );
+  const { encryptionKey } = createEncryptionKeyFromOpaqueExportKey(exportKey);
   const derivedEncryptionKey = kdfDeriveFromKey({
     key: encryptionKey,
     context: workspaceInvitationDerivedKeyContext,

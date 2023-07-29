@@ -10,12 +10,8 @@ export const decryptDevice = ({
   ciphertext,
   nonce,
   exportKey,
-  encryptionKeySalt,
 }): PrivateKeys => {
-  const { encryptionKey } = createEncryptionKeyFromOpaqueExportKey(
-    exportKey,
-    encryptionKeySalt
-  );
+  const { encryptionKey } = createEncryptionKeyFromOpaqueExportKey(exportKey);
   const decryptedCiphertextBase64 = sodium.crypto_secretbox_open_easy(
     sodium.from_base64(ciphertext),
     sodium.from_base64(nonce),

@@ -13,8 +13,7 @@ export const getPendingWorkspaceInvitation = async ({}: Props) => {
     !pendingWorkspaceInvitation?.id ||
     !pendingWorkspaceInvitation?.ciphertext ||
     !pendingWorkspaceInvitation?.publicNonce ||
-    !pendingWorkspaceInvitation?.subkeyId ||
-    !pendingWorkspaceInvitation?.encryptionKeySalt
+    !pendingWorkspaceInvitation?.subkeyId
   ) {
     return null;
   }

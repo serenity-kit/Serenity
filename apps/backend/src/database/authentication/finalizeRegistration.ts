@@ -15,7 +15,6 @@ sendgrid.setApiKey(process.env.SENDGRID_API_KEY);
 type DeviceInput = Device & {
   ciphertext: string;
   nonce: string;
-  encryptionKeySalt: string;
 };
 
 type Props = {
@@ -26,7 +25,6 @@ type Props = {
   pendingWorkspaceInvitationKeySubkeyId: number | null | undefined;
   pendingWorkspaceInvitationKeyCiphertext: string | null | undefined;
   pendingWorkspaceInvitationKeyPublicNonce: string | null | undefined;
-  pendingWorkspaceInvitationKeyEncryptionSalt: string | null | undefined;
 };
 
 export async function finalizeRegistration({
@@ -37,7 +35,6 @@ export async function finalizeRegistration({
   pendingWorkspaceInvitationKeySubkeyId,
   pendingWorkspaceInvitationKeyCiphertext,
   pendingWorkspaceInvitationKeyPublicNonce,
-  pendingWorkspaceInvitationKeyEncryptionSalt,
 }: Props) {
   if (pendingWorkspaceInvitationId && !pendingWorkspaceInvitationKeySubkeyId) {
     throw new UserInputError(
@@ -58,14 +55,6 @@ export async function finalizeRegistration({
   ) {
     throw new UserInputError(
       "pendingWorkspaceInvitationId without workspaceInvitationKeyPublicNonce"
-    );
-  }
-  if (
-    pendingWorkspaceInvitationId &&
-    !pendingWorkspaceInvitationKeyEncryptionSalt
-  ) {
-    throw new UserInputError(
-      "pendingWorkspaceInvitationId without pendingWorkspaceInvitationKeyEncryptionSalt"
     );
   }
   try {
@@ -90,7 +79,6 @@ export async function finalizeRegistration({
           mainDeviceCiphertext: mainDevice.ciphertext,
           mainDeviceNonce: mainDevice.nonce,
           mainDeviceSigningPublicKey: mainDevice.signingPublicKey,
-          mainDeviceEncryptionKeySalt: mainDevice.encryptionKeySalt,
           mainDeviceEncryptionPublicKey: mainDevice.encryptionPublicKey,
           mainDeviceEncryptionPublicKeySignature:
             mainDevice.encryptionPublicKeySignature,
@@ -98,7 +86,6 @@ export async function finalizeRegistration({
           pendingWorkspaceInvitationKeySubkeyId,
           pendingWorkspaceInvitationKeyCiphertext,
           pendingWorkspaceInvitationKeyPublicNonce,
-          pendingWorkspaceInvitationKeyEncryptionSalt,
         },
       });
 
