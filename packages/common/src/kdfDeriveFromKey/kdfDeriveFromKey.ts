@@ -5,10 +5,11 @@ import {
   randombytes_uniform,
   to_base64,
 } from "react-native-libsodium";
+import { KeyDerivationContext } from "../zodTypes";
 
 type Params = {
   key: string;
-  context: string;
+  context: KeyDerivationContext;
   subkeyId?: number;
 };
 
@@ -18,11 +19,12 @@ type Params = {
 const upperBound = 2 ** 31 - 1;
 
 export const kdfDeriveFromKey = (params: Params) => {
+  const context = KeyDerivationContext.parse(params.context);
   const subkeyId = params.subkeyId || randombytes_uniform(upperBound);
   const derivedKey = crypto_kdf_derive_from_key(
     crypto_aead_xchacha20poly1305_ietf_KEYBYTES,
     subkeyId,
-    params.context,
+    context,
     from_base64(params.key)
   );
   return {

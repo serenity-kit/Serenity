@@ -1,7 +1,5 @@
 import sodium from "react-native-libsodium";
-import { createEncryptionKeyFromOpaqueExportKey } from "../createEncryptionKeyFromOpaqueExportKey/createEncryptionKeyFromOpaqueExportKey";
 import { decryptAead } from "../decryptAead/decryptAead";
-import { workspaceInvitationDerivedKeyContext } from "../encryptWorkspaceInvitationKey/encryptWorkspaceInvitationKey";
 import { kdfDeriveFromKey } from "../kdfDeriveFromKey/kdfDeriveFromKey";
 
 type Params = {
@@ -18,12 +16,15 @@ export const decryptWorkspaceInvitationKey = ({
   publicNonce,
 }: Params) => {
   const publicData = "";
-  const { encryptionKey } = createEncryptionKeyFromOpaqueExportKey(exportKey);
+
   const derivedEncryptionKey = kdfDeriveFromKey({
-    key: encryptionKey,
-    context: workspaceInvitationDerivedKeyContext,
+    key: sodium.to_base64(
+      sodium.from_base64(exportKey).subarray(0, sodium.crypto_kdf_KEYBYTES)
+    ),
+    context: "wsinvite",
     subkeyId,
   });
+
   const result = decryptAead(
     sodium.from_base64(ciphertext),
     publicData,

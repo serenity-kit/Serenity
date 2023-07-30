@@ -242,7 +242,7 @@ export default function Sidebar(props: DrawerContentComponentProps) {
                       folder.keyDerivationTrace.trace.length - 1
                     ].subkeyId
                   }
-                  keyDerivationTrace={folder.keyDerivationTrace!}
+                  keyDerivationTrace={folder.keyDerivationTrace}
                   workspaceId={workspaceId}
                   onStructureChange={refetchRootFolders}
                 />
