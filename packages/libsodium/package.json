@@ -8,10 +8,10 @@
     "lint": "eslint --ext .tsx --ext .ts ./"
   },
   "dependencies": {
-    "libsodium-wrappers": "^0.7.10"
+    "libsodium-wrappers": "^0.7.11"
   },
   "devDependencies": {
-    "@types/libsodium-wrappers": "^0.7.9"
+    "@types/libsodium-wrappers": "^0.7.10"
   },
   "jest": {
     "preset": "react-native"

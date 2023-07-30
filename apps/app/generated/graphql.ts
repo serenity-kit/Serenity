@@ -474,7 +474,6 @@ export type FinishLoginResult = {
 
 export type FinishRegistrationDeviceInput = {
   ciphertext: Scalars['String'];
-  encryptionKeySalt: Scalars['String'];
   encryptionPublicKey: Scalars['String'];
   encryptionPublicKeySignature: Scalars['String'];
   nonce: Scalars['String'];
@@ -486,7 +485,6 @@ export type FinishRegistrationInput = {
   message: Scalars['String'];
   pendingWorkspaceInvitationId?: InputMaybe<Scalars['String']>;
   pendingWorkspaceInvitationKeyCiphertext?: InputMaybe<Scalars['String']>;
-  pendingWorkspaceInvitationKeyEncryptionSalt?: InputMaybe<Scalars['String']>;
   pendingWorkspaceInvitationKeyPublicNonce?: InputMaybe<Scalars['String']>;
   pendingWorkspaceInvitationKeySubkeyId?: InputMaybe<Scalars['Int']>;
   username: Scalars['String'];
@@ -585,7 +583,6 @@ export type MainDeviceResult = {
   __typename?: 'MainDeviceResult';
   ciphertext: Scalars['String'];
   createdAt: Scalars['Date'];
-  encryptionKeySalt: Scalars['String'];
   encryptionPublicKey: Scalars['String'];
   encryptionPublicKeySignature: Scalars['String'];
   info?: Maybe<Scalars['String']>;
@@ -817,7 +814,6 @@ export type PageInfo = {
 export type PendingWorkspaceInvitationResult = {
   __typename?: 'PendingWorkspaceInvitationResult';
   ciphertext?: Maybe<Scalars['String']>;
-  encryptionKeySalt?: Maybe<Scalars['String']>;
   id?: Maybe<Scalars['String']>;
   publicNonce?: Maybe<Scalars['String']>;
   subkeyId?: Maybe<Scalars['Int']>;
@@ -1681,7 +1677,7 @@ export type FoldersQuery = { __typename?: 'Query', folders?: { __typename?: 'Fol
 export type MainDeviceQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type MainDeviceQuery = { __typename?: 'Query', mainDevice?: { __typename?: 'MainDeviceResult', signingPublicKey: string, nonce: string, ciphertext: string, encryptionKeySalt: string, encryptionPublicKey: string, encryptionPublicKeySignature: string, createdAt: any } | null };
+export type MainDeviceQuery = { __typename?: 'Query', mainDevice?: { __typename?: 'MainDeviceResult', signingPublicKey: string, nonce: string, ciphertext: string, encryptionPublicKey: string, encryptionPublicKeySignature: string, createdAt: any } | null };
 
 export type MeQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -1701,7 +1697,7 @@ export type MeWithWorkspaceLoadingInfoQuery = { __typename?: 'Query', me?: { __t
 export type PendingWorkspaceInvitationQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type PendingWorkspaceInvitationQuery = { __typename?: 'Query', pendingWorkspaceInvitation?: { __typename?: 'PendingWorkspaceInvitationResult', id?: string | null, ciphertext?: string | null, publicNonce?: string | null, subkeyId?: number | null, encryptionKeySalt?: string | null } | null };
+export type PendingWorkspaceInvitationQuery = { __typename?: 'Query', pendingWorkspaceInvitation?: { __typename?: 'PendingWorkspaceInvitationResult', id?: string | null, ciphertext?: string | null, publicNonce?: string | null, subkeyId?: number | null } | null };
 
 export type RootFoldersQueryVariables = Exact<{
   workspaceId: Scalars['ID'];
@@ -2564,7 +2560,6 @@ export const MainDeviceDocument = gql`
     signingPublicKey
     nonce
     ciphertext
-    encryptionKeySalt
     encryptionPublicKey
     encryptionPublicKeySignature
     createdAt
@@ -2618,7 +2613,6 @@ export const PendingWorkspaceInvitationDocument = gql`
     ciphertext
     publicNonce
     subkeyId
-    encryptionKeySalt
   }
 }
     `;

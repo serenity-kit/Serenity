@@ -90,7 +90,7 @@ export default function LibsodiumTestScreen(
 
       const kdfDerivedKey = kdfDeriveFromKey({
         key: kdfKey,
-        context: "serenity",
+        context: "doctitle",
         subkeyId: 5200022,
       });
 

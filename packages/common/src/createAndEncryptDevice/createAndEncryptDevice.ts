@@ -1,10 +1,15 @@
 import sodium from "react-native-libsodium";
 import { createDevice } from "../createDevice/createDevice";
-import { createEncryptionKeyFromOpaqueExportKey } from "../createEncryptionKeyFromOpaqueExportKey/createEncryptionKeyFromOpaqueExportKey";
+import { kdfDeriveFromKey } from "../kdfDeriveFromKey/kdfDeriveFromKey";
 
 export const createAndEncryptDevice = (exportKey: string) => {
-  const { encryptionKey, encryptionKeySalt } =
-    createEncryptionKeyFromOpaqueExportKey(exportKey);
+  const { key: encryptionKey } = kdfDeriveFromKey({
+    key: sodium.to_base64(
+      sodium.from_base64(exportKey).subarray(0, sodium.crypto_kdf_KEYBYTES)
+    ),
+    context: "m_device",
+    subkeyId: 1111,
+  });
   const {
     signingPublicKey,
     signingPrivateKey,
@@ -31,6 +36,5 @@ export const createAndEncryptDevice = (exportKey: string) => {
     signingPrivateKey,
     encryptionPublicKey,
     encryptionPrivateKey,
-    encryptionKeySalt,
   };
 };

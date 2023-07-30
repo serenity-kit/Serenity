@@ -7767,11 +7767,6 @@
   resolved "https://registry.yarnpkg.com/@types/libsodium-wrappers/-/libsodium-wrappers-0.7.10.tgz#a6ebde70d3b4af960fd802af8d0e3c7cfe281eb2"
   integrity sha512-BqI9B92u+cM3ccp8mpHf+HzJ8fBlRwdmyd6+fz3p99m3V6ifT5O3zmOMi612PGkpeFeG/G6loxUnzlDNhfjPSA==
 
-"@types/libsodium-wrappers@^0.7.9":
-  version "0.7.9"
-  resolved "https://registry.yarnpkg.com/@types/libsodium-wrappers/-/libsodium-wrappers-0.7.9.tgz#89c3ad2156d5143e64bce86cfeb0045a983aeccc"
-  integrity sha512-LisgKLlYQk19baQwjkBZZXdJL0KbeTpdEnrAfz5hQACbklCY0gVFnsKUyjfNWF1UQsCSjw93Sj5jSbiO8RPfdw==
-
 "@types/lodash.clonedeep@^4.5.7":
   version "4.5.7"
   resolved "https://registry.yarnpkg.com/@types/lodash.clonedeep/-/lodash.clonedeep-4.5.7.tgz#0e119f582ed6f9e6b373c04a644651763214f197"
@@ -16488,17 +16483,17 @@ lib0@^0.2.49:
   dependencies:
     isomorphic.js "^0.2.4"
 
-libsodium-wrappers@^0.7.10:
-  version "0.7.10"
-  resolved "https://registry.yarnpkg.com/libsodium-wrappers/-/libsodium-wrappers-0.7.10.tgz#13ced44cacb0fc44d6ac9ce67d725956089ce733"
-  integrity sha512-pO3F1Q9NPLB/MWIhehim42b/Fwb30JNScCNh8TcQ/kIc+qGLQch8ag8wb0keK3EP5kbGakk1H8Wwo7v+36rNQg==
+libsodium-wrappers@^0.7.11:
+  version "0.7.11"
+  resolved "https://registry.yarnpkg.com/libsodium-wrappers/-/libsodium-wrappers-0.7.11.tgz#53bd20606dffcc54ea2122133c7da38218f575f7"
+  integrity sha512-SrcLtXj7BM19vUKtQuyQKiQCRJPgbpauzl3s0rSwD+60wtHqSUuqcoawlMDheCJga85nKOQwxNYQxf/CKAvs6Q==
   dependencies:
-    libsodium "^0.7.0"
+    libsodium "^0.7.11"
 
-libsodium@^0.7.0:
-  version "0.7.10"
-  resolved "https://registry.yarnpkg.com/libsodium/-/libsodium-0.7.10.tgz#c2429a7e4c0836f879d701fec2c8a208af024159"
-  integrity sha512-eY+z7hDrDKxkAK+QKZVNv92A5KYkxfvIshtBJkmg5TSiCnYqZP3i9OO9whE79Pwgm4jGaoHgkM4ao/b9Cyu4zQ==
+libsodium@^0.7.11:
+  version "0.7.11"
+  resolved "https://registry.yarnpkg.com/libsodium/-/libsodium-0.7.11.tgz#cd10aae7bcc34a300cc6ad0ac88fcca674cfbc2e"
+  integrity sha512-WPfJ7sS53I2s4iM58QxY3Inb83/6mjlYgcmZs7DJsvDlnmVUwNinBCi5vBT43P6bHRy01O4zsMU2CoVR6xJ40A==
 
 lilconfig@2.0.5, lilconfig@^2.0.5:
   version "2.0.5"
@@ -20138,13 +20133,13 @@ react-native-gradle-plugin@^0.70.3:
   resolved "https://registry.yarnpkg.com/react-native-gradle-plugin/-/react-native-gradle-plugin-0.70.3.tgz#cbcf0619cbfbddaa9128701aa2d7b4145f9c4fc8"
   integrity sha512-oOanj84fJEXUg9FoEAQomA8ISG+DVIrTZ3qF7m69VQUJyOGYyDZmPqKcjvRku4KXlEH6hWO9i4ACLzNBh8gC0A==
 
-react-native-libsodium@^0.7.0:
-  version "0.7.0"
-  resolved "https://registry.yarnpkg.com/react-native-libsodium/-/react-native-libsodium-0.7.0.tgz#81c7d2b0db27262854e9f8c44cb3df28955469f9"
-  integrity sha512-D7C7R8P0fCGBmPN/waNtcilOeEsXbXyaCnIUzkEnd2U5cBji+4B+OxU2HYCgAp+vshXx0dmSdn/0uY8y4Q6aPw==
+react-native-libsodium@^1.1.0:
+  version "1.1.0"
+  resolved "https://registry.yarnpkg.com/react-native-libsodium/-/react-native-libsodium-1.1.0.tgz#1b580f9978e249af106249b86dbe1f959934452e"
+  integrity sha512-HuCECkSDptMM5FTaQCw5xZtm552f1TNk8N7iIc/jlkmV8RJlwKPRhnwKlIvLDecQXBy4bH/97nTbid6U4P/22A==
   dependencies:
     "@types/libsodium-wrappers" "^0.7.10"
-    libsodium-wrappers "^0.7.10"
+    libsodium-wrappers "^0.7.11"
 
 react-native-modal@^13.0.1:
   version "13.0.1"

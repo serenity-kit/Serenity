@@ -3,7 +3,6 @@ export * from "./createAndEncryptWorkspaceKeyForDevice/createAndEncryptWorkspace
 export * from "./createCommentKey/createCommentKey";
 export * from "./createDevice/createDevice";
 export * from "./createDocumentTitleKey/createDocumentTitleKey";
-export * from "./createEncryptionKeyFromOpaqueExportKey/createEncryptionKeyFromOpaqueExportKey";
 export * from "./createIntroductionDocumentSnapshot/createIntroductionDocumentSnapshot";
 export * from "./createSnapshotKey/createSnapshotKey";
 export * from "./debounce/debounce";

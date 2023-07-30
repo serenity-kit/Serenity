@@ -4,6 +4,5 @@ query pendingWorkspaceInvitation {
     ciphertext
     publicNonce
     subkeyId
-    encryptionKeySalt
   }
 }

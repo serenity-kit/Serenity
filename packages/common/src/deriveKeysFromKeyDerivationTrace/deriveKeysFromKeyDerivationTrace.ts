@@ -34,6 +34,7 @@ export const deriveKeysFromKeyDerivationTrace = ({
   keyDerivationTrace.trace.forEach((keyDerivationTraceEntry) => {
     const ancestorKeyData = kdfDeriveFromKey({
       key: parentKey,
+      // @ts-expect-error only know if it's a string at this point
       context: keyDerivationTraceEntry.context,
       subkeyId: keyDerivationTraceEntry.subkeyId,
     });

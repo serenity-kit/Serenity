@@ -1,7 +1,7 @@
 import { gql } from "graphql-request";
-import setupGraphql from "../../../../test/helpers/setupGraphql";
-import deleteAllRecords from "../../../../test/helpers/deleteAllRecords";
 import { registerUser } from "../../../../test/helpers/authentication/registerUser";
+import deleteAllRecords from "../../../../test/helpers/deleteAllRecords";
+import setupGraphql from "../../../../test/helpers/setupGraphql";
 
 const graphql = setupGraphql();
 const username = "7dfb4dd9-88be-414c-8a40-b5c030003d89@example.com";
@@ -50,7 +50,6 @@ test("user should be be able to get their pending workspace invitation", async (
         ciphertext
         publicNonce
         subkeyId
-        encryptionKeySalt
       }
     }
   `;
@@ -58,7 +57,6 @@ test("user should be be able to get their pending workspace invitation", async (
   expect(result.pendingWorkspaceInvitation).toMatchInlineSnapshot(`
       {
         "ciphertext": "${registerUser1Result.pendingWorkspaceInvitationKeyCiphertext}",
-        "encryptionKeySalt": "${registerUser1Result.pendingWorkspaceInvitationKeyEncryptionSalt}",
         "id": "${pendingWorkspaceInvitation2}",
         "publicNonce": "${registerUser1Result.pendingWorkspaceInvitationKeyPublicNonce}",
         "subkeyId": ${registerUser1Result.pendingWorkspaceInvitationKeySubkeyId},

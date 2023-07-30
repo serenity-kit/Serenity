@@ -1,5 +1,5 @@
 import sodium from "react-native-libsodium";
-import { createEncryptionKeyFromOpaqueExportKey } from "../createEncryptionKeyFromOpaqueExportKey/createEncryptionKeyFromOpaqueExportKey";
+import { kdfDeriveFromKey } from "../kdfDeriveFromKey/kdfDeriveFromKey";
 
 type PrivateKeys = {
   encryptionPrivateKey: string;
@@ -10,12 +10,14 @@ export const decryptDevice = ({
   ciphertext,
   nonce,
   exportKey,
-  encryptionKeySalt,
 }): PrivateKeys => {
-  const { encryptionKey } = createEncryptionKeyFromOpaqueExportKey(
-    exportKey,
-    encryptionKeySalt
-  );
+  const { key: encryptionKey } = kdfDeriveFromKey({
+    key: sodium.to_base64(
+      sodium.from_base64(exportKey).subarray(0, sodium.crypto_kdf_KEYBYTES)
+    ),
+    context: "m_device",
+    subkeyId: 1111,
+  });
   const decryptedCiphertextBase64 = sodium.crypto_secretbox_open_easy(
     sodium.from_base64(ciphertext),
     sodium.from_base64(nonce),

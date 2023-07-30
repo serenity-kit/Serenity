@@ -1,10 +1,21 @@
 import { Snapshot, SnapshotWithClientData } from "@serenity-tools/secsync";
 import { z } from "zod";
 
+export const KeyDerivationContext = z.union([
+  z.literal("comment_"),
+  z.literal("doctitle"),
+  z.literal("snapshot"),
+  z.literal("wsinvite"),
+  z.literal("folder__"),
+  z.literal("m_device"),
+]);
+export type KeyDerivationContext = z.infer<typeof KeyDerivationContext>;
+
 export const KeyDerivationTraceEntry = z.object({
   entryId: z.string(), // didn't use id because it often GraphQL clients normalize by the id field
   subkeyId: z.number(),
   parentId: z.union([z.string(), z.null(), z.undefined()]), // the first entry has no parent
+  // should be, but causes too many issues with GraphQL KeyDerivationContext,
   context: z.string(), // kdf context
 });
 

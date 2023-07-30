@@ -67,50 +67,46 @@ model Update {
 }
 
 model UnverifiedUser {
-  id                                          String  @id @default(uuid())
-  username                                    String
-  opaqueEnvelope                              String
-  confirmationCode                            String  @default(uuid())
-  confirmationTryCounter                      Int     @default(0)
+  id                                       String  @id @default(uuid())
+  username                                 String
+  opaqueEnvelope                           String
+  confirmationCode                         String  @default(uuid())
+  confirmationTryCounter                   Int     @default(0)
   // contains the device signingPrivateKey and encryptionPrivateKey
   // can be decrypted using the key storred in the OPAQUE envelope
-  mainDeviceNonce                             String  @unique
-  mainDeviceCiphertext                        String
-  mainDeviceEncryptionKeySalt                 String
-  mainDeviceSigningPublicKey                  String  @unique
-  mainDeviceEncryptionPublicKey               String  @unique
-  mainDeviceEncryptionPublicKeySignature      String  @unique
-  pendingWorkspaceInvitationId                String?
-  pendingWorkspaceInvitationKeySubkeyId       Int?
-  pendingWorkspaceInvitationKeyCiphertext     String?
-  pendingWorkspaceInvitationKeyPublicNonce    String?
-  pendingWorkspaceInvitationKeyEncryptionSalt String?
+  mainDeviceNonce                          String  @unique
+  mainDeviceCiphertext                     String
+  mainDeviceSigningPublicKey               String  @unique
+  mainDeviceEncryptionPublicKey            String  @unique
+  mainDeviceEncryptionPublicKeySignature   String  @unique
+  pendingWorkspaceInvitationId             String?
+  pendingWorkspaceInvitationKeySubkeyId    Int?
+  pendingWorkspaceInvitationKeyCiphertext  String?
+  pendingWorkspaceInvitationKeyPublicNonce String?
 }
 
 model User {
-  id                                          String                 @id @default(uuid())
-  username                                    String                 @unique
-  opaqueEnvelope                              String
+  id                                       String                 @id @default(uuid())
+  username                                 String                 @unique
+  opaqueEnvelope                           String
   // contains the device signingPrivateKey and encryptionPrivateKey
   // can be decrypted using the key storred in the OPAQUE envelope
-  mainDeviceCiphertext                        String
+  mainDeviceCiphertext                     String
   // nonce to decrypt the mainDeviceCiphertext
-  mainDeviceNonce                             String                 @unique
-  mainDeviceEncryptionKeySalt                 String
-  mainDevice                                  Device                 @relation(name: "mainDevice", fields: [mainDeviceSigningPublicKey], references: [signingPublicKey])
-  mainDeviceSigningPublicKey                  String                 @unique
-  devices                                     Device[]
-  recoveryDevice                              RecoveryDevice?
-  usersToWorkspaces                           UsersToWorkspaces[]
-  workspaceInvitations                        WorkspaceInvitations[]
-  sessions                                    Session[]
-  pendingWorkspaceInvitationId                String?
-  pendingWorkspaceInvitationKeySubkeyId       Int?
-  pendingWorkspaceInvitationKeyCiphertext     String?
-  pendingWorkspaceInvitationKeyPublicNonce    String?
-  pendingWorkspaceInvitationKeyEncryptionSalt String?
-  creatorDevices                              CreatorDevice[]
-  documentShareLinks                          DocumentShareLink[]
+  mainDeviceNonce                          String                 @unique
+  mainDevice                               Device                 @relation(name: "mainDevice", fields: [mainDeviceSigningPublicKey], references: [signingPublicKey])
+  mainDeviceSigningPublicKey               String                 @unique
+  devices                                  Device[]
+  recoveryDevice                           RecoveryDevice?
+  usersToWorkspaces                        UsersToWorkspaces[]
+  workspaceInvitations                     WorkspaceInvitations[]
+  sessions                                 Session[]
+  pendingWorkspaceInvitationId             String?
+  pendingWorkspaceInvitationKeySubkeyId    Int?
+  pendingWorkspaceInvitationKeyCiphertext  String?
+  pendingWorkspaceInvitationKeyPublicNonce String?
+  creatorDevices                           CreatorDevice[]
+  documentShareLinks                       DocumentShareLink[]
 }
 
 model Session {
