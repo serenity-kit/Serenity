@@ -1,4 +1,5 @@
 import { client, server } from "@serenity-kit/opaque";
+import * as userChain from "@serenity-kit/user-chain";
 import * as workspaceChain from "@serenity-kit/workspace-chain";
 import {
   createAndEncryptDevice,
@@ -64,16 +65,35 @@ export default async function createUserWithWorkspace({
       },
     });
 
+    const createChainEvent = userChain.createChain({
+      authorKeyPair: {
+        privateKey: mainDevice.signingPrivateKey,
+        publicKey: mainDevice.signingPublicKey,
+      },
+      email: username,
+    });
+    const userChainState = userChain.resolveState({
+      events: [createChainEvent],
+      knownVersion: userChain.version,
+    });
+
     const user = await prisma.user.create({
       data: {
         username,
-        opaqueEnvelope: clientRegistrationFinishResult.registrationRecord,
+        registrationRecord: clientRegistrationFinishResult.registrationRecord,
         mainDeviceCiphertext: mainDevice.ciphertext,
         mainDeviceNonce: mainDevice.nonce,
         mainDeviceSigningPublicKey: mainDevice.signingPublicKey,
         devices: {
           connect: {
             signingPublicKey: device.signingPublicKey,
+          },
+        },
+        chain: {
+          create: {
+            content: createChainEvent,
+            state: userChainState,
+            position: 0,
           },
         },
       },

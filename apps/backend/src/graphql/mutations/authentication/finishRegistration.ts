@@ -1,3 +1,4 @@
+import * as userChain from "@serenity-kit/user-chain";
 import {
   arg,
   inputObjectType,
@@ -21,13 +22,13 @@ export const FinishRegistrationDeviceInput = inputObjectType({
 export const FinishRegistrationInput = inputObjectType({
   name: "FinishRegistrationInput",
   definition(t) {
-    t.nonNull.string("message");
-    t.nonNull.string("username");
+    t.nonNull.string("registrationRecord");
     t.nonNull.field("mainDevice", { type: FinishRegistrationDeviceInput });
     t.string("pendingWorkspaceInvitationId");
     t.int("pendingWorkspaceInvitationKeySubkeyId");
     t.string("pendingWorkspaceInvitationKeyCiphertext");
     t.string("pendingWorkspaceInvitationKeyPublicNonce");
+    t.nonNull.string("serializedUserChainEvent");
   },
 });
 
@@ -53,9 +54,12 @@ export const finishRegistrationMutation = mutationField("finishRegistration", {
       throw new Error("Missing process.env.OPAQUE_SERVER_SETUP");
     }
 
+    const createChainEvent = userChain.CreateChainEvent.parse(
+      JSON.parse(args.input.serializedUserChainEvent)
+    );
+
     const unverifiedUser = await finalizeRegistration({
-      username: args.input.username,
-      opaqueEnvelope: args.input.message,
+      registrationRecord: args.input.registrationRecord,
       mainDevice: args.input.mainDevice,
       pendingWorkspaceInvitationId: args.input.pendingWorkspaceInvitationId,
       pendingWorkspaceInvitationKeySubkeyId:
@@ -64,6 +68,7 @@ export const finishRegistrationMutation = mutationField("finishRegistration", {
         args.input.pendingWorkspaceInvitationKeyCiphertext,
       pendingWorkspaceInvitationKeyPublicNonce:
         args.input.pendingWorkspaceInvitationKeyPublicNonce,
+      createChainEvent,
     });
     return {
       id: unverifiedUser.id,

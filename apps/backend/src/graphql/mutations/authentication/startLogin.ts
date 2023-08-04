@@ -9,7 +9,7 @@ import {
 } from "nexus";
 import { z } from "zod";
 import { createLoginAttempt } from "../../../database/authentication/createLoginAttempt";
-import { getEnvelope } from "../../../database/authentication/getEnvelope";
+import { getRegistrationRecord } from "../../../database/authentication/getEnvelope";
 
 export const StartLoginInput = inputObjectType({
   name: "StartLoginInput",
@@ -51,7 +51,7 @@ export const startLoginMutation = mutationField("startLogin", {
     }
 
     try {
-      result = await getEnvelope(username);
+      result = await getRegistrationRecord(username);
     } catch (error) {
       throw new Error("Failed to initiate login");
     }

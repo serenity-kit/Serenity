@@ -2,6 +2,8 @@ import sodium from "react-native-libsodium";
 import { createDevice } from "../createDevice/createDevice";
 import { kdfDeriveFromKey } from "../kdfDeriveFromKey/kdfDeriveFromKey";
 
+// TODO rename to createAndEncryptMainDevice (since the context is m_device)
+// TODO should we just derive from the export_key here?
 export const createAndEncryptDevice = (exportKey: string) => {
   const { key: encryptionKey } = kdfDeriveFromKey({
     key: sodium.to_base64(

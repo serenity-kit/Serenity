@@ -1,6 +1,6 @@
 import { prisma } from "../prisma";
 
-export async function getEnvelope(username: string): Promise<{
+export async function getRegistrationRecord(username: string): Promise<{
   envelop: string;
 }> {
   // if this user does not exist, we have a problem
@@ -13,6 +13,6 @@ export async function getEnvelope(username: string): Promise<{
     throw new Error("User is not registered");
   }
   return {
-    envelop: user.opaqueEnvelope,
+    envelop: user.registrationRecord,
   };
 }

@@ -482,12 +482,12 @@ export type FinishRegistrationDeviceInput = {
 
 export type FinishRegistrationInput = {
   mainDevice: FinishRegistrationDeviceInput;
-  message: Scalars['String'];
   pendingWorkspaceInvitationId?: InputMaybe<Scalars['String']>;
   pendingWorkspaceInvitationKeyCiphertext?: InputMaybe<Scalars['String']>;
   pendingWorkspaceInvitationKeyPublicNonce?: InputMaybe<Scalars['String']>;
   pendingWorkspaceInvitationKeySubkeyId?: InputMaybe<Scalars['Int']>;
-  username: Scalars['String'];
+  registrationRecord: Scalars['String'];
+  serializedUserChainEvent: Scalars['String'];
 };
 
 export type FinishRegistrationResult = {

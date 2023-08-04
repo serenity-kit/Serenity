@@ -1,4 +1,5 @@
 import { PrismaClient } from "@prisma/client";
+import * as userChain from "@serenity-kit/user-chain";
 import { UserInputError } from "apollo-server-express";
 import { Prisma, UnverifiedUser } from "../../../prisma/generated/output";
 import { createConfirmationCode } from "../../utils/confirmationCode";
@@ -50,10 +51,19 @@ const createDevicesAndUser = async (
       info: JSON.stringify({ type: "main" }),
     },
   });
+
+  const createChainEvent = userChain.CreateChainEvent.parse(
+    unverifiedUser.createChainEvent
+  );
+  const userChainState = userChain.resolveState({
+    events: [createChainEvent],
+    knownVersion: userChain.version,
+  });
+
   const user = await prisma.user.create({
     data: {
       username: unverifiedUser.username,
-      opaqueEnvelope: unverifiedUser.opaqueEnvelope,
+      registrationRecord: unverifiedUser.registrationRecord,
       mainDeviceCiphertext: unverifiedUser.mainDeviceCiphertext,
       mainDeviceNonce: unverifiedUser.mainDeviceNonce,
       mainDeviceSigningPublicKey: unverifiedUser.mainDeviceSigningPublicKey,
@@ -69,6 +79,13 @@ const createDevicesAndUser = async (
         unverifiedUser.pendingWorkspaceInvitationKeyCiphertext,
       pendingWorkspaceInvitationKeyPublicNonce:
         unverifiedUser.pendingWorkspaceInvitationKeyPublicNonce,
+      chain: {
+        create: {
+          content: createChainEvent,
+          state: userChainState,
+          position: 0,
+        },
+      },
     },
   });
   await prisma.unverifiedUser.delete({

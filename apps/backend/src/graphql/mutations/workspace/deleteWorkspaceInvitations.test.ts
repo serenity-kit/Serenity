@@ -11,8 +11,8 @@ import { getLastWorkspaceChainEvent } from "../../../../test/helpers/workspace/g
 import createUserWithWorkspace from "../../../database/testHelpers/createUserWithWorkspace";
 
 const graphql = setupGraphql();
-const username1 = "user1";
-const username2 = "user2";
+const username1 = "user11@example.com";
+const username2 = "user21@example.com";
 let userAndDevice1: any = null;
 let userAndDevice2: any = null;
 

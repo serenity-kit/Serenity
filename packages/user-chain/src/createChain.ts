@@ -6,6 +6,7 @@ import {
   KeyPairBase64,
 } from "./types";
 import { hashTransaction } from "./utils";
+import { version } from "./version";
 
 type Params = {
   authorKeyPair: KeyPairBase64;
@@ -21,7 +22,7 @@ export const createChain = ({
     id: generateId(),
     prevEventHash: null,
     email,
-    version: 0,
+    version,
   };
   const hash = hashTransaction(transaction);
 

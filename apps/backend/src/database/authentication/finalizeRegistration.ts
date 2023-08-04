@@ -1,9 +1,11 @@
 import sendgrid from "@sendgrid/mail";
+import * as userChain from "@serenity-kit/user-chain";
 import { UserInputError } from "apollo-server-express";
 import { Device } from "../../types/device";
 import { createConfirmationCode } from "../../utils/confirmationCode";
 import { ExpectedGraphqlError } from "../../utils/expectedGraphqlError/expectedGraphqlError";
 import { prisma } from "../prisma";
+
 if (!process.env.FROM_EMAIL) {
   throw new Error("Missing process.env.FROM_EMAIL");
 }
@@ -18,24 +20,38 @@ type DeviceInput = Device & {
 };
 
 type Props = {
-  username: string;
-  opaqueEnvelope: string;
+  registrationRecord: string;
   mainDevice: DeviceInput;
   pendingWorkspaceInvitationId: string | null | undefined;
   pendingWorkspaceInvitationKeySubkeyId: number | null | undefined;
   pendingWorkspaceInvitationKeyCiphertext: string | null | undefined;
   pendingWorkspaceInvitationKeyPublicNonce: string | null | undefined;
+  createChainEvent: userChain.CreateChainEvent;
 };
 
 export async function finalizeRegistration({
-  username,
-  opaqueEnvelope,
+  registrationRecord,
   mainDevice,
   pendingWorkspaceInvitationId,
   pendingWorkspaceInvitationKeySubkeyId,
   pendingWorkspaceInvitationKeyCiphertext,
   pendingWorkspaceInvitationKeyPublicNonce,
+  createChainEvent,
 }: Props) {
+  const userChainState = userChain.resolveState({
+    events: [createChainEvent],
+    knownVersion: userChain.version,
+  });
+  const username = userChainState.currentState.email;
+  if (
+    mainDevice.signingPublicKey !==
+    userChainState.currentState.mainDeviceSigningPublicKey
+  ) {
+    throw new UserInputError(
+      "mainDevice and createChainEvent signing keys don't match"
+    );
+  }
+
   if (pendingWorkspaceInvitationId && !pendingWorkspaceInvitationKeySubkeyId) {
     throw new UserInputError(
       "pendingWorkspaceInvitationId without workspaceInvitationKeySubkeyId"
@@ -57,6 +73,7 @@ export async function finalizeRegistration({
       "pendingWorkspaceInvitationId without workspaceInvitationKeyPublicNonce"
     );
   }
+
   try {
     return await prisma.$transaction(async (prisma) => {
       // if this user has already completed registration, throw an error
@@ -75,7 +92,7 @@ export async function finalizeRegistration({
         data: {
           username,
           confirmationCode,
-          opaqueEnvelope,
+          registrationRecord,
           mainDeviceCiphertext: mainDevice.ciphertext,
           mainDeviceNonce: mainDevice.nonce,
           mainDeviceSigningPublicKey: mainDevice.signingPublicKey,
@@ -86,6 +103,7 @@ export async function finalizeRegistration({
           pendingWorkspaceInvitationKeySubkeyId,
           pendingWorkspaceInvitationKeyCiphertext,
           pendingWorkspaceInvitationKeyPublicNonce,
+          createChainEvent,
         },
       });
 

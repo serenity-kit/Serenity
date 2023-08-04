@@ -1,3 +1,4 @@
+import * as userChain from "@serenity-kit/user-chain";
 import {
   createAndEncryptDevice,
   encryptWorkspaceInvitationPrivateKey,
@@ -132,15 +133,24 @@ export default function RegisterForm(props: Props) {
           pendingWorkspaceInvitationKeyPublicNonce =
             encryptedWorkspaceKeyData.publicNonce;
         }
+
+        const createChainEvent = userChain.createChain({
+          authorKeyPair: {
+            privateKey: signingPrivateKey,
+            publicKey: mainDevice.signingPublicKey,
+          },
+          email: username,
+        });
+
         const finishRegistrationResult = await finishRegistrationMutation({
           input: {
-            message: registrationRecord,
-            username,
+            registrationRecord,
             mainDevice,
             pendingWorkspaceInvitationId: props.pendingWorkspaceInvitationId,
             pendingWorkspaceInvitationKeySubkeyId,
             pendingWorkspaceInvitationKeyCiphertext,
             pendingWorkspaceInvitationKeyPublicNonce,
+            serializedUserChainEvent: JSON.stringify(createChainEvent),
           },
         });
         // check for an error
