@@ -6,6 +6,7 @@ import {
   UserChainEvent,
 } from "./types";
 import { hashEvent, hashTransaction } from "./utils";
+import { version } from "./version";
 
 type Params = {
   authorKeyPair: KeyPairBase64;
@@ -26,7 +27,7 @@ export const addDevice = ({
     devicePublicKey,
     prevEventHash,
     expiresAt: expiresAt ? expiresAt.toISOString() : undefined,
-    version: 0,
+    version,
   };
   const hash = hashTransaction(transaction);
 

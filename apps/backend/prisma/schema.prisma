@@ -69,7 +69,7 @@ model Update {
 model UnverifiedUser {
   id                                       String  @id @default(uuid())
   username                                 String
-  opaqueEnvelope                           String
+  registrationRecord                       String
   confirmationCode                         String  @default(uuid())
   confirmationTryCounter                   Int     @default(0)
   // contains the device signingPrivateKey and encryptionPrivateKey
@@ -83,12 +83,13 @@ model UnverifiedUser {
   pendingWorkspaceInvitationKeySubkeyId    Int?
   pendingWorkspaceInvitationKeyCiphertext  String?
   pendingWorkspaceInvitationKeyPublicNonce String?
+  createChainEvent                         Json
 }
 
 model User {
   id                                       String                 @id @default(uuid())
   username                                 String                 @unique
-  opaqueEnvelope                           String
+  registrationRecord                       String
   // contains the device signingPrivateKey and encryptionPrivateKey
   // can be decrypted using the key storred in the OPAQUE envelope
   mainDeviceCiphertext                     String
@@ -107,6 +108,19 @@ model User {
   pendingWorkspaceInvitationKeyPublicNonce String?
   creatorDevices                           CreatorDevice[]
   documentShareLinks                       DocumentShareLink[]
+  chain                                    UserChainEvent[]
+}
+
+model UserChainEvent {
+  position  Int
+  content   Json
+  state     Json
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId    String
+  createdAt DateTime @default(now())
+
+  @@id([userId, position])
+  @@index([userId, position(sort: Asc)])
 }
 
 model Session {

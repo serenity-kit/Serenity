@@ -1,4 +1,5 @@
 import { client } from "@serenity-kit/opaque";
+import * as userChain from "@serenity-kit/user-chain";
 import {
   createAndEncryptDevice,
   encryptWorkspaceInvitationPrivateKey,
@@ -67,15 +68,23 @@ export const registerUser = async (
     pendingWorkspaceInvitationKeySubkeyId = workspaceInvitationKeyData.subkeyId;
   }
 
+  const createChainEvent = userChain.createChain({
+    authorKeyPair: {
+      privateKey: signingPrivateKey,
+      publicKey: mainDevice.signingPublicKey,
+    },
+    email: username,
+  });
+
   const registrationResponse = await graphql.client.request(query, {
     input: {
-      message: clientRegistrationFinishResult.registrationRecord,
-      username,
+      registrationRecord: clientRegistrationFinishResult.registrationRecord,
       mainDevice: mainDeviceWithoutPrivateKeys,
       pendingWorkspaceInvitationId,
       pendingWorkspaceInvitationKeyCiphertext,
       pendingWorkspaceInvitationKeyPublicNonce,
       pendingWorkspaceInvitationKeySubkeyId,
+      serializedUserChainEvent: JSON.stringify(createChainEvent),
     },
   });
 

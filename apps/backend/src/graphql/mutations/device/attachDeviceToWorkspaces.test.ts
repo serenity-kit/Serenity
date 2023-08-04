@@ -9,7 +9,7 @@ import createUserWithWorkspace from "../../../database/testHelpers/createUserWit
 import { WorkspaceKey } from "../../../types/workspace";
 
 const graphql = setupGraphql();
-const username1 = "user1";
+const username1 = "user1@example.com";
 let userAndDevice1: any;
 
 beforeAll(async () => {

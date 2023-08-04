@@ -6,6 +6,7 @@ import {
   UserChainEvent,
 } from "./types";
 import { hashEvent, hashTransaction } from "./utils";
+import { version } from "./version";
 
 type Params = {
   authorKeyPair: KeyPairBase64;
@@ -24,7 +25,7 @@ export const removeDevice = ({
     type: "remove-device",
     devicePublicKey,
     prevEventHash,
-    version: 0,
+    version,
   };
   const hash = hashTransaction(transaction);
 
