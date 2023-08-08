@@ -66,6 +66,7 @@ test("add device", async () => {
     username: userData1.user.username,
     password: "password",
     envelope: userData1.envelope,
+    mainDevice: userData1.mainDevice,
   });
   user1Device2 = loginResult.webDevice;
   const { nonce, ciphertext } = createAndEncryptWorkspaceKeyForDevice({
@@ -129,6 +130,7 @@ test("delete device", async () => {
     username: userData1.user.username,
     password: "password",
     envelope: userData1.envelope,
+    mainDevice: userData1.mainDevice,
   });
 
   const user1Device3 = loginResult.webDevice;

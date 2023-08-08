@@ -77,6 +77,7 @@ export async function createSessionAndDevice({
       event: addDeviceEvent,
       knownVersion: userChain.version,
     });
+
     await prisma.userChainEvent.create({
       data: {
         content: addDeviceEvent,

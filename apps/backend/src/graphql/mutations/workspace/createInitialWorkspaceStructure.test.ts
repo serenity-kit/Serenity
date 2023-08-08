@@ -101,8 +101,6 @@ test("create initial workspace structure", async () => {
     authorizationHeader,
   });
 
-  console.log(snapshot);
-
   const snapshotKeyTrace = deriveKeysFromKeyDerivationTrace({
     keyDerivationTrace: snapshot.keyDerivationTrace,
     activeDevice: {

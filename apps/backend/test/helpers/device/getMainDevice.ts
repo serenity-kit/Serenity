@@ -16,11 +16,8 @@ export const getMainDevice = async ({
   const query = gql`
     {
       mainDevice {
-        signingPublicKey
-        encryptionPublicKeySignature
         nonce
         ciphertext
-        info
       }
     }
   `;

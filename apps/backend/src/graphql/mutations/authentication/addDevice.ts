@@ -43,8 +43,6 @@ export const addDeviceMutation = mutationField("addDevice", {
     ),
   },
   async resolve(root, args, context) {
-    console.log("context", context);
-
     if (!context.authorizationHeader) {
       throw new ForbiddenError("Unauthorized");
     }
@@ -70,8 +68,6 @@ export const addDeviceMutation = mutationField("addDevice", {
     const loginAttempt = await getLoginAttempt({
       loginAttemptId: args.input.loginId,
     });
-
-    console.log("loginAttempt", loginAttempt);
 
     if (
       loginAttempt.sessionKey === null ||

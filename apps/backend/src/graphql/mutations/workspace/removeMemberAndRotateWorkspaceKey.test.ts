@@ -51,6 +51,7 @@ test("user cannot remove self", async () => {
     username: userData1.user.username,
     envelope: userData1.envelope,
     password: password1,
+    mainDevice: userData1.mainDevice,
   });
   const newDevice = loginResult.webDevice;
   const { ciphertext, nonce } = encryptWorkspaceKeyForDevice({
@@ -121,6 +122,7 @@ test("user cannot revoke own main device", async () => {
     username: userData1.user.username,
     envelope: userData1.envelope,
     password: password1,
+    mainDevice: userData1.mainDevice,
   });
   const newDevice = loginResult.webDevice;
   const { ciphertext, nonce } = encryptWorkspaceKeyForDevice({
@@ -469,6 +471,7 @@ test("user can rotate key for multiple devices", async () => {
     username: userData1.user.username,
     envelope: userData1.envelope,
     password: password1,
+    mainDevice: userData1.mainDevice,
   });
   const newDevice = loginResult.webDevice;
   const keyData3 = encryptWorkspaceKeyForDevice({

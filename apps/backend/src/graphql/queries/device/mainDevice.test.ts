@@ -20,6 +20,7 @@ test("user should be retrieve the mainDevice", async () => {
     graphql,
     username,
     password: "12345689",
+    mainDevice: userAndDevice.mainDevice,
   });
   const authorizationHeader = sessionKey;
   const result = await getMainDevice({

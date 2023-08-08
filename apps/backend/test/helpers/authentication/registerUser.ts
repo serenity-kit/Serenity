@@ -98,6 +98,7 @@ export const registerUser = async (
     graphql,
     username,
     password,
+    mainDevice,
   });
   return {
     userId: verifyRegistrationResponse.verifyRegistration.id,

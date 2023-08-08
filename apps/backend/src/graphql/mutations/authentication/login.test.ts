@@ -71,7 +71,14 @@ test("server should login a user", async () => {
   const query = gql`
     mutation finishLogin($input: FinishLoginInput!) {
       finishLogin(input: $input) {
-        expiresAt
+        userChain {
+          position
+          serializedContent
+        }
+        mainDevice {
+          ciphertext
+          nonce
+        }
       }
     }
   `;
@@ -80,22 +87,26 @@ test("server should login a user", async () => {
     input: {
       loginId: result.data.loginId,
       message: clientLoginFinishResult.finishLoginRequest,
-      deviceSigningPublicKey: device.signingPublicKey,
-      deviceEncryptionPublicKey: device.encryptionPublicKey,
-      deviceEncryptionPublicKeySignature: device.encryptionPublicKeySignature,
-      deviceInfo: deviceInfo,
-      sessionTokenSignature,
-      deviceType: "web",
     },
   });
-  expect(loginResponse.finishLogin.expiresAt).toBeDefined();
+  expect(loginResponse.finishLogin.userChain).toBeDefined();
+  expect(loginResponse.finishLogin.mainDevice).toBeDefined();
+  expect(loginResponse.finishLogin.mainDevice.ciphertext).toBeDefined();
+  expect(loginResponse.finishLogin.mainDevice.nonce).toBeDefined();
 });
 
 describe("Input errors", () => {
   const query = gql`
     mutation finishLogin($input: FinishLoginInput) {
       finishLogin(input: $input) {
-        expiresAt
+        userChain {
+          position
+          serializedContent
+        }
+        mainDevice {
+          ciphertext
+          nonce
+        }
       }
     }
   `;

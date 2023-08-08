@@ -65,7 +65,6 @@ export default async function createServer() {
             },
           };
         } else {
-          console.log("WOWOW", request.req.headers);
           // currently only used for addDevice mutation after loginFinish mutation
           return {
             authorizationHeader: request.req.headers.authorization,

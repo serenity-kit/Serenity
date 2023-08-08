@@ -215,6 +215,7 @@ export default async function createUserWithWorkspace({
     username,
     password: thePassword,
     envelope: clientRegistrationFinishResult.registrationRecord,
+    mainDevice,
   });
 
   const webDeviceWorkspaceKeyBox = encryptWorkspaceKeyForDevice({
