@@ -1,4 +1,4 @@
-export * from "./createAndEncryptDevice/createAndEncryptDevice";
+export * from "./createAndEncryptMainDevice/createAndEncryptMainDevice";
 export * from "./createAndEncryptWorkspaceKeyForDevice/createAndEncryptWorkspaceKeyForDevice";
 export * from "./createCommentKey/createCommentKey";
 export * from "./createDevice/createDevice";
@@ -8,9 +8,9 @@ export * from "./createSnapshotKey/createSnapshotKey";
 export * from "./debounce/debounce";
 export * from "./decryptAead/decryptAead";
 export * from "./decryptComment/decryptComment";
-export * from "./decryptDevice/decryptDevice";
 export * from "./decryptDocumentTitle/decryptDocumentTitle";
 export * from "./decryptFolderName/decryptFolderName";
+export * from "./decryptMainDevice/decryptMainDevice";
 export * from "./decryptWorkspaceInvitationKey/decryptWorkspaceInvitationKey";
 export * from "./decryptWorkspaceKey/decryptWorkspaceKey";
 export * from "./deriveKeysFromKeyDerivationTrace/deriveKeysFromKeyDerivationTrace";

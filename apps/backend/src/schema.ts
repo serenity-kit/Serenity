@@ -1,5 +1,6 @@
 import { connectionPlugin, makeSchema } from "nexus";
 import path from "path";
+import * as AddDeviceTypes from "./graphql/mutations/authentication/addDevice";
 import * as FinishLoginTypes from "./graphql/mutations/authentication/finishLogin";
 import * as FinishRegistrationTypes from "./graphql/mutations/authentication/finishRegistration";
 import * as LogoutTypes from "./graphql/mutations/authentication/logout";
@@ -63,6 +64,7 @@ import * as WorkspaceChainByInvitationIdQueryTypes from "./graphql/queries/works
 import * as DateTypes from "./graphql/types/date";
 import * as DocumentTypes from "./graphql/types/document";
 import * as DocumentShareLinkTypes from "./graphql/types/documentShareLink";
+import * as UserChainTypes from "./graphql/types/userChain";
 import * as WorkspaceTypes from "./graphql/types/workspace";
 import * as WorkspaceChainTypes from "./graphql/types/workspaceChain";
 
@@ -104,6 +106,7 @@ export const schema = makeSchema({
     VerifyRegistrationTypes,
     StartLoginTypes,
     FinishLoginTypes,
+    AddDeviceTypes,
     MeQueryTypes,
     UserIdFromUsernameQueryTypes,
     LogoutTypes,
@@ -147,6 +150,8 @@ export const schema = makeSchema({
     WorkspaceChainTypes,
     WorkspaceChainQueryTypes,
     WorkspaceChainByInvitationIdQueryTypes,
+
+    UserChainTypes,
 
     AuthorizeMemberTypes,
 

@@ -15,22 +15,18 @@ import { OnboardingScreenWrapper } from "../../../components/onboardingScreenWra
 import { useAppContext } from "../../../context/AppContext";
 import {
   runWorkspaceInvitationQuery,
-  useFinishLoginMutation,
   useStartLoginMutation,
   useVerifyRegistrationMutation,
 } from "../../../generated/graphql";
 import { RootStackScreenProps } from "../../../types/navigationProps";
-import { createDeviceWithInfo } from "../../../utils/authentication/createDeviceWithInfo";
 import {
-  fetchMainDevice,
   login,
   navigateToNextAuthenticatedPage,
 } from "../../../utils/authentication/loginHelper";
 import {
-  deleteStoredUsernamePassword,
-  getStoredPassword,
-  getStoredUsername,
-  isUsernamePasswordStored,
+  clearRegistrationInfo,
+  getRegistrationInfo,
+  isRegistrationInfoStored,
 } from "../../../utils/authentication/registrationMemoryStore";
 import { setDevice } from "../../../utils/device/deviceStore";
 import { getMainDevice } from "../../../utils/device/mainDeviceMemoryStore";
@@ -62,7 +58,6 @@ export default function RegistrationVerificationScreen(
   const [graphqlError, setGraphqlError] = useState("");
   const { updateAuthentication, updateActiveDevice } = useAppContext();
   const [, startLoginMutation] = useStartLoginMutation();
-  const [, finishLoginMutation] = useFinishLoginMutation();
 
   const navigateToLoginScreen = async () => {
     await removeLastUsedWorkspaceId();
@@ -124,56 +119,42 @@ export default function RegistrationVerificationScreen(
   };
 
   const loginWithStoredUsernamePassword = async () => {
-    const username = getStoredUsername();
-    const password = getStoredPassword();
-    deleteStoredUsernamePassword();
-    if (!username || !password) {
+    const registrationInfo = getRegistrationInfo();
+    clearRegistrationInfo();
+    if (!registrationInfo) {
       navigateToLoginScreen();
       return;
     }
     try {
       setErrorMessage("");
 
-      const unsafedDevice = createDeviceWithInfo();
-
       // FIXME: allow non-extended login by storing into sessionStorage
       // for now this is a HACK to support devices and workspaceKeyBoxes
+      // This is specific to the registration
       const useExtendedLogin = true;
 
       const loginResult = await login({
-        username,
-        password,
-        startLoginMutation,
-        finishLoginMutation,
+        username: registrationInfo.username,
+        password: registrationInfo.password,
         updateAuthentication,
-        device: unsafedDevice,
         useExtendedLogin,
-      });
-      const exportKey = loginResult.result.exportKey;
-      await fetchMainDevice({
-        exportKey,
       });
 
       if (Platform.OS === "web") {
         await removeWebDevice();
-        await setWebDevice(unsafedDevice, useExtendedLogin);
+        await setWebDevice(loginResult.device, useExtendedLogin);
         await updateActiveDevice();
       } else if (Platform.OS === "ios") {
         if (useExtendedLogin) {
-          await setDevice(unsafedDevice);
+          await setDevice(loginResult.device);
           await updateActiveDevice();
         }
       }
-      try {
-        await attachDeviceToWorkspaces({
-          activeDevice: unsafedDevice,
-        });
-      } catch (error) {
-        // TOOD: handle error
-        console.error(error);
-        return;
-      }
-      await acceptPendingWorkspaceInvitation(exportKey);
+      await attachDeviceToWorkspaces({
+        activeDevice: loginResult.device,
+      });
+
+      await acceptPendingWorkspaceInvitation(loginResult.result.exportKey);
       navigateToNextAuthenticatedPage({
         navigation: props.navigation,
         pendingWorkspaceInvitationId: null,
@@ -213,7 +194,7 @@ export default function RegistrationVerificationScreen(
       } else {
         setVerificationError("none");
       }
-      if (isUsernamePasswordStored()) {
+      if (isRegistrationInfoStored()) {
         await loginWithStoredUsernamePassword();
       } else {
         navigateToLoginScreen();

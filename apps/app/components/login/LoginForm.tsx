@@ -10,13 +10,8 @@ import { useEffect, useState } from "react";
 import { Platform, useWindowDimensions } from "react-native";
 import { z } from "zod";
 import { useAppContext } from "../../context/AppContext";
-import {
-  useFinishLoginMutation,
-  useStartLoginMutation,
-} from "../../generated/graphql";
 import { clearDeviceAndSessionStorage } from "../../utils/authentication/clearDeviceAndSessionStorage";
-import { createDeviceWithInfo } from "../../utils/authentication/createDeviceWithInfo";
-import { fetchMainDevice, login } from "../../utils/authentication/loginHelper";
+import { login } from "../../utils/authentication/loginHelper";
 import { setDevice } from "../../utils/device/deviceStore";
 import {
   removeWebDevice,
@@ -38,8 +33,6 @@ export function LoginForm(props: Props) {
   const [isLoggingIn, setIsLoggingIn] = useState(false);
   const [gqlErrorMessage, setGqlErrorMessage] = useState("");
   const { updateAuthentication, updateActiveDevice } = useAppContext();
-  const [, startLoginMutation] = useStartLoginMutation();
-  const [, finishLoginMutation] = useFinishLoginMutation();
   const clearWorkspaceKeyStore = userWorkspaceKeyStore((state) => state.clear);
 
   // we want to reset the form when the user navigates away from the screen
@@ -75,19 +68,14 @@ export function LoginForm(props: Props) {
       setGqlErrorMessage("");
       setIsLoggingIn(true);
       await clearDeviceAndSessionStorage(clearWorkspaceKeyStore);
-      const unsavedDevice = createDeviceWithInfo();
       const loginResult = await login({
         username,
         password,
-        startLoginMutation,
-        finishLoginMutation,
         updateAuthentication,
-        device: unsavedDevice,
         useExtendedLogin,
       });
-      const exportKey = loginResult.result.exportKey;
+      const unsavedDevice = loginResult.device;
       // reset the password in case the user ends up on this screen again
-      await fetchMainDevice({ exportKey });
       if (Platform.OS === "web") {
         await removeWebDevice();
         await setWebDevice(unsavedDevice, useExtendedLogin);

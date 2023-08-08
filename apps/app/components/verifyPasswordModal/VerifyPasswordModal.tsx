@@ -1,3 +1,4 @@
+import { decryptMainDevice } from "@serenity-tools/common";
 import {
   Button,
   Description,
@@ -12,8 +13,12 @@ import {
 import { useEffect, useRef, useState } from "react";
 import { TextInput } from "react-native";
 import { client } from "react-native-opaque";
-import { runMeQuery, useStartLoginMutation } from "../../generated/graphql";
-import { fetchMainDevice } from "../../utils/authentication/loginHelper";
+import {
+  runMainDeviceQuery,
+  runMeQuery,
+  useStartLoginMutation,
+} from "../../generated/graphql";
+import { setMainDevice } from "../../utils/device/mainDeviceMemoryStore";
 
 export type Props = {
   isVisible: boolean;
@@ -75,18 +80,25 @@ export function VerifyPasswordModal(props: Props) {
         // TODO: show this error to user
         throw new Error("Could not start login");
       }
-      let finishLoginResponse;
-      try {
-        finishLoginResponse = client.finishLogin({
-          password,
-          clientLoginState: clientLoginStartResult.clientLoginState,
-          loginResponse: startLoginResult.data.startLogin.challengeResponse,
-        });
-      } catch (error) {
-        throw error;
+
+      const finishLoginResponse = client.finishLogin({
+        password,
+        clientLoginState: clientLoginStartResult.clientLoginState,
+        loginResponse: startLoginResult.data.startLogin.challengeResponse,
+      });
+
+      const mainDeviceResult = await runMainDeviceQuery({});
+      if (!mainDeviceResult.data?.mainDevice) {
+        throw new Error("Failed to fetch the main device.");
       }
 
-      await fetchMainDevice({ exportKey: finishLoginResponse.exportKey });
+      const mainDevice = decryptMainDevice({
+        ciphertext: mainDeviceResult.data.mainDevice.ciphertext,
+        nonce: mainDeviceResult.data.mainDevice.nonce,
+        exportKey: finishLoginResponse.exportKey,
+      });
+
+      setMainDevice(mainDevice); // so it's locally available
 
       if (props.onSuccess) {
         props.onSuccess();

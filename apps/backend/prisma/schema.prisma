@@ -175,6 +175,7 @@ model Device {
   info                         String?
   createdAt                    DateTime        @default(now())
   session                      Session[]
+  expiresAt                    DateTime?
 }
 
 model CreatorDevice {
@@ -350,4 +351,5 @@ model LoginAttempt {
   username             String
   startLoginServerData String
   createdAt            DateTime @default(now())
+  sessionKey           String?  @unique
 }

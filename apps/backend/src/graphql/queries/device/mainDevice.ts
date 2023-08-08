@@ -7,9 +7,6 @@ export const MainDeviceResult = objectType({
   definition(t) {
     t.nonNull.string("ciphertext");
     t.nonNull.string("nonce");
-    t.nonNull.string("signingPublicKey");
-    t.nonNull.string("encryptionPublicKey");
-    t.nonNull.string("encryptionPublicKeySignature");
     t.field("createdAt", { type: nonNull("Date") });
     t.string("info");
   },

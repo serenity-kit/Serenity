@@ -1,5 +1,12 @@
 mutation finishLogin($input: FinishLoginInput!) {
   finishLogin(input: $input) {
-    expiresAt
+    userChain {
+      position
+      serializedContent
+    }
+    mainDevice {
+      ciphertext
+      nonce
+    }
   }
 }

@@ -1,6 +1,6 @@
 import { client } from "@serenity-kit/opaque";
 import * as userChain from "@serenity-kit/user-chain";
-import { createAndEncryptDevice } from "@serenity-tools/common";
+import { createAndEncryptMainDevice } from "@serenity-tools/common";
 import { gql } from "graphql-request";
 import sodium from "libsodium-wrappers";
 
@@ -34,7 +34,7 @@ export const finalizeRegistration = async ({
 
   const exportKey = clientRegistrationFinishResult.exportKey;
   const { signingPrivateKey, encryptionPrivateKey, ...mainDevice } =
-    createAndEncryptDevice(sodium.to_base64(exportKey));
+    createAndEncryptMainDevice(sodium.to_base64(exportKey));
 
   const createChainEvent = userChain.createChain({
     authorKeyPair: {

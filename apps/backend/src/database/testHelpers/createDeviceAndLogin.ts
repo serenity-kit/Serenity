@@ -1,7 +1,7 @@
 import { client, server } from "@serenity-kit/opaque";
 import { createDevice } from "@serenity-tools/common";
 import { addDays } from "../../utils/addDays/addDays";
-import { createSession } from "../authentication/createSession";
+import { createSessionAndDevice } from "../authentication/createSessionAndDevice";
 
 type Params = {
   username: string;
@@ -37,7 +37,7 @@ export const createDeviceAndLogin = async ({
 
   const webDevice = createDevice();
 
-  const session = await createSession({
+  const session = await createSessionAndDevice({
     username,
     sessionKey: loginStartResponse.sessionKey,
     expiresAt: addDays(new Date(), 30),

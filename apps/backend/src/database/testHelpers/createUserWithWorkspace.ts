@@ -2,7 +2,7 @@ import { client, server } from "@serenity-kit/opaque";
 import * as userChain from "@serenity-kit/user-chain";
 import * as workspaceChain from "@serenity-kit/workspace-chain";
 import {
-  createAndEncryptDevice,
+  createAndEncryptMainDevice,
   createAndEncryptWorkspaceKeyForDevice,
   createDocumentTitleKey,
   createIntroductionDocumentSnapshot,
@@ -54,7 +54,7 @@ export default async function createUserWithWorkspace({
   });
   const exportKey = clientRegistrationFinishResult.exportKey;
 
-  const mainDevice = createAndEncryptDevice(exportKey);
+  const mainDevice = createAndEncryptMainDevice(exportKey);
 
   const result = await prisma.$transaction(async (prisma) => {
     const device = await prisma.device.create({
@@ -92,7 +92,7 @@ export default async function createUserWithWorkspace({
         chain: {
           create: {
             content: createChainEvent,
-            state: userChainState,
+            state: userChainState.currentState,
             position: 0,
           },
         },

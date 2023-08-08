@@ -32,6 +32,22 @@ export type ActiveWorkspaceKeysResult = {
   activeWorkspaceKeys: Array<WorkspaceKey>;
 };
 
+export type AddDeviceInput = {
+  deviceEncryptionPublicKey: Scalars['String'];
+  deviceEncryptionPublicKeySignature: Scalars['String'];
+  deviceInfo: Scalars['String'];
+  deviceSigningPublicKey: Scalars['String'];
+  deviceType: Scalars['String'];
+  loginId: Scalars['String'];
+  serializedUserChainEvent: Scalars['String'];
+  sessionTokenSignature: Scalars['String'];
+};
+
+export type AddDeviceResult = {
+  __typename?: 'AddDeviceResult';
+  expiresAt: Scalars['Date'];
+};
+
 export type AddMemberWorkspaceKeyInput = {
   workspaceKeyBoxes: Array<WorkspaceDeviceInput>;
   workspaceKeyId: Scalars['String'];
@@ -457,19 +473,20 @@ export type File = {
 };
 
 export type FinishLoginInput = {
-  deviceEncryptionPublicKey: Scalars['String'];
-  deviceEncryptionPublicKeySignature: Scalars['String'];
-  deviceInfo: Scalars['String'];
-  deviceSigningPublicKey: Scalars['String'];
-  deviceType: Scalars['String'];
   loginId: Scalars['String'];
   message: Scalars['String'];
-  sessionTokenSignature: Scalars['String'];
+};
+
+export type FinishLoginMainDevice = {
+  __typename?: 'FinishLoginMainDevice';
+  ciphertext: Scalars['String'];
+  nonce: Scalars['String'];
 };
 
 export type FinishLoginResult = {
   __typename?: 'FinishLoginResult';
-  expiresAt: Scalars['Date'];
+  mainDevice: FinishLoginMainDevice;
+  userChain: Array<UserChainEvent>;
 };
 
 export type FinishRegistrationDeviceInput = {
@@ -583,11 +600,8 @@ export type MainDeviceResult = {
   __typename?: 'MainDeviceResult';
   ciphertext: Scalars['String'];
   createdAt: Scalars['Date'];
-  encryptionPublicKey: Scalars['String'];
-  encryptionPublicKeySignature: Scalars['String'];
   info?: Maybe<Scalars['String']>;
   nonce: Scalars['String'];
-  signingPublicKey: Scalars['String'];
 };
 
 export type MeResult = {
@@ -616,6 +630,7 @@ export type MinimalDevice = {
 export type Mutation = {
   __typename?: 'Mutation';
   acceptWorkspaceInvitation?: Maybe<AcceptWorkspaceInvitationResult>;
+  addDevice?: Maybe<AddDeviceResult>;
   attachDeviceToWorkspaces?: Maybe<AttachDeviceToWorkspacesResult>;
   authorizeMember?: Maybe<AuthorizeMemberResult>;
   createComment?: Maybe<CreateCommentResult>;
@@ -651,6 +666,11 @@ export type Mutation = {
 
 export type MutationAcceptWorkspaceInvitationArgs = {
   input: AcceptWorkspaceInvitationInput;
+};
+
+
+export type MutationAddDeviceArgs = {
+  input: AddDeviceInput;
 };
 
 
@@ -1174,6 +1194,12 @@ export type UpdateWorkspaceNameResult = {
   workspace?: Maybe<Workspace>;
 };
 
+export type UserChainEvent = {
+  __typename?: 'UserChainEvent';
+  position: Scalars['Int'];
+  serializedContent: Scalars['String'];
+};
+
 export type UserIdFromUsernameResult = {
   __typename?: 'UserIdFromUsernameResult';
   id: Scalars['String'];
@@ -1370,6 +1396,13 @@ export type AcceptWorkspaceInvitationMutationVariables = Exact<{
 
 export type AcceptWorkspaceInvitationMutation = { __typename?: 'Mutation', acceptWorkspaceInvitation?: { __typename?: 'AcceptWorkspaceInvitationResult', workspaceId: string } | null };
 
+export type AddDeviceMutationVariables = Exact<{
+  input: AddDeviceInput;
+}>;
+
+
+export type AddDeviceMutation = { __typename?: 'Mutation', addDevice?: { __typename?: 'AddDeviceResult', expiresAt: any } | null };
+
 export type AttachDeviceToWorkspacesMutationVariables = Exact<{
   input: AttachDeviceToWorkspacesInput;
 }>;
@@ -1487,7 +1520,7 @@ export type FinishLoginMutationVariables = Exact<{
 }>;
 
 
-export type FinishLoginMutation = { __typename?: 'Mutation', finishLogin?: { __typename?: 'FinishLoginResult', expiresAt: any } | null };
+export type FinishLoginMutation = { __typename?: 'Mutation', finishLogin?: { __typename?: 'FinishLoginResult', userChain: Array<{ __typename?: 'UserChainEvent', position: number, serializedContent: string }>, mainDevice: { __typename?: 'FinishLoginMainDevice', ciphertext: string, nonce: string } } | null };
 
 export type FinishRegistrationMutationVariables = Exact<{
   input: FinishRegistrationInput;
@@ -1677,7 +1710,7 @@ export type FoldersQuery = { __typename?: 'Query', folders?: { __typename?: 'Fol
 export type MainDeviceQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type MainDeviceQuery = { __typename?: 'Query', mainDevice?: { __typename?: 'MainDeviceResult', signingPublicKey: string, nonce: string, ciphertext: string, encryptionPublicKey: string, encryptionPublicKeySignature: string, createdAt: any } | null };
+export type MainDeviceQuery = { __typename?: 'Query', mainDevice?: { __typename?: 'MainDeviceResult', nonce: string, ciphertext: string } | null };
 
 export type MeQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -1788,6 +1821,17 @@ export const AcceptWorkspaceInvitationDocument = gql`
 
 export function useAcceptWorkspaceInvitationMutation() {
   return Urql.useMutation<AcceptWorkspaceInvitationMutation, AcceptWorkspaceInvitationMutationVariables>(AcceptWorkspaceInvitationDocument);
+};
+export const AddDeviceDocument = gql`
+    mutation addDevice($input: AddDeviceInput!) {
+  addDevice(input: $input) {
+    expiresAt
+  }
+}
+    `;
+
+export function useAddDeviceMutation() {
+  return Urql.useMutation<AddDeviceMutation, AddDeviceMutationVariables>(AddDeviceDocument);
 };
 export const AttachDeviceToWorkspacesDocument = gql`
     mutation attachDeviceToWorkspaces($input: AttachDeviceToWorkspacesInput!) {
@@ -2060,7 +2104,14 @@ export function useDeleteWorkspacesMutation() {
 export const FinishLoginDocument = gql`
     mutation finishLogin($input: FinishLoginInput!) {
   finishLogin(input: $input) {
-    expiresAt
+    userChain {
+      position
+      serializedContent
+    }
+    mainDevice {
+      ciphertext
+      nonce
+    }
   }
 }
     `;
@@ -2557,12 +2608,8 @@ export function useFoldersQuery(options: Omit<Urql.UseQueryArgs<FoldersQueryVari
 export const MainDeviceDocument = gql`
     query mainDevice {
   mainDevice {
-    signingPublicKey
     nonce
     ciphertext
-    encryptionPublicKey
-    encryptionPublicKeySignature
-    createdAt
   }
 }
     `;
@@ -2910,6 +2957,20 @@ export const runAcceptWorkspaceInvitationMutation = async (variables: AcceptWork
   return await getUrqlClient()
     .mutation<AcceptWorkspaceInvitationMutation, AcceptWorkspaceInvitationMutationVariables>(
       AcceptWorkspaceInvitationDocument,
+      variables,
+      {
+        // better to be safe here and always refetch
+        requestPolicy: "network-only",
+        ...options
+      }
+    )
+    .toPromise();
+};
+
+export const runAddDeviceMutation = async (variables: AddDeviceMutationVariables, options?: any) => {
+  return await getUrqlClient()
+    .mutation<AddDeviceMutation, AddDeviceMutationVariables>(
+      AddDeviceDocument,
       variables,
       {
         // better to be safe here and always refetch

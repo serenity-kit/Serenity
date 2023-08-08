@@ -82,7 +82,7 @@ const createDevicesAndUser = async (
       chain: {
         create: {
           content: createChainEvent,
-          state: userChainState,
+          state: userChainState.currentState,
           position: 0,
         },
       },
