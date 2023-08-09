@@ -33,6 +33,7 @@ const setup = async () => {
     username: userData1.user.username,
     password: "password",
     envelope: userData1.envelope,
+    mainDevice: userData1.mainDevice,
   });
   user1Device2 = loginResult.webDevice;
   workspaceKey = getWorkspaceKeyForWorkspaceAndDevice({

@@ -1,10 +1,10 @@
 import { prisma } from "../prisma";
 
-export async function getUserByUsername(username: string) {
-  const user = await prisma.user.findUnique({
-    where: {
-      username,
-    },
-  });
+type Params = {
+  username: string;
+};
+
+export async function getUserByUsername({ username }: Params) {
+  const user = await prisma.user.findUniqueOrThrow({ where: { username } });
   return user;
 }

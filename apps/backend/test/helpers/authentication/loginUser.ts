@@ -1,16 +1,24 @@
 import { client } from "@serenity-kit/opaque";
-import { createDevice } from "@serenity-tools/common";
+import * as userChain from "@serenity-kit/user-chain";
+import { LocalDevice, createDevice } from "@serenity-tools/common";
 import { gql } from "graphql-request";
 import sodium from "react-native-libsodium";
+import { addHours } from "../../../src/utils/addHours/addHours";
 import { requestLoginChallengeResponse } from "./requestLoginChallengeResponse";
 
 type Params = {
   graphql: any;
   username: string;
   password: string;
+  mainDevice: LocalDevice;
 };
 
-export const loginUser = async ({ graphql, username, password }: Params) => {
+export const loginUser = async ({
+  graphql,
+  username,
+  password,
+  mainDevice,
+}: Params) => {
   const startLoginResult = await requestLoginChallengeResponse({
     graphql,
     username,
@@ -29,12 +37,26 @@ export const loginUser = async ({ graphql, username, password }: Params) => {
   const finishLoginQuery = gql`
     mutation finishLogin($input: FinishLoginInput!) {
       finishLogin(input: $input) {
-        expiresAt
+        userChain {
+          position
+          serializedContent
+        }
+        mainDevice {
+          ciphertext
+          nonce
+        }
       }
     }
   `;
 
   const sessionKey = clientLoginFinishResult.sessionKey;
+
+  const finishLoginResult = await graphql.client.request(finishLoginQuery, {
+    input: {
+      loginId: startLoginResult.data.loginId,
+      message: clientLoginFinishResult.finishLoginRequest,
+    },
+  });
 
   const device = createDevice();
   const deviceInfoJson = {
@@ -51,16 +73,42 @@ export const loginUser = async ({ graphql, username, password }: Params) => {
     sodium.from_base64(device.signingPrivateKey)
   );
 
-  await graphql.client.request(finishLoginQuery, {
+  const expiresAt = addHours(new Date(), 1);
+  const lastUserChainEvent = JSON.parse(
+    finishLoginResult.finishLogin.userChain[
+      finishLoginResult.finishLogin.userChain.length - 1
+    ].serializedContent
+  );
+
+  const addDeviceEvent = userChain.addDevice({
+    authorKeyPair: {
+      privateKey: mainDevice.signingPrivateKey,
+      publicKey: mainDevice.signingPublicKey,
+    },
+    devicePublicKey: device.signingPublicKey,
+    prevEvent: lastUserChainEvent,
+    expiresAt,
+  });
+
+  const addDeviceQuery = gql`
+    mutation addDevice($input: AddDeviceInput!) {
+      addDevice(input: $input) {
+        expiresAt
+      }
+    }
+  `;
+
+  graphql.client.setHeader("authorization", sessionKey);
+  await graphql.client.request(addDeviceQuery, {
     input: {
       loginId: startLoginResult.data.loginId,
-      message: clientLoginFinishResult.finishLoginRequest,
       deviceSigningPublicKey: device.signingPublicKey,
       deviceEncryptionPublicKey: device.encryptionPublicKey,
       deviceEncryptionPublicKeySignature: device.encryptionPublicKeySignature,
-      deviceInfo: deviceInfo,
+      deviceInfo,
       sessionTokenSignature: sodium.to_base64(sessionTokenSignature),
       deviceType: "web",
+      serializedUserChainEvent: JSON.stringify(addDeviceEvent),
     },
   });
 

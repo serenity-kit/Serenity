@@ -91,6 +91,7 @@ const setup = async () => {
     username: userAndWorkspaceData.user.username,
     password: "12345689",
     envelope: userAndWorkspaceData.envelope,
+    mainDevice: userAndWorkspaceData.mainDevice,
   });
   webDevice2 = loginResult.webDevice;
 };

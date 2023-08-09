@@ -1,17 +1,20 @@
-import { LocalDevice, decryptDevice } from "@serenity-tools/common";
+import * as userChain from "@serenity-kit/user-chain";
+import { decryptMainDevice } from "@serenity-tools/common";
+import { addDays, addHours } from "date-fns";
 import { Platform } from "react-native";
 import sodium from "react-native-libsodium";
 import { client } from "react-native-opaque";
 import { UpdateAuthenticationFunction } from "../../context/AppContext";
 import {
-  MainDeviceDocument,
-  MainDeviceQuery,
+  runAddDeviceMutation,
+  runFinishLoginMutation,
   runLogoutMutation,
   runMeQuery,
+  runStartLoginMutation,
 } from "../../generated/graphql";
 import { setMainDevice } from "../device/mainDeviceMemoryStore";
 import { removeLastUsedDocumentIdAndWorkspaceId } from "../lastUsedWorkspaceAndDocumentStore/lastUsedWorkspaceAndDocumentStore";
-import { getUrqlClient } from "../urqlClient/urqlClient";
+import { createDeviceWithInfo } from "./createDeviceWithInfo";
 import {
   isUserIdSameAsLastLogin,
   removeLastLogin,
@@ -31,7 +34,7 @@ const removeLastUsedWorkspaceIdIfLoginChanged = async (userId?: string) => {
   }
 };
 
-const getDeviceType = (useExtendedLogin: boolean) => {
+export const getDeviceType = (useExtendedLogin: boolean) => {
   if (Platform.OS === "ios" || Platform.OS === "android") {
     return "mobile";
   }
@@ -44,19 +47,13 @@ const getDeviceType = (useExtendedLogin: boolean) => {
 export type LoginParams = {
   username: string;
   password: string;
-  startLoginMutation: any;
-  finishLoginMutation: any;
   updateAuthentication: UpdateAuthenticationFunction;
-  device: LocalDevice;
   useExtendedLogin: boolean;
 };
 export const login = async ({
   username,
   password,
-  startLoginMutation,
-  finishLoginMutation,
   updateAuthentication,
-  device,
   useExtendedLogin,
 }: LoginParams) => {
   const logoutResult = await runLogoutMutation({}, {});
@@ -67,7 +64,7 @@ export const login = async ({
   }
   await updateAuthentication(null);
   const clientLoginResult = client.startLogin({ password });
-  const startLoginResult = await startLoginMutation({
+  const startLoginResult = await runStartLoginMutation({
     input: {
       username: username,
       challenge: clientLoginResult.startLoginRequest,
@@ -87,6 +84,60 @@ export const login = async ({
     throw new Error("Failed to finish login");
   }
 
+  const finishLoginResult = await runFinishLoginMutation({
+    input: {
+      loginId: startLoginResult.data.startLogin.loginId,
+      message: result.finishLoginRequest,
+    },
+  });
+  if (!finishLoginResult.data?.finishLogin) {
+    throw new Error("Failed to finish login");
+  }
+
+  const mainDevice = decryptMainDevice({
+    ciphertext: finishLoginResult.data.finishLogin.mainDevice.ciphertext,
+    nonce: finishLoginResult.data.finishLogin.mainDevice.nonce,
+    exportKey: result.exportKey,
+  });
+
+  const userChainEvents = finishLoginResult.data.finishLogin.userChain.map(
+    (userChainEvent) => JSON.parse(userChainEvent.serializedContent)
+  );
+  const userChainState = userChain.resolveState({
+    events: userChainEvents,
+    knownVersion: userChain.version,
+  });
+  if (
+    mainDevice.signingPublicKey !==
+    userChainState.currentState.mainDeviceSigningPublicKey
+  ) {
+    throw new Error("Invalid user chain");
+  }
+  const lastUserChainEvent = userChainEvents[userChainEvents.length - 1];
+
+  const device = createDeviceWithInfo();
+  if (!device.info) {
+    throw new Error("Device Info is missing");
+  }
+
+  let expiresAt: Date | undefined;
+  const deviceType = getDeviceType(useExtendedLogin);
+  if (deviceType === "web") {
+    expiresAt = addDays(new Date(), 30);
+  } else if (deviceType === "temporary-web") {
+    expiresAt = addHours(new Date(), 24);
+  }
+
+  const addDeviceEvent = userChain.addDevice({
+    authorKeyPair: {
+      privateKey: mainDevice.signingPrivateKey,
+      publicKey: mainDevice.signingPublicKey,
+    },
+    devicePublicKey: device.signingPublicKey,
+    prevEvent: lastUserChainEvent,
+    expiresAt,
+  });
+
   const sessionTokenSignature = sodium.to_base64(
     sodium.crypto_sign_detached(
       result.sessionKey,
@@ -94,24 +145,30 @@ export const login = async ({
     )
   );
 
-  const finishLoginResult = await finishLoginMutation({
-    input: {
-      loginId: startLoginResult.data.startLogin.loginId,
-      message: result.finishLoginRequest,
-      deviceSigningPublicKey: device.signingPublicKey,
-      deviceEncryptionPublicKey: device.encryptionPublicKey,
-      deviceEncryptionPublicKeySignature: device.encryptionPublicKeySignature,
-      deviceInfo: device.info,
-      sessionTokenSignature,
-      deviceType: getDeviceType(useExtendedLogin),
+  const addDeviceResult = await runAddDeviceMutation(
+    {
+      input: {
+        loginId: startLoginResult.data.startLogin.loginId,
+        deviceSigningPublicKey: device.signingPublicKey,
+        deviceEncryptionPublicKey: device.encryptionPublicKey,
+        deviceEncryptionPublicKeySignature: device.encryptionPublicKeySignature,
+        deviceInfo: device.info,
+        sessionTokenSignature,
+        deviceType: getDeviceType(useExtendedLogin),
+        serializedUserChainEvent: JSON.stringify(addDeviceEvent),
+      },
     },
-  });
-  if (!finishLoginResult.data?.finishLogin) {
-    throw new Error("Failed to finish login");
+    {
+      fetchOptions: { headers: { Authorization: result.sessionKey } },
+    }
+  );
+  if (!addDeviceResult.data?.addDevice) {
+    throw new Error("Failed to add device during login process");
   }
+
   const authenticatedUrqlClient = await updateAuthentication({
     sessionKey: result.sessionKey,
-    expiresAt: finishLoginResult.data.finishLogin.expiresAt,
+    expiresAt: addDeviceResult.data?.addDevice.expiresAt,
   });
   const meResult = await runMeQuery({});
   if (meResult.error) {
@@ -125,38 +182,10 @@ export const login = async ({
   const userId = meResult.data.me.username;
   // if the user has changed, remove the previous lastusedworkspaceId and lastUsedDocumentId
   await removeLastUsedWorkspaceIdIfLoginChanged(userId);
-  return { result, urqlClient: authenticatedUrqlClient };
-};
 
-export type FetchMainDeviceParams = {
-  exportKey: string;
-};
-export const fetchMainDevice = async ({ exportKey }: FetchMainDeviceParams) => {
-  const mainDeviceResult = await getUrqlClient()
-    .query<MainDeviceQuery>(MainDeviceDocument, undefined, {
-      // better to be safe here and always refetch
-      requestPolicy: "network-only",
-    })
-    .toPromise();
-  if (mainDeviceResult.error) {
-    throw new Error(mainDeviceResult.error.message);
-  }
-  if (!mainDeviceResult.data?.mainDevice) {
-    throw new Error("Failed to fetch main device.");
-  }
-  const mainDevice = mainDeviceResult.data.mainDevice;
-  const privateKeys = decryptDevice({
-    ciphertext: mainDevice.ciphertext,
-    nonce: mainDevice.nonce,
-    exportKey,
-  });
-  setMainDevice({
-    encryptionPrivateKey: privateKeys.encryptionPrivateKey,
-    signingPrivateKey: privateKeys.signingPrivateKey,
-    signingPublicKey: mainDevice.signingPublicKey,
-    encryptionPublicKey: mainDevice.encryptionPublicKey,
-    encryptionPublicKeySignature: mainDevice.encryptionPublicKeySignature,
-  });
+  setMainDevice(mainDevice); // so it's locally available
+
+  return { result, urqlClient: authenticatedUrqlClient, mainDevice, device };
 };
 
 /**

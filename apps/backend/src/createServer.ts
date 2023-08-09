@@ -64,6 +64,11 @@ export default async function createServer() {
               }
             },
           };
+        } else {
+          // currently only used for addDevice mutation after loginFinish mutation
+          return {
+            authorizationHeader: request.req.headers.authorization,
+          };
         }
       }
       return {};

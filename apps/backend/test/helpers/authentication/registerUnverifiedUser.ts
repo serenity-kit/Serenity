@@ -1,7 +1,7 @@
 import { client } from "@serenity-kit/opaque";
 import * as userChain from "@serenity-kit/user-chain";
 import {
-  createAndEncryptDevice,
+  createAndEncryptMainDevice,
   encryptWorkspaceInvitationPrivateKey,
 } from "@serenity-tools/common";
 import { gql } from "graphql-request";
@@ -42,7 +42,7 @@ export const registerUnverifiedUser = async ({
   `;
   const exportKey = clientRegistrationFinishResult.exportKey;
   const { signingPrivateKey, encryptionPrivateKey, ...mainDevice } =
-    createAndEncryptDevice(exportKey);
+    createAndEncryptMainDevice(exportKey);
 
   let pendingWorkspaceInvitationKeyCiphertext: string | null = null;
   let pendingWorkspaceInvitationKeyPublicNonce: string | null = null;

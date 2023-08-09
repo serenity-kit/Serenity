@@ -23,12 +23,14 @@ const setup = async () => {
     username: userData1.user.username,
     password: "password",
     envelope: userData1.envelope,
+    mainDevice: userData1.mainDevice,
   });
   user1Device2 = loginResult1.webDevice;
   loginResult2 = await createDeviceAndLogin({
     username: userData1.user.username,
     password: "password",
     envelope: userData1.envelope,
+    mainDevice: userData1.mainDevice,
   });
   user1Device3 = loginResult2.webDevice;
 };

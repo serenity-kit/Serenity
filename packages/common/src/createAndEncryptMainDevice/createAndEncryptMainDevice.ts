@@ -2,9 +2,7 @@ import sodium from "react-native-libsodium";
 import { createDevice } from "../createDevice/createDevice";
 import { kdfDeriveFromKey } from "../kdfDeriveFromKey/kdfDeriveFromKey";
 
-// TODO rename to createAndEncryptMainDevice (since the context is m_device)
-// TODO should we just derive from the export_key here?
-export const createAndEncryptDevice = (exportKey: string) => {
+export const createAndEncryptMainDevice = (exportKey: string) => {
   const { key: encryptionKey } = kdfDeriveFromKey({
     key: sodium.to_base64(
       sodium.from_base64(exportKey).subarray(0, sodium.crypto_kdf_KEYBYTES)
@@ -20,9 +18,14 @@ export const createAndEncryptDevice = (exportKey: string) => {
     encryptionPublicKeySignature,
   } = createDevice();
   const nonce = sodium.randombytes_buf(sodium.crypto_secretbox_NONCEBYTES);
+  const createdAt = new Date().toISOString();
   const privateKeyPairString = JSON.stringify({
+    signingPublicKey,
     signingPrivateKey,
+    encryptionPublicKey,
     encryptionPrivateKey,
+    encryptionPublicKeySignature,
+    createdAt,
   });
   const ciphertext = sodium.crypto_secretbox_easy(
     privateKeyPairString,

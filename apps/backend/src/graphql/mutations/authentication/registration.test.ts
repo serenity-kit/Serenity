@@ -1,7 +1,7 @@
 import { client } from "@serenity-kit/opaque";
 import * as userChain from "@serenity-kit/user-chain";
 import {
-  createAndEncryptDevice,
+  createAndEncryptMainDevice,
   encryptWorkspaceInvitationPrivateKey,
   generateId,
 } from "@serenity-tools/common";
@@ -49,7 +49,7 @@ test("server should register a user", async () => {
 
   const exportKey = clientRegistrationFinishResult.exportKey;
   const { signingPrivateKey, encryptionPrivateKey, ...mainDevice } =
-    createAndEncryptDevice(sodium.to_base64(exportKey));
+    createAndEncryptMainDevice(sodium.to_base64(exportKey));
 
   const createChainEvent = userChain.createChain({
     authorKeyPair: {
@@ -95,7 +95,7 @@ test("server should register a user with a pending workspace id", async () => {
 
   const exportKey = clientRegistrationFinishResult.exportKey;
   const { signingPrivateKey, encryptionPrivateKey, ...mainDevice } =
-    createAndEncryptDevice(exportKey);
+    createAndEncryptMainDevice(exportKey);
   const workspaceInvitationKeyData = encryptWorkspaceInvitationPrivateKey({
     exportKey,
     workspaceInvitationSigningPrivateKey: sodium.to_base64(
@@ -171,7 +171,7 @@ describe("Input errors", () => {
     });
     const exportKey = clientRegistrationFinishResult.exportKey;
     const { signingPrivateKey, encryptionPrivateKey, ...mainDevice } =
-      createAndEncryptDevice(sodium.to_base64(exportKey));
+      createAndEncryptMainDevice(sodium.to_base64(exportKey));
 
     const createChainEvent = userChain.createChain({
       authorKeyPair: {
@@ -211,7 +211,7 @@ describe("Input errors", () => {
     });
     const exportKey = clientRegistrationFinishResult.exportKey;
     const { signingPrivateKey, encryptionPrivateKey, ...mainDevice } =
-      createAndEncryptDevice(sodium.to_base64(exportKey));
+      createAndEncryptMainDevice(sodium.to_base64(exportKey));
 
     const createChainEvent = userChain.createChain({
       authorKeyPair: {
@@ -248,7 +248,7 @@ describe("Input errors", () => {
     });
     const exportKey = clientRegistrationFinishResult.exportKey;
     const { signingPrivateKey, encryptionPrivateKey, ...mainDevice } =
-      createAndEncryptDevice(sodium.to_base64(exportKey));
+      createAndEncryptMainDevice(sodium.to_base64(exportKey));
 
     const createChainEvent = userChain.createChain({
       authorKeyPair: {
@@ -290,7 +290,7 @@ describe("Input errors", () => {
       encryptionPrivateKey,
       ciphertext,
       ...mainDevice
-    } = createAndEncryptDevice(sodium.to_base64(exportKey));
+    } = createAndEncryptMainDevice(sodium.to_base64(exportKey));
 
     const createChainEvent = userChain.createChain({
       authorKeyPair: {
@@ -328,7 +328,7 @@ describe("Input errors", () => {
     });
     const exportKey = clientRegistrationFinishResult.exportKey;
     const { signingPrivateKey, encryptionPrivateKey, nonce, ...mainDevice } =
-      createAndEncryptDevice(sodium.to_base64(exportKey));
+      createAndEncryptMainDevice(sodium.to_base64(exportKey));
 
     const createChainEvent = userChain.createChain({
       authorKeyPair: {
@@ -370,7 +370,7 @@ describe("Input errors", () => {
       encryptionPrivateKey,
       signingPublicKey,
       ...mainDevice
-    } = createAndEncryptDevice(sodium.to_base64(exportKey));
+    } = createAndEncryptMainDevice(sodium.to_base64(exportKey));
 
     const createChainEvent = userChain.createChain({
       authorKeyPair: {
@@ -412,7 +412,7 @@ describe("Input errors", () => {
       encryptionPrivateKey,
       encryptionPublicKey,
       ...mainDevice
-    } = createAndEncryptDevice(sodium.to_base64(exportKey));
+    } = createAndEncryptMainDevice(sodium.to_base64(exportKey));
 
     const createChainEvent = userChain.createChain({
       authorKeyPair: {
@@ -454,7 +454,7 @@ describe("Input errors", () => {
       encryptionPrivateKey,
       encryptionPublicKeySignature,
       ...mainDevice
-    } = createAndEncryptDevice(sodium.to_base64(exportKey));
+    } = createAndEncryptMainDevice(sodium.to_base64(exportKey));
 
     const createChainEvent = userChain.createChain({
       authorKeyPair: {

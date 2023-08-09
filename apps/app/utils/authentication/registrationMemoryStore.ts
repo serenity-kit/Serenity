@@ -1,24 +1,25 @@
-let storedUsername: string | null = null;
-let storedPassword: string | null = null;
+import * as userChain from "@serenity-kit/user-chain";
 
-export const storeUsernamePassword = (username: string, password: string) => {
-  storedUsername = username;
-  storedPassword = password;
+type RegistrationInfo = {
+  username: string;
+  password: string;
+  createChainEvent: userChain.CreateChainEvent;
 };
 
-export const isUsernamePasswordStored = (): boolean => {
-  return storedUsername !== null || storedPassword !== null;
+let storedRegistrationInfo: RegistrationInfo | null = null;
+
+export const setRegistrationInfo = (registrationInfo: RegistrationInfo) => {
+  storedRegistrationInfo = registrationInfo;
 };
 
-export const getStoredUsername = (): string | null => {
-  return storedUsername;
+export const isRegistrationInfoStored = (): boolean => {
+  return storedRegistrationInfo !== null;
 };
 
-export const getStoredPassword = (): string | null => {
-  return storedPassword;
+export const getRegistrationInfo = (): RegistrationInfo | null => {
+  return storedRegistrationInfo;
 };
 
-export const deleteStoredUsernamePassword = async () => {
-  storedUsername = null;
-  storedPassword = null;
+export const clearRegistrationInfo = async () => {
+  storedRegistrationInfo = null;
 };

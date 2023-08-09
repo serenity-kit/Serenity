@@ -1,7 +1,7 @@
 import { client } from "@serenity-kit/opaque";
 import * as userChain from "@serenity-kit/user-chain";
 import {
-  createAndEncryptDevice,
+  createAndEncryptMainDevice,
   encryptWorkspaceInvitationPrivateKey,
 } from "@serenity-tools/common";
 import { gql } from "graphql-request";
@@ -43,7 +43,7 @@ export const registerUser = async (
 
   const exportKey = clientRegistrationFinishResult.exportKey;
 
-  const mainDevice = createAndEncryptDevice(exportKey);
+  const mainDevice = createAndEncryptMainDevice(exportKey);
   const {
     encryptionPrivateKey,
     signingPrivateKey,
@@ -98,6 +98,7 @@ export const registerUser = async (
     graphql,
     username,
     password,
+    mainDevice,
   });
   return {
     userId: verifyRegistrationResponse.verifyRegistration.id,

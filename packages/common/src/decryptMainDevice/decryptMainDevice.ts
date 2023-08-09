@@ -1,16 +1,12 @@
 import sodium from "react-native-libsodium";
 import { kdfDeriveFromKey } from "../kdfDeriveFromKey/kdfDeriveFromKey";
+import { LocalDevice } from "../types";
 
-type PrivateKeys = {
-  encryptionPrivateKey: string;
-  signingPrivateKey: string;
-};
-
-export const decryptDevice = ({
+export const decryptMainDevice = ({
   ciphertext,
   nonce,
   exportKey,
-}): PrivateKeys => {
+}): LocalDevice => {
   const { key: encryptionKey } = kdfDeriveFromKey({
     key: sodium.to_base64(
       sodium.from_base64(exportKey).subarray(0, sodium.crypto_kdf_KEYBYTES)
@@ -23,10 +19,14 @@ export const decryptDevice = ({
     sodium.from_base64(nonce),
     sodium.from_base64(encryptionKey)
   );
-  const privateKeyPairString = sodium.to_string(decryptedCiphertextBase64);
-  const privateKeyPairs = JSON.parse(privateKeyPairString);
+  const deviceString = sodium.to_string(decryptedCiphertextBase64);
+  const device = JSON.parse(deviceString);
   return {
-    encryptionPrivateKey: privateKeyPairs.encryptionPrivateKey,
-    signingPrivateKey: privateKeyPairs.signingPrivateKey,
+    signingPrivateKey: device.signingPrivateKey,
+    signingPublicKey: device.signingPublicKey,
+    encryptionPrivateKey: device.encryptionPrivateKey,
+    encryptionPublicKey: device.encryptionPublicKey,
+    encryptionPublicKeySignature: device.encryptionPublicKeySignature,
+    createdAt: device.createdAt,
   };
 };

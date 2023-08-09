@@ -1,6 +1,6 @@
 import * as userChain from "@serenity-kit/user-chain";
 import {
-  createAndEncryptDevice,
+  createAndEncryptMainDevice,
   encryptWorkspaceInvitationPrivateKey,
 } from "@serenity-tools/common";
 import {
@@ -21,7 +21,7 @@ import {
   useFinishRegistrationMutation,
   useStartRegistrationMutation,
 } from "../../generated/graphql";
-import { storeUsernamePassword } from "../../utils/authentication/registrationMemoryStore";
+import { setRegistrationInfo } from "../../utils/authentication/registrationMemoryStore";
 import { setMainDevice } from "../../utils/device/mainDeviceMemoryStore";
 
 type Props = {
@@ -105,7 +105,7 @@ export default function RegisterForm(props: Props) {
             startRegistrationResult.data.startRegistration.challengeResponse,
         });
         const { encryptionPrivateKey, signingPrivateKey, ...mainDevice } =
-          createAndEncryptDevice(exportKey);
+          createAndEncryptMainDevice(exportKey);
 
         setMainDevice({
           encryptionPrivateKey: encryptionPrivateKey,
@@ -161,7 +161,12 @@ export default function RegisterForm(props: Props) {
               finishRegistrationResult.data?.finishRegistration.verificationCode
             );
           }
-          storeUsernamePassword(username, password);
+
+          setRegistrationInfo({
+            username,
+            password,
+            createChainEvent,
+          });
           // reset since the user might end up on this screen again
           setPassword("");
           setUsername("");
