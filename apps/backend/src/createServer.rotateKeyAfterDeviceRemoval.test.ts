@@ -15,7 +15,7 @@ import {
 } from "@serenity-tools/secsync";
 import sodium, { KeyPair } from "react-native-libsodium";
 import deleteAllRecords from "../test/helpers/deleteAllRecords";
-import { deleteDevices } from "../test/helpers/device/deleteDevices";
+import { deleteDevice } from "../test/helpers/device/deleteDevice";
 import { createDocument } from "../test/helpers/document/createDocument";
 import setupGraphql from "../test/helpers/setupGraphql";
 import {
@@ -232,14 +232,14 @@ test("delete a device", async () => {
     },
   ];
   // device should exist
-  const response = await deleteDevices({
+  const response = await deleteDevice({
     graphql,
     creatorSigningPublicKey: device!.signingPublicKey,
     newDeviceWorkspaceKeyBoxes,
-    deviceSigningPublicKeysToBeDeleted: [webDevice2!.signingPublicKey],
+    deviceSigningPublicKeyToBeDeleted: webDevice2!.signingPublicKey,
     authorizationHeader,
   });
-  expect(response.deleteDevices.status).toBe("success");
+  expect(response.deleteDevice.status).toBe("success");
 });
 
 test("document update will fail", async () => {

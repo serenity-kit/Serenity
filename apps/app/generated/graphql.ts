@@ -269,14 +269,14 @@ export type DeleteCommentsResult = {
   status: Scalars['String'];
 };
 
-export type DeleteDevicesInput = {
+export type DeleteDeviceInput = {
   creatorSigningPublicKey: Scalars['String'];
-  deviceSigningPublicKeysToBeDeleted: Array<Scalars['String']>;
+  deviceSigningPublicKeyToBeDeleted: Scalars['String'];
   newDeviceWorkspaceKeyBoxes: Array<WorkspaceWithWorkspaceDevicesParingInput>;
 };
 
-export type DeleteDevicesResult = {
-  __typename?: 'DeleteDevicesResult';
+export type DeleteDeviceResult = {
+  __typename?: 'DeleteDeviceResult';
   status: Scalars['String'];
 };
 
@@ -642,7 +642,7 @@ export type Mutation = {
   createWorkspaceInvitation?: Maybe<CreateWorkspaceInvitationResult>;
   deleteCommentReplies?: Maybe<DeleteCommentRepliesResult>;
   deleteComments?: Maybe<DeleteCommentsResult>;
-  deleteDevices?: Maybe<DeleteDevicesResult>;
+  deleteDevice?: Maybe<DeleteDeviceResult>;
   deleteDocuments?: Maybe<DeleteDocumentsResult>;
   deleteFolders?: Maybe<DeleteFoldersResult>;
   deleteWorkspaceInvitations?: Maybe<DeleteWorkspaceInvitationsResult>;
@@ -729,8 +729,8 @@ export type MutationDeleteCommentsArgs = {
 };
 
 
-export type MutationDeleteDevicesArgs = {
-  input: DeleteDevicesInput;
+export type MutationDeleteDeviceArgs = {
+  input: DeleteDeviceInput;
 };
 
 
@@ -1480,12 +1480,12 @@ export type DeleteCommentsMutationVariables = Exact<{
 
 export type DeleteCommentsMutation = { __typename?: 'Mutation', deleteComments?: { __typename?: 'DeleteCommentsResult', status: string } | null };
 
-export type DeleteDevicesMutationVariables = Exact<{
-  input: DeleteDevicesInput;
+export type DeleteDeviceMutationVariables = Exact<{
+  input: DeleteDeviceInput;
 }>;
 
 
-export type DeleteDevicesMutation = { __typename?: 'Mutation', deleteDevices?: { __typename?: 'DeleteDevicesResult', status: string } | null };
+export type DeleteDeviceMutation = { __typename?: 'Mutation', deleteDevice?: { __typename?: 'DeleteDeviceResult', status: string } | null };
 
 export type DeleteDocumentsMutationVariables = Exact<{
   input: DeleteDocumentsInput;
@@ -2046,16 +2046,16 @@ export const DeleteCommentsDocument = gql`
 export function useDeleteCommentsMutation() {
   return Urql.useMutation<DeleteCommentsMutation, DeleteCommentsMutationVariables>(DeleteCommentsDocument);
 };
-export const DeleteDevicesDocument = gql`
-    mutation deleteDevices($input: DeleteDevicesInput!) {
-  deleteDevices(input: $input) {
+export const DeleteDeviceDocument = gql`
+    mutation deleteDevice($input: DeleteDeviceInput!) {
+  deleteDevice(input: $input) {
     status
   }
 }
     `;
 
-export function useDeleteDevicesMutation() {
-  return Urql.useMutation<DeleteDevicesMutation, DeleteDevicesMutationVariables>(DeleteDevicesDocument);
+export function useDeleteDeviceMutation() {
+  return Urql.useMutation<DeleteDeviceMutation, DeleteDeviceMutationVariables>(DeleteDeviceDocument);
 };
 export const DeleteDocumentsDocument = gql`
     mutation deleteDocuments($input: DeleteDocumentsInput!) {
@@ -3135,10 +3135,10 @@ export const runDeleteCommentsMutation = async (variables: DeleteCommentsMutatio
     .toPromise();
 };
 
-export const runDeleteDevicesMutation = async (variables: DeleteDevicesMutationVariables, options?: any) => {
+export const runDeleteDeviceMutation = async (variables: DeleteDeviceMutationVariables, options?: any) => {
   return await getUrqlClient()
-    .mutation<DeleteDevicesMutation, DeleteDevicesMutationVariables>(
-      DeleteDevicesDocument,
+    .mutation<DeleteDeviceMutation, DeleteDeviceMutationVariables>(
+      DeleteDeviceDocument,
       variables,
       {
         // better to be safe here and always refetch

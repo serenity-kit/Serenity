@@ -11,14 +11,14 @@ type Params = {
   userId: string;
   newDeviceWorkspaceKeyBoxes: WorkspaceWithWorkspaceDevicesParing[];
   creatorDeviceSigningPublicKey: string;
-  deviceSigningPublicKeysToBeDeleted: string[];
+  deviceSigningPublicKeyToBeDeleted: string;
 };
 
-export async function deleteDevices({
+export async function deleteDevice({
   userId,
   creatorDeviceSigningPublicKey,
   newDeviceWorkspaceKeyBoxes,
-  deviceSigningPublicKeysToBeDeleted,
+  deviceSigningPublicKeyToBeDeleted,
 }: Params): Promise<WorkspaceKey[]> {
   return await prisma.$transaction(async (prisma) => {
     // make sure the user owns the requested devices
@@ -107,11 +107,16 @@ export async function deleteDevices({
     const allDeviceSigningPublicKeysExceptDeletables = new Set(
       allDeviceSigningPublicKeysExceptDeletablesArray
     );
-    deviceSigningPublicKeysToBeDeleted.forEach((signingPublicKey) => {
-      if (allDeviceSigningPublicKeysExceptDeletables.has(signingPublicKey)) {
-        allDeviceSigningPublicKeysExceptDeletables.delete(signingPublicKey);
-      }
-    });
+
+    if (
+      allDeviceSigningPublicKeysExceptDeletables.has(
+        deviceSigningPublicKeyToBeDeleted
+      )
+    ) {
+      allDeviceSigningPublicKeysExceptDeletables.delete(
+        deviceSigningPublicKeyToBeDeleted
+      );
+    }
 
     const verifiedDeviceWorkspaceKeyBoxes: WorkspaceWithWorkspaceDevicesParing[] =
       [];

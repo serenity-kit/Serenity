@@ -13,8 +13,8 @@ import {
   ListItem,
   ListText,
   SettingsContentWrapper,
-  useIsDesktopDevice,
   View,
+  useIsDesktopDevice,
 } from "@serenity-tools/ui";
 import { useMachine } from "@xstate/react";
 import { format, parseJSON } from "date-fns";
@@ -23,7 +23,7 @@ import { useWindowDimensions } from "react-native";
 import sodium from "react-native-libsodium";
 import { VerifyPasswordModal } from "../../../components/verifyPasswordModal/VerifyPasswordModal";
 import {
-  useDeleteDevicesMutation,
+  useDeleteDeviceMutation,
   useDevicesQuery,
 } from "../../../generated/graphql";
 import { useAuthenticatedAppContext } from "../../../hooks/useAuthenticatedAppContext";
@@ -59,7 +59,7 @@ export default function AccountDevicesSettingsScreen(
       first: 500,
     },
   });
-  const [, deleteDevicesMutation] = useDeleteDevicesMutation();
+  const [, deleteDeviceMutation] = useDeleteDeviceMutation();
 
   const deleteDevicePreflight = async (deviceSigningPublicKey: string) => {
     const mainDevice = getMainDevice();
@@ -118,14 +118,14 @@ export default function AccountDevicesSettingsScreen(
         workspaceDevices: workspaceDevicePairing,
       });
     }
-    const deleteDevicesResult = await deleteDevicesMutation({
+    const deleteDeviceResult = await deleteDeviceMutation({
       input: {
         creatorSigningPublicKey: activeDevice.signingPublicKey,
         newDeviceWorkspaceKeyBoxes,
-        deviceSigningPublicKeysToBeDeleted: [deviceSigningPublicKey],
+        deviceSigningPublicKeyToBeDeleted: deviceSigningPublicKey,
       },
     });
-    if (deleteDevicesResult.data?.deleteDevices) {
+    if (deleteDeviceResult.data?.deleteDevice) {
       fetchDevices();
     } else {
       // TODO: show error: couldn't delete device
