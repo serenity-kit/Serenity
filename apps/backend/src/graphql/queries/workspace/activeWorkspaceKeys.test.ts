@@ -5,7 +5,7 @@ import {
 } from "@serenity-tools/common";
 import deleteAllRecords from "../../../../test/helpers/deleteAllRecords";
 import { attachDeviceToWorkspaces } from "../../../../test/helpers/device/attachDeviceToWorkspaces";
-import { deleteDevices } from "../../../../test/helpers/device/deleteDevices";
+import { deleteDevice } from "../../../../test/helpers/device/deleteDevice";
 import { getWorkspaceKeyForWorkspaceAndDevice } from "../../../../test/helpers/device/getWorkspaceKeyForWorkspaceAndDevice";
 import setupGraphql from "../../../../test/helpers/setupGraphql";
 import { getActiveWorkspaceKeys } from "../../../../test/helpers/workspace/getActiveWorkspaceKeys";
@@ -171,12 +171,13 @@ test("delete device", async () => {
       ],
     },
   ];
-  await deleteDevices({
+  await deleteDevice({
     graphql,
     creatorSigningPublicKey: userData1.device.signingPublicKey,
     newDeviceWorkspaceKeyBoxes,
-    deviceSigningPublicKeysToBeDeleted: [user1Device3.signingPublicKey],
+    deviceSigningPublicKeyToBeDeleted: user1Device3.signingPublicKey,
     authorizationHeader: userData1.sessionKey,
+    mainDevice: userData1.mainDevice,
   });
   const result = await getActiveWorkspaceKeys({
     graphql,

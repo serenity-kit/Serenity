@@ -1,0 +1,8 @@
+query userChain {
+  userChain(first: 5000) {
+    nodes {
+      serializedContent
+      position
+    }
+  }
+}

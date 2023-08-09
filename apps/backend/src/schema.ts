@@ -12,7 +12,7 @@ import * as DeleteCommentsMutationTypes from "./graphql/mutations/comment/delete
 import * as CreateCommentReplyMutationTypes from "./graphql/mutations/commentReply/createCommentReply";
 import * as DeleteCommentRepliesMutationTypes from "./graphql/mutations/commentReply/deleteCommentReplies";
 import * as AttachDeviceToWorkspacesMutationTypes from "./graphql/mutations/device/attachDeviceToWorkspaces";
-import * as DeleteDevicesMutationTypes from "./graphql/mutations/device/deleteDevices";
+import * as DeleteDeviceMutationTypes from "./graphql/mutations/device/deleteDevice";
 import * as CreateDocumentMutationTypes from "./graphql/mutations/document/createDocument";
 import * as CreateDocumentShareLinkTypes from "./graphql/mutations/document/createDocumentShareLink";
 import * as DeleteDocumentsMutationTypes from "./graphql/mutations/document/deleteDocuments";
@@ -50,6 +50,7 @@ import * as FolderTraceQueryTypes from "./graphql/queries/folder/folderTrace";
 import * as FoldersQueryTypes from "./graphql/queries/folder/folders";
 import * as RootFoldersQueryTypes from "./graphql/queries/folder/rootFolders";
 import * as SnapshotQueryTypes from "./graphql/queries/snapshot/snapshot";
+import * as UserChainQueryTypes from "./graphql/queries/userChain/userChain";
 import * as UserIdFromUsernameQueryTypes from "./graphql/queries/userIdFromUsername";
 import * as ActiveWorkspaceKeysQueryTypes from "./graphql/queries/workspace/activeWorkspaceKeys";
 import * as PendingingWorkspaceInvitationQueryTypes from "./graphql/queries/workspace/pendingWorkspaceInvitation";
@@ -134,7 +135,7 @@ export const schema = makeSchema({
 
     DevicesQueryTypes,
     deviceBySigningPublicKeyQueryTypes,
-    DeleteDevicesMutationTypes,
+    DeleteDeviceMutationTypes,
     MainDeviceQueryTypes,
     AttachDeviceToWorkspacesMutationTypes,
 
@@ -151,6 +152,7 @@ export const schema = makeSchema({
     WorkspaceChainQueryTypes,
     WorkspaceChainByInvitationIdQueryTypes,
 
+    UserChainQueryTypes,
     UserChainTypes,
 
     AuthorizeMemberTypes,

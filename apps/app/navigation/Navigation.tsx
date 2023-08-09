@@ -38,6 +38,7 @@ import {
   WorkspaceStackParamList,
 } from "../types/navigation";
 import { setLastUsedWorkspaceId } from "../utils/lastUsedWorkspaceAndDocumentStore/lastUsedWorkspaceAndDocumentStore";
+import { notNull } from "../utils/notNull/notNull";
 import {
   authorizeMembersIfNecessary,
   secondsBetweenNewMemberChecks,
@@ -210,14 +211,15 @@ function WorkspaceStackNavigator(props) {
   let lastChainEvent: workspaceChain.WorkspaceChainEvent | null = null;
   if (workspaceChainQueryResult.data?.workspaceChain?.nodes) {
     workspaceChainState = workspaceChain.resolveState(
-      workspaceChainQueryResult.data.workspaceChain.nodes.map((event) => {
-        const data = workspaceChain.WorkspaceChainEvent.parse(
-          // @ts-expect-error
-          JSON.parse(event.serializedContent)
-        );
-        lastChainEvent = data;
-        return data;
-      })
+      workspaceChainQueryResult.data.workspaceChain.nodes
+        .filter(notNull)
+        .map((event) => {
+          const data = workspaceChain.WorkspaceChainEvent.parse(
+            JSON.parse(event.serializedContent)
+          );
+          lastChainEvent = data;
+          return data;
+        })
     );
   }
 
