@@ -177,6 +177,7 @@ test("delete device", async () => {
     newDeviceWorkspaceKeyBoxes,
     deviceSigningPublicKeyToBeDeleted: user1Device3.signingPublicKey,
     authorizationHeader: userData1.sessionKey,
+    mainDevice: userData1.mainDevice,
   });
   const result = await getActiveWorkspaceKeys({
     graphql,

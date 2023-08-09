@@ -6,6 +6,7 @@ import {
   runAcceptWorkspaceInvitationMutation,
   runWorkspaceChainByInvitationIdQuery,
 } from "../../generated/graphql";
+import { notNull } from "../notNull/notNull";
 
 type Role = `${RoleEnum}`;
 
@@ -38,16 +39,15 @@ export const acceptWorkspaceInvitation = async ({
     workspaceChainByInvitationIdResult.data?.workspaceChainByInvitationId?.nodes
   ) {
     workspaceChain.resolveState(
-      workspaceChainByInvitationIdResult.data.workspaceChainByInvitationId.nodes.map(
-        (event) => {
+      workspaceChainByInvitationIdResult.data.workspaceChainByInvitationId.nodes
+        .filter(notNull)
+        .map((event) => {
           const data = workspaceChain.WorkspaceChainEvent.parse(
-            // @ts-expect-error
             JSON.parse(event.serializedContent)
           );
           lastChainEvent = data;
           return data;
-        }
-      )
+        })
     );
   }
 

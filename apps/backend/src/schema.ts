@@ -50,6 +50,7 @@ import * as FolderTraceQueryTypes from "./graphql/queries/folder/folderTrace";
 import * as FoldersQueryTypes from "./graphql/queries/folder/folders";
 import * as RootFoldersQueryTypes from "./graphql/queries/folder/rootFolders";
 import * as SnapshotQueryTypes from "./graphql/queries/snapshot/snapshot";
+import * as UserChainQueryTypes from "./graphql/queries/userChain/userChain";
 import * as UserIdFromUsernameQueryTypes from "./graphql/queries/userIdFromUsername";
 import * as ActiveWorkspaceKeysQueryTypes from "./graphql/queries/workspace/activeWorkspaceKeys";
 import * as PendingingWorkspaceInvitationQueryTypes from "./graphql/queries/workspace/pendingWorkspaceInvitation";
@@ -151,6 +152,7 @@ export const schema = makeSchema({
     WorkspaceChainQueryTypes,
     WorkspaceChainByInvitationIdQueryTypes,
 
+    UserChainQueryTypes,
     UserChainTypes,
 
     AuthorizeMemberTypes,

@@ -1,5 +1,8 @@
+import * as userChain from "@serenity-kit/user-chain";
+import { LocalDevice } from "@serenity-tools/common";
 import { gql } from "graphql-request";
 import { WorkspaceWithWorkspaceDevicesParing } from "../../../src/types/workspaceDevice";
+import { getLastUserChainEventByMainDeviceSigningPublicKey } from "../userChain/getLastUserChainEventByMainDeviceSigningPublicKey";
 
 type Params = {
   graphql: any;
@@ -7,6 +10,7 @@ type Params = {
   newDeviceWorkspaceKeyBoxes: WorkspaceWithWorkspaceDevicesParing[];
   deviceSigningPublicKeyToBeDeleted: string;
   authorizationHeader: string;
+  mainDevice: LocalDevice;
 };
 
 export const deleteDevice = async ({
@@ -15,7 +19,22 @@ export const deleteDevice = async ({
   newDeviceWorkspaceKeyBoxes,
   authorizationHeader,
   deviceSigningPublicKeyToBeDeleted,
+  mainDevice,
 }: Params) => {
+  const { lastChainEvent } =
+    await getLastUserChainEventByMainDeviceSigningPublicKey({
+      mainDeviceSigningPublicKey: mainDevice.signingPublicKey,
+    });
+
+  const event = userChain.removeDevice({
+    authorKeyPair: {
+      privateKey: mainDevice.signingPrivateKey,
+      publicKey: mainDevice.signingPublicKey,
+    },
+    devicePublicKey: deviceSigningPublicKeyToBeDeleted,
+    prevEvent: lastChainEvent,
+  });
+
   const authorizationHeaders = {
     authorization: authorizationHeader,
   };
@@ -32,7 +51,7 @@ export const deleteDevice = async ({
       input: {
         creatorSigningPublicKey,
         newDeviceWorkspaceKeyBoxes,
-        deviceSigningPublicKeyToBeDeleted,
+        serializedUserChainEvent: JSON.stringify(event),
       },
     },
     authorizationHeaders

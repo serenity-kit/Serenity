@@ -49,9 +49,10 @@ let encryptionPrivateKey = "";
 let lastSnapshotKey = "";
 let firstSnapshot: Snapshot;
 let secondSnapshot: Snapshot;
+let userAndWorkspaceData: any = null;
 
 const setup = async () => {
-  const userAndWorkspaceData = await createUserWithWorkspace({
+  userAndWorkspaceData = await createUserWithWorkspace({
     username,
   });
   workspaceId = userAndWorkspaceData.workspace.id;
@@ -238,6 +239,7 @@ test("delete a device", async () => {
     newDeviceWorkspaceKeyBoxes,
     deviceSigningPublicKeyToBeDeleted: webDevice2!.signingPublicKey,
     authorizationHeader,
+    mainDevice: userAndWorkspaceData.mainDevice,
   });
   expect(response.deleteDevice.status).toBe("success");
 });

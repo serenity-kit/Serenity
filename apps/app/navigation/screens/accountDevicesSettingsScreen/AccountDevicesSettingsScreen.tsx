@@ -1,3 +1,4 @@
+import * as userChain from "@serenity-kit/user-chain";
 import {
   createAndEncryptWorkspaceKeyForDevice,
   getExpiredTextFromString,
@@ -25,6 +26,7 @@ import { VerifyPasswordModal } from "../../../components/verifyPasswordModal/Ver
 import {
   useDeleteDeviceMutation,
   useDevicesQuery,
+  useUserChainQuery,
 } from "../../../generated/graphql";
 import { useAuthenticatedAppContext } from "../../../hooks/useAuthenticatedAppContext";
 import { loadMeAndVerifyMachine } from "../../../machines/loadMeAndVerifyMachine";
@@ -53,6 +55,7 @@ export default function AccountDevicesSettingsScreen(
   useWindowDimensions();
   const isDesktopDevice = useIsDesktopDevice();
 
+  // TODO remove it and use the userChainState
   const [devicesResult, fetchDevices] = useDevicesQuery({
     variables: {
       hasNonExpiredSession: true,
@@ -60,6 +63,26 @@ export default function AccountDevicesSettingsScreen(
     },
   });
   const [, deleteDeviceMutation] = useDeleteDeviceMutation();
+
+  const [userChainQueryResult, reExecuteUserChainQuery] = useUserChainQuery({});
+
+  let userChainState: userChain.UserChainState | null = null;
+  let lastChainEvent: userChain.UserChainEvent | null = null;
+  if (userChainQueryResult.data?.userChain?.nodes) {
+    const userChainResult = userChain.resolveState({
+      events: userChainQueryResult.data.userChain.nodes
+        .filter(notNull)
+        .map((event) => {
+          const data = userChain.UserChainEvent.parse(
+            JSON.parse(event.serializedContent)
+          );
+          lastChainEvent = data;
+          return data;
+        }),
+      knownVersion: userChain.version,
+    });
+    userChainState = userChainResult.currentState;
+  }
 
   const deleteDevicePreflight = async (deviceSigningPublicKey: string) => {
     const mainDevice = getMainDevice();
@@ -72,6 +95,13 @@ export default function AccountDevicesSettingsScreen(
   };
 
   const deleteDevice = async (deviceSigningPublicKey: string) => {
+    const mainDevice = getMainDevice();
+    if (!mainDevice) {
+      throw new Error("Main device not available");
+    }
+    if (!lastChainEvent) {
+      throw new Error("lastChainEvent not available");
+    }
     const newDeviceWorkspaceKeyBoxes: WorkspaceWithWorkspaceDevicesParing[] =
       [];
     const workspaces = await getWorkspaces({
@@ -118,15 +148,26 @@ export default function AccountDevicesSettingsScreen(
         workspaceDevices: workspaceDevicePairing,
       });
     }
+
+    const event = userChain.removeDevice({
+      authorKeyPair: {
+        privateKey: mainDevice.signingPrivateKey,
+        publicKey: mainDevice.signingPublicKey,
+      },
+      devicePublicKey: deviceSigningPublicKey,
+      prevEvent: lastChainEvent,
+    });
+
     const deleteDeviceResult = await deleteDeviceMutation({
       input: {
         creatorSigningPublicKey: activeDevice.signingPublicKey,
         newDeviceWorkspaceKeyBoxes,
-        deviceSigningPublicKeyToBeDeleted: deviceSigningPublicKey,
+        serializedUserChainEvent: JSON.stringify(event),
       },
     });
     if (deleteDeviceResult.data?.deleteDevice) {
       fetchDevices();
+      reExecuteUserChainQuery();
     } else {
       // TODO: show error: couldn't delete device
     }

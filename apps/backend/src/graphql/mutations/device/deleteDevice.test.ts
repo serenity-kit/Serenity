@@ -85,6 +85,7 @@ test("delete and keep devices mismatch", async () => {
         newDeviceWorkspaceKeyBoxes,
         deviceSigningPublicKeyToBeDeleted: user1Device2.signingPublicKey,
         authorizationHeader: authorizationHeader1,
+        mainDevice: userData1.mainDevice,
       }))()
   ).rejects.toThrowError(/Missing newWorkspaceDevicekeyBox workspaceDevice/);
 });
@@ -139,6 +140,7 @@ test("delete a device", async () => {
     newDeviceWorkspaceKeyBoxes,
     deviceSigningPublicKeyToBeDeleted: user1Device2.signingPublicKey,
     authorizationHeader,
+    mainDevice: userData1.mainDevice,
   });
   expect(response.deleteDevice.status).toBe("success");
 
@@ -209,6 +211,7 @@ test("delete login device clears session", async () => {
     newDeviceWorkspaceKeyBoxes,
     deviceSigningPublicKeyToBeDeleted: userData1.webDevice.signingPublicKey,
     authorizationHeader,
+    mainDevice: userData1.mainDevice,
   });
   expect(response.deleteDevice.status).toBe("success");
 
@@ -246,6 +249,7 @@ test("Unauthenticated", async () => {
         newDeviceWorkspaceKeyBoxes: [],
         deviceSigningPublicKeyToBeDeleted: userData1.webDevice.signingPublicKey,
         authorizationHeader: "badauthheader",
+        mainDevice: userData1.mainDevice,
       }))()
   ).rejects.toThrowError(/UNAUTHENTICATED/);
 });

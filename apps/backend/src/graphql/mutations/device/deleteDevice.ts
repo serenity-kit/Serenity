@@ -1,3 +1,4 @@
+import * as userChain from "@serenity-kit/user-chain";
 import { AuthenticationError } from "apollo-server-express";
 import {
   arg,
@@ -20,10 +21,10 @@ export const DeleteDeviceInput = inputObjectType({
   name: "DeleteDeviceInput",
   definition(t) {
     t.nonNull.string("creatorSigningPublicKey");
-    t.nonNull.string("deviceSigningPublicKeyToBeDeleted");
     t.nonNull.list.nonNull.field("newDeviceWorkspaceKeyBoxes", {
       type: WorkspaceWithWorkspaceDevicesParingInput,
     });
+    t.nonNull.string("serializedUserChainEvent");
   },
 });
 
@@ -43,12 +44,16 @@ export const deleteDeviceMutation = mutationField("deleteDevice", {
     context.assertValidDeviceSigningPublicKeyForThisSession(
       args.input.creatorSigningPublicKey
     );
+
+    const removeDeviceEvent = userChain.RemoveDeviceEvent.parse(
+      JSON.parse(args.input.serializedUserChainEvent)
+    );
+
     await deleteDevice({
       userId: context.user.id,
       creatorDeviceSigningPublicKey: args.input.creatorSigningPublicKey,
       newDeviceWorkspaceKeyBoxes: args.input.newDeviceWorkspaceKeyBoxes,
-      deviceSigningPublicKeyToBeDeleted:
-        args.input.deviceSigningPublicKeyToBeDeleted,
+      removeDeviceEvent,
     });
     return {
       status: "success",

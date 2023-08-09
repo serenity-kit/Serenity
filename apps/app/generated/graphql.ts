@@ -271,8 +271,8 @@ export type DeleteCommentsResult = {
 
 export type DeleteDeviceInput = {
   creatorSigningPublicKey: Scalars['String'];
-  deviceSigningPublicKeyToBeDeleted: Scalars['String'];
   newDeviceWorkspaceKeyBoxes: Array<WorkspaceWithWorkspaceDevicesParingInput>;
+  serializedUserChainEvent: Scalars['String'];
 };
 
 export type DeleteDeviceResult = {
@@ -861,6 +861,7 @@ export type Query = {
   rootFolders?: Maybe<FolderConnection>;
   snapshot?: Maybe<Snapshot>;
   unauthorizedMember?: Maybe<UnauthorizedMemberResult>;
+  userChain?: Maybe<UserChainEventConnection>;
   userIdFromUsername?: Maybe<UserIdFromUsernameResult>;
   workspace?: Maybe<Workspace>;
   workspaceChain?: Maybe<WorkspaceChainEventConnection>;
@@ -971,6 +972,12 @@ export type QueryRootFoldersArgs = {
 export type QuerySnapshotArgs = {
   documentId: Scalars['ID'];
   documentShareLinkToken?: InputMaybe<Scalars['String']>;
+};
+
+
+export type QueryUserChainArgs = {
+  after?: InputMaybe<Scalars['String']>;
+  first: Scalars['Int'];
 };
 
 
@@ -1198,6 +1205,24 @@ export type UserChainEvent = {
   __typename?: 'UserChainEvent';
   position: Scalars['Int'];
   serializedContent: Scalars['String'];
+};
+
+export type UserChainEventConnection = {
+  __typename?: 'UserChainEventConnection';
+  /** https://facebook.github.io/relay/graphql/connections.htm#sec-Edge-Types */
+  edges?: Maybe<Array<Maybe<UserChainEventEdge>>>;
+  /** Flattened list of UserChainEvent type */
+  nodes?: Maybe<Array<Maybe<UserChainEvent>>>;
+  /** https://facebook.github.io/relay/graphql/connections.htm#sec-undefined.PageInfo */
+  pageInfo: PageInfo;
+};
+
+export type UserChainEventEdge = {
+  __typename?: 'UserChainEventEdge';
+  /** https://facebook.github.io/relay/graphql/connections.htm#sec-Cursor */
+  cursor: Scalars['String'];
+  /** https://facebook.github.io/relay/graphql/connections.htm#sec-Node */
+  node?: Maybe<UserChainEvent>;
 };
 
 export type UserIdFromUsernameResult = {
@@ -1752,6 +1777,11 @@ export type UnauthorizedMemberQueryVariables = Exact<{ [key: string]: never; }>;
 
 
 export type UnauthorizedMemberQuery = { __typename?: 'Query', unauthorizedMember?: { __typename?: 'UnauthorizedMemberResult', userId: string, userMainDeviceSigningPublicKey: string, workspaceId: string, devices: Array<{ __typename?: 'Device', userId?: string | null, signingPublicKey: string, encryptionPublicKey: string, info?: string | null, createdAt?: any | null, encryptionPublicKeySignature: string }> } | null };
+
+export type UserChainQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type UserChainQuery = { __typename?: 'Query', userChain?: { __typename?: 'UserChainEventConnection', nodes?: Array<{ __typename?: 'UserChainEvent', serializedContent: string, position: number } | null> | null } | null };
 
 export type UserIdFromUsernameQueryVariables = Exact<{
   username: Scalars['String'];
@@ -2741,6 +2771,20 @@ export const UnauthorizedMemberDocument = gql`
 
 export function useUnauthorizedMemberQuery(options?: Omit<Urql.UseQueryArgs<UnauthorizedMemberQueryVariables>, 'query'>) {
   return Urql.useQuery<UnauthorizedMemberQuery, UnauthorizedMemberQueryVariables>({ query: UnauthorizedMemberDocument, ...options });
+};
+export const UserChainDocument = gql`
+    query userChain {
+  userChain(first: 5000) {
+    nodes {
+      serializedContent
+      position
+    }
+  }
+}
+    `;
+
+export function useUserChainQuery(options?: Omit<Urql.UseQueryArgs<UserChainQueryVariables>, 'query'>) {
+  return Urql.useQuery<UserChainQuery, UserChainQueryVariables>({ query: UserChainDocument, ...options });
 };
 export const UserIdFromUsernameDocument = gql`
     query userIdFromUsername($username: String!) {
@@ -5441,6 +5485,109 @@ export const unauthorizedMemberQueryService =
         // perform cleanup
         clearInterval(intervalId);
         unauthorizedMemberQueryServiceSubscribers[variablesString].intervalId = null;
+      }
+    };
+  };
+
+
+
+export const runUserChainQuery = async (variables: UserChainQueryVariables, options?: any) => {
+  return await getUrqlClient()
+    .query<UserChainQuery, UserChainQueryVariables>(
+      UserChainDocument,
+      variables,
+      {
+        // better to be safe here and always refetch
+        requestPolicy: "network-only",
+        ...options
+      }
+    )
+    .toPromise();
+};
+
+export type UserChainQueryResult = Urql.OperationResult<UserChainQuery, UserChainQueryVariables>;
+
+export type UserChainQueryUpdateResultEvent = {
+  type: "UserChainQuery.UPDATE_RESULT";
+  result: UserChainQueryResult;
+};
+
+export type UserChainQueryErrorEvent = {
+  type: "UserChainQuery.ERROR";
+  result: UserChainQueryResult;
+};
+
+export type UserChainQueryServiceEvent = UserChainQueryUpdateResultEvent | UserChainQueryErrorEvent;
+
+type UserChainQueryServiceSubscribersEntry = {
+  variables: UserChainQueryVariables;
+  callbacks: ((event: UserChainQueryServiceEvent) => void)[];
+  intervalId: NodeJS.Timer | null;
+};
+
+type UserChainQueryServiceSubscribers = {
+  [variables: string]: UserChainQueryServiceSubscribersEntry;
+};
+
+const userChainQueryServiceSubscribers: UserChainQueryServiceSubscribers = {};
+
+const triggerUserChainQuery = (variablesString: string, variables: UserChainQueryVariables) => {
+  getUrqlClient()
+    .query<UserChainQuery, UserChainQueryVariables>(UserChainDocument, variables)
+    .toPromise()
+    .then((result) => {
+      userChainQueryServiceSubscribers[variablesString].callbacks.forEach(
+        (callback) => {
+          callback({
+            type: result.error ? "UserChainQuery.ERROR" : "UserChainQuery.UPDATE_RESULT",
+            result: result,
+          });
+        }
+      );
+    });
+};
+
+/**
+ * This service is used to query results every 4 seconds.
+ *
+ * It allows machines to spawn a service that will fetch the query
+ * and send the result to the machine.
+ * It will share the same interval for all machines.
+ * When the last subscription is stopped, the interval will be cleared.
+ * It also considers the variables passed to the service.
+ */
+export const userChainQueryService =
+  (variables: UserChainQueryVariables, intervalInMs?: number) => (callback, onReceive) => {
+    const variablesString = canonicalize(variables) as string;
+    if (userChainQueryServiceSubscribers[variablesString]) {
+      userChainQueryServiceSubscribers[variablesString].callbacks.push(callback);
+    } else {
+      userChainQueryServiceSubscribers[variablesString] = {
+        variables,
+        callbacks: [callback],
+        intervalId: null,
+      };
+    }
+
+    triggerUserChainQuery(variablesString, variables);
+    if (!userChainQueryServiceSubscribers[variablesString].intervalId) {
+      userChainQueryServiceSubscribers[variablesString].intervalId = setInterval(
+        () => {
+          triggerUserChainQuery(variablesString, variables);
+        },
+        intervalInMs || 4000
+      );
+    }
+
+    const intervalId = userChainQueryServiceSubscribers[variablesString].intervalId;
+    return () => {
+      if (
+        userChainQueryServiceSubscribers[variablesString].callbacks.length === 0 &&
+        intervalId
+      ) {
+        // perform cleanup
+        clearInterval(intervalId);
+        userChainQueryServiceSubscribers[variablesString].intervalId = null;
       }
     };
   };

@@ -1,3 +1,4 @@
+import * as userChain from "@serenity-kit/user-chain";
 import { UserInputError } from "apollo-server-express";
 import { WorkspaceKey } from "../../../prisma/generated/output";
 import {
@@ -5,21 +6,24 @@ import {
   WorkspaceWithWorkspaceDevicesParing,
 } from "../../types/workspaceDevice";
 import { prisma } from "../prisma";
+import { getLastUserChainEventWithState } from "../userChain/getLastUserChainEventWithState";
 import { rotateWorkspaceKey } from "../workspace/rotateWorkspaceKey";
 
 type Params = {
   userId: string;
   newDeviceWorkspaceKeyBoxes: WorkspaceWithWorkspaceDevicesParing[];
   creatorDeviceSigningPublicKey: string;
-  deviceSigningPublicKeyToBeDeleted: string;
+  removeDeviceEvent: userChain.RemoveDeviceEvent;
 };
 
 export async function deleteDevice({
   userId,
   creatorDeviceSigningPublicKey,
   newDeviceWorkspaceKeyBoxes,
-  deviceSigningPublicKeyToBeDeleted,
+  removeDeviceEvent,
 }: Params): Promise<WorkspaceKey[]> {
+  const deviceSigningPublicKeyToBeDeleted =
+    removeDeviceEvent.transaction.devicePublicKey;
   return await prisma.$transaction(async (prisma) => {
     // make sure the user owns the requested devices
     const user = await prisma.user.findFirst({
@@ -28,6 +32,24 @@ export async function deleteDevice({
     const allUserDevices = await prisma.device.findMany({
       where: { userId },
       select: { signingPublicKey: true },
+    });
+
+    const { lastUserChainEvent, userChainState } =
+      await getLastUserChainEventWithState({ prisma, userId });
+
+    const newUserChainState = userChain.applyEvent({
+      state: userChainState,
+      event: removeDeviceEvent,
+      knownVersion: userChain.version,
+    });
+
+    await prisma.userChainEvent.create({
+      data: {
+        content: removeDeviceEvent,
+        state: newUserChainState,
+        userId,
+        position: lastUserChainEvent.position + 1,
+      },
     });
 
     // build a table to look up user ownership of
