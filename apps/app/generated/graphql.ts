@@ -1256,7 +1256,7 @@ export type Workspace = {
 
 export type WorkspaceChainEvent = {
   __typename?: 'WorkspaceChainEvent';
-  position: Scalars['String'];
+  position: Scalars['Int'];
   serializedContent: Scalars['String'];
 };
 
@@ -1803,14 +1803,14 @@ export type WorkspaceChainQueryVariables = Exact<{
 }>;
 
 
-export type WorkspaceChainQuery = { __typename?: 'Query', workspaceChain?: { __typename?: 'WorkspaceChainEventConnection', nodes?: Array<{ __typename?: 'WorkspaceChainEvent', serializedContent: string, position: string } | null> | null } | null };
+export type WorkspaceChainQuery = { __typename?: 'Query', workspaceChain?: { __typename?: 'WorkspaceChainEventConnection', nodes?: Array<{ __typename?: 'WorkspaceChainEvent', serializedContent: string, position: number } | null> | null } | null };
 
 export type WorkspaceChainByInvitationIdQueryVariables = Exact<{
   invitationId: Scalars['ID'];
 }>;
 
 
-export type WorkspaceChainByInvitationIdQuery = { __typename?: 'Query', workspaceChainByInvitationId?: { __typename?: 'WorkspaceChainEventConnection', nodes?: Array<{ __typename?: 'WorkspaceChainEvent', serializedContent: string, position: string } | null> | null } | null };
+export type WorkspaceChainByInvitationIdQuery = { __typename?: 'Query', workspaceChainByInvitationId?: { __typename?: 'WorkspaceChainEventConnection', nodes?: Array<{ __typename?: 'WorkspaceChainEvent', serializedContent: string, position: number } | null> | null } | null };
 
 export type WorkspaceDevicesQueryVariables = Exact<{
   workspaceId: Scalars['ID'];
