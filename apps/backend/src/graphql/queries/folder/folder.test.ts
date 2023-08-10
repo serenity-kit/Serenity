@@ -9,13 +9,10 @@ import { createFolder } from "../../../../test/helpers/folder/createFolder";
 import { getFolder } from "../../../../test/helpers/folder/getFolder";
 import setupGraphql from "../../../../test/helpers/setupGraphql";
 import createUserWithWorkspace from "../../../database/testHelpers/createUserWithWorkspace";
-import { Device } from "../../../types/device";
 
 const graphql = setupGraphql();
 const username = "7dfb4dd9-88be-414c-8a40-b5c030003d89@example.com";
 let workspaceId = "";
-let userId: string | null = null;
-let device: Device | null = null;
 let sessionKey = "";
 let workspaceKey = "";
 let folderKey = "";
@@ -27,8 +24,6 @@ beforeAll(async () => {
   const result = await createUserWithWorkspace({
     username,
   });
-  userId = result.user.id;
-  device = result.device;
   sessionKey = result.sessionKey;
   addedWorkspace = result.workspace;
   workspaceId = addedWorkspace.id;

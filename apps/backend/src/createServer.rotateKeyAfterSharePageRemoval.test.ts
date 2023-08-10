@@ -13,6 +13,7 @@ import {
   Snapshot,
 } from "@serenity-tools/secsync";
 import sodium, { KeyPair } from "react-native-libsodium";
+import { Device } from "../prisma/generated/output";
 import deleteAllRecords from "../test/helpers/deleteAllRecords";
 import { createDocument } from "../test/helpers/document/createDocument";
 import setupGraphql from "../test/helpers/setupGraphql";
@@ -23,15 +24,11 @@ import {
 import { getWorkspace } from "../test/helpers/workspace/getWorkspace";
 import { prisma } from "./database/prisma";
 import createUserWithWorkspace from "./database/testHelpers/createUserWithWorkspace";
-import { Device } from "./types/device";
-
-let server;
 
 const graphql = setupGraphql();
 const username = "59f80f08-c065-4acc-a542-2725fb2dff6c@example.com";
 let workspaceId = "";
 const documentId = "72fbd941-42b7-4263-89fe-65bf43f455a7";
-let userId: string | null = null;
 let device: Device | null = null;
 let webDevice: LocalDevice | null = null;
 let sessionKey = "";
@@ -50,7 +47,6 @@ const setup = async () => {
     username,
   });
   workspaceId = result.workspace.id;
-  userId = result.user.id;
   device = result.device;
   webDevice = result.webDevice;
   sessionKey = result.sessionKey;

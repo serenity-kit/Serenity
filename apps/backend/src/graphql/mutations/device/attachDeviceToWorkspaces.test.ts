@@ -82,8 +82,7 @@ test("attach the same device does nothing", async () => {
 
 test("attach a device to a workspace", async () => {
   const createDeviceResult = await createDevice({
-    graphql,
-    authorizationHeader: userAndDevice1.sessionKey,
+    userId: userAndDevice1.user.id,
   });
   const newDevice = createDeviceResult.localDevice;
   const authorizationHeader = userAndDevice1.sessionKey;

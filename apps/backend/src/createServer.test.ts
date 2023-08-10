@@ -16,16 +16,11 @@ import {
   waitForClientState,
 } from "../test/helpers/websocket";
 import createUserWithWorkspace from "./database/testHelpers/createUserWithWorkspace";
-import { Device } from "./types/device";
-
-let server;
 
 const graphql = setupGraphql();
 const username = "74176fce-8391-4f12-bbd5-d30a91e9ee7f@example.com";
 let workspaceId = "";
 const documentId = "10f99b10-62a3-427f-9928-c1e0b32648e2";
-let userId: string | null = null;
-let device: Device | null = null;
 let webDevice: LocalDevice | null = null;
 let sessionKey = "";
 let workspaceKey = "";
@@ -41,8 +36,6 @@ const setup = async () => {
     username,
   });
   workspaceId = result.workspace.id;
-  userId = result.user.id;
-  device = result.device;
   webDevice = result.webDevice;
   sessionKey = result.sessionKey;
   addedWorkspace = result.workspace;
