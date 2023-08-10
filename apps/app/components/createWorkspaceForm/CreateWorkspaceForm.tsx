@@ -48,7 +48,7 @@ export function CreateWorkspaceForm(props: CreateWorkspaceFormProps) {
 
   const [devicesResult] = useDevicesQuery({
     variables: {
-      hasNonExpiredSession: true,
+      onlyNotExpired: true,
       first: 500,
     },
   });

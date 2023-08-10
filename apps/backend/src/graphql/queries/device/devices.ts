@@ -1,16 +1,16 @@
 import { AuthenticationError, UserInputError } from "apollo-server-express";
 import { booleanArg, nonNull, queryField } from "nexus";
 import { getDevices } from "../../../database/device/getDevices";
-import { DeviceWithRecentSession } from "../../types/device";
+import { Device } from "../../types/device";
 
 export const devicesQuery = queryField((t) => {
   // @ts-ignore sometimes the type is defined, sometimes not
   t.connectionField("devices", {
-    type: DeviceWithRecentSession,
+    type: Device,
     disableBackwardPagination: true,
     cursorFromNode: (node) => node?.signingPublicKey ?? "",
     additionalArgs: {
-      hasNonExpiredSession: nonNull(booleanArg()),
+      onlyNotExpired: nonNull(booleanArg()),
     },
     async nodes(root, args, context) {
       if (args.first > 500) {
@@ -28,21 +28,16 @@ export const devicesQuery = queryField((t) => {
       const skip = cursor ? 1 : undefined;
       // include one extra project to set hasNextPage value
       const take: any = args.first ? args.first + 1 : undefined;
-      const hasNonExpiredSession = args.hasNonExpiredSession;
+      const onlyNotExpired = args.onlyNotExpired;
 
       const devices = await getDevices({
-        hasNonExpiredSession,
+        onlyNotExpired,
         userId,
         cursor,
         skip,
         take,
       });
-      return devices.map((device) => {
-        if (!device.userId) {
-          throw new UserInputError("Device without a userId");
-        }
-        return device;
-      });
+      return devices;
     },
   });
 });

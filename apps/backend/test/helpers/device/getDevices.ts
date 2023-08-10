@@ -2,13 +2,13 @@ import { gql } from "graphql-request";
 
 type Params = {
   graphql: any;
-  hasNonExpiredSession: boolean;
+  onlyNotExpired: boolean;
   authorizationHeader: string;
 };
 
 export const getDevices = async ({
   graphql,
-  hasNonExpiredSession,
+  onlyNotExpired,
   authorizationHeader,
 }: Params) => {
   const authorizationHeaders = {
@@ -18,17 +18,13 @@ export const getDevices = async ({
   // get root folders from graphql
   const query = gql`
     {
-      devices(hasNonExpiredSession: ${hasNonExpiredSession}, first: 50) {
+      devices(onlyNotExpired: ${onlyNotExpired}, first: 50) {
         edges {
           node {
-            userId
             signingPublicKey
             encryptionPublicKey
             encryptionPublicKeySignature
             info
-            mostRecentSession {
-              expiresAt
-            }
           }
         }
         pageInfo {

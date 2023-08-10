@@ -58,7 +58,7 @@ export default function AccountDevicesSettingsScreen(
   // TODO remove it and use the userChainState
   const [devicesResult, fetchDevices] = useDevicesQuery({
     variables: {
-      hasNonExpiredSession: true,
+      onlyNotExpired: true,
       first: 500,
     },
   });
@@ -253,7 +253,7 @@ export default function AccountDevicesSettingsScreen(
           </Description>
         </View>
         <List
-          data={devices}
+          data={activeDevices}
           emptyString={"No devices found."}
           header={
             <ListHeader
