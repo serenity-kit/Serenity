@@ -37,6 +37,7 @@ import {
 } from "../../../types/workspaceDevice";
 import { getMainDevice } from "../../../utils/device/mainDeviceMemoryStore";
 import { notNull } from "../../../utils/notNull/notNull";
+import { showToast } from "../../../utils/toast/showToast";
 import { getWorkspaceDevices } from "../../../utils/workspace/getWorkspaceDevices";
 import { getWorkspaces } from "../../../utils/workspace/getWorkspaces";
 
@@ -55,7 +56,6 @@ export default function AccountDevicesSettingsScreen(
   useWindowDimensions();
   const isDesktopDevice = useIsDesktopDevice();
 
-  // TODO remove it and use the userChainState
   const [devicesResult, fetchDevices] = useDevicesQuery({
     variables: {
       onlyNotExpired: true,
@@ -169,7 +169,9 @@ export default function AccountDevicesSettingsScreen(
       fetchDevices();
       reExecuteUserChainQuery();
     } else {
-      // TODO: show error: couldn't delete device
+      showToast("Failed to delete the device.", "error");
+      fetchDevices();
+      reExecuteUserChainQuery();
     }
     setSigningPublicKeyToBeDeleted(undefined);
   };
