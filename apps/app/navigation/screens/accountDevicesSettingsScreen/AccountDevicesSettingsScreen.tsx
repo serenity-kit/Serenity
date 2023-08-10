@@ -18,7 +18,7 @@ import {
   useIsDesktopDevice,
 } from "@serenity-tools/ui";
 import { useMachine } from "@xstate/react";
-import { format, parseJSON } from "date-fns";
+import { format } from "date-fns";
 import { useState } from "react";
 import { useWindowDimensions } from "react-native";
 import sodium from "react-native-libsodium";
@@ -176,6 +176,70 @@ export default function AccountDevicesSettingsScreen(
 
   const devices = devicesResult.data?.devices?.nodes?.filter(notNull) || [];
 
+  type AccountSettingsDevice = {
+    signingPublicKey: string;
+    deviceName: string;
+    expiresAt?: string;
+    createdAt?: string;
+    type: string;
+  };
+
+  const activeDevices: AccountSettingsDevice[] = [];
+  const expiredDevices: AccountSettingsDevice[] = [];
+  if (devices.length > 0 && userChainState !== null) {
+    Object.entries(userChainState.devices).forEach(
+      ([signingPublicKey, { expiresAt }]) => {
+        const device = devices.find(
+          (deviceInfo) => deviceInfo.signingPublicKey === signingPublicKey
+        );
+        const deviceInfo = JSON.parse(device?.info || "{}");
+
+        let deviceName = "";
+        switch (deviceInfo.type) {
+          case "web":
+            deviceName = deviceInfo.browser;
+            break;
+          case "main":
+            deviceName = "Main";
+            break;
+          default:
+            deviceName = deviceInfo.os;
+        }
+
+        if (signingPublicKey === userChainState?.mainDeviceSigningPublicKey) {
+          activeDevices.unshift({
+            signingPublicKey,
+            deviceName,
+            expiresAt,
+            createdAt: device?.createdAt,
+            type: deviceInfo.type,
+          });
+        } else {
+          if (
+            expiresAt === undefined ||
+            (expiresAt && new Date(expiresAt) > new Date())
+          ) {
+            activeDevices.push({
+              signingPublicKey,
+              deviceName,
+              expiresAt,
+              createdAt: device?.createdAt,
+              type: deviceInfo.type,
+            });
+          } else {
+            expiredDevices.push({
+              signingPublicKey,
+              deviceName,
+              expiresAt,
+              createdAt: device?.createdAt,
+              type: deviceInfo.type,
+            });
+          }
+        }
+      }
+    );
+  }
+
   return (
     <>
       <SettingsContentWrapper title={"Devices"}>
@@ -199,23 +263,9 @@ export default function AccountDevicesSettingsScreen(
           }
           testID={"devices-list"}
         >
-          {devices.map((device) => {
-            const deviceInfoJson = JSON.parse(device.info!);
-
-            let deviceName = "";
-            switch (deviceInfoJson.type) {
-              case "web":
-                deviceName = deviceInfoJson.browser;
-                break;
-              case "main":
-                deviceName = "Main";
-                break;
-              default:
-                deviceName = deviceInfoJson.os;
-            }
-
-            const isMainDevice = deviceInfoJson.type === "main";
-            const isWebDevice = deviceInfoJson.type === "web";
+          {activeDevices.map((device) => {
+            const isMainDevice = device.type === "main";
+            const isWebDevice = device.type === "web";
             const isActiveDevice =
               activeDevice.signingPublicKey === device.signingPublicKey;
 
@@ -225,18 +275,22 @@ export default function AccountDevicesSettingsScreen(
                 mainItem={
                   <ListIconText
                     iconName={isWebDevice ? "window-line" : "device-line"}
-                    main={deviceName + (isActiveDevice ? " (this device)" : "")}
+                    main={
+                      device.deviceName +
+                      (isActiveDevice ? " (this device)" : "")
+                    }
                     secondary={
+                      device.createdAt &&
                       (!isDesktopDevice ? "Created at " : "") +
-                      format(parseJSON(device.createdAt), "yyyy-MM-dd")
+                        format(new Date(device.createdAt), "yyyy-MM-dd")
                     }
                   ></ListIconText>
                 }
                 secondaryItem={
                   <ListText secondary>
-                    {isWebDevice &&
+                    {device.expiresAt &&
                       getExpiredTextFromString(
-                        device.mostRecentSession?.expiresAt,
+                        device.expiresAt,
                         isDesktopDevice
                       )}
                   </ListText>
