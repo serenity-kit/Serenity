@@ -49,29 +49,29 @@ export const applyEvent = ({
   }
 
   if (event.transaction.type === "add-device") {
-    if (devices.hasOwnProperty(event.transaction.devicePublicKey)) {
+    if (devices.hasOwnProperty(event.transaction.signingPublicKey)) {
       throw new InvalidUserChainError("Device already exists.");
     }
 
-    devices[event.transaction.devicePublicKey] = {
+    devices[event.transaction.signingPublicKey] = {
       expiresAt: event.transaction.expiresAt,
     };
   }
 
   if (event.transaction.type === "remove-device") {
-    if (!devices.hasOwnProperty(event.transaction.devicePublicKey)) {
+    if (!devices.hasOwnProperty(event.transaction.signingPublicKey)) {
       throw new InvalidUserChainError("Failed to remove non-existing device.");
     }
 
     if (
-      event.transaction.devicePublicKey === state.mainDeviceSigningPublicKey
+      event.transaction.signingPublicKey === state.mainDeviceSigningPublicKey
     ) {
       throw new InvalidUserChainError(
         "Failed to remove the main device. This is not possible."
       );
     }
 
-    delete devices[event.transaction.devicePublicKey];
+    delete devices[event.transaction.signingPublicKey];
   }
 
   return {

@@ -11,20 +11,20 @@ import { version } from "./version";
 type Params = {
   authorKeyPair: KeyPairBase64;
   prevEvent: UserChainEvent;
-  devicePublicKey: string;
+  signingPublicKey: string;
   expiresAt?: Date;
 };
 
 export const addDevice = ({
   authorKeyPair,
   prevEvent,
-  devicePublicKey,
+  signingPublicKey,
   expiresAt,
 }: Params): AddDeviceEvent => {
   const prevEventHash = hashEvent(prevEvent);
   const transaction: AddDeviceTransaction = {
     type: "add-device",
-    devicePublicKey,
+    signingPublicKey,
     prevEventHash,
     expiresAt: expiresAt ? expiresAt.toISOString() : undefined,
     version,

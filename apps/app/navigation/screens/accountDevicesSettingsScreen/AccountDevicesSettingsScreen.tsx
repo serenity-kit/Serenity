@@ -154,7 +154,7 @@ export default function AccountDevicesSettingsScreen(
         privateKey: mainDevice.signingPrivateKey,
         publicKey: mainDevice.signingPublicKey,
       },
-      devicePublicKey: deviceSigningPublicKey,
+      signingPublicKey: deviceSigningPublicKey,
       prevEvent: lastChainEvent,
     });
 

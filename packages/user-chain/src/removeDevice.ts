@@ -11,19 +11,19 @@ import { version } from "./version";
 type Params = {
   authorKeyPair: KeyPairBase64;
   prevEvent: UserChainEvent;
-  devicePublicKey: string;
+  signingPublicKey: string;
   expiresAt?: Date;
 };
 
 export const removeDevice = ({
   authorKeyPair,
   prevEvent,
-  devicePublicKey,
+  signingPublicKey,
 }: Params): RemoveDeviceEvent => {
   const prevEventHash = hashEvent(prevEvent);
   const transaction: RemoveDeviceTransaction = {
     type: "remove-device",
-    devicePublicKey,
+    signingPublicKey,
     prevEventHash,
     version,
   };

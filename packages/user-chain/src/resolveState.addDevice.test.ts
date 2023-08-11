@@ -31,7 +31,7 @@ test("should resolve to two devices after adding a device", async () => {
   });
   const addDeviceEvent = addDevice({
     authorKeyPair: keyPairsA.sign,
-    devicePublicKey: keyPairsB.sign.publicKey,
+    signingPublicKey: keyPairsB.sign.publicKey,
     prevEvent: event,
   });
   const state = resolveState({
@@ -66,7 +66,7 @@ test("should resolve to have a device with an expireAt", async () => {
   });
   const addDeviceEvent = addDevice({
     authorKeyPair: keyPairsA.sign,
-    devicePublicKey: keyPairsB.sign.publicKey,
+    signingPublicKey: keyPairsB.sign.publicKey,
     prevEvent: event,
     expiresAt: new Date("2030-01-01"),
   });
@@ -94,7 +94,7 @@ test("should fail if an invalid expireAt is provided", async () => {
   expect(() =>
     addDevice({
       authorKeyPair: keyPairsA.sign,
-      devicePublicKey: keyPairsB.sign.publicKey,
+      signingPublicKey: keyPairsB.sign.publicKey,
       prevEvent: event,
       // @ts-expect-error
       expiresAt: "2030-01-01T00:00:00.000Z",
@@ -109,12 +109,12 @@ test("should fail if the same event is added twice", async () => {
   });
   const addDeviceEvent = addDevice({
     authorKeyPair: keyPairsA.sign,
-    devicePublicKey: keyPairsB.sign.publicKey,
+    signingPublicKey: keyPairsB.sign.publicKey,
     prevEvent: event,
   });
   const addDeviceEvent2 = addDevice({
     authorKeyPair: keyPairsA.sign,
-    devicePublicKey: keyPairsB.sign.publicKey,
+    signingPublicKey: keyPairsB.sign.publicKey,
     prevEvent: addDeviceEvent,
   });
   expect(() =>
@@ -132,7 +132,7 @@ test("should fail if the signature has been manipulated", async () => {
   });
   const addDeviceEvent = addDevice({
     authorKeyPair: keyPairsA.sign,
-    devicePublicKey: keyPairsB.sign.publicKey,
+    signingPublicKey: keyPairsB.sign.publicKey,
     prevEvent: event,
   });
 
@@ -158,7 +158,7 @@ test("should fail if the author (publicKey and signature) have been replaced", a
   });
   const addDeviceEvent = addDevice({
     authorKeyPair: keyPairsA.sign,
-    devicePublicKey: keyPairsB.sign.publicKey,
+    signingPublicKey: keyPairsB.sign.publicKey,
     prevEvent: event,
   });
 
@@ -189,12 +189,12 @@ test("should fail if the knownVersion is smaller than the actual event version",
   const addDeviceWithVersion1 = ({
     authorKeyPair,
     prevEvent,
-    devicePublicKey,
+    signingPublicKey,
   }): AddDeviceEvent => {
     const prevEventHash = hashEvent(prevEvent);
     const transaction: AddDeviceTransaction = {
       type: "add-device",
-      devicePublicKey,
+      signingPublicKey,
       prevEventHash,
       version: 1,
     };
@@ -216,7 +216,7 @@ test("should fail if the knownVersion is smaller than the actual event version",
 
   const addDeviceEvent = addDeviceWithVersion1({
     authorKeyPair: keyPairsA.sign,
-    devicePublicKey: keyPairsB.sign.publicKey,
+    signingPublicKey: keyPairsB.sign.publicKey,
     prevEvent: event,
   });
 
@@ -262,7 +262,7 @@ test("should fail if an old event version is applied after a newer one", async (
   });
   const addDeviceEvent = addDevice({
     authorKeyPair: keyPairsA.sign,
-    devicePublicKey: keyPairsB.sign.publicKey,
+    signingPublicKey: keyPairsB.sign.publicKey,
     prevEvent: event,
   });
   expect(() =>
@@ -281,7 +281,7 @@ test("should fail if the chain is based on a different event", async () => {
   });
   const addDeviceEvent = addDevice({
     authorKeyPair: keyPairsA.sign,
-    devicePublicKey: keyPairsB.sign.publicKey,
+    signingPublicKey: keyPairsB.sign.publicKey,
     prevEvent: event2,
   });
 

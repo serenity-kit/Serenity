@@ -24,12 +24,12 @@ test("should resolve to one device after adding and removing a device", async ()
   });
   const addDeviceEvent = addDevice({
     authorKeyPair: keyPairsA.sign,
-    devicePublicKey: keyPairsB.sign.publicKey,
+    signingPublicKey: keyPairsB.sign.publicKey,
     prevEvent: event,
   });
   const removeDeviceEvent = removeDevice({
     authorKeyPair: keyPairsA.sign,
-    devicePublicKey: keyPairsB.sign.publicKey,
+    signingPublicKey: keyPairsB.sign.publicKey,
     prevEvent: addDeviceEvent,
   });
   const state = resolveState({
@@ -61,17 +61,17 @@ test("should fail if a device is removed twice", async () => {
   });
   const addDeviceEvent = addDevice({
     authorKeyPair: keyPairsA.sign,
-    devicePublicKey: keyPairsB.sign.publicKey,
+    signingPublicKey: keyPairsB.sign.publicKey,
     prevEvent: event,
   });
   const removeDeviceEvent = removeDevice({
     authorKeyPair: keyPairsA.sign,
-    devicePublicKey: keyPairsB.sign.publicKey,
+    signingPublicKey: keyPairsB.sign.publicKey,
     prevEvent: addDeviceEvent,
   });
   const removeDeviceEvent2 = removeDevice({
     authorKeyPair: keyPairsA.sign,
-    devicePublicKey: keyPairsB.sign.publicKey,
+    signingPublicKey: keyPairsB.sign.publicKey,
     prevEvent: removeDeviceEvent,
   });
   expect(() =>
@@ -89,12 +89,12 @@ test("should fail if a device is removed that doesn't exist", async () => {
   });
   const addDeviceEvent = addDevice({
     authorKeyPair: keyPairsA.sign,
-    devicePublicKey: keyPairsB.sign.publicKey,
+    signingPublicKey: keyPairsB.sign.publicKey,
     prevEvent: event,
   });
   const removeDeviceEvent = removeDevice({
     authorKeyPair: keyPairsA.sign,
-    devicePublicKey: "abc",
+    signingPublicKey: "abc",
     prevEvent: addDeviceEvent,
   });
   expect(() =>
@@ -114,12 +114,12 @@ test("should fail if the signature has been manipulated", async () => {
   });
   const addDeviceEvent = addDevice({
     authorKeyPair: keyPairsA.sign,
-    devicePublicKey: keyPairsB.sign.publicKey,
+    signingPublicKey: keyPairsB.sign.publicKey,
     prevEvent: event,
   });
   const removeDeviceEvent = removeDevice({
     authorKeyPair: keyPairsA.sign,
-    devicePublicKey: "abc",
+    signingPublicKey: "abc",
     prevEvent: addDeviceEvent,
   });
 
@@ -145,12 +145,12 @@ test("should fail if the author (publicKey and signature) have been replaced", a
   });
   const addDeviceEvent = addDevice({
     authorKeyPair: keyPairsA.sign,
-    devicePublicKey: keyPairsB.sign.publicKey,
+    signingPublicKey: keyPairsB.sign.publicKey,
     prevEvent: event,
   });
   const removeDeviceEvent = removeDevice({
     authorKeyPair: keyPairsA.sign,
-    devicePublicKey: "abc",
+    signingPublicKey: "abc",
     prevEvent: addDeviceEvent,
   });
 
@@ -179,17 +179,17 @@ test("should fail if the chain is based on a different event", async () => {
   });
   const addDeviceEvent = addDevice({
     authorKeyPair: keyPairsA.sign,
-    devicePublicKey: keyPairsB.sign.publicKey,
+    signingPublicKey: keyPairsB.sign.publicKey,
     prevEvent: event,
   });
   const addDeviceEvent2 = addDevice({
     authorKeyPair: keyPairsA.sign,
-    devicePublicKey: keyPairsB.sign.publicKey,
+    signingPublicKey: keyPairsB.sign.publicKey,
     prevEvent: event,
   });
   const removeDeviceEvent = removeDevice({
     authorKeyPair: keyPairsA.sign,
-    devicePublicKey: "abc",
+    signingPublicKey: "abc",
     prevEvent: addDeviceEvent2,
   });
 

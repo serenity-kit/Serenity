@@ -35,7 +35,7 @@ export type CreateChainEvent = z.infer<typeof CreateChainEvent>;
 
 export const AddDeviceTransaction = TransactionBase.extend({
   type: z.literal("add-device"),
-  devicePublicKey: z.string(),
+  signingPublicKey: z.string(),
   expiresAt: z.optional(z.string().datetime()),
 });
 export type AddDeviceTransaction = z.infer<typeof AddDeviceTransaction>;
@@ -48,7 +48,7 @@ export type AddDeviceEvent = z.infer<typeof AddDeviceEvent>;
 
 export const RemoveDeviceTransaction = TransactionBase.extend({
   type: z.literal("remove-device"),
-  devicePublicKey: z.string(),
+  signingPublicKey: z.string(),
 });
 export type RemoveDeviceTransaction = z.infer<typeof RemoveDeviceTransaction>;
 
