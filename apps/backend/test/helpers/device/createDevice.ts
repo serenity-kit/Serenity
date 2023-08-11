@@ -1,23 +1,12 @@
 import { createDevice as createdDeviceHelper } from "@serenity-tools/common";
-import { createDevice as saveDevice } from "../../../src/database/device/createDevice";
 import { prisma } from "../../../src/database/prisma";
 
 type Params = {
-  graphql: any;
-  authorizationHeader: string;
+  expiresAt?: Date;
+  userId: string;
 };
 
-export const createDevice = async ({
-  graphql,
-  authorizationHeader,
-}: Params) => {
-  const session = await prisma.session.findFirst({
-    where: { sessionKey: authorizationHeader },
-    select: { userId: true },
-  });
-  if (!session) {
-    throw new Error("Session not found");
-  }
+export const createDevice = async ({ userId, expiresAt }: Params) => {
   const device = createdDeviceHelper();
 
   const deviceInfoJson = {
@@ -29,12 +18,16 @@ export const createDevice = async ({
   };
   const deviceInfo = JSON.stringify(deviceInfoJson);
 
-  await saveDevice({
-    userId: session.userId,
-    signingPublicKey: device.signingPublicKey,
-    encryptionPublicKey: device.encryptionPublicKey,
-    encryptionPublicKeySignature: device.encryptionPublicKeySignature,
-    info: deviceInfo,
+  await prisma.device.create({
+    data: {
+      signingPublicKey: device.signingPublicKey,
+      encryptionPublicKey: device.encryptionPublicKey,
+      encryptionPublicKeySignature: device.encryptionPublicKeySignature,
+      info: deviceInfo,
+      user: { connect: { id: userId } },
+      expiresAt,
+    },
   });
+
   return { localDevice: device };
 };

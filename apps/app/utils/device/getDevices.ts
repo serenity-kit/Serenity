@@ -7,15 +7,15 @@ import {
 import { getUrqlClient } from "../urqlClient/urqlClient";
 
 export type Props = {
-  hasNonExpiredSession: boolean;
+  onlyNotExpired: boolean;
 };
 export const getDevices = async ({
-  hasNonExpiredSession,
+  onlyNotExpired,
 }: Props): Promise<Device[] | null> => {
   const devicesResult = await getUrqlClient()
     .query<DevicesQuery, DevicesQueryVariables>(
       DevicesDocument,
-      { hasNonExpiredSession, first: 500 },
+      { onlyNotExpired, first: 500 },
       {
         requestPolicy: "network-only",
       }

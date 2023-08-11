@@ -1,8 +1,10 @@
 import { gql } from "graphql-request";
 import deleteAllRecords from "../../../../test/helpers/deleteAllRecords";
+import { createDevice } from "../../../../test/helpers/device/createDevice";
 import { getDevices } from "../../../../test/helpers/device/getDevices";
 import setupGraphql from "../../../../test/helpers/setupGraphql";
 import createUserWithWorkspace from "../../../database/testHelpers/createUserWithWorkspace";
+import { deductHours } from "../../../utils/deductHours/deductHours";
 
 const graphql = setupGraphql();
 const username = "7dfb4dd9-88be-414c-8a40-b5c030003d89@example.com";
@@ -14,13 +16,18 @@ beforeAll(async () => {
     username,
   });
   sessionKey = result.sessionKey;
+  // creating an expired device
+  await createDevice({
+    userId: result.user.id,
+    expiresAt: deductHours(new Date(), 24),
+  });
 });
 
 test("all user devices", async () => {
   const authorizationHeader = sessionKey;
   const result = await getDevices({
     graphql,
-    hasNonExpiredSession: true,
+    onlyNotExpired: true,
     authorizationHeader,
   });
   const edges = result.devices.edges;
@@ -31,11 +38,11 @@ test("only active sessions", async () => {
   const authorizationHeader = sessionKey;
   const result = await getDevices({
     graphql,
-    hasNonExpiredSession: false,
+    onlyNotExpired: false,
     authorizationHeader,
   });
   const edges = result.devices.edges;
-  expect(edges.length).toBe(1);
+  expect(edges.length).toBe(3);
 });
 
 test("Unauthenticated", async () => {
@@ -43,7 +50,7 @@ test("Unauthenticated", async () => {
     (async () =>
       await getDevices({
         graphql,
-        hasNonExpiredSession: true,
+        onlyNotExpired: true,
         authorizationHeader: "badauthheader",
       }))()
   ).rejects.toThrowError(/UNAUTHENTICATED/);
@@ -57,10 +64,9 @@ test("Input Errors", async () => {
   // get root folders from graphql
   const query = gql`
     {
-      devices(hasNonExpiredSession: true, first: 501) {
+      devices(onlyNotExpired: true, first: 501) {
         edges {
           node {
-            userId
             signingPublicKey
             encryptionPublicKey
             encryptionPublicKeySignature

@@ -1,4 +1,5 @@
 import {
+  Device,
   CreatorDevice as PrismaCreatorDevice,
   Workspace as PrismaWorkspace,
   WorkspaceKey as PrismaWorkspaceKey,
@@ -6,7 +7,7 @@ import {
   Role,
   UsersToWorkspaces,
 } from "../../prisma/generated/output";
-import { CreatorDevice, Device, MinimalDevice } from "./device";
+import { CreatorDevice, MinimalDevice } from "./device";
 
 export type MemberIdWithDevice = {
   id: string;

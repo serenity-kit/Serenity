@@ -3,7 +3,6 @@ import * as workspaceChain from "@serenity-kit/workspace-chain";
 import {
   createIntroductionDocumentSnapshot,
   createSnapshotKey,
-  Device,
   encryptDocumentTitle,
   encryptFolderName,
   folderDerivedKeyContext,
@@ -22,12 +21,10 @@ import { useEffect, useRef, useState } from "react";
 import { TextInput } from "react-native";
 import sodium from "react-native-libsodium";
 import { useAppContext } from "../../context/AppContext";
-import {
-  useCreateInitialWorkspaceStructureMutation,
-  useDevicesQuery,
-} from "../../generated/graphql";
+import { useCreateInitialWorkspaceStructureMutation } from "../../generated/graphql";
 import { createWorkspaceKeyBoxesForDevices } from "../../utils/device/createWorkspaceKeyBoxesForDevices";
 import { getMainDevice } from "../../utils/device/mainDeviceMemoryStore";
+import { getAndVerifyUserDevices } from "../../utils/getAndVerifyUserDevices/getAndVerifyUserDevices";
 import { VerifyPasswordModal } from "../verifyPasswordModal/VerifyPasswordModal";
 
 export type CreateWorkspaceFormProps = {
@@ -45,13 +42,6 @@ export function CreateWorkspaceForm(props: CreateWorkspaceFormProps) {
   const navigation = useNavigation();
   const [, createInitialWorkspaceStructure] =
     useCreateInitialWorkspaceStructureMutation();
-
-  const [devicesResult] = useDevicesQuery({
-    variables: {
-      hasNonExpiredSession: true,
-      first: 500,
-    },
-  });
 
   useEffect(() => {
     // the password input field doesn't work in case we activate the modal
@@ -89,11 +79,12 @@ export function CreateWorkspaceForm(props: CreateWorkspaceFormProps) {
       const folderName = "Getting started";
       const documentName = "Introduction";
 
+      const { devices } = await getAndVerifyUserDevices({
+        onlyNotExpired: true,
+        first: 500,
+      });
+
       // build workspace key boxes for workspace
-      if (!devicesResult.data?.devices?.nodes) {
-        throw new Error("No devices found!");
-      }
-      const devices = devicesResult.data?.devices?.nodes as Device[];
       const { deviceWorkspaceKeyBoxes, workspaceKey } =
         createWorkspaceKeyBoxesForDevices({ devices, activeDevice });
       if (!workspaceKey) {
@@ -247,10 +238,7 @@ export function CreateWorkspaceForm(props: CreateWorkspaceFormProps) {
         <ModalButtonFooter
           confirm={
             <Button
-              disabled={
-                name.trim() === "" &&
-                devicesResult.data?.devices?.nodes?.length !== undefined
-              }
+              disabled={name.trim() === ""}
               onPress={createWorkspace}
               isLoading={isCreatingWorkspace}
             >

@@ -28,6 +28,7 @@ const exchanges = [
       KeyDerivationTraceEntry: () => null, // should not be normalized
       WorkspaceKeyByDocumentIdResult: () => null, // should not be normalized
       WorkspaceChainEvent: () => null, // should not be normalized
+      UserChainEvent: () => null, // should not be normalized
       // @ts-expect-error the type seems to be wrong,
       MainDeviceResult: (mainDevice) => {
         return mainDevice.signingPublicKey;
@@ -38,10 +39,6 @@ const exchanges = [
       },
       // @ts-expect-error the type seems to be wrong
       MinimalDevice: (device) => {
-        return device.signingPublicKey;
-      },
-      // @ts-expect-error the type seems to be wrong
-      DeviceWithRecentSession: (device) => {
         return device.signingPublicKey;
       },
       Session: () => null,
