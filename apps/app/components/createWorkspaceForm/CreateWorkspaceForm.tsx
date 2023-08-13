@@ -79,14 +79,14 @@ export function CreateWorkspaceForm(props: CreateWorkspaceFormProps) {
       const folderName = "Getting started";
       const documentName = "Introduction";
 
-      const { devices } = await getAndVerifyUserDevices({
-        onlyNotExpired: true,
-        first: 500,
-      });
+      const { nonExpiredDevices } = await getAndVerifyUserDevices();
 
       // build workspace key boxes for workspace
       const { deviceWorkspaceKeyBoxes, workspaceKey } =
-        createWorkspaceKeyBoxesForDevices({ devices, activeDevice });
+        createWorkspaceKeyBoxesForDevices({
+          devices: nonExpiredDevices,
+          activeDevice,
+        });
       if (!workspaceKey) {
         throw new Error("Could not retrieve workspaceKey!");
       }

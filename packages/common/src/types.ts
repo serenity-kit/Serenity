@@ -13,3 +13,8 @@ export type LocalDevice = {
   createdAt?: Date;
   info?: string;
 };
+
+export type VerifiedDevice = {
+  signingPublicKey: string;
+  encryptionPublicKey: string;
+};

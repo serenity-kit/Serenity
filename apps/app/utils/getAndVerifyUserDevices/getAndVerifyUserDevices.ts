@@ -1,29 +1,10 @@
 import * as userChain from "@serenity-kit/user-chain";
-import { Device, verifyDevice } from "@serenity-tools/common";
-import { runDevicesQuery, runUserChainQuery } from "../../generated/graphql";
+import { VerifiedDevice } from "@serenity-tools/common";
+import { runUserChainQuery } from "../../generated/graphql";
 import { notNull } from "../notNull/notNull";
 
-export type VerifiedDevice = Device & {
-  deviceName: string;
-  expiresAt?: string;
-  createdAt?: string;
-  type: string;
-};
-
-type Params = {
-  onlyNotExpired: boolean;
-  first: number;
-};
-
-export const getAndVerifyUserDevices = async ({
-  onlyNotExpired,
-  first,
-}: Params) => {
+export const getAndVerifyUserDevices = async () => {
   const userChainQueryResult = await runUserChainQuery({});
-  const devicesQueryResult = await runDevicesQuery({ onlyNotExpired, first });
-
-  const devices =
-    devicesQueryResult.data?.devices?.nodes?.filter(notNull) || [];
 
   let userChainState: userChain.UserChainState | null = null;
   let lastChainEvent: userChain.UserChainEvent | null = null;
@@ -43,66 +24,29 @@ export const getAndVerifyUserDevices = async ({
     userChainState = userChainResult.currentState;
   }
 
-  const activeDevices: VerifiedDevice[] = [];
+  const nonExpiredDevices: VerifiedDevice[] = [];
   const expiredDevices: VerifiedDevice[] = [];
-  if (devices.length > 0 && userChainState !== null) {
+  if (userChainState !== null) {
     Object.entries(userChainState.devices).forEach(
-      ([signingPublicKey, { expiresAt }]) => {
-        const device = devices.find(
-          (deviceInfo) => deviceInfo.signingPublicKey === signingPublicKey
-        );
-        if (!device) {
-          return;
-        }
-        verifyDevice(device);
-
-        const deviceInfo = JSON.parse(device.info || "{}");
-
-        let deviceName = "";
-        switch (deviceInfo.type) {
-          case "web":
-            deviceName = deviceInfo.browser;
-            break;
-          case "main":
-            deviceName = "Main";
-            break;
-          default:
-            deviceName = deviceInfo.os;
-        }
-
+      ([signingPublicKey, { expiresAt, encryptionPublicKey }]) => {
         if (signingPublicKey === userChainState?.mainDeviceSigningPublicKey) {
-          activeDevices.unshift({
+          nonExpiredDevices.unshift({
             signingPublicKey,
-            encryptionPublicKey: device.encryptionPublicKey,
-            encryptionPublicKeySignature: device.encryptionPublicKeySignature,
-            deviceName,
-            expiresAt,
-            createdAt: device?.createdAt,
-            type: deviceInfo.type,
+            encryptionPublicKey,
           });
         } else {
           if (
             expiresAt === undefined ||
             (expiresAt && new Date(expiresAt) > new Date())
           ) {
-            activeDevices.push({
+            nonExpiredDevices.push({
               signingPublicKey,
-              encryptionPublicKey: device.encryptionPublicKey,
-              encryptionPublicKeySignature: device.encryptionPublicKeySignature,
-              deviceName,
-              expiresAt,
-              createdAt: device?.createdAt,
-              type: deviceInfo.type,
+              encryptionPublicKey,
             });
           } else {
             expiredDevices.push({
               signingPublicKey,
-              encryptionPublicKey: device.encryptionPublicKey,
-              encryptionPublicKeySignature: device.encryptionPublicKeySignature,
-              deviceName,
-              expiresAt,
-              createdAt: device?.createdAt,
-              type: deviceInfo.type,
+              encryptionPublicKey,
             });
           }
         }
@@ -110,7 +54,7 @@ export const getAndVerifyUserDevices = async ({
     );
   }
   return {
-    devices: activeDevices,
+    nonExpiredDevices,
     expiredDevices,
     lastChainEvent,
   };
