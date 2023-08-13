@@ -2,7 +2,7 @@ import sodium from "react-native-libsodium";
 
 export type KeyPairs = {
   sign: { privateKey: string; publicKey: string; keyType: "ed25519" };
-  box: { privateKey: string; publicKey: string; keyType: "x25519" };
+  encryption: { privateKey: string; publicKey: string; keyType: "x25519" };
 };
 
 export const getKeyPairA = (): sodium.KeyPair => {
@@ -49,7 +49,7 @@ export const getKeyPairsA = (): KeyPairs => {
       publicKey: "74IPzs2dhoERLRuxeS7zadzEvKfb7IqOK-jKu0mQxIM",
       keyType: "ed25519",
     },
-    box: {
+    encryption: {
       privateKey: "JZFX98tVGO7tnagDgwkKUdnoKh5EI7FlYh8j2E2UtR4",
       publicKey: "wevxDsZ-L7wpy3ePZcQNfG8WDh0wB0d27phr5OMdLwI",
       keyType: "x25519",
@@ -65,7 +65,7 @@ export const getKeyPairsB = (): KeyPairs => {
       publicKey: "MTDhqVIMflTD0Car-KSP1MWCIEYqs2LBaXfU20di0tY",
       keyType: "ed25519",
     },
-    box: {
+    encryption: {
       privateKey: "fec_R3XDXUW-w6NoWeygnf9NDFzOlJM2QNczm0_ztG8",
       publicKey: "b_skeL8qudNQji-HuOldPNFDzYSBENNqmFMlawhtrHg",
       keyType: "x25519",
@@ -81,7 +81,7 @@ export const getKeyPairsC = (): KeyPairs => {
       publicKey: "ZKcwjAMAaSiq7k3MQVQUZ6aa7kBreK__5hkGI4SCltk",
       keyType: "ed25519",
     },
-    box: {
+    encryption: {
       privateKey: "Z5apAnVoYXmKbbF8xXdxW2lz6I8TV8KbiSmwQLcJ24I",
       publicKey: "0hUuO22MoTa8X65ZvpR9KcfUwF_B2aIvLORPjuaofBg",
       keyType: "x25519",

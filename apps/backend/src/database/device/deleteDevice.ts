@@ -23,7 +23,7 @@ export async function deleteDevice({
   removeDeviceEvent,
 }: Params): Promise<WorkspaceKey[]> {
   const deviceSigningPublicKeyToBeDeleted =
-    removeDeviceEvent.transaction.devicePublicKey;
+    removeDeviceEvent.transaction.signingPublicKey;
   return await prisma.$transaction(async (prisma) => {
     // make sure the user owns the requested devices
     const user = await prisma.user.findFirst({

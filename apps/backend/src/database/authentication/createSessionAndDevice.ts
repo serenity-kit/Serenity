@@ -34,9 +34,9 @@ export async function createSessionAndDevice({
   addDeviceEvent,
   deviceType: rawDeviceType,
 }: Params) {
-  if (addDeviceEvent.transaction.devicePublicKey !== device.signingPublicKey) {
+  if (addDeviceEvent.transaction.signingPublicKey !== device.signingPublicKey) {
     throw new Error(
-      "addDeviceEvent.transaction.devicePublicKey does not match device.signingPublicKey"
+      "addDeviceEvent.transaction.signingPublicKey does not match device.signingPublicKey"
     );
   }
   const deviceType = DeviceType.parse(rawDeviceType);

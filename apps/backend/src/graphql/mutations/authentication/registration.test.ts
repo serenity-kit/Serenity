@@ -57,6 +57,7 @@ test("server should register a user", async () => {
       publicKey: mainDevice.signingPublicKey,
     },
     email: username,
+    encryptionPublicKey: mainDevice.encryptionPublicKey,
   });
 
   const registrationResponse = await graphql.client.request(query, {
@@ -109,6 +110,7 @@ test("server should register a user with a pending workspace id", async () => {
       publicKey: mainDevice.signingPublicKey,
     },
     email: username,
+    encryptionPublicKey: mainDevice.encryptionPublicKey,
   });
 
   const registrationResponse = await graphql.client.request(query, {
@@ -179,6 +181,7 @@ describe("Input errors", () => {
         publicKey: mainDevice.signingPublicKey,
       },
       email: username,
+      encryptionPublicKey: mainDevice.encryptionPublicKey,
     });
 
     await expect(
@@ -219,6 +222,7 @@ describe("Input errors", () => {
         publicKey: mainDevice.signingPublicKey,
       },
       email: username,
+      encryptionPublicKey: mainDevice.encryptionPublicKey,
     });
 
     await expect(
@@ -256,6 +260,7 @@ describe("Input errors", () => {
         publicKey: mainDevice.signingPublicKey,
       },
       email: username,
+      encryptionPublicKey: mainDevice.encryptionPublicKey,
     });
 
     await expect(
@@ -298,6 +303,7 @@ describe("Input errors", () => {
         publicKey: mainDevice.signingPublicKey,
       },
       email: username,
+      encryptionPublicKey: mainDevice.encryptionPublicKey,
     });
 
     await expect(
@@ -336,6 +342,7 @@ describe("Input errors", () => {
         publicKey: mainDevice.signingPublicKey,
       },
       email: username,
+      encryptionPublicKey: mainDevice.encryptionPublicKey,
     });
 
     await expect(
@@ -378,6 +385,7 @@ describe("Input errors", () => {
         publicKey: signingPublicKey,
       },
       email: username,
+      encryptionPublicKey: mainDevice.encryptionPublicKey,
     });
 
     await expect(
@@ -420,6 +428,7 @@ describe("Input errors", () => {
         publicKey: mainDevice.signingPublicKey,
       },
       email: username,
+      encryptionPublicKey,
     });
 
     await expect(
@@ -462,6 +471,7 @@ describe("Input errors", () => {
         publicKey: mainDevice.signingPublicKey,
       },
       email: username,
+      encryptionPublicKey: mainDevice.encryptionPublicKey,
     });
 
     await expect(

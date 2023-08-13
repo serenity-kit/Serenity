@@ -2,8 +2,6 @@ query devices($onlyNotExpired: Boolean!, $first: Int!, $after: String) {
   devices(onlyNotExpired: $onlyNotExpired, first: $first, after: $after) {
     nodes {
       signingPublicKey
-      encryptionPublicKey
-      encryptionPublicKeySignature
       info
       createdAt
     }

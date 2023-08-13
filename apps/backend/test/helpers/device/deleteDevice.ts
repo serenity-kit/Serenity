@@ -31,7 +31,7 @@ export const deleteDevice = async ({
       privateKey: mainDevice.signingPrivateKey,
       publicKey: mainDevice.signingPublicKey,
     },
-    devicePublicKey: deviceSigningPublicKeyToBeDeleted,
+    signingPublicKey: deviceSigningPublicKeyToBeDeleted,
     prevEvent: lastChainEvent,
   });
 

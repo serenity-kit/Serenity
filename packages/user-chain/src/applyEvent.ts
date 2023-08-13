@@ -2,6 +2,7 @@ import sodium from "react-native-libsodium";
 import { InvalidUserChainError, UnknownVersionUserChainError } from "./errors";
 import { UpdateChainEvent, UserChainEvent, UserChainState } from "./types";
 import { hashEvent, hashTransaction } from "./utils";
+import { verifyDevice } from "./verifyDevice";
 
 type Params = {
   state: UserChainState;
@@ -49,29 +50,37 @@ export const applyEvent = ({
   }
 
   if (event.transaction.type === "add-device") {
-    if (devices.hasOwnProperty(event.transaction.devicePublicKey)) {
+    if (devices.hasOwnProperty(event.transaction.signingPublicKey)) {
       throw new InvalidUserChainError("Device already exists.");
     }
 
-    devices[event.transaction.devicePublicKey] = {
+    verifyDevice({
+      signingPublicKey: event.author.publicKey,
+      encryptionPublicKey: event.transaction.encryptionPublicKey,
+      encryptionPublicKeySignature:
+        event.transaction.encryptionPublicKeySignature,
+    });
+
+    devices[event.transaction.signingPublicKey] = {
       expiresAt: event.transaction.expiresAt,
+      encryptionPublicKey: event.transaction.encryptionPublicKey,
     };
   }
 
   if (event.transaction.type === "remove-device") {
-    if (!devices.hasOwnProperty(event.transaction.devicePublicKey)) {
+    if (!devices.hasOwnProperty(event.transaction.signingPublicKey)) {
       throw new InvalidUserChainError("Failed to remove non-existing device.");
     }
 
     if (
-      event.transaction.devicePublicKey === state.mainDeviceSigningPublicKey
+      event.transaction.signingPublicKey === state.mainDeviceSigningPublicKey
     ) {
       throw new InvalidUserChainError(
         "Failed to remove the main device. This is not possible."
       );
     }
 
-    delete devices[event.transaction.devicePublicKey];
+    delete devices[event.transaction.signingPublicKey];
   }
 
   return {
@@ -79,6 +88,9 @@ export const applyEvent = ({
     devices,
     email: state.email,
     mainDeviceSigningPublicKey: state.mainDeviceSigningPublicKey,
+    mainDeviceEncryptionPublicKey: state.mainDeviceEncryptionPublicKey,
+    mainDeviceEncryptionPublicKeySignature:
+      state.mainDeviceEncryptionPublicKeySignature,
     eventHash,
     eventVersion: event.transaction.version,
   };

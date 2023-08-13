@@ -23,6 +23,8 @@ export const CreateChainTransaction = z.object({
   id: z.string(),
   prevEventHash: z.null(), //there is no previous hash for the first event
   email: z.string().email(),
+  encryptionPublicKey: z.string(),
+  encryptionPublicKeySignature: z.string(),
   version: Version,
 });
 export type CreateChainTransaction = z.infer<typeof CreateChainTransaction>;
@@ -35,7 +37,9 @@ export type CreateChainEvent = z.infer<typeof CreateChainEvent>;
 
 export const AddDeviceTransaction = TransactionBase.extend({
   type: z.literal("add-device"),
-  devicePublicKey: z.string(),
+  signingPublicKey: z.string(),
+  encryptionPublicKey: z.string(),
+  encryptionPublicKeySignature: z.string(),
   expiresAt: z.optional(z.string().datetime()),
 });
 export type AddDeviceTransaction = z.infer<typeof AddDeviceTransaction>;
@@ -48,7 +52,7 @@ export type AddDeviceEvent = z.infer<typeof AddDeviceEvent>;
 
 export const RemoveDeviceTransaction = TransactionBase.extend({
   type: z.literal("remove-device"),
-  devicePublicKey: z.string(),
+  signingPublicKey: z.string(),
 });
 export type RemoveDeviceTransaction = z.infer<typeof RemoveDeviceTransaction>;
 
@@ -66,6 +70,7 @@ export type UserChainEvent = z.infer<typeof UserChainEvent>;
 
 export const DeviceInfo = z.object({
   expiresAt: z.optional(z.string().datetime()),
+  encryptionPublicKey: z.string(),
 });
 export type DeviceInfo = z.infer<typeof DeviceInfo>;
 
@@ -73,6 +78,8 @@ export const UserChainState = z.object({
   id: z.string(),
   email: z.string().email(),
   mainDeviceSigningPublicKey: z.string(),
+  mainDeviceEncryptionPublicKey: z.string(),
+  mainDeviceEncryptionPublicKeySignature: z.string(),
   devices: z.record(z.string(), DeviceInfo),
   eventHash: z.string(),
   eventVersion: Version,

@@ -11,20 +11,30 @@ import { version } from "./version";
 type Params = {
   authorKeyPair: KeyPairBase64;
   prevEvent: UserChainEvent;
-  devicePublicKey: string;
+  signingPublicKey: string;
+  encryptionPublicKey: string;
   expiresAt?: Date;
 };
 
 export const addDevice = ({
   authorKeyPair,
   prevEvent,
-  devicePublicKey,
+  signingPublicKey,
+  encryptionPublicKey,
   expiresAt,
 }: Params): AddDeviceEvent => {
   const prevEventHash = hashEvent(prevEvent);
+  const encryptionPublicKeySignature = sodium.crypto_sign_detached(
+    encryptionPublicKey,
+    sodium.from_base64(authorKeyPair.privateKey)
+  );
   const transaction: AddDeviceTransaction = {
     type: "add-device",
-    devicePublicKey,
+    signingPublicKey,
+    encryptionPublicKey,
+    encryptionPublicKeySignature: sodium.to_base64(
+      encryptionPublicKeySignature
+    ),
     prevEventHash,
     expiresAt: expiresAt ? expiresAt.toISOString() : undefined,
     version,
