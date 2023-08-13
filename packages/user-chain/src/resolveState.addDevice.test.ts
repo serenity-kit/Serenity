@@ -196,6 +196,34 @@ test("should fail if the author (publicKey and signature) have been replaced", a
   ).toThrow(InvalidUserChainError);
 });
 
+test("should fail if the encryptionPublicKeySignature have been manipulated", async () => {
+  const event = createChain({
+    authorKeyPair: keyPairsA.sign,
+    encryptionPublicKey: keyPairsA.encryption.publicKey,
+    email: "jane@example.com",
+  });
+  const addDeviceEvent = addDevice({
+    authorKeyPair: keyPairsA.sign,
+    signingPublicKey: keyPairsB.sign.publicKey,
+    encryptionPublicKey: keyPairsB.encryption.publicKey,
+    prevEvent: event,
+  });
+
+  addDeviceEvent.transaction.encryptionPublicKeySignature = sodium.to_base64(
+    sodium.crypto_sign_detached(
+      "something",
+      sodium.from_base64(keyPairsB.sign.privateKey)
+    )
+  );
+
+  expect(() =>
+    resolveState({
+      events: [event, addDeviceEvent],
+      knownVersion: 0,
+    })
+  ).toThrow(InvalidUserChainError);
+});
+
 test("should fail if the knownVersion is smaller than the actual event version", async () => {
   const event = createChain({
     authorKeyPair: keyPairsA.sign,

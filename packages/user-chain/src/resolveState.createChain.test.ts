@@ -91,3 +91,21 @@ test("should fail if the signature has been manipulated", async () => {
     InvalidUserChainError
   );
 });
+
+test("should fail if the encryptionPublicKeySignature has been manipulated", async () => {
+  const event = createChain({
+    authorKeyPair: keyPairsA.sign,
+    encryptionPublicKey: keyPairsA.encryption.publicKey,
+    email: "jane@example.com",
+  });
+
+  event.transaction.encryptionPublicKeySignature = sodium.to_base64(
+    sodium.crypto_sign_detached(
+      "something",
+      sodium.from_base64(keyPairsB.sign.privateKey)
+    )
+  );
+  expect(() => resolveState({ events: [event], knownVersion: 0 })).toThrow(
+    InvalidUserChainError
+  );
+});
