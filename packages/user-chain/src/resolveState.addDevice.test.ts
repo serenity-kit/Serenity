@@ -27,11 +27,13 @@ beforeAll(async () => {
 test("should resolve to two devices after adding a device", async () => {
   const event = createChain({
     authorKeyPair: keyPairsA.sign,
+    encryptionPublicKey: keyPairsA.encryption.publicKey,
     email: "jane@example.com",
   });
   const addDeviceEvent = addDevice({
     authorKeyPair: keyPairsA.sign,
     signingPublicKey: keyPairsB.sign.publicKey,
+    encryptionPublicKey: keyPairsB.encryption.publicKey,
     prevEvent: event,
   });
   const state = resolveState({
@@ -41,9 +43,11 @@ test("should resolve to two devices after adding a device", async () => {
   expect(state.currentState.devices).toMatchInlineSnapshot(`
     {
       "74IPzs2dhoERLRuxeS7zadzEvKfb7IqOK-jKu0mQxIM": {
+        "encryptionPublicKey": "wevxDsZ-L7wpy3ePZcQNfG8WDh0wB0d27phr5OMdLwI",
         "expiresAt": undefined,
       },
       "MTDhqVIMflTD0Car-KSP1MWCIEYqs2LBaXfU20di0tY": {
+        "encryptionPublicKey": "b_skeL8qudNQji-HuOldPNFDzYSBENNqmFMlawhtrHg",
         "expiresAt": undefined,
       },
     }
@@ -62,11 +66,13 @@ test("should resolve to two devices after adding a device", async () => {
 test("should resolve to have a device with an expireAt", async () => {
   const event = createChain({
     authorKeyPair: keyPairsA.sign,
+    encryptionPublicKey: keyPairsA.encryption.publicKey,
     email: "jane@example.com",
   });
   const addDeviceEvent = addDevice({
     authorKeyPair: keyPairsA.sign,
     signingPublicKey: keyPairsB.sign.publicKey,
+    encryptionPublicKey: keyPairsB.encryption.publicKey,
     prevEvent: event,
     expiresAt: new Date("2030-01-01"),
   });
@@ -77,9 +83,11 @@ test("should resolve to have a device with an expireAt", async () => {
   expect(state.currentState.devices).toMatchInlineSnapshot(`
     {
       "74IPzs2dhoERLRuxeS7zadzEvKfb7IqOK-jKu0mQxIM": {
+        "encryptionPublicKey": "wevxDsZ-L7wpy3ePZcQNfG8WDh0wB0d27phr5OMdLwI",
         "expiresAt": undefined,
       },
       "MTDhqVIMflTD0Car-KSP1MWCIEYqs2LBaXfU20di0tY": {
+        "encryptionPublicKey": "b_skeL8qudNQji-HuOldPNFDzYSBENNqmFMlawhtrHg",
         "expiresAt": "2030-01-01T00:00:00.000Z",
       },
     }
@@ -89,6 +97,7 @@ test("should resolve to have a device with an expireAt", async () => {
 test("should fail if an invalid expireAt is provided", async () => {
   const event = createChain({
     authorKeyPair: keyPairsA.sign,
+    encryptionPublicKey: keyPairsA.encryption.publicKey,
     email: "jane@example.com",
   });
   expect(() =>
@@ -105,16 +114,19 @@ test("should fail if an invalid expireAt is provided", async () => {
 test("should fail if the same event is added twice", async () => {
   const event = createChain({
     authorKeyPair: keyPairsA.sign,
+    encryptionPublicKey: keyPairsA.encryption.publicKey,
     email: "jane@example.com",
   });
   const addDeviceEvent = addDevice({
     authorKeyPair: keyPairsA.sign,
     signingPublicKey: keyPairsB.sign.publicKey,
+    encryptionPublicKey: keyPairsB.encryption.publicKey,
     prevEvent: event,
   });
   const addDeviceEvent2 = addDevice({
     authorKeyPair: keyPairsA.sign,
     signingPublicKey: keyPairsB.sign.publicKey,
+    encryptionPublicKey: keyPairsB.encryption.publicKey,
     prevEvent: addDeviceEvent,
   });
   expect(() =>
@@ -128,11 +140,13 @@ test("should fail if the same event is added twice", async () => {
 test("should fail if the signature has been manipulated", async () => {
   const event = createChain({
     authorKeyPair: keyPairsA.sign,
+    encryptionPublicKey: keyPairsA.encryption.publicKey,
     email: "jane@example.com",
   });
   const addDeviceEvent = addDevice({
     authorKeyPair: keyPairsA.sign,
     signingPublicKey: keyPairsB.sign.publicKey,
+    encryptionPublicKey: keyPairsB.encryption.publicKey,
     prevEvent: event,
   });
 
@@ -154,11 +168,13 @@ test("should fail if the signature has been manipulated", async () => {
 test("should fail if the author (publicKey and signature) have been replaced", async () => {
   const event = createChain({
     authorKeyPair: keyPairsA.sign,
+    encryptionPublicKey: keyPairsA.encryption.publicKey,
     email: "jane@example.com",
   });
   const addDeviceEvent = addDevice({
     authorKeyPair: keyPairsA.sign,
     signingPublicKey: keyPairsB.sign.publicKey,
+    encryptionPublicKey: keyPairsB.encryption.publicKey,
     prevEvent: event,
   });
 
@@ -183,6 +199,7 @@ test("should fail if the author (publicKey and signature) have been replaced", a
 test("should fail if the knownVersion is smaller than the actual event version", async () => {
   const event = createChain({
     authorKeyPair: keyPairsA.sign,
+    encryptionPublicKey: keyPairsA.encryption.publicKey,
     email: "jane@example.com",
   });
 
@@ -190,11 +207,20 @@ test("should fail if the knownVersion is smaller than the actual event version",
     authorKeyPair,
     prevEvent,
     signingPublicKey,
+    encryptionPublicKey,
   }): AddDeviceEvent => {
     const prevEventHash = hashEvent(prevEvent);
+    const encryptionPublicKeySignature = sodium.crypto_sign_detached(
+      sodium.from_base64(encryptionPublicKey),
+      sodium.from_base64(authorKeyPair.privateKey)
+    );
     const transaction: AddDeviceTransaction = {
       type: "add-device",
       signingPublicKey,
+      encryptionPublicKey,
+      encryptionPublicKeySignature: sodium.to_base64(
+        encryptionPublicKeySignature
+      ),
       prevEventHash,
       version: 1,
     };
@@ -217,6 +243,7 @@ test("should fail if the knownVersion is smaller than the actual event version",
   const addDeviceEvent = addDeviceWithVersion1({
     authorKeyPair: keyPairsA.sign,
     signingPublicKey: keyPairsB.sign.publicKey,
+    encryptionPublicKey: keyPairsB.encryption.publicKey,
     prevEvent: event,
   });
 
@@ -232,13 +259,22 @@ test("should fail if an old event version is applied after a newer one", async (
   const createChainWithVersion1 = ({
     authorKeyPair,
     email,
+    encryptionPublicKey,
   }): CreateChainEvent => {
+    const encryptionPublicKeySignature = sodium.crypto_sign_detached(
+      encryptionPublicKey,
+      sodium.from_base64(authorKeyPair.privateKey)
+    );
     const transaction: CreateChainTransaction = {
       type: "create",
       id: generateId(),
       prevEventHash: null,
       email,
       version: 1,
+      encryptionPublicKey,
+      encryptionPublicKeySignature: sodium.to_base64(
+        encryptionPublicKeySignature
+      ),
     };
     const hash = hashTransaction(transaction);
 
@@ -259,10 +295,12 @@ test("should fail if an old event version is applied after a newer one", async (
   const event = createChainWithVersion1({
     authorKeyPair: keyPairsA.sign,
     email: "jane@example.com",
+    encryptionPublicKey: keyPairsA.encryption.publicKey,
   });
   const addDeviceEvent = addDevice({
     authorKeyPair: keyPairsA.sign,
     signingPublicKey: keyPairsB.sign.publicKey,
+    encryptionPublicKey: keyPairsB.encryption.publicKey,
     prevEvent: event,
   });
   expect(() =>
@@ -273,15 +311,18 @@ test("should fail if an old event version is applied after a newer one", async (
 test("should fail if the chain is based on a different event", async () => {
   const event = createChain({
     authorKeyPair: keyPairsA.sign,
+    encryptionPublicKey: keyPairsA.encryption.publicKey,
     email: "jane@example.com",
   });
   const event2 = createChain({
     authorKeyPair: keyPairsA.sign,
+    encryptionPublicKey: keyPairsA.encryption.publicKey,
     email: "jane@example.com",
   });
   const addDeviceEvent = addDevice({
     authorKeyPair: keyPairsA.sign,
     signingPublicKey: keyPairsB.sign.publicKey,
+    encryptionPublicKey: keyPairsB.encryption.publicKey,
     prevEvent: event2,
   });
 

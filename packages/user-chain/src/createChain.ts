@@ -10,16 +10,26 @@ import { version } from "./version";
 
 type Params = {
   authorKeyPair: KeyPairBase64;
+  encryptionPublicKey: string;
   email: string;
 };
 
 export const createChain = ({
   authorKeyPair,
+  encryptionPublicKey,
   email,
 }: Params): CreateChainEvent => {
+  const encryptionPublicKeySignature = sodium.crypto_sign_detached(
+    encryptionPublicKey,
+    sodium.from_base64(authorKeyPair.privateKey)
+  );
   const transaction: CreateChainTransaction = {
     type: "create",
     id: generateId(),
+    encryptionPublicKey: encryptionPublicKey,
+    encryptionPublicKeySignature: sodium.to_base64(
+      encryptionPublicKeySignature
+    ),
     prevEventHash: null,
     email,
     version,

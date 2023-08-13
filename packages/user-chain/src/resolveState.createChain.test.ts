@@ -20,12 +20,14 @@ beforeAll(async () => {
 test("should resolve to one device after creating a chain", async () => {
   const event = createChain({
     authorKeyPair: keyPairsA.sign,
+    encryptionPublicKey: keyPairsA.encryption.publicKey,
     email: "jane@example.com",
   });
   const state = resolveState({ events: [event], knownVersion: 0 });
   expect(state.currentState.devices).toMatchInlineSnapshot(`
     {
       "74IPzs2dhoERLRuxeS7zadzEvKfb7IqOK-jKu0mQxIM": {
+        "encryptionPublicKey": "wevxDsZ-L7wpy3ePZcQNfG8WDh0wB0d27phr5OMdLwI",
         "expiresAt": undefined,
       },
     }
@@ -48,10 +50,12 @@ test("should resolve to one device after creating a chain", async () => {
 test("should fail if two createChain events are applied", async () => {
   const event = createChain({
     authorKeyPair: keyPairsA.sign,
+    encryptionPublicKey: keyPairsA.encryption.publicKey,
     email: "jane@example.com",
   });
   const event2 = createChain({
     authorKeyPair: keyPairsA.sign,
+    encryptionPublicKey: keyPairsA.encryption.publicKey,
     email: "jane@example.com",
   });
   expect(() =>
@@ -62,6 +66,7 @@ test("should fail if two createChain events are applied", async () => {
 test("should fail if the knownVersion is smaller than the actual event version", async () => {
   const event = createChain({
     authorKeyPair: keyPairsA.sign,
+    encryptionPublicKey: keyPairsA.encryption.publicKey,
     email: "jane@example.com",
   });
   expect(() => resolveState({ events: [event], knownVersion: -1 })).toThrow(
@@ -72,6 +77,7 @@ test("should fail if the knownVersion is smaller than the actual event version",
 test("should fail if the signature has been manipulated", async () => {
   const event = createChain({
     authorKeyPair: keyPairsA.sign,
+    encryptionPublicKey: keyPairsA.encryption.publicKey,
     email: "jane@example.com",
   });
 

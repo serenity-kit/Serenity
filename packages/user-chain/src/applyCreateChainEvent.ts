@@ -7,6 +7,7 @@ import {
   UserChainState,
 } from "./types";
 import { hashEvent, hashTransaction } from "./utils";
+import { verifyDevice } from "./verifyDevice";
 
 type Params = {
   event: UserChainEvent;
@@ -37,8 +38,18 @@ export const applyCreateChainEvent = ({
     );
   }
 
+  verifyDevice({
+    signingPublicKey: event.author.publicKey,
+    encryptionPublicKey: event.transaction.encryptionPublicKey,
+    encryptionPublicKeySignature:
+      event.transaction.encryptionPublicKeySignature,
+  });
+
   const devices: { [publicKey: string]: DeviceInfo } = {
-    [event.author.publicKey]: { expiresAt: undefined },
+    [event.author.publicKey]: {
+      expiresAt: undefined,
+      encryptionPublicKey: event.transaction.encryptionPublicKey,
+    },
   };
 
   return {
@@ -46,6 +57,9 @@ export const applyCreateChainEvent = ({
     devices,
     email: event.transaction.email,
     mainDeviceSigningPublicKey: event.author.publicKey,
+    mainDeviceEncryptionPublicKey: event.transaction.encryptionPublicKey,
+    mainDeviceEncryptionPublicKeySignature:
+      event.transaction.encryptionPublicKeySignature,
     eventHash,
     eventVersion: event.transaction.version,
   };

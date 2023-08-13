@@ -20,11 +20,13 @@ beforeAll(async () => {
 test("should resolve to one device after adding and removing a device", async () => {
   const event = createChain({
     authorKeyPair: keyPairsA.sign,
+    encryptionPublicKey: keyPairsA.encryption.publicKey,
     email: "jane@example.com",
   });
   const addDeviceEvent = addDevice({
     authorKeyPair: keyPairsA.sign,
     signingPublicKey: keyPairsB.sign.publicKey,
+    encryptionPublicKey: keyPairsB.encryption.publicKey,
     prevEvent: event,
   });
   const removeDeviceEvent = removeDevice({
@@ -39,6 +41,7 @@ test("should resolve to one device after adding and removing a device", async ()
   expect(state.currentState.devices).toMatchInlineSnapshot(`
     {
       "74IPzs2dhoERLRuxeS7zadzEvKfb7IqOK-jKu0mQxIM": {
+        "encryptionPublicKey": "wevxDsZ-L7wpy3ePZcQNfG8WDh0wB0d27phr5OMdLwI",
         "expiresAt": undefined,
       },
     }
@@ -57,11 +60,13 @@ test("should resolve to one device after adding and removing a device", async ()
 test("should fail if a device is removed twice", async () => {
   const event = createChain({
     authorKeyPair: keyPairsA.sign,
+    encryptionPublicKey: keyPairsA.encryption.publicKey,
     email: "jane@example.com",
   });
   const addDeviceEvent = addDevice({
     authorKeyPair: keyPairsA.sign,
     signingPublicKey: keyPairsB.sign.publicKey,
+    encryptionPublicKey: keyPairsB.encryption.publicKey,
     prevEvent: event,
   });
   const removeDeviceEvent = removeDevice({
@@ -85,11 +90,13 @@ test("should fail if a device is removed twice", async () => {
 test("should fail if a device is removed that doesn't exist", async () => {
   const event = createChain({
     authorKeyPair: keyPairsA.sign,
+    encryptionPublicKey: keyPairsA.encryption.publicKey,
     email: "jane@example.com",
   });
   const addDeviceEvent = addDevice({
     authorKeyPair: keyPairsA.sign,
     signingPublicKey: keyPairsB.sign.publicKey,
+    encryptionPublicKey: keyPairsB.encryption.publicKey,
     prevEvent: event,
   });
   const removeDeviceEvent = removeDevice({
@@ -110,11 +117,13 @@ test("should fail if a device is removed that doesn't exist", async () => {
 test("should fail if the signature has been manipulated", async () => {
   const event = createChain({
     authorKeyPair: keyPairsA.sign,
+    encryptionPublicKey: keyPairsA.encryption.publicKey,
     email: "jane@example.com",
   });
   const addDeviceEvent = addDevice({
     authorKeyPair: keyPairsA.sign,
     signingPublicKey: keyPairsB.sign.publicKey,
+    encryptionPublicKey: keyPairsB.encryption.publicKey,
     prevEvent: event,
   });
   const removeDeviceEvent = removeDevice({
@@ -141,11 +150,13 @@ test("should fail if the signature has been manipulated", async () => {
 test("should fail if the author (publicKey and signature) have been replaced", async () => {
   const event = createChain({
     authorKeyPair: keyPairsA.sign,
+    encryptionPublicKey: keyPairsA.encryption.publicKey,
     email: "jane@example.com",
   });
   const addDeviceEvent = addDevice({
     authorKeyPair: keyPairsA.sign,
     signingPublicKey: keyPairsB.sign.publicKey,
+    encryptionPublicKey: keyPairsB.encryption.publicKey,
     prevEvent: event,
   });
   const removeDeviceEvent = removeDevice({
@@ -175,16 +186,19 @@ test("should fail if the author (publicKey and signature) have been replaced", a
 test("should fail if the chain is based on a different event", async () => {
   const event = createChain({
     authorKeyPair: keyPairsA.sign,
+    encryptionPublicKey: keyPairsA.encryption.publicKey,
     email: "jane@example.com",
   });
   const addDeviceEvent = addDevice({
     authorKeyPair: keyPairsA.sign,
     signingPublicKey: keyPairsB.sign.publicKey,
+    encryptionPublicKey: keyPairsB.encryption.publicKey,
     prevEvent: event,
   });
   const addDeviceEvent2 = addDevice({
     authorKeyPair: keyPairsA.sign,
     signingPublicKey: keyPairsB.sign.publicKey,
+    encryptionPublicKey: keyPairsB.encryption.publicKey,
     prevEvent: event,
   });
   const removeDeviceEvent = removeDevice({

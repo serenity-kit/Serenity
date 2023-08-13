@@ -2,6 +2,7 @@ import sodium from "react-native-libsodium";
 import { InvalidUserChainError, UnknownVersionUserChainError } from "./errors";
 import { UpdateChainEvent, UserChainEvent, UserChainState } from "./types";
 import { hashEvent, hashTransaction } from "./utils";
+import { verifyDevice } from "./verifyDevice";
 
 type Params = {
   state: UserChainState;
@@ -53,8 +54,16 @@ export const applyEvent = ({
       throw new InvalidUserChainError("Device already exists.");
     }
 
+    verifyDevice({
+      signingPublicKey: event.author.publicKey,
+      encryptionPublicKey: event.transaction.encryptionPublicKey,
+      encryptionPublicKeySignature:
+        event.transaction.encryptionPublicKeySignature,
+    });
+
     devices[event.transaction.signingPublicKey] = {
       expiresAt: event.transaction.expiresAt,
+      encryptionPublicKey: event.transaction.encryptionPublicKey,
     };
   }
 
@@ -79,6 +88,9 @@ export const applyEvent = ({
     devices,
     email: state.email,
     mainDeviceSigningPublicKey: state.mainDeviceSigningPublicKey,
+    mainDeviceEncryptionPublicKey: state.mainDeviceEncryptionPublicKey,
+    mainDeviceEncryptionPublicKeySignature:
+      state.mainDeviceEncryptionPublicKeySignature,
     eventHash,
     eventVersion: event.transaction.version,
   };

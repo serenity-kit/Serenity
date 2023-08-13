@@ -86,6 +86,7 @@ export const loginUser = async ({
       publicKey: mainDevice.signingPublicKey,
     },
     signingPublicKey: device.signingPublicKey,
+    encryptionPublicKey: device.encryptionPublicKey,
     prevEvent: lastUserChainEvent,
     expiresAt,
   });

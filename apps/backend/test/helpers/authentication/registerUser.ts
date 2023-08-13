@@ -74,6 +74,7 @@ export const registerUser = async (
       publicKey: mainDevice.signingPublicKey,
     },
     email: username,
+    encryptionPublicKey: mainDevice.encryptionPublicKey,
   });
 
   const registrationResponse = await graphql.client.request(query, {

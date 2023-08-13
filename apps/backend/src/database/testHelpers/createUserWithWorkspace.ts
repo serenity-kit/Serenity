@@ -71,6 +71,7 @@ export default async function createUserWithWorkspace({
         publicKey: mainDevice.signingPublicKey,
       },
       email: username,
+      encryptionPublicKey: mainDevice.encryptionPublicKey,
     });
     const userChainState = userChain.resolveState({
       events: [createChainEvent],
