@@ -8,7 +8,6 @@ import {
 } from "@serenity-tools/common";
 import { decryptDocumentTitleBasedOnSnapshotKey } from "@serenity-tools/common/src/decryptDocumentTitleBasedOnSnapshotKey/decryptDocumentTitleBasedOnSnapshotKey";
 import { gql } from "graphql-request";
-import { Role } from "../../../../prisma/generated/output";
 import { registerUser } from "../../../../test/helpers/authentication/registerUser";
 import deleteAllRecords from "../../../../test/helpers/deleteAllRecords";
 import setupGraphql from "../../../../test/helpers/setupGraphql";
@@ -52,9 +51,6 @@ test("create initial workspace structure", async () => {
   expect(workspace.id).not.toBeUndefined();
   expect(workspace.name).toBe(workspaceName);
   expect(workspace.members.length).toBe(1);
-  workspace.members.forEach((member: { userId: string; role: Role }) => {
-    expect(member.role).toBe(Role.ADMIN);
-  });
   expect(workspace.currentWorkspaceKey.id).not.toBeNull();
   expect(folder.id).not.toBeNull();
   expect(folder.id).not.toBeUndefined();
@@ -169,7 +165,6 @@ const query = gql`
         name
         members {
           userId
-          role
         }
       }
       folder {

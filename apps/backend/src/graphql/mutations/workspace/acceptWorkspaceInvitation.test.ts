@@ -11,7 +11,6 @@ import { getWorkspace } from "../../../database/workspace/getWorkspace";
 const graphql = setupGraphql();
 let invitationId = "";
 let workspaceId = "";
-const inviteeUsername = `invitee-${generateId()}@example.com`;
 let inviterUserAndDevice: any = null;
 let inviteeUserAndDevice: any = null;
 let workspaceInvitationResult: any = null;
@@ -73,13 +72,6 @@ test("accept admin role", async () => {
     throw new Error("workspace not found");
   }
   expect(sharedWorkspace.members.length).toBe(2);
-  sharedWorkspace.members.forEach((member) => {
-    if (member.username === inviteeUsername) {
-      expect(member.role).toBe(role);
-    } else if (member.username === inviterUsername) {
-      expect(member.role).toBe(Role.ADMIN);
-    }
-  });
 });
 
 test("double-accepting invitation throws an error", async () => {
@@ -147,13 +139,6 @@ test("accept editor role", async () => {
     throw new Error("workspace not found");
   }
   expect(sharedWorkspace.members.length).toBe(2);
-  sharedWorkspace.members.forEach((member) => {
-    if (member.username === inviteeUsername) {
-      expect(member.role).toBe(role);
-    } else if (member.username === inviterUsername) {
-      expect(member.role).toBe(Role.ADMIN);
-    }
-  });
 });
 
 test("accept commenter role", async () => {
@@ -208,13 +193,6 @@ test("accept commenter role", async () => {
     throw new Error("workspace not found");
   }
   expect(sharedWorkspace.members.length).toBe(2);
-  sharedWorkspace.members.forEach((member) => {
-    if (member.username === inviteeUsername) {
-      expect(member.role).toBe(role);
-    } else if (member.username === inviterUsername) {
-      expect(member.role).toBe(Role.ADMIN);
-    }
-  });
 });
 
 test("accept viewer role", async () => {
@@ -269,13 +247,6 @@ test("accept viewer role", async () => {
     throw new Error("workspace not found");
   }
   expect(sharedWorkspace.members.length).toBe(2);
-  sharedWorkspace.members.forEach((member) => {
-    if (member.username === inviteeUsername) {
-      expect(member.role).toBe(role);
-    } else if (member.username === inviterUsername) {
-      expect(member.role).toBe(Role.ADMIN);
-    }
-  });
 });
 
 test("invalid invitation id should throw error", async () => {

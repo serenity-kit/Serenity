@@ -41,7 +41,6 @@ const meWithWorkspaceLoadingInfoQuery = gql`
         id
         isAuthorized
         documentId
-        role
       }
     }
   }
@@ -97,7 +96,6 @@ test("should be able to get the workspaceLoadingInfo with a defined workspaceId 
       "documentId": "${userData1.document.id}",
       "id": "${userData1.workspace.id}",
       "isAuthorized": true,
-      "role": "ADMIN",
     }
   `);
 });
@@ -118,7 +116,6 @@ test("should get the fallback workspace if the workspaceId is not available and 
       "documentId": "${otherWorkspaceStructure.document.id}",
       "id": "${otherWorkspaceStructure.workspace.id}",
       "isAuthorized": true,
-      "role": "ADMIN",
     }
   `);
 });
@@ -152,7 +149,6 @@ test("should be able to get the workspaceLoadingInfo, but another documentId if 
       "documentId": "${userData1.document.id}",
       "id": "${userData1.workspace.id}",
       "isAuthorized": true,
-      "role": "ADMIN",
     }
   `);
 });
@@ -172,7 +168,6 @@ test("should get the workspaceLoadingInfo, but no documentId if the provided doc
       "documentId": null,
       "id": "${userData1.workspace.id}",
       "isAuthorized": true,
-      "role": "ADMIN",
     }
   `);
 });

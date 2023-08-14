@@ -15,7 +15,6 @@ export const query = gql`
         infoWorkspaceKeyId
         members {
           username
-          role
         }
         infoWorkspaceKey {
           workspaceId

@@ -26,7 +26,6 @@ const query = gql`
         name
         members {
           userId
-          role
         }
         currentWorkspaceKey {
           id

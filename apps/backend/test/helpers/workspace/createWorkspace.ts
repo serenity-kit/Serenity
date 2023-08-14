@@ -29,7 +29,6 @@ export const createWorkspace = async ({
           name
           members {
             userId
-            role
           }
         }
       }

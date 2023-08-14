@@ -3,7 +3,6 @@ mutation createWorkspaceInvitation($input: CreateWorkspaceInvitationInput!) {
     workspaceInvitation {
       id
       workspaceId
-      role
       expiresAt
     }
   }

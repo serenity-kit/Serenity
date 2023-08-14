@@ -177,7 +177,6 @@ export async function createWorkspace({
       members.push({
         userId: userToWorkspace.userId,
         username: userToWorkspace.user.username,
-        role: userToWorkspace.role,
         devices: userToWorkspace.user.devices,
         mainDeviceSigningPublicKey:
           userToWorkspace.user.mainDeviceSigningPublicKey,

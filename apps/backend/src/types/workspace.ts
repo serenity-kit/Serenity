@@ -40,7 +40,6 @@ export type WorkspaceKey = {
 export type WorkspaceMember = {
   userId: string;
   username: string | undefined | null;
-  role: Role;
   mainDeviceSigningPublicKey: string;
   devices: MinimalDevice[];
 };
@@ -124,7 +123,6 @@ export const formatWorkspace = (workspace: DbWorkspace): Workspace => {
       userId: member.userId,
       mainDeviceSigningPublicKey: member.user.mainDeviceSigningPublicKey,
       username: member.user.username,
-      role: member.role,
       devices: member.user.devices,
     };
     members.push(workspaceMember);

@@ -39,7 +39,6 @@ export const MeResult = objectType({
         return {
           id: workspace.id,
           isAuthorized: workspace.usersToWorkspaces[0].isAuthorizedMember,
-          role: workspace.usersToWorkspaces[0].role,
           documentId: workspace.documents[0]?.id || null,
         };
       },

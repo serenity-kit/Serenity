@@ -110,7 +110,6 @@ describe("Input errors", () => {
           name
           members {
             userId
-            role
           }
         }
       }

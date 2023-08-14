@@ -25,7 +25,6 @@ export const updateWorkspaceName = async ({
           name
           members {
             userId
-            role
           }
         }
       }

@@ -1,5 +1,3 @@
-import { Role } from "../generated/graphql";
-
 export type WorkspaceKeyBox = {
   id: string;
   workspaceKeyId: string;
@@ -19,7 +17,6 @@ export type WorkspaceKey = {
 export type WorkspaceMember = {
   userId: string;
   username: string | undefined | null;
-  role: Role;
 };
 
 export type Workspace = {
