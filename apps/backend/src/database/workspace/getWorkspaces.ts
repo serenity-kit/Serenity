@@ -37,37 +37,6 @@ export async function getWorkspaces({
       name: "asc",
     },
     include: {
-      usersToWorkspaces: {
-        orderBy: {
-          userId: "asc",
-        },
-        include: {
-          user: {
-            select: {
-              id: true,
-              username: true,
-              chain: {
-                orderBy: {
-                  position: "asc",
-                },
-                select: {
-                  position: true,
-                  content: true,
-                },
-              },
-
-              mainDeviceSigningPublicKey: true, // TODO remove
-              devices: {
-                select: {
-                  signingPublicKey: true,
-                  encryptionPublicKey: true,
-                  encryptionPublicKeySignature: true,
-                },
-              },
-            },
-          },
-        },
-      },
       workspaceKeys: {
         include: {
           workspaceKeyBoxes: {

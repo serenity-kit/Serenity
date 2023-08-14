@@ -25,37 +25,6 @@ export async function getWorkspace({
   // include userstoworkspaces but in descending alphabetical order by userId
   const rawWorkspace = await prisma.workspace.findUnique({
     include: {
-      usersToWorkspaces: {
-        orderBy: {
-          userId: "asc",
-        },
-        include: {
-          user: {
-            select: {
-              id: true,
-              username: true,
-              chain: {
-                orderBy: {
-                  position: "asc",
-                },
-                select: {
-                  position: true,
-                  content: true,
-                },
-              },
-
-              mainDeviceSigningPublicKey: true, // TODO remove
-              devices: {
-                select: {
-                  signingPublicKey: true,
-                  encryptionPublicKey: true,
-                  encryptionPublicKeySignature: true,
-                },
-              },
-            },
-          },
-        },
-      },
       infoWorkspaceKey: {
         include: {
           workspaceKeyBoxes: {

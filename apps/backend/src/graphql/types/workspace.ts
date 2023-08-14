@@ -1,5 +1,5 @@
 import { enumType, nonNull, objectType } from "nexus";
-import { CreatorDevice, Device, MinimalDevice } from "./device";
+import { CreatorDevice, Device } from "./device";
 import { User } from "./user";
 
 export const MemberIdWithDevice = objectType({
@@ -61,9 +61,6 @@ export const WorkspaceMember = objectType({
   definition(t) {
     t.nonNull.string("id"); // workspaceId + userId
     t.nonNull.field("user", { type: User });
-
-    t.nonNull.string("mainDeviceSigningPublicKey"); // TODO remove
-    t.list.nonNull.field("devices", { type: MinimalDevice }); // TODO remove
   },
 });
 
@@ -77,7 +74,6 @@ export const Workspace = objectType({
     t.string("infoNonce");
     t.string("infoWorkspaceKeyId");
     t.field("infoWorkspaceKey", { type: WorkspaceKey });
-    t.list.nonNull.field("members", { type: WorkspaceMember });
     t.list.nonNull.field("workspaceKeys", { type: WorkspaceKey });
     t.field("currentWorkspaceKey", { type: WorkspaceKey });
   },

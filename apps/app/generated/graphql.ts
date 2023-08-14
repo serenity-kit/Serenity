@@ -586,13 +586,6 @@ export type MeResultWorkspaceLoadingInfoArgs = {
   workspaceId?: InputMaybe<Scalars['ID']>;
 };
 
-export type MinimalDevice = {
-  __typename?: 'MinimalDevice';
-  encryptionPublicKey: Scalars['String'];
-  encryptionPublicKeySignature: Scalars['String'];
-  signingPublicKey: Scalars['String'];
-};
-
 export type Mutation = {
   __typename?: 'Mutation';
   acceptWorkspaceInvitation?: Maybe<AcceptWorkspaceInvitationResult>;
@@ -1217,7 +1210,6 @@ export type Workspace = {
   infoNonce?: Maybe<Scalars['String']>;
   infoWorkspaceKey?: Maybe<WorkspaceKey>;
   infoWorkspaceKeyId?: Maybe<Scalars['String']>;
-  members?: Maybe<Array<WorkspaceMember>>;
   name?: Maybe<Scalars['String']>;
   workspaceKeys?: Maybe<Array<WorkspaceKey>>;
 };
@@ -1358,9 +1350,7 @@ export type WorkspaceLoadingInfo = {
 
 export type WorkspaceMember = {
   __typename?: 'WorkspaceMember';
-  devices?: Maybe<Array<MinimalDevice>>;
   id: Scalars['String'];
-  mainDeviceSigningPublicKey: Scalars['String'];
   user: User;
 };
 

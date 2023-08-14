@@ -4,8 +4,6 @@ import {
   Workspace,
   WorkspaceKey,
   WorkspaceKeyBox,
-  WorkspaceMember,
-  formatWorkspaceMember,
 } from "../../types/workspace";
 import { getOrCreateCreatorDevice } from "../../utils/device/getOrCreateCreatorDevice";
 import { prisma } from "../prisma";
@@ -146,54 +144,14 @@ export async function createWorkspace({
         creatorDevice: true,
       },
     });
-    const usersToWorkspaces = await prisma.usersToWorkspaces.findMany({
-      where: {
-        workspaceId: rawWorkspace.id,
-        userId,
-      },
-      select: {
-        userId: true,
-        role: true,
-        user: {
-          select: {
-            id: true,
-            username: true,
-            chain: {
-              orderBy: {
-                position: "asc",
-              },
-              select: {
-                position: true,
-                content: true,
-              },
-            },
-
-            mainDeviceSigningPublicKey: true, // TODO remove
-            devices: {
-              select: {
-                signingPublicKey: true,
-                encryptionPublicKey: true,
-                encryptionPublicKeySignature: true,
-              },
-            },
-          },
-        },
-      },
-    });
     const returningWorkspaceKey: WorkspaceKey = {
       ...currentWorkspaceKey,
       workspaceKeyBox: createdWorkspaceKeyBoxes[0],
     };
-    const members: WorkspaceMember[] = usersToWorkspaces.map(
-      (userToWorkspace) => {
-        return formatWorkspaceMember(userToWorkspace.user, rawWorkspace.id);
-      }
-    );
     const workspace: Workspace = {
       id: rawWorkspace.id,
       name: rawWorkspace.name,
       idSignature: rawWorkspace.idSignature,
-      members,
       currentWorkspaceKey: returningWorkspaceKey,
       workspaceKeys: [returningWorkspaceKey],
     };

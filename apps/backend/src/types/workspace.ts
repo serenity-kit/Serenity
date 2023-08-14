@@ -5,9 +5,8 @@ import {
   WorkspaceKey as PrismaWorkspaceKey,
   WorkspaceKeyBox as PrismaWorkspaceKeyBox,
   Role,
-  UsersToWorkspaces,
 } from "../../prisma/generated/output";
-import { CreatorDevice, MinimalDevice } from "./device";
+import { CreatorDevice } from "./device";
 
 export type MemberIdWithDevice = {
   id: string;
@@ -37,6 +36,11 @@ export type WorkspaceKey = {
   workspaceKeyBoxes?: WorkspaceKeyBox[];
 };
 
+type ChainEntry = {
+  serializedContent: string;
+  position: number;
+};
+
 export type WorkspaceMember = {
   id: string;
   user: {
@@ -44,12 +48,6 @@ export type WorkspaceMember = {
     username: string;
     chain: ChainEntry[];
   };
-  mainDeviceSigningPublicKey: string;
-  devices: MinimalDevice[];
-};
-
-type ChainEntry = {
-  serializedContent: string;
 };
 
 export type Workspace = {
@@ -60,7 +58,6 @@ export type Workspace = {
   infoNonce?: string | undefined | null;
   infoWorkspaceKeyId?: string | undefined | null;
   infoWorkspaceKey?: WorkspaceKey | undefined | null;
-  members: WorkspaceMember[];
   workspaceKeys?: WorkspaceKey[];
   currentWorkspaceKey?: WorkspaceKey;
   chain?: ChainEntry[];
@@ -80,19 +77,10 @@ export type WorkspaceInvitation = {
 type DbUser = {
   id: string;
   username: string;
-  mainDeviceSigningPublicKey: string;
-  devices: {
-    signingPublicKey: string;
-    encryptionPublicKey: string;
-    encryptionPublicKeySignature: string;
-  }[];
-  chain?: { content: any }[];
+  chain: { content: any; position: number }[];
 };
 
-type DbUsersToWorkspacesInclUser = UsersToWorkspaces & { user: DbUser };
-
 type DbWorkspace = PrismaWorkspace & {
-  usersToWorkspaces: DbUsersToWorkspacesInclUser[];
   workspaceKeys?: (PrismaWorkspaceKey & {
     workspaceKeyBoxes: (PrismaWorkspaceKeyBox & {
       creatorDevice: PrismaCreatorDevice;
@@ -107,7 +95,7 @@ type DbWorkspace = PrismaWorkspace & {
     | undefined
     | null;
 
-  chain?: { content: any }[];
+  chain?: { content: any; position: number }[];
 };
 
 export const formatWorkspaceKey = (workspaceKey: any): WorkspaceKey => {
@@ -133,13 +121,12 @@ export const formatWorkspaceMember = (
   }
   const workspaceMember: WorkspaceMember = {
     id: `workspace:${workspaceId}-user:${user.id}`,
-    mainDeviceSigningPublicKey: user.mainDeviceSigningPublicKey,
-    devices: user.devices,
     user: {
       ...user,
       chain: user.chain.map((userChainEvent) => {
         return {
           serializedContent: JSON.stringify(userChainEvent.content),
+          position: userChainEvent.position,
         };
       }),
     },
@@ -148,10 +135,6 @@ export const formatWorkspaceMember = (
 };
 
 export const formatWorkspace = (workspace: DbWorkspace): Workspace => {
-  const members: WorkspaceMember[] = [];
-  workspace.usersToWorkspaces.forEach((member) => {
-    members.push(formatWorkspaceMember(member.user, workspace.id));
-  });
   let currentWorkspaceKey: WorkspaceKey | undefined = undefined;
   const workspaceKeys: WorkspaceKey[] = [];
   if (workspace.workspaceKeys) {
@@ -177,13 +160,13 @@ export const formatWorkspace = (workspace: DbWorkspace): Workspace => {
   }
   return {
     ...workspace,
-    members: members,
     currentWorkspaceKey,
     infoWorkspaceKey,
     workspaceKeys,
     chain: workspace.chain?.map((entry) => {
       return {
         serializedContent: JSON.stringify(entry.content),
+        position: entry.position,
       };
     }),
   };

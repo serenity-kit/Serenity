@@ -20,7 +20,6 @@ const exchanges = [
   dedupExchange,
   cacheExchange({
     keys: {
-      WorkspaceMember: () => null, // since it has no unique key // TODO user id
       CreatorDevice: () => null, // since it has no unique key
       UnauthorizedMemberResult: () => null, // since it has no unique key
       PendingWorkspaceInvitationResult: () => null, // since it is just an id
@@ -35,10 +34,6 @@ const exchanges = [
       },
       // @ts-expect-error the type seems to be wrong
       Device: (device) => {
-        return device.signingPublicKey;
-      },
-      // @ts-expect-error the type seems to be wrong
-      MinimalDevice: (device) => {
         return device.signingPublicKey;
       },
       Session: () => null,

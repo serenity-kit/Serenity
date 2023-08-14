@@ -8,12 +8,13 @@ export const workspaceMembersQuery = queryField((t) => {
   t.connectionField("workspaceMembers", {
     type: WorkspaceMember,
     disableBackwardPagination: true,
-    cursorFromNode: (node) => node?.userId ?? "",
+    cursorFromNode: (node) => {
+      if (node?.id) return node.id;
+      throw new Error("Missing id on WorkspaceMember");
+    },
     additionalArgs: {
       workspaceId: nonNull(idArg()),
     },
-    // TODO remove the ignore
-    // @ts-ignore due the temporary mismatch of WorkspaceMember graphql type
     async nodes(root, args, context) {
       if (args.first > 500) {
         throw new UserInputError(

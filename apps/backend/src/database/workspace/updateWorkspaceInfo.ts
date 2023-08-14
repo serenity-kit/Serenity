@@ -123,37 +123,6 @@ export async function updateWorkspaceInfo({
         infoWorkspaceKeyId: insertedWorkspaceKey.id,
       },
       include: {
-        usersToWorkspaces: {
-          orderBy: {
-            userId: "asc",
-          },
-          include: {
-            user: {
-              select: {
-                id: true,
-                username: true,
-                chain: {
-                  orderBy: {
-                    position: "asc",
-                  },
-                  select: {
-                    position: true,
-                    content: true,
-                  },
-                },
-
-                mainDeviceSigningPublicKey: true, // TODO remove
-                devices: {
-                  select: {
-                    signingPublicKey: true,
-                    encryptionPublicKey: true,
-                    encryptionPublicKeySignature: true,
-                  },
-                },
-              },
-            },
-          },
-        },
         infoWorkspaceKey: {
           include: {
             workspaceKeyBoxes: {

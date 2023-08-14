@@ -68,36 +68,6 @@ export async function updateWorkspaceMemberRole({
     });
     const updatedWorkspace = await prisma.workspace.findFirstOrThrow({
       where: { id: workspaceId },
-      include: {
-        usersToWorkspaces: {
-          include: {
-            user: {
-              select: {
-                id: true,
-                username: true,
-                chain: {
-                  orderBy: {
-                    position: "asc",
-                  },
-                  select: {
-                    position: true,
-                    content: true,
-                  },
-                },
-
-                mainDeviceSigningPublicKey: true, // TODO remove
-                devices: {
-                  select: {
-                    signingPublicKey: true,
-                    encryptionPublicKey: true,
-                    encryptionPublicKeySignature: true,
-                  },
-                },
-              },
-            },
-          },
-        },
-      },
     });
     return formatWorkspace(updatedWorkspace);
   });

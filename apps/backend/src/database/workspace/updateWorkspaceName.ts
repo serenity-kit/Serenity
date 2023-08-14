@@ -3,11 +3,6 @@ import { Role } from "../../../prisma/generated/output";
 import { formatWorkspace } from "../../types/workspace";
 import { prisma } from "../prisma";
 
-export type WorkspaceMemberParams = {
-  userId: string;
-  role: Role;
-};
-
 type Params = {
   id: string;
   name: string | undefined;
@@ -50,78 +45,12 @@ export async function updateWorkspaceName({ id, name, userId }: Params) {
           name: name,
           idSignature: "TODO",
         },
-        include: {
-          usersToWorkspaces: {
-            orderBy: {
-              userId: "asc",
-            },
-            include: {
-              user: {
-                select: {
-                  id: true,
-                  username: true,
-                  chain: {
-                    orderBy: {
-                      position: "asc",
-                    },
-                    select: {
-                      position: true,
-                      content: true,
-                    },
-                  },
-
-                  mainDeviceSigningPublicKey: true, // TODO remove
-                  devices: {
-                    select: {
-                      signingPublicKey: true,
-                      encryptionPublicKey: true,
-                      encryptionPublicKeySignature: true,
-                    },
-                  },
-                },
-              },
-            },
-          },
-        },
       });
     } else {
       updatedWorkspace = workspace;
       updatedWorkspace = await prisma.workspace.findFirst({
         where: {
           id: workspace.id,
-        },
-        include: {
-          usersToWorkspaces: {
-            orderBy: {
-              userId: "asc",
-            },
-            include: {
-              user: {
-                select: {
-                  id: true,
-                  username: true,
-                  chain: {
-                    orderBy: {
-                      position: "asc",
-                    },
-                    select: {
-                      position: true,
-                      content: true,
-                    },
-                  },
-
-                  mainDeviceSigningPublicKey: true, // TODO remove
-                  devices: {
-                    select: {
-                      signingPublicKey: true,
-                      encryptionPublicKey: true,
-                      encryptionPublicKeySignature: true,
-                    },
-                  },
-                },
-              },
-            },
-          },
         },
       });
     }

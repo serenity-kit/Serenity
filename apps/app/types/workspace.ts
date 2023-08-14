@@ -14,16 +14,10 @@ export type WorkspaceKey = {
   workspaceKeyBox: WorkspaceKeyBox;
 };
 
-export type WorkspaceMember = {
-  userId: string;
-  username: string | undefined | null;
-};
-
 export type Workspace = {
   id: string;
   name: string;
   idSignature?: string;
-  members: WorkspaceMember[];
   workspaceKeys?: WorkspaceKey[];
   currentWorkspaceKey?: WorkspaceKey;
 };

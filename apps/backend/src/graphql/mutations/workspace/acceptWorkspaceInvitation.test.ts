@@ -5,6 +5,7 @@ import deleteAllRecords from "../../../../test/helpers/deleteAllRecords";
 import setupGraphql from "../../../../test/helpers/setupGraphql";
 import { acceptWorkspaceInvitation } from "../../../../test/helpers/workspace/acceptWorkspaceInvitation";
 import { createWorkspaceInvitation } from "../../../../test/helpers/workspace/createWorkspaceInvitation";
+import { prisma } from "../../../database/prisma";
 import createUserWithWorkspace from "../../../database/testHelpers/createUserWithWorkspace";
 import { getWorkspace } from "../../../database/workspace/getWorkspace";
 
@@ -63,15 +64,10 @@ test("accept admin role", async () => {
     workspaceId
   );
 
-  const sharedWorkspace = await getWorkspace({
-    id: workspaceId,
-    userId: inviterUserAndDevice.user.id,
-    deviceSigningPublicKey: device.signingPublicKey,
+  const workspaceMembers = await prisma.usersToWorkspaces.findMany({
+    where: { workspaceId },
   });
-  if (!sharedWorkspace) {
-    throw new Error("workspace not found");
-  }
-  expect(sharedWorkspace.members.length).toBe(2);
+  expect(workspaceMembers.length).toBe(2);
 });
 
 test("double-accepting invitation throws an error", async () => {
@@ -130,15 +126,10 @@ test("accept editor role", async () => {
     workspaceId
   );
 
-  const sharedWorkspace = await getWorkspace({
-    id: workspaceId,
-    userId: inviterUserAndDevice.user.id,
-    deviceSigningPublicKey: device.signingPublicKey,
+  const workspaceMembers = await prisma.usersToWorkspaces.findMany({
+    where: { workspaceId },
   });
-  if (!sharedWorkspace) {
-    throw new Error("workspace not found");
-  }
-  expect(sharedWorkspace.members.length).toBe(2);
+  expect(workspaceMembers.length).toBe(2);
 });
 
 test("accept commenter role", async () => {
@@ -184,15 +175,10 @@ test("accept commenter role", async () => {
     workspaceId
   );
 
-  const sharedWorkspace = await getWorkspace({
-    id: workspaceId,
-    userId: inviterUserAndDevice.user.id,
-    deviceSigningPublicKey: device.signingPublicKey,
+  const workspaceMembers = await prisma.usersToWorkspaces.findMany({
+    where: { workspaceId },
   });
-  if (!sharedWorkspace) {
-    throw new Error("workspace not found");
-  }
-  expect(sharedWorkspace.members.length).toBe(2);
+  expect(workspaceMembers.length).toBe(2);
 });
 
 test("accept viewer role", async () => {
@@ -238,15 +224,10 @@ test("accept viewer role", async () => {
     workspaceId
   );
 
-  const sharedWorkspace = await getWorkspace({
-    id: workspaceId,
-    userId: inviterUserAndDevice.user.id,
-    deviceSigningPublicKey: device.signingPublicKey,
+  const workspaceMembers = await prisma.usersToWorkspaces.findMany({
+    where: { workspaceId },
   });
-  if (!sharedWorkspace) {
-    throw new Error("workspace not found");
-  }
-  expect(sharedWorkspace.members.length).toBe(2);
+  expect(workspaceMembers.length).toBe(2);
 });
 
 test("invalid invitation id should throw error", async () => {
