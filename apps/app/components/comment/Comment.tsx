@@ -38,7 +38,7 @@ export default function Comment({ comment, meId, meName }: Props) {
   );
 
   const isActiveComment = comment.id === state.context.highlightedComment?.id;
-  const isMyComment = commentCreator?.userId === meId;
+  const isMyComment = commentCreator?.user.id === meId;
 
   const replyLength = comment.replies.length;
   const replyString = {
@@ -82,12 +82,12 @@ export default function Comment({ comment, meId, meName }: Props) {
         <HStack alignItems="center" space="1.5">
           {commentCreator ? (
             <Avatar
-              key={commentCreator.userId}
-              color={hashToCollaboratorColor(commentCreator.userId)}
+              key={commentCreator.user.id}
+              color={hashToCollaboratorColor(commentCreator.user.id)}
               size="xs"
               muted={!isActiveComment}
             >
-              {commentCreator.username?.split("@")[0].substring(0, 1)}
+              {commentCreator.user.username?.split("@")[0].substring(0, 1)}
             </Avatar>
           ) : (
             <Avatar color="arctic" size="xs" muted={!isActiveComment}>
@@ -104,7 +104,7 @@ export default function Comment({ comment, meId, meName }: Props) {
             numberOfLines={1}
             ellipsizeMode="tail"
           >
-            {commentCreator?.username || "External"}
+            {commentCreator?.user.username || "External"}
           </Text>
         </HStack>
         {isMyComment && (isActiveComment || isHovered) ? (

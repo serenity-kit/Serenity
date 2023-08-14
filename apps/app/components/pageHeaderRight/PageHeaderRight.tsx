@@ -56,10 +56,10 @@ export const PageHeaderRight: React.FC<Props> = ({ toggleCommentsDrawer }) => {
                 {workspaceQueryResult.data.workspace.members.map((member) => {
                   return (
                     <Avatar
-                      key={member.userId}
-                      color={hashToCollaboratorColor(member.userId)}
+                      key={member.user.id}
+                      color={hashToCollaboratorColor(member.user.id)}
                     >
-                      {member.username?.split("@")[0].substring(0, 1)}
+                      {member.user.username?.split("@")[0].substring(0, 1)}
                     </Avatar>
                   );
                 })}

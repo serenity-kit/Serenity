@@ -3,9 +3,9 @@ import { getUserFromWorkspaceQueryResultByDeviceInfo } from "./getUserFromWorksp
 const workspaceQueryResult = {
   workspace: {
     members: [
-      { userId: "1", devices: [{ signingPublicKey: "xyz" }] },
-      { userId: "2", devices: [{ signingPublicKey: "abc" }] },
-      { userId: "3", devices: [{ signingPublicKey: "def" }] },
+      { user: { id: "1" }, devices: [{ signingPublicKey: "xyz" }] },
+      { user: { id: "2" }, devices: [{ signingPublicKey: "abc" }] },
+      { user: { id: "3" }, devices: [{ signingPublicKey: "def" }] },
     ],
   },
 };
@@ -34,5 +34,5 @@ test("should return the member that contains the device", () => {
     workspaceQueryResult,
     { signingPublicKey: "abc" }
   );
-  expect(result?.userId).toBe("2");
+  expect(result?.user.id).toBe("2");
 });

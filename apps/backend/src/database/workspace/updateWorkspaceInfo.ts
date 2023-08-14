@@ -130,8 +130,19 @@ export async function updateWorkspaceInfo({
           include: {
             user: {
               select: {
+                id: true,
                 username: true,
-                mainDeviceSigningPublicKey: true,
+                chain: {
+                  orderBy: {
+                    position: "asc",
+                  },
+                  select: {
+                    position: true,
+                    content: true,
+                  },
+                },
+
+                mainDeviceSigningPublicKey: true, // TODO remove
                 devices: {
                   select: {
                     signingPublicKey: true,

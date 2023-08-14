@@ -274,16 +274,16 @@ export default function WorkspaceSettingsMembersScreen(
                       state.context.meWithWorkspaceLoadingInfoQueryResult?.data
                         ?.me?.id;
                     // TODO use the username when available
-                    const username = member.username.slice(
+                    const username = member.user.username.slice(
                       0,
-                      member.username.indexOf("@")
+                      member.user.username.indexOf("@")
                     );
                     // TODO use initials when we have a username
                     const initials = username.substring(0, 1);
-                    const email = member.username;
+                    const email = member.user.username;
 
                     const allowEditing =
-                      currentUserIsAdmin && member.userId !== adminUserId;
+                      currentUserIsAdmin && member.user.id !== adminUserId;
 
                     // capitalize by css doesn't work here as it will only affect the first letter
                     const roleName =
@@ -293,12 +293,12 @@ export default function WorkspaceSettingsMembersScreen(
                     return (
                       <ListItem
                         testID={`workspace-member-row__${adminUserId}`}
-                        key={member.userId}
+                        key={member.user.id}
                         mainItem={
                           <ListIconText
                             main={
                               username +
-                              (member.userId === adminUserId ? " (you)" : "")
+                              (member.user.id === adminUserId ? " (you)" : "")
                             }
                             secondary={email}
                             avatar={
@@ -314,7 +314,7 @@ export default function WorkspaceSettingsMembersScreen(
                         actionItem={
                           allowEditing ? (
                             <MemberMenu
-                              memberId={member.userId}
+                              memberId={member.user.id}
                               role={memberInfo.role}
                               onUpdateRole={(role) => {
                                 updateMemberRolePreflight({
@@ -325,7 +325,7 @@ export default function WorkspaceSettingsMembersScreen(
                               onDeletePressed={() => {
                                 removeMemberPreflight({
                                   mainDeviceSigningPublicKey,
-                                  userId: member.userId,
+                                  userId: member.user.id,
                                 });
                               }}
                             />

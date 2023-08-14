@@ -5,6 +5,7 @@ import {
   WorkspaceKey,
   WorkspaceKeyBox,
   WorkspaceMember,
+  formatWorkspaceMember,
 } from "../../types/workspace";
 import { getOrCreateCreatorDevice } from "../../utils/device/getOrCreateCreatorDevice";
 import { prisma } from "../prisma";
@@ -155,8 +156,19 @@ export async function createWorkspace({
         role: true,
         user: {
           select: {
+            id: true,
             username: true,
-            mainDeviceSigningPublicKey: true,
+            chain: {
+              orderBy: {
+                position: "asc",
+              },
+              select: {
+                position: true,
+                content: true,
+              },
+            },
+
+            mainDeviceSigningPublicKey: true, // TODO remove
             devices: {
               select: {
                 signingPublicKey: true,
@@ -172,16 +184,11 @@ export async function createWorkspace({
       ...currentWorkspaceKey,
       workspaceKeyBox: createdWorkspaceKeyBoxes[0],
     };
-    const members: WorkspaceMember[] = [];
-    usersToWorkspaces.forEach((userToWorkspace) => {
-      members.push({
-        userId: userToWorkspace.userId,
-        username: userToWorkspace.user.username,
-        devices: userToWorkspace.user.devices,
-        mainDeviceSigningPublicKey:
-          userToWorkspace.user.mainDeviceSigningPublicKey,
-      });
-    });
+    const members: WorkspaceMember[] = usersToWorkspaces.map(
+      (userToWorkspace) => {
+        return formatWorkspaceMember(userToWorkspace.user, rawWorkspace.id);
+      }
+    );
     const workspace: Workspace = {
       id: rawWorkspace.id,
       name: rawWorkspace.name,

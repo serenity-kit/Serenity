@@ -38,8 +38,12 @@ export type WorkspaceKey = {
 };
 
 export type WorkspaceMember = {
-  userId: string;
-  username: string | undefined | null;
+  id: string;
+  user: {
+    id: string;
+    username: string;
+    chain: ChainEntry[];
+  };
   mainDeviceSigningPublicKey: string;
   devices: MinimalDevice[];
 };
@@ -73,18 +77,22 @@ export type WorkspaceInvitation = {
   expiresAt: Date;
 };
 
+type DbUser = {
+  id: string;
+  username: string;
+  mainDeviceSigningPublicKey: string;
+  devices: {
+    signingPublicKey: string;
+    encryptionPublicKey: string;
+    encryptionPublicKeySignature: string;
+  }[];
+  chain?: { content: any }[];
+};
+
+type DbUsersToWorkspacesInclUser = UsersToWorkspaces & { user: DbUser };
+
 type DbWorkspace = PrismaWorkspace & {
-  usersToWorkspaces: (UsersToWorkspaces & {
-    user: {
-      username: string;
-      mainDeviceSigningPublicKey: string;
-      devices: {
-        signingPublicKey: string;
-        encryptionPublicKey: string;
-        encryptionPublicKeySignature: string;
-      }[];
-    };
-  })[];
+  usersToWorkspaces: DbUsersToWorkspacesInclUser[];
   workspaceKeys?: (PrismaWorkspaceKey & {
     workspaceKeyBoxes: (PrismaWorkspaceKeyBox & {
       creatorDevice: PrismaCreatorDevice;
@@ -116,16 +124,33 @@ export const formatWorkspaceInvitation = (workspaceInvitation: any) => {
   };
 };
 
+export const formatWorkspaceMember = (
+  user: DbUser,
+  workspaceId: string
+): WorkspaceMember => {
+  if (!user.chain) {
+    throw new Error("Missing chain for user");
+  }
+  const workspaceMember: WorkspaceMember = {
+    id: `workspace:${workspaceId}-user:${user.id}`,
+    mainDeviceSigningPublicKey: user.mainDeviceSigningPublicKey,
+    devices: user.devices,
+    user: {
+      ...user,
+      chain: user.chain.map((userChainEvent) => {
+        return {
+          serializedContent: JSON.stringify(userChainEvent.content),
+        };
+      }),
+    },
+  };
+  return workspaceMember;
+};
+
 export const formatWorkspace = (workspace: DbWorkspace): Workspace => {
   const members: WorkspaceMember[] = [];
   workspace.usersToWorkspaces.forEach((member) => {
-    const workspaceMember: WorkspaceMember = {
-      userId: member.userId,
-      mainDeviceSigningPublicKey: member.user.mainDeviceSigningPublicKey,
-      username: member.user.username,
-      devices: member.user.devices,
-    };
-    members.push(workspaceMember);
+    members.push(formatWorkspaceMember(member.user, workspace.id));
   });
   let currentWorkspaceKey: WorkspaceKey | undefined = undefined;
   const workspaceKeys: WorkspaceKey[] = [];

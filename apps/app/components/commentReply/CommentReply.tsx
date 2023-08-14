@@ -38,7 +38,7 @@ export default function CommentReply({
     reply.creatorDevice
   );
 
-  const isMyReply = replyCreator?.userId === meId;
+  const isMyReply = replyCreator?.user.id === meId;
 
   return (
     <View
@@ -52,11 +52,11 @@ export default function CommentReply({
           {/* TODO if comment has been read change color to gray */}
           {replyCreator ? (
             <Avatar
-              key={replyCreator.userId}
-              color={hashToCollaboratorColor(replyCreator.userId)}
+              key={replyCreator.user.id}
+              color={hashToCollaboratorColor(replyCreator.user.id)}
               size="xs"
             >
-              {replyCreator.username?.split("@")[0].substring(0, 1)}
+              {replyCreator.user.username?.split("@")[0].substring(0, 1)}
             </Avatar>
           ) : (
             <Avatar color="arctic" size="xs">
@@ -70,7 +70,7 @@ export default function CommentReply({
             numberOfLines={1}
             ellipsizeMode="tail"
           >
-            {replyCreator?.username || "External"}
+            {replyCreator?.user.username || "External"}
           </Text>
         </HStack>
         {isMyReply && isHovered ? (

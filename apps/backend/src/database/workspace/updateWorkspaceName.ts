@@ -1,6 +1,6 @@
 import { ForbiddenError } from "apollo-server-express";
 import { Role } from "../../../prisma/generated/output";
-import { formatWorkspace, Workspace } from "../../types/workspace";
+import { formatWorkspace } from "../../types/workspace";
 import { prisma } from "../prisma";
 
 export type WorkspaceMemberParams = {
@@ -14,17 +14,7 @@ type Params = {
   userId: string;
 };
 
-type UserToWorkspaceData = {
-  userId: string;
-  workspaceId: string;
-  role: Role;
-};
-
-export async function updateWorkspaceName({
-  id,
-  name,
-  userId,
-}: Params): Promise<Workspace> {
+export async function updateWorkspaceName({ id, name, userId }: Params) {
   return await prisma.$transaction(async (prisma) => {
     const userToWorkspace = await prisma.usersToWorkspaces.findFirst({
       where: {
@@ -60,7 +50,39 @@ export async function updateWorkspaceName({
           name: name,
           idSignature: "TODO",
         },
-        include: { usersToWorkspaces: { include: { user: true } } },
+        include: {
+          usersToWorkspaces: {
+            orderBy: {
+              userId: "asc",
+            },
+            include: {
+              user: {
+                select: {
+                  id: true,
+                  username: true,
+                  chain: {
+                    orderBy: {
+                      position: "asc",
+                    },
+                    select: {
+                      position: true,
+                      content: true,
+                    },
+                  },
+
+                  mainDeviceSigningPublicKey: true, // TODO remove
+                  devices: {
+                    select: {
+                      signingPublicKey: true,
+                      encryptionPublicKey: true,
+                      encryptionPublicKeySignature: true,
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
       });
     } else {
       updatedWorkspace = workspace;
@@ -68,7 +90,39 @@ export async function updateWorkspaceName({
         where: {
           id: workspace.id,
         },
-        include: { usersToWorkspaces: { include: { user: true } } },
+        include: {
+          usersToWorkspaces: {
+            orderBy: {
+              userId: "asc",
+            },
+            include: {
+              user: {
+                select: {
+                  id: true,
+                  username: true,
+                  chain: {
+                    orderBy: {
+                      position: "asc",
+                    },
+                    select: {
+                      position: true,
+                      content: true,
+                    },
+                  },
+
+                  mainDeviceSigningPublicKey: true, // TODO remove
+                  devices: {
+                    select: {
+                      signingPublicKey: true,
+                      encryptionPublicKey: true,
+                      encryptionPublicKeySignature: true,
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
       });
     }
     return formatWorkspace(updatedWorkspace);

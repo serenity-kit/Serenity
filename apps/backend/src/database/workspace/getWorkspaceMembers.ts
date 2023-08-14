@@ -1,4 +1,5 @@
 import { ForbiddenError } from "apollo-server-express";
+import { formatWorkspaceMember } from "../../types/workspace";
 import { prisma } from "../prisma";
 
 type Cursor = {
@@ -50,21 +51,20 @@ export async function getWorkspaceMembers({
           content: true,
         },
       },
+
+      mainDeviceSigningPublicKey: true, // TODO remove
+      // TODO remove
+      devices: {
+        select: {
+          signingPublicKey: true,
+          encryptionPublicKey: true,
+          encryptionPublicKeySignature: true,
+        },
+      },
     },
   });
 
   return users.map((user) => {
-    return {
-      id: `workspace:${workspaceId}-user:${user.id}`,
-      user: {
-        ...user,
-        chain: user.chain.map((userChainEvent) => {
-          return {
-            ...userChainEvent,
-            serializedContent: JSON.stringify(userChainEvent.content),
-          };
-        }),
-      },
-    };
+    return formatWorkspaceMember(user, workspaceId);
   });
 }

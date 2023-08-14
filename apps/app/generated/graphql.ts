@@ -1362,8 +1362,6 @@ export type WorkspaceMember = {
   id: Scalars['String'];
   mainDeviceSigningPublicKey: Scalars['String'];
   user: User;
-  userId: Scalars['String'];
-  username: Scalars['String'];
 };
 
 export type WorkspaceMemberConnection = {
@@ -1588,7 +1586,7 @@ export type UpdateWorkspaceMemberRoleMutationVariables = Exact<{
 }>;
 
 
-export type UpdateWorkspaceMemberRoleMutation = { __typename?: 'Mutation', updateWorkspaceMemberRole?: { __typename?: 'UpdateWorkspaceMemberRoleResult', workspace?: { __typename?: 'Workspace', id: string, name?: string | null, members?: Array<{ __typename?: 'WorkspaceMember', userId: string, username: string }> | null } | null } | null };
+export type UpdateWorkspaceMemberRoleMutation = { __typename?: 'Mutation', updateWorkspaceMemberRole?: { __typename?: 'UpdateWorkspaceMemberRoleResult', workspace?: { __typename?: 'Workspace', id: string, name?: string | null } | null } | null };
 
 export type UpdateWorkspaceNameMutationVariables = Exact<{
   input: UpdateWorkspaceNameInput;
@@ -1771,7 +1769,7 @@ export type WorkspaceQueryVariables = Exact<{
 }>;
 
 
-export type WorkspaceQuery = { __typename?: 'Query', workspace?: { __typename?: 'Workspace', id: string, name?: string | null, members?: Array<{ __typename?: 'WorkspaceMember', userId: string, username: string, mainDeviceSigningPublicKey: string, devices?: Array<{ __typename?: 'MinimalDevice', signingPublicKey: string, encryptionPublicKey: string, encryptionPublicKeySignature: string }> | null }> | null, currentWorkspaceKey?: { __typename?: 'WorkspaceKey', id: string, workspaceId: string, workspaceKeyBox?: { __typename?: 'WorkspaceKeyBox', id: string, workspaceKeyId: string, deviceSigningPublicKey: string, ciphertext: string, nonce: string, creatorDevice: { __typename?: 'CreatorDevice', signingPublicKey: string, encryptionPublicKey: string } } | null } | null, workspaceKeys?: Array<{ __typename?: 'WorkspaceKey', id: string, workspaceId: string, generation: number, workspaceKeyBox?: { __typename?: 'WorkspaceKeyBox', id: string, workspaceKeyId: string, deviceSigningPublicKey: string, ciphertext: string, nonce: string, creatorDevice: { __typename?: 'CreatorDevice', signingPublicKey: string, encryptionPublicKey: string } } | null }> | null } | null };
+export type WorkspaceQuery = { __typename?: 'Query', workspace?: { __typename?: 'Workspace', id: string, name?: string | null, members?: Array<{ __typename?: 'WorkspaceMember', id: string, mainDeviceSigningPublicKey: string, user: { __typename?: 'User', id: string, username: string }, devices?: Array<{ __typename?: 'MinimalDevice', signingPublicKey: string, encryptionPublicKey: string, encryptionPublicKeySignature: string }> | null }> | null, currentWorkspaceKey?: { __typename?: 'WorkspaceKey', id: string, workspaceId: string, workspaceKeyBox?: { __typename?: 'WorkspaceKeyBox', id: string, workspaceKeyId: string, deviceSigningPublicKey: string, ciphertext: string, nonce: string, creatorDevice: { __typename?: 'CreatorDevice', signingPublicKey: string, encryptionPublicKey: string } } | null } | null, workspaceKeys?: Array<{ __typename?: 'WorkspaceKey', id: string, workspaceId: string, generation: number, workspaceKeyBox?: { __typename?: 'WorkspaceKeyBox', id: string, workspaceKeyId: string, deviceSigningPublicKey: string, ciphertext: string, nonce: string, creatorDevice: { __typename?: 'CreatorDevice', signingPublicKey: string, encryptionPublicKey: string } } | null }> | null } | null };
 
 export type WorkspaceChainQueryVariables = Exact<{
   workspaceId: Scalars['ID'];
@@ -1813,7 +1811,7 @@ export type WorkspacesQueryVariables = Exact<{
 }>;
 
 
-export type WorkspacesQuery = { __typename?: 'Query', workspaces?: { __typename?: 'WorkspaceConnection', nodes?: Array<{ __typename?: 'Workspace', id: string, name?: string | null, members?: Array<{ __typename?: 'WorkspaceMember', userId: string }> | null, currentWorkspaceKey?: { __typename?: 'WorkspaceKey', id: string, workspaceId: string, generation: number, workspaceKeyBox?: { __typename?: 'WorkspaceKeyBox', id: string, workspaceKeyId: string, deviceSigningPublicKey: string, ciphertext: string, nonce: string, creatorDevice: { __typename?: 'CreatorDevice', signingPublicKey: string, encryptionPublicKey: string } } | null } | null, workspaceKeys?: Array<{ __typename?: 'WorkspaceKey', id: string, workspaceId: string, generation: number, workspaceKeyBox?: { __typename?: 'WorkspaceKeyBox', id: string, workspaceKeyId: string, deviceSigningPublicKey: string, ciphertext: string, nonce: string, creatorDevice: { __typename?: 'CreatorDevice', signingPublicKey: string, encryptionPublicKey: string } } | null }> | null } | null> | null } | null };
+export type WorkspacesQuery = { __typename?: 'Query', workspaces?: { __typename?: 'WorkspaceConnection', nodes?: Array<{ __typename?: 'Workspace', id: string, name?: string | null, currentWorkspaceKey?: { __typename?: 'WorkspaceKey', id: string, workspaceId: string, generation: number, workspaceKeyBox?: { __typename?: 'WorkspaceKeyBox', id: string, workspaceKeyId: string, deviceSigningPublicKey: string, ciphertext: string, nonce: string, creatorDevice: { __typename?: 'CreatorDevice', signingPublicKey: string, encryptionPublicKey: string } } | null } | null, workspaceKeys?: Array<{ __typename?: 'WorkspaceKey', id: string, workspaceId: string, generation: number, workspaceKeyBox?: { __typename?: 'WorkspaceKeyBox', id: string, workspaceKeyId: string, deviceSigningPublicKey: string, ciphertext: string, nonce: string, creatorDevice: { __typename?: 'CreatorDevice', signingPublicKey: string, encryptionPublicKey: string } } | null }> | null } | null> | null } | null };
 
 
 export const AcceptWorkspaceInvitationDocument = gql`
@@ -2260,10 +2258,6 @@ export const UpdateWorkspaceMemberRoleDocument = gql`
     workspace {
       id
       name
-      members {
-        userId
-        username
-      }
     }
   }
 }
@@ -2756,8 +2750,11 @@ export const WorkspaceDocument = gql`
     id
     name
     members {
-      userId
-      username
+      id
+      user {
+        id
+        username
+      }
       mainDeviceSigningPublicKey
       devices {
         signingPublicKey
@@ -2907,9 +2904,6 @@ export const WorkspacesDocument = gql`
     nodes {
       id
       name
-      members {
-        userId
-      }
       currentWorkspaceKey {
         id
         workspaceId
