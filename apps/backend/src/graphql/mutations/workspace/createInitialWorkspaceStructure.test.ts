@@ -50,7 +50,6 @@ test("create initial workspace structure", async () => {
   expect(workspace.id).not.toBeNull();
   expect(workspace.id).not.toBeUndefined();
   expect(workspace.name).toBe(workspaceName);
-  expect(workspace.members.length).toBe(1);
   expect(workspace.currentWorkspaceKey.id).not.toBeNull();
   expect(folder.id).not.toBeNull();
   expect(folder.id).not.toBeUndefined();

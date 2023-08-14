@@ -83,9 +83,6 @@ const getWorkspaces = async ({
         nodes {
           id
           name
-          members {
-            userId
-          }
           currentWorkspaceKey {
             id
             workspaceId
@@ -153,9 +150,6 @@ test("user should be able to list workspaces", async () => {
     expect(workspaceKeyBox?.workspaceKeyId).toBe(
       workspace.currentWorkspaceKey?.id
     );
-    expect(workspace.members.length).toBe(1);
-    const member = workspace.members[0];
-    expect(member.userId).toBe(userData1.user.id);
   });
 });
 
@@ -219,9 +213,6 @@ test("Input errors", async () => {
         nodes {
           id
           name
-          members {
-            userId
-          }
         }
         edges {
           cursor

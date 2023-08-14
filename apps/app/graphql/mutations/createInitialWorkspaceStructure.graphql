@@ -5,9 +5,6 @@ mutation createInitialWorkspaceStructure(
     workspace {
       id
       name
-      members {
-        userId
-      }
       currentWorkspaceKey {
         id
         workspaceId
