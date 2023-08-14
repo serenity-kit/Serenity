@@ -5,16 +5,25 @@ import { VerifiedDevice } from "../types";
 type SerializedUserChain = Array<{
   __typename?: "UserChainEvent";
   serializedContent: string;
-  position: number;
+  position?: number;
 } | null>;
 
 type Params = {
   serializedUserChain: SerializedUserChain;
 };
 
+export type VerifiedUserFromUserChain = {
+  userId: string;
+  email: string;
+  mainDeviceSigningPublicKey: string;
+  lastChainEvent: string;
+  nonExpiredDevices: VerifiedDevice[];
+  expiredDevices: VerifiedDevice[];
+};
+
 export const constructUserFromSerializedUserChain = ({
   serializedUserChain,
-}: Params) => {
+}: Params): VerifiedUserFromUserChain => {
   if (serializedUserChain.length === 0) {
     throw new Error("Empty user-chains are not valid");
   }
@@ -64,12 +73,14 @@ export const constructUserFromSerializedUserChain = ({
       }
     }
   );
-  return {
+  const workspaceMember: VerifiedUserFromUserChain = {
     userId: userChainState.id,
     email: userChainState.email,
+    mainDeviceSigningPublicKey: userChainState.mainDeviceSigningPublicKey,
     // @ts-expect-error there always must be lastChainEvent
     lastChainEvent,
     nonExpiredDevices,
     expiredDevices,
   };
+  return workspaceMember;
 };

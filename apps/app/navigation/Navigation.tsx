@@ -8,7 +8,10 @@ import {
 } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import * as workspaceChain from "@serenity-kit/workspace-chain";
-import { notNull } from "@serenity-tools/common";
+import {
+  constructUserFromSerializedUserChain,
+  notNull,
+} from "@serenity-tools/common";
 import {
   Heading,
   Text,
@@ -29,6 +32,7 @@ import WorkspaceSettingsSidebar from "../components/workspaceSettingsSidebar/Wor
 import { WorkspaceProvider } from "../context/WorkspaceContext";
 import {
   useWorkspaceChainQuery,
+  useWorkspaceMembersQuery,
   useWorkspaceQuery,
 } from "../generated/graphql";
 import { redirectToLoginIfMissingTheActiveDeviceOrSessionKey } from "../higherOrderComponents/redirectToLoginIfMissingTheActiveDeviceOrSessionKey";
@@ -223,6 +227,21 @@ function WorkspaceStackNavigator(props) {
     );
   }
 
+  const [workspaceMembersQueryResult] = useWorkspaceMembersQuery({
+    variables: {
+      workspaceId: props.route.params.workspaceId,
+    },
+  });
+  const users = workspaceMembersQueryResult.data?.workspaceMembers?.nodes
+    ? workspaceMembersQueryResult.data.workspaceMembers.nodes
+        .filter(notNull)
+        .map((member) => {
+          return constructUserFromSerializedUserChain({
+            serializedUserChain: member.user.chain,
+          });
+        })
+    : null;
+
   const fetchAndApplyNewWorkspaceChainEntries = async () => {
     reExecuteWorkspaceChainQuery();
   };
@@ -263,6 +282,7 @@ function WorkspaceStackNavigator(props) {
               }
             : null,
         fetchAndApplyNewWorkspaceChainEntries,
+        users,
       }}
     >
       <WorkspaceStack.Navigator

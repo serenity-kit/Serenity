@@ -1769,7 +1769,7 @@ export type WorkspaceQueryVariables = Exact<{
 }>;
 
 
-export type WorkspaceQuery = { __typename?: 'Query', workspace?: { __typename?: 'Workspace', id: string, name?: string | null, members?: Array<{ __typename?: 'WorkspaceMember', id: string, mainDeviceSigningPublicKey: string, user: { __typename?: 'User', id: string, username: string }, devices?: Array<{ __typename?: 'MinimalDevice', signingPublicKey: string, encryptionPublicKey: string, encryptionPublicKeySignature: string }> | null }> | null, currentWorkspaceKey?: { __typename?: 'WorkspaceKey', id: string, workspaceId: string, workspaceKeyBox?: { __typename?: 'WorkspaceKeyBox', id: string, workspaceKeyId: string, deviceSigningPublicKey: string, ciphertext: string, nonce: string, creatorDevice: { __typename?: 'CreatorDevice', signingPublicKey: string, encryptionPublicKey: string } } | null } | null, workspaceKeys?: Array<{ __typename?: 'WorkspaceKey', id: string, workspaceId: string, generation: number, workspaceKeyBox?: { __typename?: 'WorkspaceKeyBox', id: string, workspaceKeyId: string, deviceSigningPublicKey: string, ciphertext: string, nonce: string, creatorDevice: { __typename?: 'CreatorDevice', signingPublicKey: string, encryptionPublicKey: string } } | null }> | null } | null };
+export type WorkspaceQuery = { __typename?: 'Query', workspace?: { __typename?: 'Workspace', id: string, name?: string | null, currentWorkspaceKey?: { __typename?: 'WorkspaceKey', id: string, workspaceId: string, workspaceKeyBox?: { __typename?: 'WorkspaceKeyBox', id: string, workspaceKeyId: string, deviceSigningPublicKey: string, ciphertext: string, nonce: string, creatorDevice: { __typename?: 'CreatorDevice', signingPublicKey: string, encryptionPublicKey: string } } | null } | null, workspaceKeys?: Array<{ __typename?: 'WorkspaceKey', id: string, workspaceId: string, generation: number, workspaceKeyBox?: { __typename?: 'WorkspaceKeyBox', id: string, workspaceKeyId: string, deviceSigningPublicKey: string, ciphertext: string, nonce: string, creatorDevice: { __typename?: 'CreatorDevice', signingPublicKey: string, encryptionPublicKey: string } } | null }> | null } | null };
 
 export type WorkspaceChainQueryVariables = Exact<{
   workspaceId: Scalars['ID'];
@@ -1804,7 +1804,7 @@ export type WorkspaceMembersQueryVariables = Exact<{
 }>;
 
 
-export type WorkspaceMembersQuery = { __typename?: 'Query', workspaceMembers?: { __typename?: 'WorkspaceMemberConnection', nodes?: Array<{ __typename?: 'WorkspaceMember', id: string, user: { __typename?: 'User', id: string, username: string, chain: Array<{ __typename?: 'UserChainEvent', serializedContent: string, position: number }> } } | null> | null, pageInfo: { __typename?: 'PageInfo', hasNextPage: boolean, endCursor?: string | null } } | null };
+export type WorkspaceMembersQuery = { __typename?: 'Query', workspaceMembers?: { __typename?: 'WorkspaceMemberConnection', nodes?: Array<{ __typename?: 'WorkspaceMember', id: string, user: { __typename?: 'User', id: string, username: string, chain: Array<{ __typename?: 'UserChainEvent', serializedContent: string }> } } | null> | null, pageInfo: { __typename?: 'PageInfo', hasNextPage: boolean, endCursor?: string | null } } | null };
 
 export type WorkspacesQueryVariables = Exact<{
   deviceSigningPublicKey: Scalars['String'];
@@ -2749,19 +2749,6 @@ export const WorkspaceDocument = gql`
   workspace(id: $id, deviceSigningPublicKey: $deviceSigningPublicKey) {
     id
     name
-    members {
-      id
-      user {
-        id
-        username
-      }
-      mainDeviceSigningPublicKey
-      devices {
-        signingPublicKey
-        encryptionPublicKey
-        encryptionPublicKeySignature
-      }
-    }
     currentWorkspaceKey {
       id
       workspaceId
@@ -2883,7 +2870,6 @@ export const WorkspaceMembersDocument = gql`
         username
         chain {
           serializedContent
-          position
         }
       }
     }

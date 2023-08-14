@@ -2,19 +2,6 @@ query workspace($id: ID, $deviceSigningPublicKey: String!) {
   workspace(id: $id, deviceSigningPublicKey: $deviceSigningPublicKey) {
     id
     name
-    members {
-      id
-      user {
-        id
-        username
-      }
-      mainDeviceSigningPublicKey
-      devices {
-        signingPublicKey
-        encryptionPublicKey
-        encryptionPublicKeySignature
-      }
-    }
     currentWorkspaceKey {
       id
       workspaceId

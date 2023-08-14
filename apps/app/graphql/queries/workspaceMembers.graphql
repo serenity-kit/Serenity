@@ -7,7 +7,6 @@ query workspaceMembers($workspaceId: ID!) {
         username
         chain {
           serializedContent
-          position
         }
       }
     }

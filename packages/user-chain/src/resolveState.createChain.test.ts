@@ -32,6 +32,7 @@ test("should resolve to one device after creating a chain", async () => {
       },
     }
   `);
+  expect(state.currentState.removedDevices).toMatchInlineSnapshot(`{}`);
   expect(state.statePerEvent[state.currentState.eventHash]).toEqual(
     state.currentState
   );

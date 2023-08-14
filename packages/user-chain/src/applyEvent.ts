@@ -18,6 +18,7 @@ export const applyEvent = ({
   const event = UpdateChainEvent.parse(rawEvent);
 
   const devices = { ...state.devices };
+  const removedDevices = { ...state.removedDevices };
 
   const transactionHash = hashTransaction(event.transaction);
   const eventHash = hashEvent(event);
@@ -80,12 +81,18 @@ export const applyEvent = ({
       );
     }
 
+    removedDevices[event.transaction.signingPublicKey] = {
+      expiresAt: devices[event.transaction.signingPublicKey].expiresAt,
+      encryptionPublicKey:
+        devices[event.transaction.signingPublicKey].encryptionPublicKey,
+    };
     delete devices[event.transaction.signingPublicKey];
   }
 
   return {
     id: state.id,
     devices,
+    removedDevices,
     email: state.email,
     mainDeviceSigningPublicKey: state.mainDeviceSigningPublicKey,
     mainDeviceEncryptionPublicKey: state.mainDeviceEncryptionPublicKey,

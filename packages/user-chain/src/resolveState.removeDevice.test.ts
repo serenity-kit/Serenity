@@ -46,6 +46,14 @@ test("should resolve to one device after adding and removing a device", async ()
       },
     }
   `);
+  expect(state.currentState.removedDevices).toMatchInlineSnapshot(`
+    {
+      "MTDhqVIMflTD0Car-KSP1MWCIEYqs2LBaXfU20di0tY": {
+        "encryptionPublicKey": "b_skeL8qudNQji-HuOldPNFDzYSBENNqmFMlawhtrHg",
+        "expiresAt": undefined,
+      },
+    }
+  `);
   expect(state.statePerEvent[state.currentState.eventHash]).toEqual(
     state.currentState
   );

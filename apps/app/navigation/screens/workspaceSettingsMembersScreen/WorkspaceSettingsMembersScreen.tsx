@@ -53,6 +53,7 @@ export default function WorkspaceSettingsMembersScreen(
     workspaceId,
     workspaceChainData,
     fetchAndApplyNewWorkspaceChainEntries,
+    users,
   } = useWorkspace();
   const { activeDevice } = useAuthenticatedAppContext();
   const [state] = useMachine(workspaceSettingsLoadWorkspaceMachine, {
@@ -203,6 +204,29 @@ export default function WorkspaceSettingsMembersScreen(
     );
   }
 
+  const activeWorkspaceMembers =
+    workspaceChainData?.state.members && users
+      ? Object.entries(workspaceChainData.state.members).map(
+          ([mainDeviceSigningPublicKey, member]) => {
+            const user = users.find(
+              (user) =>
+                user.mainDeviceSigningPublicKey === mainDeviceSigningPublicKey
+            );
+            if (user) {
+              return { ...user, role: member.role, addedBy: member.addedBy };
+            } else {
+              return {
+                mainDeviceSigningPublicKey,
+                role: member.role,
+                addedBy: member.addedBy,
+                email: undefined,
+                userId: undefined,
+              };
+            }
+          }
+        )
+      : null;
+
   return (
     <>
       <SettingsContentWrapper
@@ -242,99 +266,82 @@ export default function WorkspaceSettingsMembersScreen(
             </Heading>
 
             <List
-              data={
-                workspaceChainData
-                  ? Object.entries(workspaceChainData.state.members)
-                  : []
-              }
+              data={activeWorkspaceMembers ? activeWorkspaceMembers : []}
               emptyString={"No members available"}
               header={
                 <ListHeader data={["Name", "Email", "Role"]} mainIsIconText />
               }
             >
-              {workspaceChainData &&
-                Object.entries(workspaceChainData.state.members).map(
-                  ([mainDeviceSigningPublicKey, memberInfo]) => {
-                    const member =
-                      state.context.workspaceQueryResult?.data?.workspace?.members?.find(
-                        (member) => {
-                          return (
-                            member.mainDeviceSigningPublicKey ===
-                            mainDeviceSigningPublicKey
-                          );
-                        }
-                      );
-
-                    // TODO show a loading indicator here instead
-                    if (!member) {
-                      return null;
-                    }
-
-                    const adminUserId =
-                      state.context.meWithWorkspaceLoadingInfoQueryResult?.data
-                        ?.me?.id;
-                    // TODO use the username when available
-                    const username = member.user.username.slice(
-                      0,
-                      member.user.username.indexOf("@")
-                    );
-                    // TODO use initials when we have a username
-                    const initials = username.substring(0, 1);
-                    const email = member.user.username;
-
-                    const allowEditing =
-                      currentUserIsAdmin && member.user.id !== adminUserId;
-
-                    // capitalize by css doesn't work here as it will only affect the first letter
-                    const roleName =
-                      memberInfo.role.charAt(0).toUpperCase() +
-                      memberInfo.role.slice(1).toLowerCase();
-
-                    return (
-                      <ListItem
-                        testID={`workspace-member-row__${adminUserId}`}
-                        key={member.user.id}
-                        mainItem={
-                          <ListIconText
-                            main={
-                              username +
-                              (member.user.id === adminUserId ? " (you)" : "")
-                            }
-                            secondary={email}
-                            avatar={
-                              <Avatar size={isDesktopDevice ? "xs" : "sm"}>
-                                {initials}
-                              </Avatar>
-                            }
-                          />
-                        }
-                        secondaryItem={
-                          <ListText secondary>{roleName}</ListText>
-                        }
-                        actionItem={
-                          allowEditing ? (
-                            <MemberMenu
-                              memberId={member.user.id}
-                              role={memberInfo.role}
-                              onUpdateRole={(role) => {
-                                updateMemberRolePreflight({
-                                  mainDeviceSigningPublicKey,
-                                  role,
-                                });
-                              }}
-                              onDeletePressed={() => {
-                                removeMemberPreflight({
-                                  mainDeviceSigningPublicKey,
-                                  userId: member.user.id,
-                                });
-                              }}
-                            />
-                          ) : null
-                        }
-                      />
-                    );
+              {activeWorkspaceMembers &&
+                activeWorkspaceMembers.map((member) => {
+                  // TODO show a loading indicator here instead
+                  if (!member) {
+                    return null;
                   }
-                )}
+
+                  const adminUserId =
+                    state.context.meWithWorkspaceLoadingInfoQueryResult?.data
+                      ?.me?.id;
+                  // TODO use the username when available
+                  const username = member.email
+                    ? member.email.slice(0, member.email.indexOf("@"))
+                    : "Unknown";
+                  // TODO use initials when we have a username
+                  const initials = username.substring(0, 1);
+                  const email = member.email;
+
+                  const allowEditing =
+                    currentUserIsAdmin && member.userId !== adminUserId;
+
+                  // capitalize by css doesn't work here as it will only affect the first letter
+                  const roleName =
+                    member.role.charAt(0).toUpperCase() +
+                    member.role.slice(1).toLowerCase();
+
+                  return (
+                    <ListItem
+                      testID={`workspace-member-row__${adminUserId}`}
+                      key={member.mainDeviceSigningPublicKey}
+                      mainItem={
+                        <ListIconText
+                          main={
+                            username +
+                            (member.userId === adminUserId ? " (you)" : "")
+                          }
+                          secondary={email}
+                          avatar={
+                            <Avatar size={isDesktopDevice ? "xs" : "sm"}>
+                              {initials}
+                            </Avatar>
+                          }
+                        />
+                      }
+                      secondaryItem={<ListText secondary>{roleName}</ListText>}
+                      actionItem={
+                        allowEditing ? (
+                          <MemberMenu
+                            memberId={member.userId || "unknown"}
+                            role={member.role}
+                            onUpdateRole={(role) => {
+                              updateMemberRolePreflight({
+                                mainDeviceSigningPublicKey:
+                                  member.mainDeviceSigningPublicKey,
+                                role,
+                              });
+                            }}
+                            onDeletePressed={() => {
+                              removeMemberPreflight({
+                                mainDeviceSigningPublicKey:
+                                  member.mainDeviceSigningPublicKey,
+                                userId: member.userId || "unknown",
+                              });
+                            }}
+                          />
+                        ) : null
+                      }
+                    />
+                  );
+                })}
             </List>
           </>
         )}
