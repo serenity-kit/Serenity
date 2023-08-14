@@ -1,12 +1,11 @@
 import * as workspaceChain from "@serenity-kit/workspace-chain";
-import { LocalDevice } from "@serenity-tools/common";
+import { LocalDevice, notNull } from "@serenity-tools/common";
 import sodium from "react-native-libsodium";
 import {
   Role as RoleEnum,
   runAcceptWorkspaceInvitationMutation,
   runWorkspaceChainByInvitationIdQuery,
 } from "../../generated/graphql";
-import { notNull } from "../notNull/notNull";
 
 type Role = `${RoleEnum}`;
 

@@ -20,7 +20,7 @@ const exchanges = [
   dedupExchange,
   cacheExchange({
     keys: {
-      WorkspaceMember: () => null, // since it has no unique key
+      WorkspaceMember: () => null, // since it has no unique key // TODO user id
       CreatorDevice: () => null, // since it has no unique key
       UnauthorizedMemberResult: () => null, // since it has no unique key
       PendingWorkspaceInvitationResult: () => null, // since it is just an id

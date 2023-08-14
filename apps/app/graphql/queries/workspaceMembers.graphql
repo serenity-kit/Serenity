@@ -1,0 +1,19 @@
+query workspaceMembers($workspaceId: ID!) {
+  workspaceMembers(workspaceId: $workspaceId, first: 500) {
+    nodes {
+      id
+      user {
+        id
+        username
+        chain {
+          serializedContent
+          position
+        }
+      }
+    }
+    pageInfo {
+      hasNextPage
+      endCursor
+    }
+  }
+}

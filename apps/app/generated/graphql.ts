@@ -323,10 +323,9 @@ export type Device = {
   createdAt?: Maybe<Scalars['Date']>;
   encryptionPublicKey: Scalars['String'];
   encryptionPublicKeySignature: Scalars['String'];
-  expiresAt?: Maybe<Scalars['Date']>;
   info?: Maybe<Scalars['String']>;
   signingPublicKey: Scalars['String'];
-  userId?: Maybe<Scalars['String']>;
+  userId: Scalars['String'];
 };
 
 export type DeviceConnection = {
@@ -513,11 +512,6 @@ export type FolderEdge = {
   cursor: Scalars['String'];
   /** https://facebook.github.io/relay/graphql/connections.htm#sec-Node */
   node?: Maybe<Folder>;
-};
-
-export type GetWorkspaceDevicesResult = {
-  __typename?: 'GetWorkspaceDevicesResult';
-  devices: Array<Device>;
 };
 
 export type InfoWorkspaceKeyBoxInput = {
@@ -838,10 +832,10 @@ export type Query = {
   workspace?: Maybe<Workspace>;
   workspaceChain?: Maybe<WorkspaceChainEventConnection>;
   workspaceChainByInvitationId?: Maybe<WorkspaceChainEventConnection>;
-  workspaceDevices?: Maybe<DeviceConnection>;
   workspaceInvitation?: Maybe<WorkspaceInvitation>;
   workspaceInvitations?: Maybe<WorkspaceInvitationConnection>;
   workspaceKeyByDocumentId?: Maybe<WorkspaceKeyByDocumentIdResult>;
+  workspaceMembers?: Maybe<WorkspaceMemberConnection>;
   workspaces?: Maybe<WorkspaceConnection>;
 };
 
@@ -978,13 +972,6 @@ export type QueryWorkspaceChainByInvitationIdArgs = {
 };
 
 
-export type QueryWorkspaceDevicesArgs = {
-  after?: InputMaybe<Scalars['String']>;
-  first: Scalars['Int'];
-  workspaceId: Scalars['ID'];
-};
-
-
 export type QueryWorkspaceInvitationArgs = {
   id: Scalars['ID'];
 };
@@ -1000,6 +987,13 @@ export type QueryWorkspaceInvitationsArgs = {
 export type QueryWorkspaceKeyByDocumentIdArgs = {
   deviceSigningPublicKey: Scalars['String'];
   documentId: Scalars['ID'];
+};
+
+
+export type QueryWorkspaceMembersArgs = {
+  after?: InputMaybe<Scalars['String']>;
+  first: Scalars['Int'];
+  workspaceId: Scalars['ID'];
 };
 
 
@@ -1166,6 +1160,13 @@ export type UpdateWorkspaceNameInput = {
 export type UpdateWorkspaceNameResult = {
   __typename?: 'UpdateWorkspaceNameResult';
   workspace?: Maybe<Workspace>;
+};
+
+export type User = {
+  __typename?: 'User';
+  chain: Array<UserChainEvent>;
+  id: Scalars['String'];
+  username: Scalars['String'];
 };
 
 export type UserChainEvent = {
@@ -1365,10 +1366,30 @@ export type WorkspaceLoadingInfo = {
 export type WorkspaceMember = {
   __typename?: 'WorkspaceMember';
   devices?: Maybe<Array<MinimalDevice>>;
+  id: Scalars['String'];
   mainDeviceSigningPublicKey: Scalars['String'];
   role: Role;
+  user: User;
   userId: Scalars['String'];
   username: Scalars['String'];
+};
+
+export type WorkspaceMemberConnection = {
+  __typename?: 'WorkspaceMemberConnection';
+  /** https://facebook.github.io/relay/graphql/connections.htm#sec-Edge-Types */
+  edges?: Maybe<Array<Maybe<WorkspaceMemberEdge>>>;
+  /** Flattened list of WorkspaceMember type */
+  nodes?: Maybe<Array<Maybe<WorkspaceMember>>>;
+  /** https://facebook.github.io/relay/graphql/connections.htm#sec-undefined.PageInfo */
+  pageInfo: PageInfo;
+};
+
+export type WorkspaceMemberEdge = {
+  __typename?: 'WorkspaceMemberEdge';
+  /** https://facebook.github.io/relay/graphql/connections.htm#sec-Cursor */
+  cursor: Scalars['String'];
+  /** https://facebook.github.io/relay/graphql/connections.htm#sec-Node */
+  node?: Maybe<WorkspaceMember>;
 };
 
 export type WorkspaceMemberInput = {
@@ -1610,7 +1631,7 @@ export type DeviceBySigningPublicKeyQueryVariables = Exact<{
 }>;
 
 
-export type DeviceBySigningPublicKeyQuery = { __typename?: 'Query', deviceBySigningPublicKey?: { __typename?: 'DeviceResult', device?: { __typename?: 'Device', userId?: string | null, signingPublicKey: string, encryptionPublicKey: string, encryptionPublicKeySignature: string, info?: string | null, createdAt?: any | null } | null } | null };
+export type DeviceBySigningPublicKeyQuery = { __typename?: 'Query', deviceBySigningPublicKey?: { __typename?: 'DeviceResult', device?: { __typename?: 'Device', userId: string, signingPublicKey: string, encryptionPublicKey: string, encryptionPublicKeySignature: string, info?: string | null, createdAt?: any | null } | null } | null };
 
 export type DevicesQueryVariables = Exact<{
   onlyNotExpired: Scalars['Boolean'];
@@ -1619,7 +1640,7 @@ export type DevicesQueryVariables = Exact<{
 }>;
 
 
-export type DevicesQuery = { __typename?: 'Query', devices?: { __typename?: 'DeviceConnection', nodes?: Array<{ __typename?: 'Device', signingPublicKey: string, encryptionPublicKey: string, encryptionPublicKeySignature: string, info?: string | null, createdAt?: any | null } | null> | null, pageInfo: { __typename?: 'PageInfo', hasNextPage: boolean, endCursor?: string | null } } | null };
+export type DevicesQuery = { __typename?: 'Query', devices?: { __typename?: 'DeviceConnection', nodes?: Array<{ __typename?: 'Device', signingPublicKey: string, info?: string | null, createdAt?: any | null } | null> | null, pageInfo: { __typename?: 'PageInfo', hasNextPage: boolean, endCursor?: string | null } } | null };
 
 export type DocumentQueryVariables = Exact<{
   id: Scalars['ID'];
@@ -1743,7 +1764,7 @@ export type SnapshotQuery = { __typename?: 'Query', snapshot?: { __typename?: 'S
 export type UnauthorizedMemberQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type UnauthorizedMemberQuery = { __typename?: 'Query', unauthorizedMember?: { __typename?: 'UnauthorizedMemberResult', userId: string, userMainDeviceSigningPublicKey: string, workspaceId: string, devices: Array<{ __typename?: 'Device', userId?: string | null, signingPublicKey: string, encryptionPublicKey: string, info?: string | null, createdAt?: any | null, encryptionPublicKeySignature: string }> } | null };
+export type UnauthorizedMemberQuery = { __typename?: 'Query', unauthorizedMember?: { __typename?: 'UnauthorizedMemberResult', userId: string, userMainDeviceSigningPublicKey: string, workspaceId: string, devices: Array<{ __typename?: 'Device', userId: string, signingPublicKey: string, encryptionPublicKey: string, info?: string | null, createdAt?: any | null, encryptionPublicKeySignature: string }> } | null };
 
 export type UserChainQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -1779,13 +1800,6 @@ export type WorkspaceChainByInvitationIdQueryVariables = Exact<{
 
 export type WorkspaceChainByInvitationIdQuery = { __typename?: 'Query', workspaceChainByInvitationId?: { __typename?: 'WorkspaceChainEventConnection', nodes?: Array<{ __typename?: 'WorkspaceChainEvent', serializedContent: string, position: number } | null> | null } | null };
 
-export type WorkspaceDevicesQueryVariables = Exact<{
-  workspaceId: Scalars['ID'];
-}>;
-
-
-export type WorkspaceDevicesQuery = { __typename?: 'Query', workspaceDevices?: { __typename?: 'DeviceConnection', nodes?: Array<{ __typename?: 'Device', userId?: string | null, signingPublicKey: string, encryptionPublicKey: string, encryptionPublicKeySignature: string, info?: string | null, createdAt?: any | null } | null> | null, pageInfo: { __typename?: 'PageInfo', hasNextPage: boolean, endCursor?: string | null } } | null };
-
 export type WorkspaceInvitationQueryVariables = Exact<{
   id: Scalars['ID'];
 }>;
@@ -1799,6 +1813,13 @@ export type WorkspaceInvitationsQueryVariables = Exact<{
 
 
 export type WorkspaceInvitationsQuery = { __typename?: 'Query', workspaceInvitations?: { __typename?: 'WorkspaceInvitationConnection', nodes?: Array<{ __typename?: 'WorkspaceInvitation', id: string, workspaceId: string, inviterUserId: string, inviterUsername: string, role: Role, expiresAt: any } | null> | null, pageInfo: { __typename?: 'PageInfo', hasNextPage: boolean, endCursor?: string | null } } | null };
+
+export type WorkspaceMembersQueryVariables = Exact<{
+  workspaceId: Scalars['ID'];
+}>;
+
+
+export type WorkspaceMembersQuery = { __typename?: 'Query', workspaceMembers?: { __typename?: 'WorkspaceMemberConnection', nodes?: Array<{ __typename?: 'WorkspaceMember', id: string, user: { __typename?: 'User', id: string, username: string, chain: Array<{ __typename?: 'UserChainEvent', serializedContent: string, position: number }> } } | null> | null, pageInfo: { __typename?: 'PageInfo', hasNextPage: boolean, endCursor?: string | null } } | null };
 
 export type WorkspacesQueryVariables = Exact<{
   deviceSigningPublicKey: Scalars['String'];
@@ -2366,8 +2387,6 @@ export const DevicesDocument = gql`
   devices(onlyNotExpired: $onlyNotExpired, first: $first, after: $after) {
     nodes {
       signingPublicKey
-      encryptionPublicKey
-      encryptionPublicKeySignature
       info
       createdAt
     }
@@ -2838,28 +2857,6 @@ export const WorkspaceChainByInvitationIdDocument = gql`
 export function useWorkspaceChainByInvitationIdQuery(options: Omit<Urql.UseQueryArgs<WorkspaceChainByInvitationIdQueryVariables>, 'query'>) {
   return Urql.useQuery<WorkspaceChainByInvitationIdQuery, WorkspaceChainByInvitationIdQueryVariables>({ query: WorkspaceChainByInvitationIdDocument, ...options });
 };
-export const WorkspaceDevicesDocument = gql`
-    query workspaceDevices($workspaceId: ID!) {
-  workspaceDevices(workspaceId: $workspaceId, first: 500) {
-    nodes {
-      userId
-      signingPublicKey
-      encryptionPublicKey
-      encryptionPublicKeySignature
-      info
-      createdAt
-    }
-    pageInfo {
-      hasNextPage
-      endCursor
-    }
-  }
-}
-    `;
-
-export function useWorkspaceDevicesQuery(options: Omit<Urql.UseQueryArgs<WorkspaceDevicesQueryVariables>, 'query'>) {
-  return Urql.useQuery<WorkspaceDevicesQuery, WorkspaceDevicesQueryVariables>({ query: WorkspaceDevicesDocument, ...options });
-};
 export const WorkspaceInvitationDocument = gql`
     query workspaceInvitation($id: ID!) {
   me {
@@ -2904,6 +2901,31 @@ export const WorkspaceInvitationsDocument = gql`
 
 export function useWorkspaceInvitationsQuery(options: Omit<Urql.UseQueryArgs<WorkspaceInvitationsQueryVariables>, 'query'>) {
   return Urql.useQuery<WorkspaceInvitationsQuery, WorkspaceInvitationsQueryVariables>({ query: WorkspaceInvitationsDocument, ...options });
+};
+export const WorkspaceMembersDocument = gql`
+    query workspaceMembers($workspaceId: ID!) {
+  workspaceMembers(workspaceId: $workspaceId, first: 500) {
+    nodes {
+      id
+      user {
+        id
+        username
+        chain {
+          serializedContent
+          position
+        }
+      }
+    }
+    pageInfo {
+      hasNextPage
+      endCursor
+    }
+  }
+}
+    `;
+
+export function useWorkspaceMembersQuery(options: Omit<Urql.UseQueryArgs<WorkspaceMembersQueryVariables>, 'query'>) {
+  return Urql.useQuery<WorkspaceMembersQuery, WorkspaceMembersQueryVariables>({ query: WorkspaceMembersDocument, ...options });
 };
 export const WorkspacesDocument = gql`
     query workspaces($deviceSigningPublicKey: String!) {
@@ -5965,109 +5987,6 @@ export const workspaceChainByInvitationIdQueryService =
 
 
 
-export const runWorkspaceDevicesQuery = async (variables: WorkspaceDevicesQueryVariables, options?: any) => {
-  return await getUrqlClient()
-    .query<WorkspaceDevicesQuery, WorkspaceDevicesQueryVariables>(
-      WorkspaceDevicesDocument,
-      variables,
-      {
-        // better to be safe here and always refetch
-        requestPolicy: "network-only",
-        ...options
-      }
-    )
-    .toPromise();
-};
-
-export type WorkspaceDevicesQueryResult = Urql.OperationResult<WorkspaceDevicesQuery, WorkspaceDevicesQueryVariables>;
-
-export type WorkspaceDevicesQueryUpdateResultEvent = {
-  type: "WorkspaceDevicesQuery.UPDATE_RESULT";
-  result: WorkspaceDevicesQueryResult;
-};
-
-export type WorkspaceDevicesQueryErrorEvent = {
-  type: "WorkspaceDevicesQuery.ERROR";
-  result: WorkspaceDevicesQueryResult;
-};
-
-export type WorkspaceDevicesQueryServiceEvent = WorkspaceDevicesQueryUpdateResultEvent | WorkspaceDevicesQueryErrorEvent;
-
-type WorkspaceDevicesQueryServiceSubscribersEntry = {
-  variables: WorkspaceDevicesQueryVariables;
-  callbacks: ((event: WorkspaceDevicesQueryServiceEvent) => void)[];
-  intervalId: NodeJS.Timer | null;
-};
-
-type WorkspaceDevicesQueryServiceSubscribers = {
-  [variables: string]: WorkspaceDevicesQueryServiceSubscribersEntry;
-};
-
-const workspaceDevicesQueryServiceSubscribers: WorkspaceDevicesQueryServiceSubscribers = {};
-
-const triggerWorkspaceDevicesQuery = (variablesString: string, variables: WorkspaceDevicesQueryVariables) => {
-  getUrqlClient()
-    .query<WorkspaceDevicesQuery, WorkspaceDevicesQueryVariables>(WorkspaceDevicesDocument, variables)
-    .toPromise()
-    .then((result) => {
-      workspaceDevicesQueryServiceSubscribers[variablesString].callbacks.forEach(
-        (callback) => {
-          callback({
-            type: result.error ? "WorkspaceDevicesQuery.ERROR" : "WorkspaceDevicesQuery.UPDATE_RESULT",
-            result: result,
-          });
-        }
-      );
-    });
-};
-
-/**
- * This service is used to query results every 4 seconds.
- *
- * It allows machines to spawn a service that will fetch the query
- * and send the result to the machine.
- * It will share the same interval for all machines.
- * When the last subscription is stopped, the interval will be cleared.
- * It also considers the variables passed to the service.
- */
-export const workspaceDevicesQueryService =
-  (variables: WorkspaceDevicesQueryVariables, intervalInMs?: number) => (callback, onReceive) => {
-    const variablesString = canonicalize(variables) as string;
-    if (workspaceDevicesQueryServiceSubscribers[variablesString]) {
-      workspaceDevicesQueryServiceSubscribers[variablesString].callbacks.push(callback);
-    } else {
-      workspaceDevicesQueryServiceSubscribers[variablesString] = {
-        variables,
-        callbacks: [callback],
-        intervalId: null,
-      };
-    }
-
-    triggerWorkspaceDevicesQuery(variablesString, variables);
-    if (!workspaceDevicesQueryServiceSubscribers[variablesString].intervalId) {
-      workspaceDevicesQueryServiceSubscribers[variablesString].intervalId = setInterval(
-        () => {
-          triggerWorkspaceDevicesQuery(variablesString, variables);
-        },
-        intervalInMs || 4000
-      );
-    }
-
-    const intervalId = workspaceDevicesQueryServiceSubscribers[variablesString].intervalId;
-    return () => {
-      if (
-        workspaceDevicesQueryServiceSubscribers[variablesString].callbacks.length === 0 &&
-        intervalId
-      ) {
-        // perform cleanup
-        clearInterval(intervalId);
-        workspaceDevicesQueryServiceSubscribers[variablesString].intervalId = null;
-      }
-    };
-  };
-
-
-
 export const runWorkspaceInvitationQuery = async (variables: WorkspaceInvitationQueryVariables, options?: any) => {
   return await getUrqlClient()
     .query<WorkspaceInvitationQuery, WorkspaceInvitationQueryVariables>(
@@ -6268,6 +6187,109 @@ export const workspaceInvitationsQueryService =
         // perform cleanup
         clearInterval(intervalId);
         workspaceInvitationsQueryServiceSubscribers[variablesString].intervalId = null;
+      }
+    };
+  };
+
+
+
+export const runWorkspaceMembersQuery = async (variables: WorkspaceMembersQueryVariables, options?: any) => {
+  return await getUrqlClient()
+    .query<WorkspaceMembersQuery, WorkspaceMembersQueryVariables>(
+      WorkspaceMembersDocument,
+      variables,
+      {
+        // better to be safe here and always refetch
+        requestPolicy: "network-only",
+        ...options
+      }
+    )
+    .toPromise();
+};
+
+export type WorkspaceMembersQueryResult = Urql.OperationResult<WorkspaceMembersQuery, WorkspaceMembersQueryVariables>;
+
+export type WorkspaceMembersQueryUpdateResultEvent = {
+  type: "WorkspaceMembersQuery.UPDATE_RESULT";
+  result: WorkspaceMembersQueryResult;
+};
+
+export type WorkspaceMembersQueryErrorEvent = {
+  type: "WorkspaceMembersQuery.ERROR";
+  result: WorkspaceMembersQueryResult;
+};
+
+export type WorkspaceMembersQueryServiceEvent = WorkspaceMembersQueryUpdateResultEvent | WorkspaceMembersQueryErrorEvent;
+
+type WorkspaceMembersQueryServiceSubscribersEntry = {
+  variables: WorkspaceMembersQueryVariables;
+  callbacks: ((event: WorkspaceMembersQueryServiceEvent) => void)[];
+  intervalId: NodeJS.Timer | null;
+};
+
+type WorkspaceMembersQueryServiceSubscribers = {
+  [variables: string]: WorkspaceMembersQueryServiceSubscribersEntry;
+};
+
+const workspaceMembersQueryServiceSubscribers: WorkspaceMembersQueryServiceSubscribers = {};
+
+const triggerWorkspaceMembersQuery = (variablesString: string, variables: WorkspaceMembersQueryVariables) => {
+  getUrqlClient()
+    .query<WorkspaceMembersQuery, WorkspaceMembersQueryVariables>(WorkspaceMembersDocument, variables)
+    .toPromise()
+    .then((result) => {
+      workspaceMembersQueryServiceSubscribers[variablesString].callbacks.forEach(
+        (callback) => {
+          callback({
+            type: result.error ? "WorkspaceMembersQuery.ERROR" : "WorkspaceMembersQuery.UPDATE_RESULT",
+            result: result,
+          });
+        }
+      );
+    });
+};
+
+/**
+ * This service is used to query results every 4 seconds.
+ *
+ * It allows machines to spawn a service that will fetch the query
+ * and send the result to the machine.
+ * It will share the same interval for all machines.
+ * When the last subscription is stopped, the interval will be cleared.
+ * It also considers the variables passed to the service.
+ */
+export const workspaceMembersQueryService =
+  (variables: WorkspaceMembersQueryVariables, intervalInMs?: number) => (callback, onReceive) => {
+    const variablesString = canonicalize(variables) as string;
+    if (workspaceMembersQueryServiceSubscribers[variablesString]) {
+      workspaceMembersQueryServiceSubscribers[variablesString].callbacks.push(callback);
+    } else {
+      workspaceMembersQueryServiceSubscribers[variablesString] = {
+        variables,
+        callbacks: [callback],
+        intervalId: null,
+      };
+    }
+
+    triggerWorkspaceMembersQuery(variablesString, variables);
+    if (!workspaceMembersQueryServiceSubscribers[variablesString].intervalId) {
+      workspaceMembersQueryServiceSubscribers[variablesString].intervalId = setInterval(
+        () => {
+          triggerWorkspaceMembersQuery(variablesString, variables);
+        },
+        intervalInMs || 4000
+      );
+    }
+
+    const intervalId = workspaceMembersQueryServiceSubscribers[variablesString].intervalId;
+    return () => {
+      if (
+        workspaceMembersQueryServiceSubscribers[variablesString].callbacks.length === 0 &&
+        intervalId
+      ) {
+        // perform cleanup
+        clearInterval(intervalId);
+        workspaceMembersQueryServiceSubscribers[variablesString].intervalId = null;
       }
     };
   };

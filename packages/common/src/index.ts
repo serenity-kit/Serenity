@@ -1,3 +1,4 @@
+export * from "./constructUserFromSerializedUserChain/constructUserFromSerializedUserChain";
 export * from "./createAndEncryptMainDevice/createAndEncryptMainDevice";
 export * from "./createAndEncryptWorkspaceKeyForDevice/createAndEncryptWorkspaceKeyForDevice";
 export * from "./createCommentKey/createCommentKey";
@@ -24,6 +25,7 @@ export * from "./equalArrayContent/equalArrayContent";
 export * from "./generateId/generateId";
 export * from "./getExpiredTextFromString/getExpiredTextFromString";
 export * from "./hash/hash";
+export * from "./notNull/notNull";
 export * from "./recreateCommentKey/recreateCommentKey";
 export * from "./recreateDocumentTitleKey/recreateDocumentTitleKey";
 export * from "./recreateSnapshotKey/recreateSnapshotKey";

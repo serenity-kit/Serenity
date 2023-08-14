@@ -8,9 +8,11 @@ export const getUserFromWorkspaceQueryResultByDeviceInfo = (
   workspaceQueryResult: WorkspaceQuery,
   device: { signingPublicKey: MinimalDevice["signingPublicKey"] }
 ) => {
-  let user: WorkspaceMember | undefined;
+  let member: WorkspaceMember | undefined;
   if (workspaceQueryResult.workspace?.members) {
-    user = workspaceQueryResult.workspace.members.find((member) => {
+    // @ts-expect-error - TODO we should use a user verified by a
+    // a userChain here
+    member = workspaceQueryResult.workspace.members.find((member) => {
       if (!member.devices) {
         return false;
       }
@@ -19,5 +21,5 @@ export const getUserFromWorkspaceQueryResultByDeviceInfo = (
       });
     });
   }
-  return user;
+  return member;
 };

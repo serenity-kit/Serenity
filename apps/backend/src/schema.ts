@@ -53,18 +53,19 @@ import * as SnapshotQueryTypes from "./graphql/queries/snapshot/snapshot";
 import * as UserChainQueryTypes from "./graphql/queries/userChain/userChain";
 import * as UserIdFromUsernameQueryTypes from "./graphql/queries/userIdFromUsername";
 import * as ActiveWorkspaceKeysQueryTypes from "./graphql/queries/workspace/activeWorkspaceKeys";
-import * as PendingingWorkspaceInvitationQueryTypes from "./graphql/queries/workspace/pendingWorkspaceInvitation";
+import * as PendingWorkspaceInvitationQueryTypes from "./graphql/queries/workspace/pendingWorkspaceInvitation";
 import * as UnauthorizedMemberTypes from "./graphql/queries/workspace/unauthorizedMember";
 import * as WorkspaceQueryTypes from "./graphql/queries/workspace/workspace";
-import * as WorkspaceDevicesQueryTypes from "./graphql/queries/workspace/workspaceDevices";
 import * as WorkspaceInvitationTypes from "./graphql/queries/workspace/workspaceInvitation";
 import * as WorkspaceInvitationsTypes from "./graphql/queries/workspace/workspaceInvitations";
+import * as WorkspaceMembersQueryTypes from "./graphql/queries/workspace/workspaceMembers";
 import * as WorkspacesQueryTypes from "./graphql/queries/workspace/workspaces";
 import * as WorkspaceChainQueryTypes from "./graphql/queries/workspaceChain/workspaceChain";
 import * as WorkspaceChainByInvitationIdQueryTypes from "./graphql/queries/workspaceChain/workspaceChainByInvitationId";
 import * as DateTypes from "./graphql/types/date";
 import * as DocumentTypes from "./graphql/types/document";
 import * as DocumentShareLinkTypes from "./graphql/types/documentShareLink";
+import * as UserTypes from "./graphql/types/user";
 import * as UserChainTypes from "./graphql/types/userChain";
 import * as WorkspaceTypes from "./graphql/types/workspace";
 import * as WorkspaceChainTypes from "./graphql/types/workspaceChain";
@@ -124,9 +125,9 @@ export const schema = makeSchema({
     WorkspaceInvitationTypes,
     DeleteWorkspaceInvitationsTypes,
     CreateInitialWorkspaceStructureMutationTypes,
-    PendingingWorkspaceInvitationQueryTypes,
+    PendingWorkspaceInvitationQueryTypes,
     RemoveMemberAndRotateWorkspaceKeyMutationTypes,
-    WorkspaceDevicesQueryTypes,
+    WorkspaceMembersQueryTypes,
     ActiveWorkspaceKeysQueryTypes,
     UpdateWorkspaceInfoMutationTypes,
 
@@ -152,8 +153,9 @@ export const schema = makeSchema({
     WorkspaceChainQueryTypes,
     WorkspaceChainByInvitationIdQueryTypes,
 
-    UserChainQueryTypes,
+    UserTypes,
     UserChainTypes,
+    UserChainQueryTypes,
 
     AuthorizeMemberTypes,
 

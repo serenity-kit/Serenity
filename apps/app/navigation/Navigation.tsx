@@ -8,6 +8,7 @@ import {
 } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import * as workspaceChain from "@serenity-kit/workspace-chain";
+import { notNull } from "@serenity-tools/common";
 import {
   Heading,
   Text,
@@ -38,7 +39,6 @@ import {
   WorkspaceStackParamList,
 } from "../types/navigation";
 import { setLastUsedWorkspaceId } from "../utils/lastUsedWorkspaceAndDocumentStore/lastUsedWorkspaceAndDocumentStore";
-import { notNull } from "../utils/notNull/notNull";
 import {
   authorizeMembersIfNecessary,
   secondsBetweenNewMemberChecks,

@@ -1,5 +1,6 @@
 import { enumType, inputObjectType, list, nonNull, objectType } from "nexus";
 import { CreatorDevice, Device, MinimalDevice } from "./device";
+import { User } from "./user";
 
 export const MemberIdWithDevice = objectType({
   name: "WorkspaceIdWithDevices",
@@ -58,11 +59,14 @@ export const MemberRoleEnum = enumType({
 export const WorkspaceMember = objectType({
   name: "WorkspaceMember",
   definition(t) {
-    t.nonNull.string("userId");
+    t.nonNull.string("id"); // workspaceId + userId
+    t.nonNull.field("user", { type: User });
+
+    t.nonNull.string("userId"); // TODO remove
     t.nonNull.string("username");
-    t.nonNull.field("role", { type: MemberRoleEnum });
-    t.nonNull.string("mainDeviceSigningPublicKey");
-    t.list.nonNull.field("devices", { type: MinimalDevice });
+    t.nonNull.field("role", { type: MemberRoleEnum }); // TODO remove
+    t.nonNull.string("mainDeviceSigningPublicKey"); // TODO remove
+    t.list.nonNull.field("devices", { type: MinimalDevice }); // TODO remove
   },
 });
 

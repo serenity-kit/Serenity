@@ -1,4 +1,5 @@
 import { useRoute } from "@react-navigation/native";
+import { notNull } from "@serenity-tools/common";
 import {
   Button,
   Description,
@@ -19,8 +20,8 @@ import {
   useIsDesktopDevice,
   View,
 } from "@serenity-tools/ui";
-import { HStack } from "native-base";
 import * as Clipboard from "expo-clipboard";
+import { HStack } from "native-base";
 import { useMemo, useState } from "react";
 import { StyleSheet } from "react-native";
 import sodium, { KeyPair } from "react-native-libsodium";
@@ -32,7 +33,6 @@ import {
 import { useAuthenticatedAppContext } from "../../hooks/useAuthenticatedAppContext";
 import { WorkspaceDrawerScreenProps } from "../../types/navigationProps";
 import { createDocumentShareLink } from "../../utils/document/createDocumentShareLink";
-import { notNull } from "../../utils/notNull/notNull";
 import { useEditorStore } from "../../utils/editorStore/editorStore";
 
 const styles = StyleSheet.create({

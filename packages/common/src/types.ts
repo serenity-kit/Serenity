@@ -17,4 +17,5 @@ export type LocalDevice = {
 export type VerifiedDevice = {
   signingPublicKey: string;
   encryptionPublicKey: string;
+  expiresAt?: Date;
 };
