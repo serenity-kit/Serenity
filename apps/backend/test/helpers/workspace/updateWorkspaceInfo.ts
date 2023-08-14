@@ -13,9 +13,6 @@ export const query = gql`
         infoCiphertext
         infoNonce
         infoWorkspaceKeyId
-        members {
-          username
-        }
         infoWorkspaceKey {
           workspaceId
           generation

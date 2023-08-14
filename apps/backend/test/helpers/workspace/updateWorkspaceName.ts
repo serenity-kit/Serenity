@@ -23,9 +23,6 @@ export const updateWorkspaceName = async ({
         workspace {
           id
           name
-          members {
-            userId
-          }
         }
       }
     }

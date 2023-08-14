@@ -202,9 +202,6 @@ describe("Input errors", () => {
         workspace {
           id
           name
-          members {
-            userId
-          }
         }
       }
     }

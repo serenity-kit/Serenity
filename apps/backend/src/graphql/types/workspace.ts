@@ -62,8 +62,6 @@ export const WorkspaceMember = objectType({
     t.nonNull.string("id"); // workspaceId + userId
     t.nonNull.field("user", { type: User });
 
-    t.nonNull.string("userId"); // TODO remove
-    t.nonNull.string("username");
     t.nonNull.string("mainDeviceSigningPublicKey"); // TODO remove
     t.list.nonNull.field("devices", { type: MinimalDevice }); // TODO remove
   },

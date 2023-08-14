@@ -27,9 +27,6 @@ export const createWorkspace = async ({
         workspace {
           id
           name
-          members {
-            userId
-          }
         }
       }
     }

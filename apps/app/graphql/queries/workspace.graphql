@@ -3,8 +3,11 @@ query workspace($id: ID, $deviceSigningPublicKey: String!) {
     id
     name
     members {
-      userId
-      username
+      id
+      user {
+        id
+        username
+      }
       mainDeviceSigningPublicKey
       devices {
         signingPublicKey

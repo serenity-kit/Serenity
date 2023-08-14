@@ -162,9 +162,6 @@ const query = gql`
       workspace {
         id
         name
-        members {
-          userId
-        }
       }
       folder {
         id
