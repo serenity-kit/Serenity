@@ -249,7 +249,8 @@ export default function Page({
         console.warn(
           "Snapshot, Update or EphemeralUpdate creator could not be validated. Probably since it is an already removed device. This is not yet implemented."
         );
-        return false;
+        return true;
+        // return false;
       }
     },
     // onCustomMessage: async (message) => {

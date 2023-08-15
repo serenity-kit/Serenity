@@ -1008,7 +1008,6 @@ export type RemoveDocumentShareLinkResult = {
 export type RemoveMemberAndRotateWorkspaceKeyInput = {
   creatorDeviceSigningPublicKey: Scalars['String'];
   deviceWorkspaceKeyBoxes: Array<WorkspaceDeviceInput>;
-  revokedUserId: Scalars['String'];
   serializedWorkspaceChainEvent: Scalars['String'];
   workspaceId: Scalars['String'];
 };

@@ -10,22 +10,26 @@ export type Props = {
   newDeviceWorkspaceKeyBoxes: WorkspaceDeviceParing[];
   creatorDeviceSigningPublicKey: string;
   workspaceId: string;
-  revokedUserId: string;
   userId: string;
   workspaceChainEvent: workspaceChain.RemoveMemberWorkspaceChainEvent;
 };
 
 export const removeMemberAndRotateWorkspaceKey = async ({
   userId,
-  revokedUserId,
   workspaceId,
   creatorDeviceSigningPublicKey,
   newDeviceWorkspaceKeyBoxes,
   workspaceChainEvent,
 }) => {
   return await prisma.$transaction(async (prisma) => {
+    const userToRevoke = await prisma.user.findUniqueOrThrow({
+      where: {
+        mainDeviceSigningPublicKey:
+          workspaceChainEvent.transaction.memberMainDeviceSigningPublicKey,
+      },
+    });
     // verify user owns workspace
-    if (userId === revokedUserId) {
+    if (userId === userToRevoke.id) {
       throw new UserInputError("Cannot remove yourself from a workspace");
     }
     const verifiedUserWorskpace = await prisma.usersToWorkspaces.findFirst({
@@ -66,7 +70,7 @@ export const removeMemberAndRotateWorkspaceKey = async ({
 
     // add only devices which will belong to this workspace
     const allowedUsers = await prisma.usersToWorkspaces.findMany({
-      where: { workspaceId, userId: { not: revokedUserId } },
+      where: { workspaceId, userId: { not: userToRevoke.id } },
       select: { userId: true },
     });
     const allowedUserIds = allowedUsers.map(
@@ -105,7 +109,7 @@ export const removeMemberAndRotateWorkspaceKey = async ({
     });
     // remove workspaceKeyBoxes for revoked users
     const revokedUserDevices = await prisma.device.findMany({
-      where: { userId: revokedUserId },
+      where: { userId: userToRevoke.id },
       select: { signingPublicKey: true },
     });
     const revokedUserDeviceSigningPublicKeys = revokedUserDevices.map(
@@ -121,7 +125,7 @@ export const removeMemberAndRotateWorkspaceKey = async ({
     });
     // remove user from workspace
     await prisma.usersToWorkspaces.deleteMany({
-      where: { workspaceId, userId: revokedUserId },
+      where: { workspaceId, userId: userToRevoke.id },
     });
     // rotate keys
     const updatedWorkspaceKey = await rotateWorkspaceKey({

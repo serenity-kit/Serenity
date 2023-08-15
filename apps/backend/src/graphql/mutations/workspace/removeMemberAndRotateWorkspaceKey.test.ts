@@ -85,7 +85,6 @@ test("user cannot remove self", async () => {
       await removeMemberAndRotateWorkspaceKey({
         graphql,
         workspaceId: userData1.workspace.id,
-        revokedUserId: userData1.user.id,
         creatorDeviceSigningPublicKey: userData1.device.signingPublicKey,
         deviceWorkspaceKeyBoxes,
         authorizationHeader: userData1.sessionKey,
@@ -156,7 +155,6 @@ test("user cannot revoke own main device", async () => {
       await removeMemberAndRotateWorkspaceKey({
         graphql,
         workspaceId: userData1.workspace.id,
-        revokedUserId: userData2.user.id,
         creatorDeviceSigningPublicKey: userData1.device.signingPublicKey,
         deviceWorkspaceKeyBoxes,
         authorizationHeader: userData1.sessionKey,
@@ -291,7 +289,6 @@ test("user can remove another user", async () => {
   const workspaceKeyResult = await removeMemberAndRotateWorkspaceKey({
     graphql,
     workspaceId: userData1.workspace.id,
-    revokedUserId: userData2.user.id,
     creatorDeviceSigningPublicKey: userData1.mainDevice.signingPublicKey,
     deviceWorkspaceKeyBoxes,
     authorizationHeader: userData1.sessionKey,
@@ -513,7 +510,6 @@ test("user can rotate key for multiple devices", async () => {
   const workspaceKeyResult = await removeMemberAndRotateWorkspaceKey({
     graphql,
     workspaceId: userData1.workspace.id,
-    revokedUserId: userData2.user.id,
     creatorDeviceSigningPublicKey: userData1.device.signingPublicKey,
     deviceWorkspaceKeyBoxes,
     authorizationHeader: userData1.sessionKey,
@@ -586,7 +582,6 @@ test("Unauthenticated", async () => {
       await removeMemberAndRotateWorkspaceKey({
         graphql,
         workspaceId: userData1.workspace.id,
-        revokedUserId: "someUserId",
         creatorDeviceSigningPublicKey: userData1.device.signingPublicKey,
         deviceWorkspaceKeyBoxes: [],
         authorizationHeader: "badAuthHeader",

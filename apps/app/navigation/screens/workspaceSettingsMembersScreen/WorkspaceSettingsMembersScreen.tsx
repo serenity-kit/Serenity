@@ -164,7 +164,6 @@ export default function WorkspaceSettingsMembersScreen(
           input: {
             creatorDeviceSigningPublicKey: activeDevice.signingPublicKey,
             deviceWorkspaceKeyBoxes,
-            revokedUserId: userId,
             workspaceId,
             serializedWorkspaceChainEvent: JSON.stringify(removeMemberEvent),
           },

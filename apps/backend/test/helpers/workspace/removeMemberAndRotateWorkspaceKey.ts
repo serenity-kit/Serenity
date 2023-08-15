@@ -4,7 +4,6 @@ import { WorkspaceDeviceParing } from "../../../src/types/workspaceDevice";
 type Params = {
   graphql: any;
   workspaceId: string;
-  revokedUserId: string;
   creatorDeviceSigningPublicKey: string;
   deviceWorkspaceKeyBoxes: WorkspaceDeviceParing[];
   authorizationHeader: string;
@@ -14,7 +13,6 @@ type Params = {
 export const removeMemberAndRotateWorkspaceKey = async ({
   graphql,
   workspaceId,
-  revokedUserId,
   creatorDeviceSigningPublicKey,
   deviceWorkspaceKeyBoxes,
   authorizationHeader,
@@ -48,7 +46,6 @@ export const removeMemberAndRotateWorkspaceKey = async ({
     {
       input: {
         creatorDeviceSigningPublicKey,
-        revokedUserId,
         workspaceId,
         deviceWorkspaceKeyBoxes,
         serializedWorkspaceChainEvent,
