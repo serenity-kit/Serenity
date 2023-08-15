@@ -174,7 +174,6 @@ export default function Page({
         key: sodium.from_base64(snapshotKeyData.key),
         publicData: {
           keyDerivationTrace: snapshotKeyData.keyDerivationTrace,
-          subkeyId: snapshotKeyData.subkeyId,
         },
         additionalServerData: { documentTitleData },
       };
