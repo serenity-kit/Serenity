@@ -56,6 +56,9 @@ export const login = async ({
   updateAuthentication,
   useExtendedLogin,
 }: LoginParams) => {
+  // ideally we would remove the device, but that requires access to the mainDevice
+  // running the logoutMutation without the removeDevice user-chain event at least
+  // removes the session on the server
   const logoutResult = await runLogoutMutation({}, {});
   const remoteCleanupSuccessful = logoutResult.data?.logout?.success || false;
   if (!remoteCleanupSuccessful) {

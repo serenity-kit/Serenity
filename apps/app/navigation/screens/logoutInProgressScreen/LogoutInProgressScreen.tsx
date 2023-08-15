@@ -1,10 +1,16 @@
 import { useFocusEffect } from "@react-navigation/native";
+import * as userChain from "@serenity-kit/user-chain";
+import { notNull } from "@serenity-tools/common";
 import { CenterContent, Text } from "@serenity-tools/ui";
 import { useWindowDimensions } from "react-native";
 import { useAppContext } from "../../../context/AppContext";
-import { runLogoutMutation } from "../../../generated/graphql";
+import {
+  runLogoutMutation,
+  runUserChainQuery,
+} from "../../../generated/graphql";
 import { RootStackScreenProps } from "../../../types/navigationProps";
 import { clearDeviceAndSessionStorage } from "../../../utils/authentication/clearDeviceAndSessionStorage";
+import { getMainDevice } from "../../../utils/device/mainDeviceMemoryStore";
 import { userWorkspaceKeyStore } from "../../../utils/workspace/workspaceKeyStore";
 
 let logoutInitiated = false;
@@ -18,7 +24,7 @@ export default function LogoutInProgress({
 }: RootStackScreenProps<"LogoutInProgress">) {
   useWindowDimensions(); // needed to ensure tw-breakpoints are triggered when resizing
   const clearWorkspaceKeyStore = userWorkspaceKeyStore((state) => state.clear);
-  const { updateAuthentication, sessionKey, activeDevice } = useAppContext();
+  const { updateAuthentication, activeDevice } = useAppContext();
 
   useFocusEffect(() => {
     async function logout() {
@@ -33,7 +39,49 @@ export default function LogoutInProgress({
       let localCleanupSuccessful = false;
       let remoteCleanupSuccessful = false;
       try {
-        const logoutResult = await runLogoutMutation({}, {});
+        const mainDevice = getMainDevice();
+        if (!mainDevice) {
+          throw new Error("Main device not available");
+        }
+
+        if (!activeDevice) {
+          throw new Error("activeDevice not available");
+        }
+
+        const userChainQueryResult = await runUserChainQuery({});
+        let lastChainEvent: userChain.UserChainEvent | null = null;
+        if (userChainQueryResult.data?.userChain?.nodes) {
+          userChain.resolveState({
+            events: userChainQueryResult.data.userChain.nodes
+              .filter(notNull)
+              .map((event) => {
+                const data = userChain.UserChainEvent.parse(
+                  JSON.parse(event.serializedContent)
+                );
+                lastChainEvent = data;
+                return data;
+              }),
+            knownVersion: userChain.version,
+          });
+        }
+
+        if (!lastChainEvent) {
+          throw new Error("lastChainEvent not available");
+        }
+
+        const event = userChain.removeDevice({
+          authorKeyPair: {
+            privateKey: mainDevice.signingPrivateKey,
+            publicKey: mainDevice.signingPublicKey,
+          },
+          signingPublicKey: activeDevice.signingPublicKey,
+          prevEvent: lastChainEvent,
+        });
+
+        const logoutResult = await runLogoutMutation(
+          { input: { serializedUserChainEvent: JSON.stringify(event) } },
+          {}
+        );
         remoteCleanupSuccessful = logoutResult.data?.logout?.success || false;
         clearDeviceAndSessionStorage(clearWorkspaceKeyStore);
         await updateAuthentication(null);

@@ -557,6 +557,10 @@ export type KeyDerivationTraceInput = {
   workspaceKeyId: Scalars['String'];
 };
 
+export type LogoutInput = {
+  serializedUserChainEvent: Scalars['String'];
+};
+
 export type LogoutResult = {
   __typename?: 'LogoutResult';
   success: Scalars['Boolean'];
@@ -725,6 +729,11 @@ export type MutationFinishRegistrationArgs = {
 
 export type MutationInitiateFileUploadArgs = {
   input: InitiateFileUploadInput;
+};
+
+
+export type MutationLogoutArgs = {
+  input?: InputMaybe<LogoutInput>;
 };
 
 
@@ -1523,7 +1532,9 @@ export type InitiateFileUploadMutationVariables = Exact<{
 
 export type InitiateFileUploadMutation = { __typename?: 'Mutation', initiateFileUpload?: { __typename?: 'InitiateFileUploadResult', uploadUrl: string, fileId: string } | null };
 
-export type LogoutMutationVariables = Exact<{ [key: string]: never; }>;
+export type LogoutMutationVariables = Exact<{
+  input?: InputMaybe<LogoutInput>;
+}>;
 
 
 export type LogoutMutation = { __typename?: 'Mutation', logout?: { __typename?: 'LogoutResult', success: boolean } | null };
@@ -2131,8 +2142,8 @@ export function useInitiateFileUploadMutation() {
   return Urql.useMutation<InitiateFileUploadMutation, InitiateFileUploadMutationVariables>(InitiateFileUploadDocument);
 };
 export const LogoutDocument = gql`
-    mutation logout {
-  logout {
+    mutation logout($input: LogoutInput) {
+  logout(input: $input) {
     success
   }
 }

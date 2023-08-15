@@ -39,11 +39,15 @@ export async function createWorkspace({
     );
     const devices = await prisma.device.findMany({
       where: {
-        userId,
-        session: { every: { expiresAt: { gte: new Date() } } },
+        OR: [
+          { userId, expiresAt: { gt: new Date() } },
+          // main devices don't expire
+          { userId, expiresAt: null },
+        ],
       },
       select: { signingPublicKey: true },
     });
+
     const actualDeviceSigningPublicKeys = devices.map(
       (item) => item.signingPublicKey
     );
