@@ -346,11 +346,6 @@ export type DeviceEdge = {
   node?: Maybe<Device>;
 };
 
-export type DeviceResult = {
-  __typename?: 'DeviceResult';
-  device?: Maybe<Device>;
-};
-
 export type DeviceWorkspaceKeyBoxInput = {
   ciphertext: Scalars['String'];
   deviceSigningPublicKey: Scalars['String'];
@@ -569,8 +564,6 @@ export type LogoutResult = {
 export type MainDeviceResult = {
   __typename?: 'MainDeviceResult';
   ciphertext: Scalars['String'];
-  createdAt: Scalars['Date'];
-  info?: Maybe<Scalars['String']>;
   nonce: Scalars['String'];
 };
 
@@ -811,7 +804,6 @@ export type Query = {
   __typename?: 'Query';
   activeWorkspaceKeys?: Maybe<ActiveWorkspaceKeysResult>;
   commentsByDocumentId?: Maybe<CommentConnection>;
-  deviceBySigningPublicKey?: Maybe<DeviceResult>;
   devices?: Maybe<DeviceConnection>;
   document?: Maybe<Document>;
   documentPath?: Maybe<Array<Maybe<Folder>>>;
@@ -855,11 +847,6 @@ export type QueryCommentsByDocumentIdArgs = {
   documentShareLinkToken?: InputMaybe<Scalars['String']>;
   first?: InputMaybe<Scalars['Int']>;
   last?: InputMaybe<Scalars['Int']>;
-};
-
-
-export type QueryDeviceBySigningPublicKeyArgs = {
-  signingPublicKey: Scalars['ID'];
 };
 
 
@@ -1611,13 +1598,6 @@ export type CommentsByDocumentIdQueryVariables = Exact<{
 
 export type CommentsByDocumentIdQuery = { __typename?: 'Query', commentsByDocumentId?: { __typename?: 'CommentConnection', nodes?: Array<{ __typename?: 'Comment', id: string, documentId: string, snapshotId: string, subkeyId: number, contentCiphertext: string, contentNonce: string, createdAt: any, creatorDevice: { __typename?: 'CreatorDevice', signingPublicKey: string, encryptionPublicKey: string, encryptionPublicKeySignature: string }, commentReplies?: Array<{ __typename?: 'CommentReply', id: string, snapshotId: string, subkeyId: number, contentCiphertext: string, contentNonce: string, createdAt: any, creatorDevice: { __typename?: 'CreatorDevice', signingPublicKey: string, encryptionPublicKey: string, encryptionPublicKeySignature: string } } | null> | null } | null> | null, pageInfo: { __typename?: 'PageInfo', hasNextPage: boolean, hasPreviousPage: boolean, startCursor?: string | null, endCursor?: string | null } } | null };
 
-export type DeviceBySigningPublicKeyQueryVariables = Exact<{
-  signingPublicKey: Scalars['ID'];
-}>;
-
-
-export type DeviceBySigningPublicKeyQuery = { __typename?: 'Query', deviceBySigningPublicKey?: { __typename?: 'DeviceResult', device?: { __typename?: 'Device', userId: string, signingPublicKey: string, encryptionPublicKey: string, encryptionPublicKeySignature: string, info?: string | null, createdAt?: any | null } | null } | null };
-
 export type DevicesQueryVariables = Exact<{
   onlyNotExpired: Scalars['Boolean'];
   first: Scalars['Int'];
@@ -2333,24 +2313,6 @@ export const CommentsByDocumentIdDocument = gql`
 
 export function useCommentsByDocumentIdQuery(options: Omit<Urql.UseQueryArgs<CommentsByDocumentIdQueryVariables>, 'query'>) {
   return Urql.useQuery<CommentsByDocumentIdQuery, CommentsByDocumentIdQueryVariables>({ query: CommentsByDocumentIdDocument, ...options });
-};
-export const DeviceBySigningPublicKeyDocument = gql`
-    query deviceBySigningPublicKey($signingPublicKey: ID!) {
-  deviceBySigningPublicKey(signingPublicKey: $signingPublicKey) {
-    device {
-      userId
-      signingPublicKey
-      encryptionPublicKey
-      encryptionPublicKeySignature
-      info
-      createdAt
-    }
-  }
-}
-    `;
-
-export function useDeviceBySigningPublicKeyQuery(options: Omit<Urql.UseQueryArgs<DeviceBySigningPublicKeyQueryVariables>, 'query'>) {
-  return Urql.useQuery<DeviceBySigningPublicKeyQuery, DeviceBySigningPublicKeyQueryVariables>({ query: DeviceBySigningPublicKeyDocument, ...options });
 };
 export const DevicesDocument = gql`
     query devices($onlyNotExpired: Boolean!, $first: Int!, $after: String) {
@@ -3462,109 +3424,6 @@ export const commentsByDocumentIdQueryService =
         // perform cleanup
         clearInterval(intervalId);
         commentsByDocumentIdQueryServiceSubscribers[variablesString].intervalId = null;
-      }
-    };
-  };
-
-
-
-export const runDeviceBySigningPublicKeyQuery = async (variables: DeviceBySigningPublicKeyQueryVariables, options?: any) => {
-  return await getUrqlClient()
-    .query<DeviceBySigningPublicKeyQuery, DeviceBySigningPublicKeyQueryVariables>(
-      DeviceBySigningPublicKeyDocument,
-      variables,
-      {
-        // better to be safe here and always refetch
-        requestPolicy: "network-only",
-        ...options
-      }
-    )
-    .toPromise();
-};
-
-export type DeviceBySigningPublicKeyQueryResult = Urql.OperationResult<DeviceBySigningPublicKeyQuery, DeviceBySigningPublicKeyQueryVariables>;
-
-export type DeviceBySigningPublicKeyQueryUpdateResultEvent = {
-  type: "DeviceBySigningPublicKeyQuery.UPDATE_RESULT";
-  result: DeviceBySigningPublicKeyQueryResult;
-};
-
-export type DeviceBySigningPublicKeyQueryErrorEvent = {
-  type: "DeviceBySigningPublicKeyQuery.ERROR";
-  result: DeviceBySigningPublicKeyQueryResult;
-};
-
-export type DeviceBySigningPublicKeyQueryServiceEvent = DeviceBySigningPublicKeyQueryUpdateResultEvent | DeviceBySigningPublicKeyQueryErrorEvent;
-
-type DeviceBySigningPublicKeyQueryServiceSubscribersEntry = {
-  variables: DeviceBySigningPublicKeyQueryVariables;
-  callbacks: ((event: DeviceBySigningPublicKeyQueryServiceEvent) => void)[];
-  intervalId: NodeJS.Timer | null;
-};
-
-type DeviceBySigningPublicKeyQueryServiceSubscribers = {
-  [variables: string]: DeviceBySigningPublicKeyQueryServiceSubscribersEntry;
-};
-
-const deviceBySigningPublicKeyQueryServiceSubscribers: DeviceBySigningPublicKeyQueryServiceSubscribers = {};
-
-const triggerDeviceBySigningPublicKeyQuery = (variablesString: string, variables: DeviceBySigningPublicKeyQueryVariables) => {
-  getUrqlClient()
-    .query<DeviceBySigningPublicKeyQuery, DeviceBySigningPublicKeyQueryVariables>(DeviceBySigningPublicKeyDocument, variables)
-    .toPromise()
-    .then((result) => {
-      deviceBySigningPublicKeyQueryServiceSubscribers[variablesString].callbacks.forEach(
-        (callback) => {
-          callback({
-            type: result.error ? "DeviceBySigningPublicKeyQuery.ERROR" : "DeviceBySigningPublicKeyQuery.UPDATE_RESULT",
-            result: result,
-          });
-        }
-      );
-    });
-};
-
-/**
- * This service is used to query results every 4 seconds.
- *
- * It allows machines to spawn a service that will fetch the query
- * and send the result to the machine.
- * It will share the same interval for all machines.
- * When the last subscription is stopped, the interval will be cleared.
- * It also considers the variables passed to the service.
- */
-export const deviceBySigningPublicKeyQueryService =
-  (variables: DeviceBySigningPublicKeyQueryVariables, intervalInMs?: number) => (callback, onReceive) => {
-    const variablesString = canonicalize(variables) as string;
-    if (deviceBySigningPublicKeyQueryServiceSubscribers[variablesString]) {
-      deviceBySigningPublicKeyQueryServiceSubscribers[variablesString].callbacks.push(callback);
-    } else {
-      deviceBySigningPublicKeyQueryServiceSubscribers[variablesString] = {
-        variables,
-        callbacks: [callback],
-        intervalId: null,
-      };
-    }
-
-    triggerDeviceBySigningPublicKeyQuery(variablesString, variables);
-    if (!deviceBySigningPublicKeyQueryServiceSubscribers[variablesString].intervalId) {
-      deviceBySigningPublicKeyQueryServiceSubscribers[variablesString].intervalId = setInterval(
-        () => {
-          triggerDeviceBySigningPublicKeyQuery(variablesString, variables);
-        },
-        intervalInMs || 4000
-      );
-    }
-
-    const intervalId = deviceBySigningPublicKeyQueryServiceSubscribers[variablesString].intervalId;
-    return () => {
-      if (
-        deviceBySigningPublicKeyQueryServiceSubscribers[variablesString].callbacks.length === 0 &&
-        intervalId
-      ) {
-        // perform cleanup
-        clearInterval(intervalId);
-        deviceBySigningPublicKeyQueryServiceSubscribers[variablesString].intervalId = null;
       }
     };
   };

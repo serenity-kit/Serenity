@@ -5,7 +5,6 @@ import {
 import { gql } from "graphql-request";
 import deleteAllRecords from "../../../../test/helpers/deleteAllRecords";
 import { deleteDevice } from "../../../../test/helpers/device/deleteDevice";
-import { getDeviceBySigningPublicKey } from "../../../../test/helpers/device/getDeviceBySigningKey";
 import { getDevices } from "../../../../test/helpers/device/getDevices";
 import { getWorkspaceKeyForWorkspaceAndDevice } from "../../../../test/helpers/device/getWorkspaceKeyForWorkspaceAndDevice";
 import setupGraphql from "../../../../test/helpers/setupGraphql";
@@ -161,14 +160,12 @@ test("delete a device", async () => {
   // expect(deletedSession).toBeNull();
 
   // device should not exist
-  await expect(
-    (async () =>
-      await getDeviceBySigningPublicKey({
-        graphql,
-        signingPublicKey: user1Device2.signingPublicKey,
-        authorizationHeader,
-      }))()
-  ).rejects.toThrowError(/FORBIDDEN/);
+  const device = await prisma.device.findUnique({
+    where: {
+      signingPublicKey: user1Device2.signingPublicKey,
+    },
+  });
+  expect(device).toBeNull();
 });
 
 test("delete login device clears session", async () => {
@@ -230,14 +227,12 @@ test("delete login device clears session", async () => {
   expect(deletedSession).toBeNull();
 
   // device should not exist
-  await expect(
-    (async () =>
-      await getDeviceBySigningPublicKey({
-        graphql,
-        signingPublicKey: user1Device2.signingPublicKey,
-        authorizationHeader,
-      }))()
-  ).rejects.toThrowError(/Not authenticated/);
+  const device = await prisma.device.findUnique({
+    where: {
+      signingPublicKey: user1Device2.signingPublicKey,
+    },
+  });
+  expect(device).toBeNull();
 });
 
 test("Unauthenticated", async () => {

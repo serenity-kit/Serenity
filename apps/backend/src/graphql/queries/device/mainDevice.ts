@@ -1,14 +1,11 @@
 import { AuthenticationError } from "apollo-server-express";
-import { nonNull, objectType, queryField } from "nexus";
-import { getDeviceBySigningPublicKey } from "../../../database/device/getDeviceBySigningPublicKey";
+import { objectType, queryField } from "nexus";
 
 export const MainDeviceResult = objectType({
   name: "MainDeviceResult",
   definition(t) {
     t.nonNull.string("ciphertext");
     t.nonNull.string("nonce");
-    t.field("createdAt", { type: nonNull("Date") });
-    t.string("info");
   },
 });
 
@@ -19,18 +16,9 @@ export const mainDeviceQuery = queryField((t) => {
       if (!context.user) {
         throw new AuthenticationError("Not authenticated");
       }
-      const device = await getDeviceBySigningPublicKey({
-        userId: context.user.id,
-        signingPublicKey: context.user.mainDeviceSigningPublicKey,
-      });
       return {
         ciphertext: context.user.mainDeviceCiphertext,
         nonce: context.user.mainDeviceNonce,
-        signingPublicKey: context.user.mainDeviceSigningPublicKey,
-        encryptionPublicKey: device.encryptionPublicKey,
-        encryptionPublicKeySignature: device.encryptionPublicKeySignature,
-        info: device.info,
-        createdAt: device.createdAt,
       };
     },
   });

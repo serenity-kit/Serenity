@@ -34,7 +34,6 @@ import * as UpdateWorkspaceMembersRolesMutationTypes from "./graphql/mutations/w
 import * as UpdateWorkspaceNameMutationTypes from "./graphql/mutations/workspace/updateWorkspaceName";
 import * as MeQueryTypes from "./graphql/queries/authentication/me";
 import * as CommentsByDocumentIdQueryTypes from "./graphql/queries/comment/commentsByDocumentId";
-import * as deviceBySigningPublicKeyQueryTypes from "./graphql/queries/device/deviceBySigningPublicKey";
 import * as DevicesQueryTypes from "./graphql/queries/device/devices";
 import * as MainDeviceQueryTypes from "./graphql/queries/device/mainDevice";
 import * as DocumentQueryTypes from "./graphql/queries/document/document";
@@ -135,7 +134,6 @@ export const schema = makeSchema({
     FileUrlQueryTypes,
 
     DevicesQueryTypes,
-    deviceBySigningPublicKeyQueryTypes,
     DeleteDeviceMutationTypes,
     MainDeviceQueryTypes,
     AttachDeviceToWorkspacesMutationTypes,
