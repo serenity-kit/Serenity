@@ -13,14 +13,18 @@ export const logout = async ({
   removeDeviceEvent,
 }: Props) => {
   return await prisma.$transaction(async (prisma) => {
-    const sessionDevices = await prisma.session.findMany({
-      where: { userId, sessionKey },
-      select: { deviceSigningPublicKey: true },
-    });
-    const deviceSigningPublicKeys = sessionDevices.map(
-      (sessionDevice) => sessionDevice.deviceSigningPublicKey
-    );
     if (removeDeviceEvent) {
+      // currently a 1 to 1 relationship, but that could change
+      const sessionDevice = await prisma.session.findFirstOrThrow({
+        where: { userId, sessionKey, expiresAt: { gt: new Date() } },
+        select: { deviceSigningPublicKey: true },
+      });
+      if (
+        sessionDevice.deviceSigningPublicKey !==
+        removeDeviceEvent.transaction.signingPublicKey
+      ) {
+        throw new Error("Device signing public key does not match on logout");
+      }
       const { lastUserChainEvent, userChainState } =
         await getLastUserChainEventWithState({ prisma, userId });
 
@@ -39,8 +43,10 @@ export const logout = async ({
         },
       });
 
-      await prisma.device.deleteMany({
-        where: { signingPublicKey: { in: deviceSigningPublicKeys } },
+      await prisma.device.delete({
+        where: {
+          signingPublicKey: removeDeviceEvent.transaction.signingPublicKey,
+        },
       });
     }
 
