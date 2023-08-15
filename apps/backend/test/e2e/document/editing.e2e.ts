@@ -83,7 +83,10 @@ test.describe("Edit document", () => {
       password: user1.password,
       stayLoggedIn: true,
     });
-    const workspaceInvitationResult = await createWorkspaceInvitation({ page });
+    const workspaceInvitationResult = await createWorkspaceInvitation({
+      page,
+      role: "EDITOR",
+    });
     const workspaceInvitationUrl = workspaceInvitationResult.url;
     await page.goBack();
     await page.goBack();
@@ -134,7 +137,9 @@ test.describe("Edit document", () => {
     expect(endingContent).toBe(user2EndingContent);
     await user2Page.type("div[class='ProseMirror']", newContent2);
     // reload page
+
     await reloadPage({ page });
+
     await reloadPage({ page: user2Page });
     // verify content for both users
     const user1EditorAfterReload = page.locator("div[class='ProseMirror']");
@@ -240,8 +245,8 @@ test.describe("Edit document in subfolder", () => {
     const user2Url = user2Page.url();
     expect(user1Url).toBe(user2Url);
 
-    const newContent1 = "\nHello User 2!";
-    const newContent2 = "\nHello User 1!";
+    const newContent1 = "\nHi User 2!";
+    const newContent2 = "\nHi User 1!";
     const user1Editor = page.locator("div[class='ProseMirror']");
     const startingContent = await user1Editor.innerHTML();
     const user2Editor = user2Page.locator("div[class='ProseMirror']");
@@ -249,8 +254,6 @@ test.describe("Edit document in subfolder", () => {
     expect(startingContent).toBe(user2StartingContent);
     // user1 edits document
     await page.type("div[class='ProseMirror']", newContent1);
-    console.log("check");
-    await delayForSeconds(30);
     // expect the cursor to show on user2's page
     const user1Cursor = user2Page.locator(
       "xpath=//span[contains(@class,'collaboration-cursor__caret')]"
