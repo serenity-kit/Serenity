@@ -55,6 +55,7 @@ export const applyCreateChainEvent = ({
   return {
     id: event.transaction.id,
     devices,
+    removedDevices: {},
     email: event.transaction.email,
     mainDeviceSigningPublicKey: event.author.publicKey,
     mainDeviceEncryptionPublicKey: event.transaction.encryptionPublicKey,

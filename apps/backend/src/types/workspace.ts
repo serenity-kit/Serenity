@@ -5,9 +5,8 @@ import {
   WorkspaceKey as PrismaWorkspaceKey,
   WorkspaceKeyBox as PrismaWorkspaceKeyBox,
   Role,
-  UsersToWorkspaces,
 } from "../../prisma/generated/output";
-import { CreatorDevice, MinimalDevice } from "./device";
+import { CreatorDevice } from "./device";
 
 export type MemberIdWithDevice = {
   id: string;
@@ -37,16 +36,18 @@ export type WorkspaceKey = {
   workspaceKeyBoxes?: WorkspaceKeyBox[];
 };
 
-export type WorkspaceMember = {
-  userId: string;
-  username: string | undefined | null;
-  role: Role;
-  mainDeviceSigningPublicKey: string;
-  devices: MinimalDevice[];
-};
-
 type ChainEntry = {
   serializedContent: string;
+  position: number;
+};
+
+export type WorkspaceMember = {
+  id: string;
+  user: {
+    id: string;
+    username: string;
+    chain: ChainEntry[];
+  };
 };
 
 export type Workspace = {
@@ -57,7 +58,6 @@ export type Workspace = {
   infoNonce?: string | undefined | null;
   infoWorkspaceKeyId?: string | undefined | null;
   infoWorkspaceKey?: WorkspaceKey | undefined | null;
-  members: WorkspaceMember[];
   workspaceKeys?: WorkspaceKey[];
   currentWorkspaceKey?: WorkspaceKey;
   chain?: ChainEntry[];
@@ -74,18 +74,13 @@ export type WorkspaceInvitation = {
   expiresAt: Date;
 };
 
+type DbUser = {
+  id: string;
+  username: string;
+  chain: { content: any; position: number }[];
+};
+
 type DbWorkspace = PrismaWorkspace & {
-  usersToWorkspaces: (UsersToWorkspaces & {
-    user: {
-      username: string;
-      mainDeviceSigningPublicKey: string;
-      devices: {
-        signingPublicKey: string;
-        encryptionPublicKey: string;
-        encryptionPublicKeySignature: string;
-      }[];
-    };
-  })[];
   workspaceKeys?: (PrismaWorkspaceKey & {
     workspaceKeyBoxes: (PrismaWorkspaceKeyBox & {
       creatorDevice: PrismaCreatorDevice;
@@ -100,7 +95,7 @@ type DbWorkspace = PrismaWorkspace & {
     | undefined
     | null;
 
-  chain?: { content: any }[];
+  chain?: { content: any; position: number }[];
 };
 
 export const formatWorkspaceKey = (workspaceKey: any): WorkspaceKey => {
@@ -117,18 +112,29 @@ export const formatWorkspaceInvitation = (workspaceInvitation: any) => {
   };
 };
 
+export const formatWorkspaceMember = (
+  user: DbUser,
+  workspaceId: string
+): WorkspaceMember => {
+  if (!user.chain) {
+    throw new Error("Missing chain for user");
+  }
+  const workspaceMember: WorkspaceMember = {
+    id: `workspace:${workspaceId}-user:${user.id}`,
+    user: {
+      ...user,
+      chain: user.chain.map((userChainEvent) => {
+        return {
+          serializedContent: JSON.stringify(userChainEvent.content),
+          position: userChainEvent.position,
+        };
+      }),
+    },
+  };
+  return workspaceMember;
+};
+
 export const formatWorkspace = (workspace: DbWorkspace): Workspace => {
-  const members: WorkspaceMember[] = [];
-  workspace.usersToWorkspaces.forEach((member) => {
-    const workspaceMember: WorkspaceMember = {
-      userId: member.userId,
-      mainDeviceSigningPublicKey: member.user.mainDeviceSigningPublicKey,
-      username: member.user.username,
-      role: member.role,
-      devices: member.user.devices,
-    };
-    members.push(workspaceMember);
-  });
   let currentWorkspaceKey: WorkspaceKey | undefined = undefined;
   const workspaceKeys: WorkspaceKey[] = [];
   if (workspace.workspaceKeys) {
@@ -154,13 +160,13 @@ export const formatWorkspace = (workspace: DbWorkspace): Workspace => {
   }
   return {
     ...workspace,
-    members: members,
     currentWorkspaceKey,
     infoWorkspaceKey,
     workspaceKeys,
     chain: workspace.chain?.map((entry) => {
       return {
         serializedContent: JSON.stringify(entry.content),
+        position: entry.position,
       };
     }),
   };

@@ -3,10 +3,6 @@ query workspaces($deviceSigningPublicKey: String!) {
     nodes {
       id
       name
-      members {
-        userId
-        role
-      }
       currentWorkspaceKey {
         id
         workspaceId

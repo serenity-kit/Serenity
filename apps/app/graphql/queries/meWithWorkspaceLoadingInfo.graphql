@@ -17,7 +17,6 @@ query meWithWorkspaceLoadingInfo(
       id
       isAuthorized
       documentId
-      role
     }
   }
 }

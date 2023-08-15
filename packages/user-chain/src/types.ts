@@ -81,6 +81,7 @@ export const UserChainState = z.object({
   mainDeviceEncryptionPublicKey: z.string(),
   mainDeviceEncryptionPublicKeySignature: z.string(),
   devices: z.record(z.string(), DeviceInfo),
+  removedDevices: z.record(z.string(), DeviceInfo),
   eventHash: z.string(),
   eventVersion: Version,
 });

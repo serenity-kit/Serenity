@@ -2,8 +2,10 @@ import {
   KeyDerivationTrace,
   LocalDevice,
   SerenitySnapshotPublicData,
+  constructUserFromSerializedUserChain,
   encryptDocumentTitle,
   generateId,
+  notNull,
 } from "@serenity-tools/common";
 import { decryptDocumentTitleBasedOnSnapshotKey } from "@serenity-tools/common/src/decryptDocumentTitleBasedOnSnapshotKey/decryptDocumentTitleBasedOnSnapshotKey";
 import { AwarenessUserInfo } from "@serenity-tools/editor";
@@ -31,9 +33,9 @@ import { usePage } from "../../context/PageContext";
 import { useWorkspace } from "../../context/WorkspaceContext";
 import {
   Document,
-  Workspace,
   runDocumentQuery,
   runMeQuery,
+  runWorkspaceMembersQuery,
 } from "../../generated/graphql";
 import { useAuthenticatedAppContext } from "../../hooks/useAuthenticatedAppContext";
 import { DocumentState } from "../../types/documentState";
@@ -44,7 +46,7 @@ import { useDocumentTitleStore } from "../../utils/document/documentTitleStore";
 import { getDocument } from "../../utils/document/getDocument";
 import { updateDocumentName } from "../../utils/document/updateDocumentName";
 import { useEditorStore } from "../../utils/editorStore/editorStore";
-import { getUserFromWorkspaceQueryResultByDeviceInfo } from "../../utils/getUserFromWorkspaceQueryResultByDeviceInfo/getUserFromWorkspaceQueryResultByDeviceInfo";
+import { findVerifiedUserByDeviceSigningPublicKey } from "../../utils/findVerifiedUserByDeviceSigningPublicKey/findVerifiedUserByDeviceSigningPublicKey";
 import {
   getLocalDocument,
   setLocalDocument,
@@ -110,7 +112,7 @@ export default function Page({
   if (process.env.SERENITY_ENV === "e2e") {
     websocketHost = `ws://localhost:4001`;
   }
-  const { workspaceQueryResult } = useWorkspace();
+  const { users, workspaceChainData } = useWorkspace();
 
   const [state] = useYjsSync({
     yDoc: yDocRef.current,
@@ -172,7 +174,6 @@ export default function Page({
         key: sodium.from_base64(snapshotKeyData.key),
         publicData: {
           keyDerivationTrace: snapshotKeyData.keyDerivationTrace,
-          subkeyId: snapshotKeyData.subkeyId,
         },
         additionalServerData: { documentTitleData },
       };
@@ -210,34 +211,46 @@ export default function Page({
       return snapshotKeyRef.current?.key as Uint8Array;
     },
     isValidCollaborator: async (signingPublicKey: string) => {
-      let workspace: Workspace | undefined | null;
-      if (workspaceQueryResult.data) {
-        // @ts-expect-error
-        workspace = workspaceQueryResult.data.workspace;
-      } else {
-        workspace = await getWorkspace({
-          workspaceId,
-          deviceSigningPublicKey: activeDevice.signingPublicKey,
+      // TODO this should also work for users that have been removed
+      // allow to fetch a user that is or was part of the workspace
+      // the must be cross-checked with workspaceChainData
+
+      if (users) {
+        const creator = findVerifiedUserByDeviceSigningPublicKey({
+          users,
+          signingPublicKey,
         });
+        if (creator) {
+          return true;
+        }
       }
 
-      if (!workspace) {
-        return false;
-      }
+      const workspaceMembersQueryResult = await runWorkspaceMembersQuery({
+        workspaceId,
+      });
+      const allUsers = workspaceMembersQueryResult.data?.workspaceMembers?.nodes
+        ? workspaceMembersQueryResult.data.workspaceMembers.nodes
+            .filter(notNull)
+            .map((member) => {
+              return constructUserFromSerializedUserChain({
+                serializedUserChain: member.user.chain,
+              });
+            })
+        : null;
 
-      const creator = getUserFromWorkspaceQueryResultByDeviceInfo(
-        { workspace },
-        { signingPublicKey }
-      );
-      if (creator) {
+      const creator2 = findVerifiedUserByDeviceSigningPublicKey({
+        users: allUsers,
+        signingPublicKey,
+      });
+      if (Boolean(creator2)) {
         return true;
+      } else {
+        console.warn(
+          "Snapshot, Update or EphemeralUpdate creator could not be validated. Probably since it is an already removed device. This is not yet implemented."
+        );
+        return true;
+        // return false;
       }
-      // TODO should be false once we can validate removed devices
-      // return false;
-      console.warn(
-        "Snapshot, Update or EphemeralUpdate creator could not be validated. Probably since it is an already removed device."
-      );
-      return true;
     },
     // onCustomMessage: async (message) => {
     //   console.log("CUSTOM MESSAGE:", message);

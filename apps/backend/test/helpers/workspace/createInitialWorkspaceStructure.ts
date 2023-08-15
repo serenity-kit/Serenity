@@ -24,10 +24,6 @@ const query = gql`
       workspace {
         id
         name
-        members {
-          userId
-          role
-        }
         currentWorkspaceKey {
           id
           workspaceId

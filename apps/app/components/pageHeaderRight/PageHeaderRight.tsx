@@ -1,3 +1,4 @@
+import { generateId } from "@serenity-tools/common";
 import {
   Avatar,
   AvatarGroup,
@@ -21,10 +22,23 @@ type Props = {
 
 export const PageHeaderRight: React.FC<Props> = ({ toggleCommentsDrawer }) => {
   const hasEditorSidebar = useHasEditorSidebar();
-  const { workspaceQueryResult } = useWorkspace();
+  const { workspaceChainData, users } = useWorkspace();
   const [isActiveShareModal, setIsActiveShareModal] = useState(false);
   const isInEditingMode = useEditorStore((state) => state.isInEditingMode);
   const triggerBlur = useEditorStore((state) => state.triggerBlur);
+
+  const activeWorkspaceMembers =
+    workspaceChainData?.state.members && users
+      ? Object.entries(workspaceChainData.state.members).map(
+          ([mainDeviceSigningPublicKey, member]) => {
+            const user = users.find(
+              (user) =>
+                user.mainDeviceSigningPublicKey === mainDeviceSigningPublicKey
+            );
+            return user;
+          }
+        )
+      : null;
 
   return (
     <>
@@ -48,18 +62,27 @@ export const PageHeaderRight: React.FC<Props> = ({ toggleCommentsDrawer }) => {
           />
         ) : (
           <>
-            {workspaceQueryResult.data?.workspace?.members?.length ? (
+            {activeWorkspaceMembers ? (
               <AvatarGroup
                 max={hasEditorSidebar ? 3 : 2}
                 _avatar={{ size: "sm" }}
               >
-                {workspaceQueryResult.data.workspace.members.map((member) => {
+                {activeWorkspaceMembers.map((member) => {
+                  if (member) {
+                    return (
+                      <Avatar
+                        key={member.userId}
+                        color={hashToCollaboratorColor(member.userId)}
+                      >
+                        {member.email?.split("@")[0].substring(0, 1)}
+                      </Avatar>
+                    );
+                  }
+                  // we need to load the user - currently it is unknown
+                  const id = generateId();
                   return (
-                    <Avatar
-                      key={member.userId}
-                      color={hashToCollaboratorColor(member.userId)}
-                    >
-                      {member.username?.split("@")[0].substring(0, 1)}
+                    <Avatar key={id} color="rose">
+                      U
                     </Avatar>
                   );
                 })}

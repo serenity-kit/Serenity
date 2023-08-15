@@ -1,5 +1,4 @@
 import { gql } from "graphql-request";
-import { Role } from "../../../../prisma/generated/output";
 import deleteAllRecords from "../../../../test/helpers/deleteAllRecords";
 import setupGraphql, {
   TestContext,
@@ -84,10 +83,6 @@ const getWorkspaces = async ({
         nodes {
           id
           name
-          members {
-            userId
-            role
-          }
           currentWorkspaceKey {
             id
             workspaceId
@@ -155,10 +150,6 @@ test("user should be able to list workspaces", async () => {
     expect(workspaceKeyBox?.workspaceKeyId).toBe(
       workspace.currentWorkspaceKey?.id
     );
-    expect(workspace.members.length).toBe(1);
-    const member = workspace.members[0];
-    expect(member.userId).toBe(userData1.user.id);
-    expect(member.role).toBe(Role.ADMIN);
   });
 });
 
@@ -222,10 +213,6 @@ test("Input errors", async () => {
         nodes {
           id
           name
-          members {
-            userId
-            role
-          }
         }
         edges {
           cursor

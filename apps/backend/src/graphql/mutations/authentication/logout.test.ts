@@ -60,7 +60,7 @@ test("logout doesn't invalidate second session", async () => {
     where: { userId: userData1.user.id },
   });
   expect(numSessionsAfterLogout).toBe(numSessionsBeforeLogout - 1);
-  expect(numDevicesAfterLogout).toBe(numDevicesBeforeLogout - 1);
+  expect(numDevicesAfterLogout).toBe(numDevicesBeforeLogout);
   const remainingSession = await prisma.session.findFirst({
     where: {
       userId: userData1.user.id,
@@ -99,18 +99,11 @@ test("logout", async () => {
     where: { userId: userData1.user.id },
   });
   expect(numSessionsAfterLogout).toBe(numSessionsBeforeLogout - 1);
-  expect(numDevicesAfterLogout).toBe(numDevicesBeforeLogout - 1);
+  expect(numDevicesAfterLogout).toBe(numDevicesBeforeLogout);
   const remainingSession = await prisma.session.findFirst({
     where: { userId: userData1.user.id, sessionKey: loginResult2.sessionKey },
   });
   expect(remainingSession).toBe(null);
-  const remainingDevice = await prisma.device.findFirst({
-    where: {
-      userId: userData1.user.id,
-      signingPublicKey: loginResult2.webDevice.signingPublicKey,
-    },
-  });
-  expect(remainingDevice).toBe(null);
 });
 
 test("Unauthenticated", async () => {

@@ -52,6 +52,7 @@ test("should resolve to two devices after adding a device", async () => {
       },
     }
   `);
+  expect(state.currentState.removedDevices).toMatchInlineSnapshot(`{}`);
   expect(state.statePerEvent[state.currentState.eventHash]).toEqual(
     state.currentState
   );
@@ -92,6 +93,7 @@ test("should resolve to have a device with an expireAt", async () => {
       },
     }
   `);
+  expect(state.currentState.removedDevices).toMatchInlineSnapshot(`{}`);
 });
 
 test("should fail if an invalid expireAt is provided", async () => {

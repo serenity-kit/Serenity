@@ -4,7 +4,6 @@ import {
   Workspace,
   WorkspaceKey,
   WorkspaceKeyBox,
-  WorkspaceMember,
 } from "../../types/workspace";
 import { getOrCreateCreatorDevice } from "../../utils/device/getOrCreateCreatorDevice";
 import { prisma } from "../prisma";
@@ -40,11 +39,15 @@ export async function createWorkspace({
     );
     const devices = await prisma.device.findMany({
       where: {
-        userId,
-        session: { every: { expiresAt: { gte: new Date() } } },
+        OR: [
+          { userId, expiresAt: { gt: new Date() } },
+          // main devices don't expire
+          { userId, expiresAt: null },
+        ],
       },
       select: { signingPublicKey: true },
     });
+
     const actualDeviceSigningPublicKeys = devices.map(
       (item) => item.signingPublicKey
     );
@@ -145,49 +148,14 @@ export async function createWorkspace({
         creatorDevice: true,
       },
     });
-    const usersToWorkspaces = await prisma.usersToWorkspaces.findMany({
-      where: {
-        workspaceId: rawWorkspace.id,
-        userId,
-      },
-      select: {
-        userId: true,
-        role: true,
-        user: {
-          select: {
-            username: true,
-            mainDeviceSigningPublicKey: true,
-            devices: {
-              select: {
-                signingPublicKey: true,
-                encryptionPublicKey: true,
-                encryptionPublicKeySignature: true,
-              },
-            },
-          },
-        },
-      },
-    });
     const returningWorkspaceKey: WorkspaceKey = {
       ...currentWorkspaceKey,
       workspaceKeyBox: createdWorkspaceKeyBoxes[0],
     };
-    const members: WorkspaceMember[] = [];
-    usersToWorkspaces.forEach((userToWorkspace) => {
-      members.push({
-        userId: userToWorkspace.userId,
-        username: userToWorkspace.user.username,
-        role: userToWorkspace.role,
-        devices: userToWorkspace.user.devices,
-        mainDeviceSigningPublicKey:
-          userToWorkspace.user.mainDeviceSigningPublicKey,
-      });
-    });
     const workspace: Workspace = {
       id: rawWorkspace.id,
       name: rawWorkspace.name,
       idSignature: rawWorkspace.idSignature,
-      members,
       currentWorkspaceKey: returningWorkspaceKey,
       workspaceKeys: [returningWorkspaceKey],
     };

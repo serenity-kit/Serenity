@@ -23,14 +23,9 @@ export async function getDevices({
     where: onlyNotExpired
       ? {
           OR: [
-            {
-              userId,
-              expiresAt: { gt: new Date() },
-            },
-            {
-              userId,
-              expiresAt: null, // main devices don't expire
-            },
+            { userId, expiresAt: { gt: new Date() } },
+            // main devices don't expire
+            { userId, expiresAt: null },
           ],
         }
       : {

@@ -1,5 +1,6 @@
-import { enumType, inputObjectType, list, nonNull, objectType } from "nexus";
-import { CreatorDevice, Device, MinimalDevice } from "./device";
+import { enumType, nonNull, objectType } from "nexus";
+import { CreatorDevice, Device } from "./device";
+import { User } from "./user";
 
 export const MemberIdWithDevice = objectType({
   name: "WorkspaceIdWithDevices",
@@ -58,11 +59,8 @@ export const MemberRoleEnum = enumType({
 export const WorkspaceMember = objectType({
   name: "WorkspaceMember",
   definition(t) {
-    t.nonNull.string("userId");
-    t.nonNull.string("username");
-    t.nonNull.field("role", { type: MemberRoleEnum });
-    t.nonNull.string("mainDeviceSigningPublicKey");
-    t.list.nonNull.field("devices", { type: MinimalDevice });
+    t.nonNull.string("id"); // workspaceId + userId
+    t.nonNull.field("user", { type: User });
   },
 });
 
@@ -76,7 +74,6 @@ export const Workspace = objectType({
     t.string("infoNonce");
     t.string("infoWorkspaceKeyId");
     t.field("infoWorkspaceKey", { type: WorkspaceKey });
-    t.list.nonNull.field("members", { type: WorkspaceMember });
     t.list.nonNull.field("workspaceKeys", { type: WorkspaceKey });
     t.field("currentWorkspaceKey", { type: WorkspaceKey });
   },
@@ -87,27 +84,7 @@ export const WorkspaceLoadingInfo = objectType({
   definition(t) {
     t.nonNull.string("id");
     t.nonNull.boolean("isAuthorized");
-    t.nonNull.field("role", { type: MemberRoleEnum });
     t.string("documentId");
-  },
-});
-
-export const WorkspaceMemberInput = inputObjectType({
-  name: "WorkspaceMemberInput",
-  definition(t) {
-    t.nonNull.string("userId");
-    t.nonNull.field("role", { type: MemberRoleEnum });
-  },
-});
-
-export const WorkspaceInput = inputObjectType({
-  name: "WorkspaceInput",
-  definition(t) {
-    t.nonNull.string("id");
-    t.nonNull.string("name");
-    t.field("sharing", {
-      type: list(WorkspaceMemberInput),
-    });
   },
 });
 

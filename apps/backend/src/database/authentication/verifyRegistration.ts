@@ -62,6 +62,7 @@ const createDevicesAndUser = async (
 
   const user = await prisma.user.create({
     data: {
+      id: userChainState.currentState.id,
       username: unverifiedUser.username,
       registrationRecord: unverifiedUser.registrationRecord,
       mainDeviceCiphertext: unverifiedUser.mainDeviceCiphertext,

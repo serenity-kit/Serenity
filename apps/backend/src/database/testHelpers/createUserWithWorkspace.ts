@@ -80,6 +80,7 @@ export default async function createUserWithWorkspace({
 
     const user = await prisma.user.create({
       data: {
+        id: userChainState.currentState.id,
         username,
         registrationRecord: clientRegistrationFinishResult.registrationRecord,
         mainDeviceCiphertext: mainDevice.ciphertext,

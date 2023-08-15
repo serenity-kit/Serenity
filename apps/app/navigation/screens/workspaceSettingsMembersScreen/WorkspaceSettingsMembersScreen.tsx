@@ -1,9 +1,5 @@
 import * as workspaceChain from "@serenity-kit/workspace-chain";
 import {
-  encryptWorkspaceKeyForDevice,
-  generateId,
-} from "@serenity-tools/common";
-import {
   Avatar,
   CenterContent,
   Description,
@@ -29,15 +25,14 @@ import { CreateWorkspaceInvitation } from "../../../components/workspace/CreateW
 import { useWorkspace } from "../../../context/WorkspaceContext";
 import {
   runRemoveMemberAndRotateWorkspaceKeyMutation,
-  runWorkspaceDevicesQuery,
   useUpdateWorkspaceMemberRoleMutation,
 } from "../../../generated/graphql";
 import { useAuthenticatedAppContext } from "../../../hooks/useAuthenticatedAppContext";
 import { workspaceSettingsLoadWorkspaceMachine } from "../../../machines/workspaceSettingsLoadWorkspaceMachine";
 import { WorkspaceStackScreenProps } from "../../../types/navigationProps";
-import { WorkspaceDeviceParing } from "../../../types/workspaceDevice";
 import { getMainDevice } from "../../../utils/device/mainDeviceMemoryStore";
 import { showToast } from "../../../utils/toast/showToast";
+import { rotateWorkspaceKey } from "../../../utils/workspace/rotateWorkspaceKey";
 
 type UpdateMemberRoleInfo = {
   mainDeviceSigningPublicKey: string;
@@ -58,6 +53,7 @@ export default function WorkspaceSettingsMembersScreen(
     workspaceId,
     workspaceChainData,
     fetchAndApplyNewWorkspaceChainEntries,
+    users,
   } = useWorkspace();
   const { activeDevice } = useAuthenticatedAppContext();
   const [state] = useMachine(workspaceSettingsLoadWorkspaceMachine, {
@@ -144,42 +140,11 @@ export default function WorkspaceSettingsMembersScreen(
       throw new Error("Missing workspace chain data");
     }
 
-    const workspaceKeyString = sodium.to_base64(sodium.crypto_kdf_keygen());
-    const workspaceKey = {
-      id: generateId(),
-      workspaceKey: workspaceKeyString,
-    };
-
-    const deviceWorkspaceKeyBoxes: WorkspaceDeviceParing[] = [];
-    let workspaceDeviceResult = await runWorkspaceDevicesQuery(
-      { workspaceId },
-      { requestPolicy: "network-only" }
-    );
-    if (
-      !workspaceDeviceResult.data?.workspaceDevices?.nodes ||
-      workspaceDeviceResult.data?.workspaceDevices?.nodes.length === 0
-    ) {
-      throw new Error("No devices found for workspace");
-    }
-    let workspaceDevices = workspaceDeviceResult.data?.workspaceDevices?.nodes;
-
-    for (let device of workspaceDevices) {
-      if (!device) {
-        continue;
-      }
-      if (device.userId !== userId) {
-        const { ciphertext, nonce } = encryptWorkspaceKeyForDevice({
-          receiverDeviceEncryptionPublicKey: device.encryptionPublicKey,
-          creatorDeviceEncryptionPrivateKey: activeDevice.encryptionPrivateKey!,
-          workspaceKey: workspaceKey.workspaceKey,
-        });
-        deviceWorkspaceKeyBoxes.push({
-          ciphertext,
-          nonce,
-          receiverDeviceSigningPublicKey: device.signingPublicKey,
-        });
-      }
-    }
+    const { deviceWorkspaceKeyBoxes } = await rotateWorkspaceKey({
+      workspaceId,
+      activeDevice,
+      userToRemoveId: userId,
+    });
 
     const removeMemberEvent = workspaceChain.removeMember(
       workspaceChain.hashTransaction(
@@ -199,7 +164,6 @@ export default function WorkspaceSettingsMembersScreen(
           input: {
             creatorDeviceSigningPublicKey: activeDevice.signingPublicKey,
             deviceWorkspaceKeyBoxes,
-            revokedUserId: userId,
             workspaceId,
             serializedWorkspaceChainEvent: JSON.stringify(removeMemberEvent),
           },
@@ -238,6 +202,29 @@ export default function WorkspaceSettingsMembersScreen(
       }
     );
   }
+
+  const activeWorkspaceMembers =
+    workspaceChainData?.state.members && users
+      ? Object.entries(workspaceChainData.state.members).map(
+          ([mainDeviceSigningPublicKey, member]) => {
+            const user = users.find(
+              (user) =>
+                user.mainDeviceSigningPublicKey === mainDeviceSigningPublicKey
+            );
+            if (user) {
+              return { ...user, role: member.role, addedBy: member.addedBy };
+            } else {
+              return {
+                mainDeviceSigningPublicKey,
+                role: member.role,
+                addedBy: member.addedBy,
+                email: undefined,
+                userId: undefined,
+              };
+            }
+          }
+        )
+      : null;
 
   return (
     <>
@@ -278,99 +265,82 @@ export default function WorkspaceSettingsMembersScreen(
             </Heading>
 
             <List
-              data={
-                workspaceChainData
-                  ? Object.entries(workspaceChainData.state.members)
-                  : []
-              }
+              data={activeWorkspaceMembers ? activeWorkspaceMembers : []}
               emptyString={"No members available"}
               header={
                 <ListHeader data={["Name", "Email", "Role"]} mainIsIconText />
               }
             >
-              {workspaceChainData &&
-                Object.entries(workspaceChainData.state.members).map(
-                  ([mainDeviceSigningPublicKey, memberInfo]) => {
-                    const member =
-                      state.context.workspaceQueryResult?.data?.workspace?.members?.find(
-                        (member) => {
-                          return (
-                            member.mainDeviceSigningPublicKey ===
-                            mainDeviceSigningPublicKey
-                          );
-                        }
-                      );
-
-                    // TODO show a loading indicator here instead
-                    if (!member) {
-                      return null;
-                    }
-
-                    const adminUserId =
-                      state.context.meWithWorkspaceLoadingInfoQueryResult?.data
-                        ?.me?.id;
-                    // TODO use the username when available
-                    const username = member.username.slice(
-                      0,
-                      member.username.indexOf("@")
-                    );
-                    // TODO use initials when we have a username
-                    const initials = username.substring(0, 1);
-                    const email = member.username;
-
-                    const allowEditing =
-                      currentUserIsAdmin && member.userId !== adminUserId;
-
-                    // capitalize by css doesn't work here as it will only affect the first letter
-                    const roleName =
-                      memberInfo.role.charAt(0).toUpperCase() +
-                      memberInfo.role.slice(1).toLowerCase();
-
-                    return (
-                      <ListItem
-                        testID={`workspace-member-row__${adminUserId}`}
-                        key={member.userId}
-                        mainItem={
-                          <ListIconText
-                            main={
-                              username +
-                              (member.userId === adminUserId ? " (you)" : "")
-                            }
-                            secondary={email}
-                            avatar={
-                              <Avatar size={isDesktopDevice ? "xs" : "sm"}>
-                                {initials}
-                              </Avatar>
-                            }
-                          />
-                        }
-                        secondaryItem={
-                          <ListText secondary>{roleName}</ListText>
-                        }
-                        actionItem={
-                          allowEditing ? (
-                            <MemberMenu
-                              memberId={member.userId}
-                              role={memberInfo.role}
-                              onUpdateRole={(role) => {
-                                updateMemberRolePreflight({
-                                  mainDeviceSigningPublicKey,
-                                  role,
-                                });
-                              }}
-                              onDeletePressed={() => {
-                                removeMemberPreflight({
-                                  mainDeviceSigningPublicKey,
-                                  userId: member.userId,
-                                });
-                              }}
-                            />
-                          ) : null
-                        }
-                      />
-                    );
+              {activeWorkspaceMembers &&
+                activeWorkspaceMembers.map((member) => {
+                  // TODO show a loading indicator here instead
+                  if (!member) {
+                    return null;
                   }
-                )}
+
+                  const adminUserId =
+                    state.context.meWithWorkspaceLoadingInfoQueryResult?.data
+                      ?.me?.id;
+                  // TODO use the username when available
+                  const username = member.email
+                    ? member.email.slice(0, member.email.indexOf("@"))
+                    : "Unknown";
+                  // TODO use initials when we have a username
+                  const initials = username.substring(0, 1);
+                  const email = member.email;
+
+                  const allowEditing =
+                    currentUserIsAdmin && member.userId !== adminUserId;
+
+                  // capitalize by css doesn't work here as it will only affect the first letter
+                  const roleName =
+                    member.role.charAt(0).toUpperCase() +
+                    member.role.slice(1).toLowerCase();
+
+                  return (
+                    <ListItem
+                      testID={`workspace-member-row__${adminUserId}`}
+                      key={member.mainDeviceSigningPublicKey}
+                      mainItem={
+                        <ListIconText
+                          main={
+                            username +
+                            (member.userId === adminUserId ? " (you)" : "")
+                          }
+                          secondary={email}
+                          avatar={
+                            <Avatar size={isDesktopDevice ? "xs" : "sm"}>
+                              {initials}
+                            </Avatar>
+                          }
+                        />
+                      }
+                      secondaryItem={<ListText secondary>{roleName}</ListText>}
+                      actionItem={
+                        allowEditing ? (
+                          <MemberMenu
+                            memberId={member.userId || "unknown"}
+                            role={member.role}
+                            onUpdateRole={(role) => {
+                              updateMemberRolePreflight({
+                                mainDeviceSigningPublicKey:
+                                  member.mainDeviceSigningPublicKey,
+                                role,
+                              });
+                            }}
+                            onDeletePressed={() => {
+                              removeMemberPreflight({
+                                mainDeviceSigningPublicKey:
+                                  member.mainDeviceSigningPublicKey,
+                                userId: member.userId || "unknown",
+                              });
+                            }}
+                          />
+                        ) : null
+                      }
+                    />
+                  );
+                })}
             </List>
           </>
         )}

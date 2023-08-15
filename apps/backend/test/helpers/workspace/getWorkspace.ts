@@ -19,10 +19,6 @@ export const getWorkspace = async ({
       workspace(id: $id, deviceSigningPublicKey: $deviceSigningPublicKey) {
         id
         name
-        members {
-          username
-          role
-        }
         currentWorkspaceKey {
           id
           workspaceId

@@ -15,7 +15,6 @@ export const RemoveMemberAndRotateWorkspaceKeyInput = inputObjectType({
   name: "RemoveMemberAndRotateWorkspaceKeyInput",
   definition(t) {
     t.nonNull.string("workspaceId");
-    t.nonNull.string("revokedUserId");
     t.nonNull.string("serializedWorkspaceChainEvent");
     t.nonNull.string("creatorDeviceSigningPublicKey");
     t.nonNull.list.nonNull.field("deviceWorkspaceKeyBoxes", {
@@ -65,7 +64,6 @@ export const removeMemberAndRotateWorkspaceKeyMutation = mutationField(
       const workspaceKey = await removeMemberAndRotateWorkspaceKey({
         userId: context.user.id,
         workspaceId: args.input.workspaceId,
-        revokedUserId: args.input.revokedUserId,
         creatorDeviceSigningPublicKey: args.input.creatorDeviceSigningPublicKey,
         newDeviceWorkspaceKeyBoxes: args.input.deviceWorkspaceKeyBoxes,
         workspaceChainEvent,

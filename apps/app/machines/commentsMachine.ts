@@ -1,6 +1,7 @@
 import {
   createCommentKey,
   decryptComment,
+  Device,
   encryptComment,
   LocalDevice,
   recreateCommentKey,
@@ -11,7 +12,6 @@ import {
   commentsByDocumentIdQueryService,
   CommentsByDocumentIdQueryServiceEvent,
   CommentsByDocumentIdQueryUpdateResultEvent,
-  MinimalDevice,
   runCreateCommentMutation,
   runCreateCommentReplyMutation,
   runDeleteCommentRepliesMutation,
@@ -29,7 +29,7 @@ export type DecryptedReply = {
   id: string;
   text: string;
   createdAt: string;
-  creatorDevice: MinimalDevice;
+  creatorDevice: Device;
 };
 
 export type DecryptedComment = {
@@ -39,7 +39,7 @@ export type DecryptedComment = {
   to: number;
   replies: DecryptedReply[];
   createdAt: string;
-  creatorDevice: MinimalDevice;
+  creatorDevice: Device;
 };
 
 type CommentKeyEntry = {

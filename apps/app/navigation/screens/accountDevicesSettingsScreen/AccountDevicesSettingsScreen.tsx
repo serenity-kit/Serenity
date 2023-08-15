@@ -1,8 +1,5 @@
 import * as userChain from "@serenity-kit/user-chain";
-import {
-  createAndEncryptWorkspaceKeyForDevice,
-  getExpiredTextFromString,
-} from "@serenity-tools/common";
+import { getExpiredTextFromString, notNull } from "@serenity-tools/common";
 import {
   Description,
   Heading,
@@ -21,7 +18,6 @@ import { useMachine } from "@xstate/react";
 import { format } from "date-fns";
 import { useState } from "react";
 import { useWindowDimensions } from "react-native";
-import sodium from "react-native-libsodium";
 import { VerifyPasswordModal } from "../../../components/verifyPasswordModal/VerifyPasswordModal";
 import {
   useDeleteDeviceMutation,
@@ -31,15 +27,11 @@ import {
 import { useAuthenticatedAppContext } from "../../../hooks/useAuthenticatedAppContext";
 import { loadMeAndVerifyMachine } from "../../../machines/loadMeAndVerifyMachine";
 import { RootStackScreenProps } from "../../../types/navigationProps";
-import {
-  WorkspaceDeviceParing,
-  WorkspaceWithWorkspaceDevicesParing,
-} from "../../../types/workspaceDevice";
+import { WorkspaceWithWorkspaceDevicesParing } from "../../../types/workspaceDevice";
 import { getMainDevice } from "../../../utils/device/mainDeviceMemoryStore";
-import { notNull } from "../../../utils/notNull/notNull";
 import { showToast } from "../../../utils/toast/showToast";
-import { getWorkspaceDevices } from "../../../utils/workspace/getWorkspaceDevices";
 import { getWorkspaces } from "../../../utils/workspace/getWorkspaces";
+import { rotateWorkspaceKey } from "../../../utils/workspace/rotateWorkspaceKey";
 
 export default function AccountDevicesSettingsScreen(
   props: RootStackScreenProps<"AccountSettingsDevices">
@@ -114,38 +106,16 @@ export default function AccountDevicesSettingsScreen(
     }
     for (let workspace of workspaces) {
       const workspaceId = workspace.id;
-      const devices = await getWorkspaceDevices({
+
+      const { deviceWorkspaceKeyBoxes } = await rotateWorkspaceKey({
         workspaceId,
+        activeDevice,
+        deviceToRemoveSigningPublicKey: deviceSigningPublicKey,
       });
-      if (!devices) {
-        console.error("No devices found");
-        setSigningPublicKeyToBeDeleted(undefined);
-        return;
-      }
-      const workspaceDevicePairing: WorkspaceDeviceParing[] = [];
-      const workspaceKeyString = sodium.to_base64(sodium.crypto_kdf_keygen());
-      for (let device of devices) {
-        if (!device) {
-          continue;
-        }
-        if (device.signingPublicKey === deviceSigningPublicKey) {
-          continue;
-        }
-        const { workspaceKey, ciphertext, nonce } =
-          createAndEncryptWorkspaceKeyForDevice({
-            receiverDeviceEncryptionPublicKey: device.encryptionPublicKey,
-            creatorDeviceEncryptionPrivateKey:
-              activeDevice.encryptionPrivateKey!,
-          });
-        workspaceDevicePairing.push({
-          ciphertext,
-          nonce,
-          receiverDeviceSigningPublicKey: device.signingPublicKey,
-        });
-      }
+
       newDeviceWorkspaceKeyBoxes.push({
         id: workspace.id,
-        workspaceDevices: workspaceDevicePairing,
+        workspaceDevices: deviceWorkspaceKeyBoxes,
       });
     }
 

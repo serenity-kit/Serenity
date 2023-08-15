@@ -59,7 +59,11 @@ test.describe("Edit document", () => {
     await delayForSeconds(2);
     const endingContent = await editor.innerHTML();
     expect(startingContent).not.toBe(endingContent);
-    await logout({ page });
+    await logout({
+      page,
+      password: user1.password,
+      throwIfPasswordVerifyNotOpen: true,
+    });
     await login({
       page,
       username: user1.username,
@@ -139,7 +143,11 @@ test.describe("Edit document", () => {
     const user2AfterReloadContent = await user2EditorAfterReload.innerHTML();
     expect(user1AfterReloadContent).toBe(user2AfterReloadContent);
     // re-login
-    await logout({ page });
+    await logout({
+      page,
+      password: user1.password,
+      throwIfPasswordVerifyNotOpen: true,
+    });
     await login({
       page,
       username: user1.username,
@@ -147,7 +155,11 @@ test.describe("Edit document", () => {
       stayLoggedIn: true,
     });
 
-    await logout({ page: user2Page });
+    await logout({
+      page: user2Page,
+      password: user2.password,
+      throwIfPasswordVerifyNotOpen: true,
+    });
     await login({
       page: user2Page,
       username: user2.username,
@@ -189,7 +201,11 @@ test.describe("Edit document in subfolder", () => {
     await delayForSeconds(2);
     const endingContent = await editor.innerHTML();
     expect(startingContent).not.toBe(endingContent);
-    await logout({ page });
+    await logout({
+      page,
+      password: user1.password,
+      throwIfPasswordVerifyNotOpen: true,
+    });
     await login({
       page,
       username: user1.username,
@@ -233,7 +249,8 @@ test.describe("Edit document in subfolder", () => {
     expect(startingContent).toBe(user2StartingContent);
     // user1 edits document
     await page.type("div[class='ProseMirror']", newContent1);
-    await delayForSeconds(2);
+    console.log("check");
+    await delayForSeconds(30);
     // expect the cursor to show on user2's page
     const user1Cursor = user2Page.locator(
       "xpath=//span[contains(@class,'collaboration-cursor__caret')]"
@@ -260,7 +277,11 @@ test.describe("Edit document in subfolder", () => {
     const user2AfterReloadContent = await user2EditorAfterReload.innerHTML();
     expect(user1AfterReloadContent).toBe(user2AfterReloadContent);
     // re-login
-    await logout({ page });
+    await logout({
+      page,
+      password: user1.password,
+      throwIfPasswordVerifyNotOpen: true,
+    });
     await login({
       page,
       username: user1.username,
@@ -268,7 +289,11 @@ test.describe("Edit document in subfolder", () => {
       stayLoggedIn: true,
     });
 
-    await logout({ page: user2Page });
+    await logout({
+      page: user2Page,
+      password: user2.password,
+      throwIfPasswordVerifyNotOpen: true,
+    });
     await login({
       page: user2Page,
       username: user2.username,

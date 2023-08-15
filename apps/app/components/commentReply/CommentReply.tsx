@@ -12,7 +12,7 @@ import React from "react";
 import { usePage } from "../../context/PageContext";
 import { useWorkspace } from "../../context/WorkspaceContext";
 import { DecryptedReply } from "../../machines/commentsMachine";
-import { getUserFromWorkspaceQueryResultByDeviceInfo } from "../../utils/getUserFromWorkspaceQueryResultByDeviceInfo/getUserFromWorkspaceQueryResultByDeviceInfo";
+import { findVerifiedUserByDeviceSigningPublicKey } from "../../utils/findVerifiedUserByDeviceSigningPublicKey/findVerifiedUserByDeviceSigningPublicKey";
 import CommentsMenu from "../commentsMenu/CommentsMenu";
 
 type Props = {
@@ -28,15 +28,15 @@ export default function CommentReply({
   commentId,
   naked = false,
 }: Props) {
-  const { workspaceQueryResult } = useWorkspace();
+  const { users } = useWorkspace();
   const { commentsService } = usePage();
   const [, send] = useActor(commentsService);
   const [isHovered, setIsHovered] = React.useState(false);
 
-  const replyCreator = getUserFromWorkspaceQueryResultByDeviceInfo(
-    workspaceQueryResult.data!,
-    reply.creatorDevice
-  );
+  const replyCreator = findVerifiedUserByDeviceSigningPublicKey({
+    users,
+    signingPublicKey: reply.creatorDevice.signingPublicKey,
+  });
 
   const isMyReply = replyCreator?.userId === meId;
 
@@ -56,7 +56,7 @@ export default function CommentReply({
               color={hashToCollaboratorColor(replyCreator.userId)}
               size="xs"
             >
-              {replyCreator.username?.split("@")[0].substring(0, 1)}
+              {replyCreator.email?.split("@")[0].substring(0, 1)}
             </Avatar>
           ) : (
             <Avatar color="arctic" size="xs">
@@ -70,7 +70,7 @@ export default function CommentReply({
             numberOfLines={1}
             ellipsizeMode="tail"
           >
-            {replyCreator?.username || "External"}
+            {replyCreator?.email || "External"}
           </Text>
         </HStack>
         {isMyReply && isHovered ? (
