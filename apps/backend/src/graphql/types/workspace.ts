@@ -1,22 +1,6 @@
 import { enumType, nonNull, objectType } from "nexus";
-import { CreatorDevice, Device } from "./device";
+import { CreatorDevice } from "./device";
 import { User } from "./user";
-
-export const MemberIdWithDevice = objectType({
-  name: "WorkspaceIdWithDevices",
-  definition(t) {
-    t.nonNull.string("id");
-    t.nonNull.list.nonNull.field("devices", { type: Device });
-  },
-});
-
-export const WorkspaceIdWithMemberDevices = objectType({
-  name: "WorkspaceIdWithMemberDevices",
-  definition(t) {
-    t.nonNull.string("id");
-    t.nonNull.list.nonNull.field("members", { type: MemberIdWithDevice });
-  },
-});
 
 export const WorkspaceKeyBox = objectType({
   name: "WorkspaceKeyBox",

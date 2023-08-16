@@ -68,8 +68,6 @@ test("Input Errors", async () => {
         edges {
           node {
             signingPublicKey
-            encryptionPublicKey
-            encryptionPublicKeySignature
             info
           }
         }

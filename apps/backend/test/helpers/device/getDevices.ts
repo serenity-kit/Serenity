@@ -22,8 +22,6 @@ export const getDevices = async ({
         edges {
           node {
             signingPublicKey
-            encryptionPublicKey
-            encryptionPublicKeySignature
             info
           }
         }
