@@ -49,14 +49,6 @@ beforeAll(async () => {
 
 test("delete and keep devices mismatch", async () => {
   const authorizationHeader1 = userData1.sessionKey;
-  const numDevicesBeforeDeleteResponse = await getDevices({
-    graphql,
-    onlyNotExpired: true,
-    authorizationHeader: authorizationHeader1,
-  });
-  const expectedNumDevices =
-    numDevicesBeforeDeleteResponse.devices.edges.length;
-
   const workspaceKeyBox1 = encryptWorkspaceKeyForDevice({
     receiverDeviceEncryptionPublicKey: userData1.device.encryptionPublicKey,
     creatorDeviceEncryptionPrivateKey: userData1.encryptionPrivateKey,
