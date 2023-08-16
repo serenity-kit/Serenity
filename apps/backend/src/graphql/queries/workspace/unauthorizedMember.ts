@@ -1,7 +1,6 @@
 import { AuthenticationError } from "apollo-server-express";
 import { objectType, queryField } from "nexus";
 import { unauthorizedMember } from "../../../database/workspace/unauthorizedMember";
-import { Device } from "../../types/device";
 
 export const UnauthorizedMemberResult = objectType({
   name: "UnauthorizedMemberResult",
@@ -9,7 +8,6 @@ export const UnauthorizedMemberResult = objectType({
     t.nonNull.string("userId");
     t.nonNull.string("userMainDeviceSigningPublicKey");
     t.nonNull.string("workspaceId");
-    t.nonNull.list.nonNull.field("devices", { type: Device });
   },
 });
 

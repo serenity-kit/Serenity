@@ -36,16 +36,10 @@ export async function unauthorizedMember({ userId }: Params) {
     },
   });
 
-  // get all the devices of the unauthorized user
-  const devices = await prisma.device.findMany({
-    where: { userId: unauthorizedMember.userId },
-  });
-
   return {
     workspaceId: workspace.workspaceId,
     userId: unauthorizedMember.userId,
     userMainDeviceSigningPublicKey:
       unauthorizedMember.user.mainDeviceSigningPublicKey,
-    devices,
   };
 }
