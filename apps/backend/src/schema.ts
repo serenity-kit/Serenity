@@ -58,6 +58,7 @@ import * as WorkspaceQueryTypes from "./graphql/queries/workspace/workspace";
 import * as WorkspaceInvitationTypes from "./graphql/queries/workspace/workspaceInvitation";
 import * as WorkspaceInvitationsTypes from "./graphql/queries/workspace/workspaceInvitations";
 import * as WorkspaceMembersQueryTypes from "./graphql/queries/workspace/workspaceMembers";
+import * as WorkspaceMembersByMainDeviceSigningPublicKeyQueryTypes from "./graphql/queries/workspace/workspaceMembersByMainDeviceSigningPublicKey";
 import * as WorkspacesQueryTypes from "./graphql/queries/workspace/workspaces";
 import * as WorkspaceChainQueryTypes from "./graphql/queries/workspaceChain/workspaceChain";
 import * as WorkspaceChainByInvitationIdQueryTypes from "./graphql/queries/workspaceChain/workspaceChainByInvitationId";
@@ -127,6 +128,7 @@ export const schema = makeSchema({
     PendingWorkspaceInvitationQueryTypes,
     RemoveMemberAndRotateWorkspaceKeyMutationTypes,
     WorkspaceMembersQueryTypes,
+    WorkspaceMembersByMainDeviceSigningPublicKeyQueryTypes,
     ActiveWorkspaceKeysQueryTypes,
     UpdateWorkspaceInfoMutationTypes,
 

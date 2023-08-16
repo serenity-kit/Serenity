@@ -830,6 +830,7 @@ export type Query = {
   workspaceInvitations?: Maybe<WorkspaceInvitationConnection>;
   workspaceKeyByDocumentId?: Maybe<WorkspaceKeyByDocumentIdResult>;
   workspaceMembers?: Maybe<WorkspaceMemberConnection>;
+  workspaceMembersByMainDeviceSigningPublicKey?: Maybe<WorkspaceMembersByMainDeviceSigningPublicKeyResult>;
   workspaces?: Maybe<WorkspaceConnection>;
 };
 
@@ -982,6 +983,12 @@ export type QueryWorkspaceKeyByDocumentIdArgs = {
 export type QueryWorkspaceMembersArgs = {
   after?: InputMaybe<Scalars['String']>;
   first: Scalars['Int'];
+  workspaceId: Scalars['ID'];
+};
+
+
+export type QueryWorkspaceMembersByMainDeviceSigningPublicKeyArgs = {
+  mainDeviceSigningPublicKeys: Array<Scalars['String']>;
   workspaceId: Scalars['ID'];
 };
 
@@ -1365,6 +1372,11 @@ export type WorkspaceMemberEdge = {
   cursor: Scalars['String'];
   /** https://facebook.github.io/relay/graphql/connections.htm#sec-Node */
   node?: Maybe<WorkspaceMember>;
+};
+
+export type WorkspaceMembersByMainDeviceSigningPublicKeyResult = {
+  __typename?: 'WorkspaceMembersByMainDeviceSigningPublicKeyResult';
+  workspaceMembers: Array<WorkspaceMember>;
 };
 
 export type WorkspaceWithWorkspaceDevicesParingInput = {
@@ -1785,6 +1797,14 @@ export type WorkspaceMembersQueryVariables = Exact<{
 
 
 export type WorkspaceMembersQuery = { __typename?: 'Query', workspaceMembers?: { __typename?: 'WorkspaceMemberConnection', nodes?: Array<{ __typename?: 'WorkspaceMember', id: string, user: { __typename?: 'User', id: string, username: string, chain: Array<{ __typename?: 'UserChainEvent', serializedContent: string }> } } | null> | null, pageInfo: { __typename?: 'PageInfo', hasNextPage: boolean, endCursor?: string | null } } | null };
+
+export type WorkspaceMembersByMainDeviceSigningPublicKeyQueryVariables = Exact<{
+  workspaceId: Scalars['ID'];
+  mainDeviceSigningPublicKeys: Array<Scalars['String']> | Scalars['String'];
+}>;
+
+
+export type WorkspaceMembersByMainDeviceSigningPublicKeyQuery = { __typename?: 'Query', workspaceMembersByMainDeviceSigningPublicKey?: { __typename?: 'WorkspaceMembersByMainDeviceSigningPublicKeyResult', workspaceMembers: Array<{ __typename?: 'WorkspaceMember', id: string, user: { __typename?: 'User', id: string, username: string, chain: Array<{ __typename?: 'UserChainEvent', serializedContent: string }> } }> } | null };
 
 export type WorkspacesQueryVariables = Exact<{
   deviceSigningPublicKey: Scalars['String'];
@@ -2845,6 +2865,29 @@ export const WorkspaceMembersDocument = gql`
 
 export function useWorkspaceMembersQuery(options: Omit<Urql.UseQueryArgs<WorkspaceMembersQueryVariables>, 'query'>) {
   return Urql.useQuery<WorkspaceMembersQuery, WorkspaceMembersQueryVariables>({ query: WorkspaceMembersDocument, ...options });
+};
+export const WorkspaceMembersByMainDeviceSigningPublicKeyDocument = gql`
+    query workspaceMembersByMainDeviceSigningPublicKey($workspaceId: ID!, $mainDeviceSigningPublicKeys: [String!]!) {
+  workspaceMembersByMainDeviceSigningPublicKey(
+    workspaceId: $workspaceId
+    mainDeviceSigningPublicKeys: $mainDeviceSigningPublicKeys
+  ) {
+    workspaceMembers {
+      id
+      user {
+        id
+        username
+        chain {
+          serializedContent
+        }
+      }
+    }
+  }
+}
+    `;
+
+export function useWorkspaceMembersByMainDeviceSigningPublicKeyQuery(options: Omit<Urql.UseQueryArgs<WorkspaceMembersByMainDeviceSigningPublicKeyQueryVariables>, 'query'>) {
+  return Urql.useQuery<WorkspaceMembersByMainDeviceSigningPublicKeyQuery, WorkspaceMembersByMainDeviceSigningPublicKeyQueryVariables>({ query: WorkspaceMembersByMainDeviceSigningPublicKeyDocument, ...options });
 };
 export const WorkspacesDocument = gql`
     query workspaces($deviceSigningPublicKey: String!) {
@@ -6102,6 +6145,109 @@ export const workspaceMembersQueryService =
         // perform cleanup
         clearInterval(intervalId);
         workspaceMembersQueryServiceSubscribers[variablesString].intervalId = null;
+      }
+    };
+  };
+
+
+
+export const runWorkspaceMembersByMainDeviceSigningPublicKeyQuery = async (variables: WorkspaceMembersByMainDeviceSigningPublicKeyQueryVariables, options?: any) => {
+  return await getUrqlClient()
+    .query<WorkspaceMembersByMainDeviceSigningPublicKeyQuery, WorkspaceMembersByMainDeviceSigningPublicKeyQueryVariables>(
+      WorkspaceMembersByMainDeviceSigningPublicKeyDocument,
+      variables,
+      {
+        // better to be safe here and always refetch
+        requestPolicy: "network-only",
+        ...options
+      }
+    )
+    .toPromise();
+};
+
+export type WorkspaceMembersByMainDeviceSigningPublicKeyQueryResult = Urql.OperationResult<WorkspaceMembersByMainDeviceSigningPublicKeyQuery, WorkspaceMembersByMainDeviceSigningPublicKeyQueryVariables>;
+
+export type WorkspaceMembersByMainDeviceSigningPublicKeyQueryUpdateResultEvent = {
+  type: "WorkspaceMembersByMainDeviceSigningPublicKeyQuery.UPDATE_RESULT";
+  result: WorkspaceMembersByMainDeviceSigningPublicKeyQueryResult;
+};
+
+export type WorkspaceMembersByMainDeviceSigningPublicKeyQueryErrorEvent = {
+  type: "WorkspaceMembersByMainDeviceSigningPublicKeyQuery.ERROR";
+  result: WorkspaceMembersByMainDeviceSigningPublicKeyQueryResult;
+};
+
+export type WorkspaceMembersByMainDeviceSigningPublicKeyQueryServiceEvent = WorkspaceMembersByMainDeviceSigningPublicKeyQueryUpdateResultEvent | WorkspaceMembersByMainDeviceSigningPublicKeyQueryErrorEvent;
+
+type WorkspaceMembersByMainDeviceSigningPublicKeyQueryServiceSubscribersEntry = {
+  variables: WorkspaceMembersByMainDeviceSigningPublicKeyQueryVariables;
+  callbacks: ((event: WorkspaceMembersByMainDeviceSigningPublicKeyQueryServiceEvent) => void)[];
+  intervalId: NodeJS.Timer | null;
+};
+
+type WorkspaceMembersByMainDeviceSigningPublicKeyQueryServiceSubscribers = {
+  [variables: string]: WorkspaceMembersByMainDeviceSigningPublicKeyQueryServiceSubscribersEntry;
+};
+
+const workspaceMembersByMainDeviceSigningPublicKeyQueryServiceSubscribers: WorkspaceMembersByMainDeviceSigningPublicKeyQueryServiceSubscribers = {};
+
+const triggerWorkspaceMembersByMainDeviceSigningPublicKeyQuery = (variablesString: string, variables: WorkspaceMembersByMainDeviceSigningPublicKeyQueryVariables) => {
+  getUrqlClient()
+    .query<WorkspaceMembersByMainDeviceSigningPublicKeyQuery, WorkspaceMembersByMainDeviceSigningPublicKeyQueryVariables>(WorkspaceMembersByMainDeviceSigningPublicKeyDocument, variables)
+    .toPromise()
+    .then((result) => {
+      workspaceMembersByMainDeviceSigningPublicKeyQueryServiceSubscribers[variablesString].callbacks.forEach(
+        (callback) => {
+          callback({
+            type: result.error ? "WorkspaceMembersByMainDeviceSigningPublicKeyQuery.ERROR" : "WorkspaceMembersByMainDeviceSigningPublicKeyQuery.UPDATE_RESULT",
+            result: result,
+          });
+        }
+      );
+    });
+};
+
+/**
+ * This service is used to query results every 4 seconds.
+ *
+ * It allows machines to spawn a service that will fetch the query
+ * and send the result to the machine.
+ * It will share the same interval for all machines.
+ * When the last subscription is stopped, the interval will be cleared.
+ * It also considers the variables passed to the service.
+ */
+export const workspaceMembersByMainDeviceSigningPublicKeyQueryService =
+  (variables: WorkspaceMembersByMainDeviceSigningPublicKeyQueryVariables, intervalInMs?: number) => (callback, onReceive) => {
+    const variablesString = canonicalize(variables) as string;
+    if (workspaceMembersByMainDeviceSigningPublicKeyQueryServiceSubscribers[variablesString]) {
+      workspaceMembersByMainDeviceSigningPublicKeyQueryServiceSubscribers[variablesString].callbacks.push(callback);
+    } else {
+      workspaceMembersByMainDeviceSigningPublicKeyQueryServiceSubscribers[variablesString] = {
+        variables,
+        callbacks: [callback],
+        intervalId: null,
+      };
+    }
+
+    triggerWorkspaceMembersByMainDeviceSigningPublicKeyQuery(variablesString, variables);
+    if (!workspaceMembersByMainDeviceSigningPublicKeyQueryServiceSubscribers[variablesString].intervalId) {
+      workspaceMembersByMainDeviceSigningPublicKeyQueryServiceSubscribers[variablesString].intervalId = setInterval(
+        () => {
+          triggerWorkspaceMembersByMainDeviceSigningPublicKeyQuery(variablesString, variables);
+        },
+        intervalInMs || 4000
+      );
+    }
+
+    const intervalId = workspaceMembersByMainDeviceSigningPublicKeyQueryServiceSubscribers[variablesString].intervalId;
+    return () => {
+      if (
+        workspaceMembersByMainDeviceSigningPublicKeyQueryServiceSubscribers[variablesString].callbacks.length === 0 &&
+        intervalId
+      ) {
+        // perform cleanup
+        clearInterval(intervalId);
+        workspaceMembersByMainDeviceSigningPublicKeyQueryServiceSubscribers[variablesString].intervalId = null;
       }
     };
   };

@@ -1,8 +1,12 @@
 import * as workspaceChain from "@serenity-kit/workspace-chain";
-import { LocalDevice } from "@serenity-tools/common";
+import {
+  LocalDevice,
+  constructUserFromSerializedUserChain,
+} from "@serenity-tools/common";
 import {
   runAuthorizeMemberMutation,
   runUnauthorizedMemberQuery,
+  runWorkspaceMembersByMainDeviceSigningPublicKeyQuery,
   runWorkspaceQuery,
 } from "../../generated/graphql";
 
@@ -39,68 +43,96 @@ export const authorizeMembersIfNecessary = async ({
         return;
       }
 
-      // TODO CHECK THAT THE DEVICES BELONG TO THE USER
-      // especially the userMainDeviceSigningPublicKey
+      const workspaceMembersByMainDeviceSigningPublicKeyQueryResult =
+        await runWorkspaceMembersByMainDeviceSigningPublicKeyQuery({
+          workspaceId,
+          mainDeviceSigningPublicKeys: [userMainDeviceSigningPublicKey],
+        });
 
-      const workspaceResult = await runWorkspaceQuery({
-        deviceSigningPublicKey: activeDevice.signingPublicKey,
-        id: workspaceId,
-      });
+      if (
+        workspaceMembersByMainDeviceSigningPublicKeyQueryResult.data
+          ?.workspaceMembersByMainDeviceSigningPublicKey?.workspaceMembers &&
+        workspaceMembersByMainDeviceSigningPublicKeyQueryResult.data
+          ?.workspaceMembersByMainDeviceSigningPublicKey?.workspaceMembers
+          .length > 0
+      ) {
+        const user = constructUserFromSerializedUserChain({
+          serializedUserChain:
+            workspaceMembersByMainDeviceSigningPublicKeyQueryResult.data
+              .workspaceMembersByMainDeviceSigningPublicKey.workspaceMembers[0]
+              .user.chain,
+        });
 
-      if (workspaceResult.data?.workspace?.workspaceKeys) {
-        const decryptedWorkspaceKeys =
-          workspaceResult.data.workspace.workspaceKeys.map(
-            (workspaceKeyData) => {
-              const { workspaceKeyBox, id } = workspaceKeyData;
-              if (!workspaceKeyBox) {
-                throw new Error("Missing a workspaceKeyBox");
+        if (
+          user.mainDeviceSigningPublicKey !== userMainDeviceSigningPublicKey
+        ) {
+          // the server returned the wrong chain!
+          return;
+        }
+
+        const workspaceResult = await runWorkspaceQuery({
+          deviceSigningPublicKey: activeDevice.signingPublicKey,
+          id: workspaceId,
+        });
+
+        if (workspaceResult.data?.workspace?.workspaceKeys) {
+          const decryptedWorkspaceKeys =
+            workspaceResult.data.workspace.workspaceKeys.map(
+              (workspaceKeyData) => {
+                const { workspaceKeyBox, id } = workspaceKeyData;
+                if (!workspaceKeyBox) {
+                  throw new Error("Missing a workspaceKeyBox");
+                }
+                const key = decryptWorkspaceKey({
+                  ciphertext: workspaceKeyBox.ciphertext,
+                  nonce: workspaceKeyBox.nonce,
+                  creatorDeviceEncryptionPublicKey:
+                    workspaceKeyBox.creatorDevice?.encryptionPublicKey!,
+                  receiverDeviceEncryptionPrivateKey:
+                    activeDevice.encryptionPrivateKey!,
+                });
+                return {
+                  workspaceKeyId: id,
+                  key,
+                };
               }
-              const key = decryptWorkspaceKey({
-                ciphertext: workspaceKeyBox.ciphertext,
-                nonce: workspaceKeyBox.nonce,
-                creatorDeviceEncryptionPublicKey:
-                  workspaceKeyBox.creatorDevice?.encryptionPublicKey!,
-                receiverDeviceEncryptionPrivateKey:
-                  activeDevice.encryptionPrivateKey!,
-              });
+            );
+
+          const workspaceKeys = decryptedWorkspaceKeys.map(
+            ({ workspaceKeyId, key }) => {
+              const workspaceKeyBoxes = user.nonExpiredDevices.map(
+                (receiverDevice) => {
+                  const { nonce, ciphertext } = encryptWorkspaceKeyForDevice({
+                    receiverDeviceEncryptionPublicKey:
+                      receiverDevice.encryptionPublicKey,
+                    creatorDeviceEncryptionPrivateKey:
+                      activeDevice.encryptionPrivateKey,
+                    workspaceKey: key,
+                  });
+                  return {
+                    receiverDeviceSigningPublicKey:
+                      receiverDevice.signingPublicKey,
+                    ciphertext,
+                    nonce,
+                  };
+                }
+              );
+
               return {
-                workspaceKeyId: id,
-                key,
+                workspaceKeyId,
+                workspaceKeyBoxes,
               };
             }
           );
 
-        const workspaceKeys = decryptedWorkspaceKeys.map(
-          ({ workspaceKeyId, key }) => {
-            const workspaceKeyBoxes = devices.map((receiverDevice) => {
-              const { nonce, ciphertext } = encryptWorkspaceKeyForDevice({
-                receiverDeviceEncryptionPublicKey:
-                  receiverDevice.encryptionPublicKey,
-                creatorDeviceEncryptionPrivateKey:
-                  activeDevice.encryptionPrivateKey,
-                workspaceKey: key,
-              });
-              return {
-                receiverDeviceSigningPublicKey: receiverDevice.signingPublicKey,
-                ciphertext,
-                nonce,
-              };
-            });
-
-            return {
-              workspaceKeyId,
-              workspaceKeyBoxes,
-            };
-          }
-        );
-
-        await runAuthorizeMemberMutation({
-          input: {
-            workspaceId,
-            creatorDeviceSigningPublicKey: activeDevice.signingPublicKey,
-            workspaceKeys,
-          },
-        });
+          await runAuthorizeMemberMutation({
+            input: {
+              workspaceId,
+              creatorDeviceSigningPublicKey: activeDevice.signingPublicKey,
+              workspaceKeys,
+            },
+          });
+        }
       }
     }
   } catch (error) {
