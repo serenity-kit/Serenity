@@ -11,6 +11,12 @@ export const KeyDerivationContext = z.union([
 ]);
 export type KeyDerivationContext = z.infer<typeof KeyDerivationContext>;
 
+export const SigningDomainContext = z.union([
+  z.literal("device_encryption_public_key"),
+  z.literal("folder_id"),
+]);
+export type SigningDomainContext = z.infer<typeof SigningDomainContext>;
+
 export const KeyDerivationTraceEntry = z.object({
   entryId: z.string(), // didn't use id because it often GraphQL clients normalize by the id field
   subkeyId: z.number(),

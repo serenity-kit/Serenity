@@ -8,6 +8,7 @@ import {
   createChain,
   CreateChainEvent,
   CreateChainTransaction,
+  deviceEncryptionPublicKeyDomainContext,
   hashEvent,
   hashTransaction,
   InvalidUserChainError,
@@ -213,7 +214,7 @@ test("should fail if the encryptionPublicKeySignature have been manipulated", as
 
   addDeviceEvent.transaction.encryptionPublicKeySignature = sodium.to_base64(
     sodium.crypto_sign_detached(
-      "something",
+      deviceEncryptionPublicKeyDomainContext + "something",
       sodium.from_base64(keyPairsB.sign.privateKey)
     )
   );
@@ -241,7 +242,8 @@ test("should fail if the knownVersion is smaller than the actual event version",
   }): AddDeviceEvent => {
     const prevEventHash = hashEvent(prevEvent);
     const encryptionPublicKeySignature = sodium.crypto_sign_detached(
-      sodium.from_base64(encryptionPublicKey),
+      deviceEncryptionPublicKeyDomainContext +
+        sodium.from_base64(encryptionPublicKey),
       sodium.from_base64(authorKeyPair.privateKey)
     );
     const transaction: AddDeviceTransaction = {
@@ -292,7 +294,7 @@ test("should fail if an old event version is applied after a newer one", async (
     encryptionPublicKey,
   }): CreateChainEvent => {
     const encryptionPublicKeySignature = sodium.crypto_sign_detached(
-      encryptionPublicKey,
+      deviceEncryptionPublicKeyDomainContext + encryptionPublicKey,
       sodium.from_base64(authorKeyPair.privateKey)
     );
     const transaction: CreateChainTransaction = {

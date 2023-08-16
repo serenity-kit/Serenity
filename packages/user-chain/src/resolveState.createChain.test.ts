@@ -3,6 +3,7 @@ import { ZodError } from "zod";
 import { getKeyPairsA, getKeyPairsB, KeyPairs } from "../test/testUtils";
 import {
   createChain,
+  deviceEncryptionPublicKeyDomainContext,
   InvalidUserChainError,
   resolveState,
   UnknownVersionUserChainError,
@@ -102,7 +103,7 @@ test("should fail if the encryptionPublicKeySignature has been manipulated", asy
 
   event.transaction.encryptionPublicKeySignature = sodium.to_base64(
     sodium.crypto_sign_detached(
-      "something",
+      deviceEncryptionPublicKeyDomainContext + "something",
       sodium.from_base64(keyPairsB.sign.privateKey)
     )
   );

@@ -213,7 +213,7 @@ In the case above the workspaceKey must be a `Uint8Array`.
 
 #### Signatures should always be encrypted as strings
 
-The reason here is that signatures often include other data as well end it's easier to stay consistent and always use strings.
+The reason here is that signatures often include other data as well end it's easier to stay consistent and always use strings. In addition every string must be prefixed with the domain context to make sure signatures can't be misused for other use-cases.
 
 ### Folder/File Naming Convention
 
