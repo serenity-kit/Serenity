@@ -1,0 +1,20 @@
+query workspaceMembersByMainDeviceSigningPublicKey(
+  $workspaceId: ID!
+  $mainDeviceSigningPublicKeys: [String!]!
+) {
+  workspaceMembersByMainDeviceSigningPublicKey(
+    workspaceId: $workspaceId
+    mainDeviceSigningPublicKeys: $mainDeviceSigningPublicKeys
+  ) {
+    workspaceMembers {
+      id
+      user {
+        id
+        username
+        chain {
+          serializedContent
+        }
+      }
+    }
+  }
+}
