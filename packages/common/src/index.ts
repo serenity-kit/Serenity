@@ -31,5 +31,4 @@ export * from "./recreateDocumentTitleKey/recreateDocumentTitleKey";
 export * from "./recreateSnapshotKey/recreateSnapshotKey";
 export * from "./sleep/sleep";
 export * from "./types";
-export * from "./verifyDevice/verifyDevice";
 export * from "./zodTypes";

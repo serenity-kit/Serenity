@@ -1,5 +1,4 @@
 import * as userChain from "@serenity-kit/user-chain";
-import { verifyDevice } from "@serenity-tools/common";
 import { ForbiddenError, UserInputError } from "apollo-server-express";
 import {
   arg,
@@ -53,7 +52,7 @@ export const addDeviceMutation = mutationField("addDevice", {
     }
 
     try {
-      verifyDevice({
+      userChain.verifyDevice({
         signingPublicKey: args.input.deviceSigningPublicKey,
         encryptionPublicKey: args.input.deviceEncryptionPublicKey,
         encryptionPublicKeySignature:
