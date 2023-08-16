@@ -17,14 +17,6 @@ export const getUnauthorizedMember = async ({
       unauthorizedMember {
         userId
         workspaceId
-        devices {
-          userId
-          signingPublicKey
-          encryptionPublicKey
-          info
-          createdAt
-          encryptionPublicKeySignature
-        }
       }
     }
   `;

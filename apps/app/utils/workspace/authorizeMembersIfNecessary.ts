@@ -30,7 +30,7 @@ export const authorizeMembersIfNecessary = async ({
   try {
     const unauthorizedMemberResult = await runUnauthorizedMemberQuery({});
     if (unauthorizedMemberResult.data?.unauthorizedMember) {
-      const { workspaceId, devices, userMainDeviceSigningPublicKey } =
+      const { workspaceId, userMainDeviceSigningPublicKey } =
         unauthorizedMemberResult.data.unauthorizedMember;
 
       if (
