@@ -20135,10 +20135,10 @@ react-native-gradle-plugin@^0.70.3:
   resolved "https://registry.yarnpkg.com/react-native-gradle-plugin/-/react-native-gradle-plugin-0.70.3.tgz#cbcf0619cbfbddaa9128701aa2d7b4145f9c4fc8"
   integrity sha512-oOanj84fJEXUg9FoEAQomA8ISG+DVIrTZ3qF7m69VQUJyOGYyDZmPqKcjvRku4KXlEH6hWO9i4ACLzNBh8gC0A==
 
-react-native-libsodium@^1.1.0:
-  version "1.1.0"
-  resolved "https://registry.yarnpkg.com/react-native-libsodium/-/react-native-libsodium-1.1.0.tgz#1b580f9978e249af106249b86dbe1f959934452e"
-  integrity sha512-HuCECkSDptMM5FTaQCw5xZtm552f1TNk8N7iIc/jlkmV8RJlwKPRhnwKlIvLDecQXBy4bH/97nTbid6U4P/22A==
+react-native-libsodium@^1.1.1:
+  version "1.1.1"
+  resolved "https://registry.yarnpkg.com/react-native-libsodium/-/react-native-libsodium-1.1.1.tgz#619ba02146d1f8357834b50a6870a08ce69768ff"
+  integrity sha512-snH1CUXbg4VZhPioZ4yY4MksMt7DZ5+yRntfZP/mxp8V3rbTXW10ydl8HLr+9UGXJXjA/1O1Qqd1mWkbTyudlA==
   dependencies:
     "@types/libsodium-wrappers" "^0.7.10"
     libsodium-wrappers "^0.7.11"
