@@ -18,7 +18,6 @@ import {
   setWebDevice,
 } from "../../utils/device/webDeviceStore";
 import { attachDeviceToWorkspaces } from "../../utils/workspace/attachDeviceToWorkspaces";
-import { userWorkspaceKeyStore } from "../../utils/workspace/workspaceKeyStore";
 
 type Props = {
   onLoginSuccess?: () => void;
@@ -33,7 +32,6 @@ export function LoginForm(props: Props) {
   const [isLoggingIn, setIsLoggingIn] = useState(false);
   const [gqlErrorMessage, setGqlErrorMessage] = useState("");
   const { updateAuthentication, updateActiveDevice } = useAppContext();
-  const clearWorkspaceKeyStore = userWorkspaceKeyStore((state) => state.clear);
 
   // we want to reset the form when the user navigates away from the screen
   // to avoid having the form filled and potentially allowing someone else to
@@ -67,7 +65,7 @@ export function LoginForm(props: Props) {
     try {
       setGqlErrorMessage("");
       setIsLoggingIn(true);
-      await clearDeviceAndSessionStorage(clearWorkspaceKeyStore);
+      await clearDeviceAndSessionStorage();
       const loginResult = await login({
         username,
         password,
