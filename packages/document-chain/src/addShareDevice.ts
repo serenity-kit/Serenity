@@ -4,6 +4,7 @@ import {
   AddShareDeviceEvent,
   AddShareDeviceTransaction,
   DocumentChainEvent,
+  DocumentShareRole,
   KeyPairBase64,
 } from "./types";
 import { hashEvent, hashTransaction } from "./utils";
@@ -14,6 +15,7 @@ type Params = {
   prevEvent: DocumentChainEvent;
   signingPublicKey: string;
   encryptionPublicKey: string;
+  role: DocumentShareRole;
   expiresAt?: Date;
 };
 
@@ -23,6 +25,7 @@ export const addShareDevice = ({
   signingPublicKey,
   encryptionPublicKey,
   expiresAt,
+  role,
 }: Params): AddShareDeviceEvent => {
   const prevEventHash = hashEvent(prevEvent);
   const encryptionPublicKeySignature = sodium.crypto_sign_detached(
@@ -31,6 +34,7 @@ export const addShareDevice = ({
   );
   const transaction: AddShareDeviceTransaction = {
     type: "add-share-device",
+    role,
     signingPublicKey,
     encryptionPublicKey,
     encryptionPublicKeySignature: sodium.to_base64(

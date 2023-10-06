@@ -2,6 +2,10 @@ import { z } from "zod";
 
 export const Version = z.number().int().nonnegative();
 
+export const DocumentShareRole = z.enum(["EDITOR", "COMMENTER", "VIEWER"]);
+
+export type DocumentShareRole = z.infer<typeof DocumentShareRole>;
+
 export const KeyPairBase64 = z.object({
   privateKey: z.string(),
   publicKey: z.string(),
@@ -37,6 +41,7 @@ export const AddShareDeviceTransaction = TransactionBase.extend({
   signingPublicKey: z.string(),
   encryptionPublicKey: z.string(),
   encryptionPublicKeySignature: z.string(),
+  role: DocumentShareRole,
   expiresAt: z.optional(z.string().datetime()),
 });
 export type AddShareDeviceTransaction = z.infer<
@@ -72,16 +77,17 @@ export type UpdateChainEvent = z.infer<typeof UpdateChainEvent>;
 export const DocumentChainEvent = z.union([CreateChainEvent, UpdateChainEvent]);
 export type DocumentChainEvent = z.infer<typeof DocumentChainEvent>;
 
-export const DeviceInfo = z.object({
+export const ShareDeviceInfo = z.object({
   expiresAt: z.optional(z.string().datetime()),
   encryptionPublicKey: z.string(),
+  role: DocumentShareRole,
 });
-export type DeviceInfo = z.infer<typeof DeviceInfo>;
+export type ShareDeviceInfo = z.infer<typeof ShareDeviceInfo>;
 
 export const DocumentChainState = z.object({
   id: z.string(),
-  devices: z.record(z.string(), DeviceInfo),
-  removedDevices: z.record(z.string(), DeviceInfo),
+  devices: z.record(z.string(), ShareDeviceInfo),
+  removedDevices: z.record(z.string(), ShareDeviceInfo),
   eventHash: z.string(),
   eventVersion: Version,
 });

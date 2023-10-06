@@ -74,6 +74,7 @@ export const applyEvent = ({
     devices[event.transaction.signingPublicKey] = {
       expiresAt: event.transaction.expiresAt,
       encryptionPublicKey: event.transaction.encryptionPublicKey,
+      role: event.transaction.role,
     };
   }
 
@@ -88,6 +89,7 @@ export const applyEvent = ({
       expiresAt: devices[event.transaction.signingPublicKey].expiresAt,
       encryptionPublicKey:
         devices[event.transaction.signingPublicKey].encryptionPublicKey,
+      role: devices[event.transaction.signingPublicKey].role,
     };
     delete devices[event.transaction.signingPublicKey];
   }

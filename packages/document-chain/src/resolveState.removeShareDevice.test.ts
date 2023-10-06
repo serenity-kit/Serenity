@@ -25,6 +25,7 @@ test("should resolve to no share device after adding and removing a share device
     authorKeyPair: keyPairsA.sign,
     signingPublicKey: keyPairsB.sign.publicKey,
     encryptionPublicKey: keyPairsB.encryption.publicKey,
+    role: "EDITOR",
     prevEvent: event,
   });
   const removeDeviceEvent = removeDevice({
@@ -42,6 +43,7 @@ test("should resolve to no share device after adding and removing a share device
       "MTDhqVIMflTD0Car-KSP1MWCIEYqs2LBaXfU20di0tY": {
         "encryptionPublicKey": "b_skeL8qudNQji-HuOldPNFDzYSBENNqmFMlawhtrHg",
         "expiresAt": undefined,
+        "role": "EDITOR",
       },
     }
   `);
@@ -61,6 +63,7 @@ test("should fail if a device is removed twice", async () => {
     authorKeyPair: keyPairsA.sign,
     signingPublicKey: keyPairsB.sign.publicKey,
     encryptionPublicKey: keyPairsB.encryption.publicKey,
+    role: "EDITOR",
     prevEvent: event,
   });
   const removeDeviceEvent = removeDevice({
@@ -94,6 +97,7 @@ test("should fail if a device is removed that doesn't exist", async () => {
     authorKeyPair: keyPairsA.sign,
     signingPublicKey: keyPairsB.sign.publicKey,
     encryptionPublicKey: keyPairsB.encryption.publicKey,
+    role: "EDITOR",
     prevEvent: event,
   });
   const removeDeviceEvent = removeDevice({
@@ -119,6 +123,7 @@ test("should fail if the signature has been manipulated", async () => {
     authorKeyPair: keyPairsA.sign,
     signingPublicKey: keyPairsB.sign.publicKey,
     encryptionPublicKey: keyPairsB.encryption.publicKey,
+    role: "EDITOR",
     prevEvent: event,
   });
   const removeDeviceEvent = removeDevice({
@@ -150,6 +155,7 @@ test("should fail if the author (publicKey and signature) have been replaced", a
     authorKeyPair: keyPairsA.sign,
     signingPublicKey: keyPairsB.sign.publicKey,
     encryptionPublicKey: keyPairsB.encryption.publicKey,
+    role: "EDITOR",
     prevEvent: event,
   });
   const removeDeviceEvent = removeDevice({
@@ -184,12 +190,14 @@ test("should fail if the chain is based on a different event", async () => {
     authorKeyPair: keyPairsA.sign,
     signingPublicKey: keyPairsB.sign.publicKey,
     encryptionPublicKey: keyPairsB.encryption.publicKey,
+    role: "EDITOR",
     prevEvent: event,
   });
   const addShareDeviceEvent2 = addShareDevice({
     authorKeyPair: keyPairsA.sign,
     signingPublicKey: keyPairsB.sign.publicKey,
     encryptionPublicKey: keyPairsB.encryption.publicKey,
+    role: "EDITOR",
     prevEvent: event,
   });
   const removeDeviceEvent = removeDevice({
