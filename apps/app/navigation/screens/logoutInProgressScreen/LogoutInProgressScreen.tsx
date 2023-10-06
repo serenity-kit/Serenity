@@ -11,7 +11,6 @@ import {
 import { RootStackScreenProps } from "../../../types/navigationProps";
 import { clearDeviceAndSessionStorage } from "../../../utils/authentication/clearDeviceAndSessionStorage";
 import { getMainDevice } from "../../../utils/device/mainDeviceMemoryStore";
-import { userWorkspaceKeyStore } from "../../../utils/workspace/workspaceKeyStore";
 
 let logoutInitiated = false;
 
@@ -23,7 +22,6 @@ export default function LogoutInProgress({
   navigation,
 }: RootStackScreenProps<"LogoutInProgress">) {
   useWindowDimensions(); // needed to ensure tw-breakpoints are triggered when resizing
-  const clearWorkspaceKeyStore = userWorkspaceKeyStore((state) => state.clear);
   const { updateAuthentication, activeDevice } = useAppContext();
 
   useFocusEffect(() => {
@@ -83,7 +81,7 @@ export default function LogoutInProgress({
           {}
         );
         remoteCleanupSuccessful = logoutResult.data?.logout?.success || false;
-        clearDeviceAndSessionStorage(clearWorkspaceKeyStore);
+        await clearDeviceAndSessionStorage();
         await updateAuthentication(null);
         localCleanupSuccessful = true;
       } catch (err) {
