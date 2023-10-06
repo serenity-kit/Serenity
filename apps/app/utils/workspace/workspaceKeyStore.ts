@@ -1,6 +1,6 @@
 import { LocalDevice } from "@serenity-tools/common";
 import create from "zustand";
-import { deriveWorkspaceKey } from "./deriveWorkspaceKey";
+import { retrieveWorkspaceKey } from "./retrieveWorkspaceKey";
 
 export type WorskpaceKeyLookup = {
   [workspaceKeyId: string]: string;
@@ -48,7 +48,7 @@ export const userWorkspaceKeyStore = create<WorkspaceKeyState>((set, get) => ({
     const workspaceKeyLookupForWorkspace = get().workspaceKeyLookupForWorkspace;
     const workspaceKeyLookup = workspaceKeyLookupForWorkspace[workspaceId];
     if (!workspaceKeyLookup) {
-      const workspaceKey = await deriveWorkspaceKey({
+      const workspaceKey = await retrieveWorkspaceKey({
         workspaceId,
         workspaceKeyId,
         activeDevice,
@@ -61,7 +61,7 @@ export const userWorkspaceKeyStore = create<WorkspaceKeyState>((set, get) => ({
     }
     const workspaceKeyString = workspaceKeyLookup[workspaceKeyId];
     if (!workspaceKeyString) {
-      const workspaceKey = await deriveWorkspaceKey({
+      const workspaceKey = await retrieveWorkspaceKey({
         workspaceId,
         workspaceKeyId,
         activeDevice,

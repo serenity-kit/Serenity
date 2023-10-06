@@ -49,8 +49,8 @@ import { createFolderKeyDerivationTrace } from "../../utils/folder/createFolderK
 import { useFolderKeyStore } from "../../utils/folder/folderKeyStore";
 import { useOpenFolderStore } from "../../utils/folder/openFolderStore";
 
-import { deriveWorkspaceKey } from "../../utils/workspace/deriveWorkspaceKey";
 import { getWorkspace } from "../../utils/workspace/getWorkspace";
+import { retrieveWorkspaceKey } from "../../utils/workspace/retrieveWorkspaceKey";
 import SidebarFolderMenu from "../sidebarFolderMenu/SidebarFolderMenu";
 import SidebarPage from "../sidebarPage/SidebarPage";
 
@@ -139,7 +139,7 @@ export default function SidebarFolder(props: Props) {
     if (!folderWorkspaceKey?.workspaceKeyBox) {
       console.error("Folder workspace key not found");
     }
-    const workspaceKeyData = await deriveWorkspaceKey({
+    const workspaceKeyData = await retrieveWorkspaceKey({
       workspaceId: workspace.id,
       workspaceKeyId: props.keyDerivationTrace.workspaceKeyId,
       activeDevice,
@@ -403,7 +403,7 @@ export default function SidebarFolder(props: Props) {
     if (!workspace.currentWorkspaceKey!.workspaceKeyBox) {
       throw new Error("no workspace key boxes for this workspace");
     }
-    const workspaceKeyData = await deriveWorkspaceKey({
+    const workspaceKeyData = await retrieveWorkspaceKey({
       workspaceId: workspace.id,
       workspaceKeyId: workspace.currentWorkspaceKey!.id,
       activeDevice,

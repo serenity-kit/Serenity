@@ -7,7 +7,7 @@ export type Props = {
   workspaceKeyId: string;
   activeDevice: LocalDevice;
 };
-export const deriveWorkspaceKey = async ({
+export const retrieveWorkspaceKey = async ({
   workspaceId,
   workspaceKeyId,
   activeDevice,
