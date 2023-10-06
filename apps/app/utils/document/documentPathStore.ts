@@ -12,8 +12,8 @@ import {
 } from "../../generated/graphql";
 import { GetFolderKeyProps } from "../folder/folderKeyStore";
 import { getUrqlClient } from "../urqlClient/urqlClient";
-import { deriveWorkspaceKey } from "../workspace/deriveWorkspaceKey";
 import { getWorkspace } from "../workspace/getWorkspace";
+import { retrieveWorkspaceKey } from "../workspace/retrieveWorkspaceKey";
 
 interface DocumentPathState {
   folders: Folder[];
@@ -67,7 +67,7 @@ export const useDocumentPathStore = create<DocumentPathState>((set, get) => ({
     if (!folderWorkspaceKey?.workspaceKeyBox) {
       console.error("Folder workspace key not found");
     }
-    const workspaceKeyData = await deriveWorkspaceKey({
+    const workspaceKeyData = await retrieveWorkspaceKey({
       workspaceId: workspaceId!,
       workspaceKeyId,
       activeDevice,
