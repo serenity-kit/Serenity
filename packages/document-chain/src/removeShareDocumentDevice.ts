@@ -2,8 +2,8 @@ import sodium from "react-native-libsodium";
 import {
   DocumentChainEvent,
   KeyPairBase64,
-  RemoveShareDeviceEvent,
-  RemoveShareDeviceTransaction,
+  RemoveShareDocumentDeviceEvent,
+  RemoveShareDocumentDeviceTransaction,
 } from "./types";
 import { hashEvent, hashTransaction } from "./utils";
 import { version } from "./version";
@@ -15,14 +15,14 @@ type Params = {
   expiresAt?: Date;
 };
 
-export const removeDevice = ({
+export const removeShareDocumentDevice = ({
   authorKeyPair,
   prevEvent,
   signingPublicKey,
-}: Params): RemoveShareDeviceEvent => {
+}: Params): RemoveShareDocumentDeviceEvent => {
   const prevEventHash = hashEvent(prevEvent);
-  const transaction: RemoveShareDeviceTransaction = {
-    type: "remove-share-device",
+  const transaction: RemoveShareDocumentDeviceTransaction = {
+    type: "remove-share-document-device",
     signingPublicKey,
     prevEventHash,
     version,
