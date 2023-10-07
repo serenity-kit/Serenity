@@ -132,7 +132,7 @@ export const createInitialWorkspaceStructure = async ({
   const folderKey = encryptedFolderResult.folderSubkey;
   const folderIdSignature = sodium.to_base64(
     sodium.crypto_sign_detached(
-      folderId,
+      "folder_id" + folderId,
       sodium.from_base64(creatorDevice.signingPrivateKey)
     )
   );
