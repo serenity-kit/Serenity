@@ -16,7 +16,7 @@ export const createAndEncryptMainDevice = (exportKey: string) => {
     encryptionPublicKey,
     encryptionPrivateKey,
     encryptionPublicKeySignature,
-  } = createDevice();
+  } = createDevice("user");
   const nonce = sodium.randombytes_buf(sodium.crypto_secretbox_NONCEBYTES);
   const createdAt = new Date().toISOString();
   const privateKeyPairString = JSON.stringify({

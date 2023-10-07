@@ -3,7 +3,7 @@ import { detect } from "detect-browser";
 import { Platform } from "react-native";
 
 export const createDeviceWithInfo = () => {
-  let device: LocalDevice = createDevice();
+  let device: LocalDevice = createDevice("user");
   const browser = detect();
   if (Platform.OS === "web") {
     const deviceInfoJson = {

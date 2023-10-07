@@ -13,6 +13,7 @@ export type KeyDerivationContext = z.infer<typeof KeyDerivationContext>;
 
 export const SigningDomainContext = z.union([
   z.literal("device_encryption_public_key"),
+  z.literal("share_document_device_encryption_public_key"),
   z.literal("folder_id"),
 ]);
 export type SigningDomainContext = z.infer<typeof SigningDomainContext>;

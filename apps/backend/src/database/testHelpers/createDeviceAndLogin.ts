@@ -41,7 +41,7 @@ export const createDeviceAndLogin = async ({
     throw new Error("Login failed");
   }
 
-  const webDevice = createDevice();
+  const webDevice = createDevice("user");
 
   const user = await getUserByUsername({ username });
   const { lastUserChainEvent } = await getLastUserChainEventWithState({
