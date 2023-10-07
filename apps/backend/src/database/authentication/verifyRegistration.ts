@@ -52,7 +52,7 @@ const createDevicesAndUser = async (
     },
   });
 
-  const createChainEvent = userChain.CreateChainEvent.parse(
+  const createChainEvent = userChain.CreateUserChainEvent.parse(
     unverifiedUser.createChainEvent
   );
   const userChainState = userChain.resolveState({

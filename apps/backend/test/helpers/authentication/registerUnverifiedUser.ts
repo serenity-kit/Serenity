@@ -62,7 +62,7 @@ export const registerUnverifiedUser = async ({
     pendingWorkspaceInvitationKeySubkeyId = workspaceInvitationKeyData.subkeyId;
   }
 
-  const createChainEvent = userChain.createChain({
+  const createChainEvent = userChain.createUserChain({
     authorKeyPair: {
       privateKey: signingPrivateKey,
       publicKey: mainDevice.signingPublicKey,

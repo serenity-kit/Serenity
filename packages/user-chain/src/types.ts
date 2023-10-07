@@ -18,7 +18,7 @@ export const TransactionBase = z.object({
   version: Version,
 });
 
-export const CreateChainTransaction = z.object({
+export const CreateUserChainTransaction = z.object({
   type: z.literal("create"),
   id: z.string(),
   prevEventHash: z.null(), //there is no previous hash for the first event
@@ -27,13 +27,15 @@ export const CreateChainTransaction = z.object({
   encryptionPublicKeySignature: z.string(),
   version: Version,
 });
-export type CreateChainTransaction = z.infer<typeof CreateChainTransaction>;
+export type CreateUserChainTransaction = z.infer<
+  typeof CreateUserChainTransaction
+>;
 
-export const CreateChainEvent = z.object({
+export const CreateUserChainEvent = z.object({
   author: Author,
-  transaction: CreateChainTransaction,
+  transaction: CreateUserChainTransaction,
 });
-export type CreateChainEvent = z.infer<typeof CreateChainEvent>;
+export type CreateUserChainEvent = z.infer<typeof CreateUserChainEvent>;
 
 export const AddDeviceTransaction = TransactionBase.extend({
   type: z.literal("add-device"),
@@ -65,7 +67,7 @@ export type RemoveDeviceEvent = z.infer<typeof RemoveDeviceEvent>;
 export const UpdateChainEvent = z.union([AddDeviceEvent, RemoveDeviceEvent]);
 export type UpdateChainEvent = z.infer<typeof UpdateChainEvent>;
 
-export const UserChainEvent = z.union([CreateChainEvent, UpdateChainEvent]);
+export const UserChainEvent = z.union([CreateUserChainEvent, UpdateChainEvent]);
 export type UserChainEvent = z.infer<typeof UserChainEvent>;
 
 export const DeviceInfo = z.object({

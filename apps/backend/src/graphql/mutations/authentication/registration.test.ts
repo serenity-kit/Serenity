@@ -51,7 +51,7 @@ test("server should register a user", async () => {
   const { signingPrivateKey, encryptionPrivateKey, ...mainDevice } =
     createAndEncryptMainDevice(sodium.to_base64(exportKey));
 
-  const createChainEvent = userChain.createChain({
+  const createChainEvent = userChain.createUserChain({
     authorKeyPair: {
       privateKey: signingPrivateKey,
       publicKey: mainDevice.signingPublicKey,
@@ -104,7 +104,7 @@ test("server should register a user with a pending workspace id", async () => {
     ),
   });
 
-  const createChainEvent = userChain.createChain({
+  const createChainEvent = userChain.createUserChain({
     authorKeyPair: {
       privateKey: signingPrivateKey,
       publicKey: mainDevice.signingPublicKey,
@@ -175,7 +175,7 @@ describe("Input errors", () => {
     const { signingPrivateKey, encryptionPrivateKey, ...mainDevice } =
       createAndEncryptMainDevice(sodium.to_base64(exportKey));
 
-    const createChainEvent = userChain.createChain({
+    const createChainEvent = userChain.createUserChain({
       authorKeyPair: {
         privateKey: signingPrivateKey,
         publicKey: mainDevice.signingPublicKey,
@@ -216,7 +216,7 @@ describe("Input errors", () => {
     const { signingPrivateKey, encryptionPrivateKey, ...mainDevice } =
       createAndEncryptMainDevice(sodium.to_base64(exportKey));
 
-    const createChainEvent = userChain.createChain({
+    const createChainEvent = userChain.createUserChain({
       authorKeyPair: {
         privateKey: signingPrivateKey,
         publicKey: mainDevice.signingPublicKey,
@@ -254,7 +254,7 @@ describe("Input errors", () => {
     const { signingPrivateKey, encryptionPrivateKey, ...mainDevice } =
       createAndEncryptMainDevice(sodium.to_base64(exportKey));
 
-    const createChainEvent = userChain.createChain({
+    const createChainEvent = userChain.createUserChain({
       authorKeyPair: {
         privateKey: signingPrivateKey,
         publicKey: mainDevice.signingPublicKey,
@@ -297,7 +297,7 @@ describe("Input errors", () => {
       ...mainDevice
     } = createAndEncryptMainDevice(sodium.to_base64(exportKey));
 
-    const createChainEvent = userChain.createChain({
+    const createChainEvent = userChain.createUserChain({
       authorKeyPair: {
         privateKey: signingPrivateKey,
         publicKey: mainDevice.signingPublicKey,
@@ -336,7 +336,7 @@ describe("Input errors", () => {
     const { signingPrivateKey, encryptionPrivateKey, nonce, ...mainDevice } =
       createAndEncryptMainDevice(sodium.to_base64(exportKey));
 
-    const createChainEvent = userChain.createChain({
+    const createChainEvent = userChain.createUserChain({
       authorKeyPair: {
         privateKey: signingPrivateKey,
         publicKey: mainDevice.signingPublicKey,
@@ -379,7 +379,7 @@ describe("Input errors", () => {
       ...mainDevice
     } = createAndEncryptMainDevice(sodium.to_base64(exportKey));
 
-    const createChainEvent = userChain.createChain({
+    const createChainEvent = userChain.createUserChain({
       authorKeyPair: {
         privateKey: signingPrivateKey,
         publicKey: signingPublicKey,
@@ -422,7 +422,7 @@ describe("Input errors", () => {
       ...mainDevice
     } = createAndEncryptMainDevice(sodium.to_base64(exportKey));
 
-    const createChainEvent = userChain.createChain({
+    const createChainEvent = userChain.createUserChain({
       authorKeyPair: {
         privateKey: signingPrivateKey,
         publicKey: mainDevice.signingPublicKey,
@@ -465,7 +465,7 @@ describe("Input errors", () => {
       ...mainDevice
     } = createAndEncryptMainDevice(sodium.to_base64(exportKey));
 
-    const createChainEvent = userChain.createChain({
+    const createChainEvent = userChain.createUserChain({
       authorKeyPair: {
         privateKey: signingPrivateKey,
         publicKey: mainDevice.signingPublicKey,

@@ -1,7 +1,7 @@
 import sodium from "react-native-libsodium";
 import { InvalidUserChainError, UnknownVersionUserChainError } from "./errors";
 import {
-  CreateChainEvent,
+  CreateUserChainEvent,
   DeviceInfo,
   UserChainEvent,
   UserChainState,
@@ -14,11 +14,11 @@ type Params = {
   knownVersion: number;
 };
 
-export const applyCreateChainEvent = ({
+export const applyCreateUserChainEvent = ({
   event: rawEvent,
   knownVersion,
 }: Params): UserChainState => {
-  const event = CreateChainEvent.parse(rawEvent);
+  const event = CreateUserChainEvent.parse(rawEvent);
   const transactionHash = hashTransaction(event.transaction);
   const eventHash = hashEvent(event);
   const isValidSignature = sodium.crypto_sign_verify_detached(

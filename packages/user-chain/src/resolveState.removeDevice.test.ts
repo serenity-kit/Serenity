@@ -2,7 +2,7 @@ import sodium from "react-native-libsodium";
 import { getKeyPairsA, getKeyPairsB, KeyPairs } from "../test/testUtils";
 import {
   addDevice,
-  createChain,
+  createUserChain,
   InvalidUserChainError,
   removeDevice,
   resolveState,
@@ -18,7 +18,7 @@ beforeAll(async () => {
 });
 
 test("should resolve to one device after adding and removing a device", async () => {
-  const event = createChain({
+  const event = createUserChain({
     authorKeyPair: keyPairsA.sign,
     encryptionPublicKey: keyPairsA.encryption.publicKey,
     email: "jane@example.com",
@@ -66,7 +66,7 @@ test("should resolve to one device after adding and removing a device", async ()
 });
 
 test("should fail if a device is removed twice", async () => {
-  const event = createChain({
+  const event = createUserChain({
     authorKeyPair: keyPairsA.sign,
     encryptionPublicKey: keyPairsA.encryption.publicKey,
     email: "jane@example.com",
@@ -96,7 +96,7 @@ test("should fail if a device is removed twice", async () => {
 });
 
 test("should fail if a device is removed that doesn't exist", async () => {
-  const event = createChain({
+  const event = createUserChain({
     authorKeyPair: keyPairsA.sign,
     encryptionPublicKey: keyPairsA.encryption.publicKey,
     email: "jane@example.com",
@@ -123,7 +123,7 @@ test("should fail if a device is removed that doesn't exist", async () => {
 // ---------------------------
 
 test("should fail if the signature has been manipulated", async () => {
-  const event = createChain({
+  const event = createUserChain({
     authorKeyPair: keyPairsA.sign,
     encryptionPublicKey: keyPairsA.encryption.publicKey,
     email: "jane@example.com",
@@ -156,7 +156,7 @@ test("should fail if the signature has been manipulated", async () => {
 });
 
 test("should fail if the author (publicKey and signature) have been replaced", async () => {
-  const event = createChain({
+  const event = createUserChain({
     authorKeyPair: keyPairsA.sign,
     encryptionPublicKey: keyPairsA.encryption.publicKey,
     email: "jane@example.com",
@@ -192,7 +192,7 @@ test("should fail if the author (publicKey and signature) have been replaced", a
 });
 
 test("should fail if the chain is based on a different event", async () => {
-  const event = createChain({
+  const event = createUserChain({
     authorKeyPair: keyPairsA.sign,
     encryptionPublicKey: keyPairsA.encryption.publicKey,
     email: "jane@example.com",

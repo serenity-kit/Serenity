@@ -54,7 +54,7 @@ export const finishRegistrationMutation = mutationField("finishRegistration", {
       throw new Error("Missing process.env.OPAQUE_SERVER_SETUP");
     }
 
-    const createChainEvent = userChain.CreateChainEvent.parse(
+    const createChainEvent = userChain.CreateUserChainEvent.parse(
       JSON.parse(args.input.serializedUserChainEvent)
     );
 

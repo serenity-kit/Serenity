@@ -3,7 +3,7 @@ import * as userChain from "@serenity-kit/user-chain";
 type RegistrationInfo = {
   username: string;
   password: string;
-  createChainEvent: userChain.CreateChainEvent;
+  createChainEvent: userChain.CreateUserChainEvent;
 };
 
 let storedRegistrationInfo: RegistrationInfo | null = null;
