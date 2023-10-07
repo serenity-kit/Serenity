@@ -7181,10 +7181,10 @@
     "@sendgrid/client" "^7.7.0"
     "@sendgrid/helpers" "^7.7.0"
 
-"@serenity-kit/opaque@^0.7.0":
-  version "0.7.0"
-  resolved "https://registry.yarnpkg.com/@serenity-kit/opaque/-/opaque-0.7.0.tgz#58e90e4c56a3152e664670ef2876b833f96832d5"
-  integrity sha512-5CikruVTY7EAAhLvHHU139OOaWRIIq58HhDRjpPDZOS8gAaF9qSfZRyR4kuEqGZWOuNjUtilDwD2G3Nc3YlJzw==
+"@serenity-kit/opaque@^0.8.0":
+  version "0.8.0"
+  resolved "https://registry.yarnpkg.com/@serenity-kit/opaque/-/opaque-0.8.0.tgz#82ef4056238611514c0a1e2072015b39a1732dd5"
+  integrity sha512-xZ4HV++Q6Ej2lss9oECMxCCPgRgEXJ/6iqOaqKJO3mRrW6huIaM3zGre47jQEQk37SgSpDBY1mYyw5n+JvwTxA==
 
 "@sideway/address@^4.1.3":
   version "4.1.3"
@@ -20151,12 +20151,12 @@ react-native-modal@^13.0.1:
     prop-types "^15.6.2"
     react-native-animatable "1.3.3"
 
-react-native-opaque@^0.2.6:
-  version "0.2.6"
-  resolved "https://registry.yarnpkg.com/react-native-opaque/-/react-native-opaque-0.2.6.tgz#7fddfd8173584c0d9febd5c3949b40a27d634293"
-  integrity sha512-LrrsBmHRejmJHw7cTAEFiDuMWHRDo38J8BaHwMOjKGeCdb2WG1PssMTN4ynoxHv9qaqixiqNVJQWVqpRRGix5w==
+react-native-opaque@^0.3.1:
+  version "0.3.1"
+  resolved "https://registry.yarnpkg.com/react-native-opaque/-/react-native-opaque-0.3.1.tgz#a01672064ad0d9b12b0c07d18555ed872f39956c"
+  integrity sha512-DShK07S9uUquI0L9ErHvhudQOzoOrCQSdyieHrXCL2RMb2IXPhS3Qmb+av47vlHbYQQvhXRwd4fUAKGsa+vN1A==
   dependencies:
-    "@serenity-kit/opaque" "^0.7.0"
+    "@serenity-kit/opaque" "^0.8.0"
 
 react-native-popper@^0.3.2:
   version "0.3.2"

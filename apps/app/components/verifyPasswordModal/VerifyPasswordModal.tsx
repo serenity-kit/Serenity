@@ -86,6 +86,9 @@ export function VerifyPasswordModal(props: Props) {
         clientLoginState: clientLoginStartResult.clientLoginState,
         loginResponse: startLoginResult.data.startLogin.challengeResponse,
       });
+      if (finishLoginResponse === null) {
+        throw new Error("Could not finish the login process");
+      }
 
       const mainDeviceResult = await runMainDeviceQuery({});
       if (!mainDeviceResult.data?.mainDevice) {

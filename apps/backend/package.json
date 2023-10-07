@@ -27,11 +27,11 @@
   "dependencies": {
     "@aws-sdk/client-s3": "^3.193.0",
     "@aws-sdk/s3-request-presigner": "^3.194.0",
-    "@serenity-tools/secsync": "*",
     "@prisma/client": "^4.8.0",
     "@sendgrid/mail": "^7.7.0",
-    "@serenity-kit/opaque": "^0.7.0",
+    "@serenity-kit/opaque": "^0.8.0",
     "@serenity-tools/common": "*",
+    "@serenity-tools/secsync": "*",
     "apollo-server-express": "^3.10.2",
     "canonicalize": "^2.0.0",
     "express": "^4.18.1",
