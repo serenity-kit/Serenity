@@ -2,7 +2,7 @@ import sodium from "react-native-libsodium";
 import { getKeyPairsA, getKeyPairsB, KeyPairs } from "../test/testUtils";
 import {
   addShareDevice,
-  createChain,
+  createDocumentChain,
   InvalidDocumentChainError,
   removeDevice,
   resolveState,
@@ -18,7 +18,7 @@ beforeAll(async () => {
 });
 
 test("should resolve to no share device after adding and removing a share device", async () => {
-  const event = createChain({
+  const event = createDocumentChain({
     authorKeyPair: keyPairsA.sign,
   });
   const addShareDeviceEvent = addShareDevice({
@@ -56,7 +56,7 @@ test("should resolve to no share device after adding and removing a share device
 });
 
 test("should fail if a device is removed twice", async () => {
-  const event = createChain({
+  const event = createDocumentChain({
     authorKeyPair: keyPairsA.sign,
   });
   const addShareDeviceEvent = addShareDevice({
@@ -90,7 +90,7 @@ test("should fail if a device is removed twice", async () => {
 });
 
 test("should fail if a device is removed that doesn't exist", async () => {
-  const event = createChain({
+  const event = createDocumentChain({
     authorKeyPair: keyPairsA.sign,
   });
   const addShareDeviceEvent = addShareDevice({
@@ -116,7 +116,7 @@ test("should fail if a device is removed that doesn't exist", async () => {
 // ---------------------------
 
 test("should fail if the signature has been manipulated", async () => {
-  const event = createChain({
+  const event = createDocumentChain({
     authorKeyPair: keyPairsA.sign,
   });
   const addShareDeviceEvent = addShareDevice({
@@ -148,7 +148,7 @@ test("should fail if the signature has been manipulated", async () => {
 });
 
 test("should fail if the author (publicKey and signature) have been replaced", async () => {
-  const event = createChain({
+  const event = createDocumentChain({
     authorKeyPair: keyPairsA.sign,
   });
   const addShareDeviceEvent = addShareDevice({
@@ -183,7 +183,7 @@ test("should fail if the author (publicKey and signature) have been replaced", a
 });
 
 test("should fail if the chain is based on a different event", async () => {
-  const event = createChain({
+  const event = createDocumentChain({
     authorKeyPair: keyPairsA.sign,
   });
   const addShareDeviceEvent = addShareDevice({

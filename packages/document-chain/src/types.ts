@@ -22,19 +22,21 @@ export const TransactionBase = z.object({
   version: Version,
 });
 
-export const CreateChainTransaction = z.object({
+export const CreateDocumentChainTransaction = z.object({
   type: z.literal("create"),
   id: z.string(),
   prevEventHash: z.null(), //there is no previous hash for the first event
   version: Version,
 });
-export type CreateChainTransaction = z.infer<typeof CreateChainTransaction>;
+export type CreateDocumentChainTransaction = z.infer<
+  typeof CreateDocumentChainTransaction
+>;
 
-export const CreateChainEvent = z.object({
+export const CreateDocumentChainEvent = z.object({
   author: Author,
-  transaction: CreateChainTransaction,
+  transaction: CreateDocumentChainTransaction,
 });
-export type CreateChainEvent = z.infer<typeof CreateChainEvent>;
+export type CreateDocumentChainEvent = z.infer<typeof CreateDocumentChainEvent>;
 
 export const AddShareDeviceTransaction = TransactionBase.extend({
   type: z.literal("add-share-device"),
@@ -74,7 +76,10 @@ export const UpdateChainEvent = z.union([
 ]);
 export type UpdateChainEvent = z.infer<typeof UpdateChainEvent>;
 
-export const DocumentChainEvent = z.union([CreateChainEvent, UpdateChainEvent]);
+export const DocumentChainEvent = z.union([
+  CreateDocumentChainEvent,
+  UpdateChainEvent,
+]);
 export type DocumentChainEvent = z.infer<typeof DocumentChainEvent>;
 
 export const ShareDeviceInfo = z.object({

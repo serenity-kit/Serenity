@@ -5,9 +5,9 @@ import {
   addShareDevice,
   AddShareDeviceEvent,
   AddShareDeviceTransaction,
-  createChain,
-  CreateChainEvent,
-  CreateChainTransaction,
+  createDocumentChain,
+  CreateDocumentChainEvent,
+  CreateDocumentChainTransaction,
   hashEvent,
   hashTransaction,
   InvalidDocumentChainError,
@@ -26,7 +26,7 @@ beforeAll(async () => {
 });
 
 test("should resolve to one share device after adding a device", async () => {
-  const event = createChain({
+  const event = createDocumentChain({
     authorKeyPair: keyPairsA.sign,
   });
   const addShareDeviceEvent = addShareDevice({
@@ -59,7 +59,7 @@ test("should resolve to one share device after adding a device", async () => {
 });
 
 test("should resolve to have a device with an expireAt", async () => {
-  const event = createChain({
+  const event = createDocumentChain({
     authorKeyPair: keyPairsA.sign,
   });
   const addShareDeviceEvent = addShareDevice({
@@ -87,7 +87,7 @@ test("should resolve to have a device with an expireAt", async () => {
 });
 
 test("should fail if an invalid expireAt is provided", async () => {
-  const event = createChain({
+  const event = createDocumentChain({
     authorKeyPair: keyPairsA.sign,
   });
   expect(() =>
@@ -102,7 +102,7 @@ test("should fail if an invalid expireAt is provided", async () => {
 });
 
 test("should fail if the same event is added twice", async () => {
-  const event = createChain({
+  const event = createDocumentChain({
     authorKeyPair: keyPairsA.sign,
   });
   const addShareDeviceEvent = addShareDevice({
@@ -128,7 +128,7 @@ test("should fail if the same event is added twice", async () => {
 });
 
 test("should fail if the signature has been manipulated", async () => {
-  const event = createChain({
+  const event = createDocumentChain({
     authorKeyPair: keyPairsA.sign,
   });
   const addShareDeviceEvent = addShareDevice({
@@ -155,7 +155,7 @@ test("should fail if the signature has been manipulated", async () => {
 });
 
 test("should fail if the author (publicKey and signature) have been replaced", async () => {
-  const event = createChain({
+  const event = createDocumentChain({
     authorKeyPair: keyPairsA.sign,
   });
   const addShareDeviceEvent = addShareDevice({
@@ -185,7 +185,7 @@ test("should fail if the author (publicKey and signature) have been replaced", a
 });
 
 test("should fail if the encryptionPublicKeySignature have been manipulated", async () => {
-  const event = createChain({
+  const event = createDocumentChain({
     authorKeyPair: keyPairsA.sign,
   });
   const addShareDeviceEvent = addShareDevice({
@@ -213,7 +213,7 @@ test("should fail if the encryptionPublicKeySignature have been manipulated", as
 });
 
 test("should fail if the knownVersion is smaller than the actual event version", async () => {
-  const event = createChain({
+  const event = createDocumentChain({
     authorKeyPair: keyPairsA.sign,
   });
 
@@ -272,8 +272,10 @@ test("should fail if the knownVersion is smaller than the actual event version",
 });
 
 test("should fail if an old event version is applied after a newer one", async () => {
-  const createChainWithVersion1 = ({ authorKeyPair }): CreateChainEvent => {
-    const transaction: CreateChainTransaction = {
+  const createDocumentChainWithVersion1 = ({
+    authorKeyPair,
+  }): CreateDocumentChainEvent => {
+    const transaction: CreateDocumentChainTransaction = {
       type: "create",
       id: generateId(),
       prevEventHash: null,
@@ -295,7 +297,7 @@ test("should fail if an old event version is applied after a newer one", async (
     };
   };
 
-  const event = createChainWithVersion1({
+  const event = createDocumentChainWithVersion1({
     authorKeyPair: keyPairsA.sign,
   });
   const addShareDeviceEvent = addShareDevice({
@@ -311,10 +313,10 @@ test("should fail if an old event version is applied after a newer one", async (
 });
 
 test("should fail if the chain is based on a different event", async () => {
-  const event = createChain({
+  const event = createDocumentChain({
     authorKeyPair: keyPairsA.sign,
   });
-  const event2 = createChain({
+  const event2 = createDocumentChain({
     authorKeyPair: keyPairsA.sign,
   });
   const addShareDeviceEvent = addShareDevice({
