@@ -1,5 +1,6 @@
 import { generateId } from "@serenity-tools/common";
 import { ForbiddenError } from "apollo-server-express";
+import { Prisma } from "../../../prisma/generated/output";
 import { WorkspaceKey, WorkspaceKeyBox } from "../../types/workspace";
 import { getOrCreateCreatorDevice } from "../../utils/device/getOrCreateCreatorDevice";
 import { prisma } from "../prisma";
@@ -37,149 +38,158 @@ export async function attachDeviceToWorkspaces({
     workspaceIds.push(workspaceKeyBox.workspaceId);
   });
   try {
-    return await prisma.$transaction(async (prisma) => {
-      // 1. get the workspaces associated with this user
-      // 2. Add any missing workspaceKeys
-      // 3. Find any existing workspaceKeyBoxes matching this device signingPublicKey
-      // 4. Create a new worskpaceKeyBoxes for this signingPublicKey
-      //    on all workspaceKeys for the user's workspaces
-      const userToWorkspaces = await prisma.usersToWorkspaces.findMany({
-        where: {
-          workspaceId: {
-            in: workspaceIds,
+    return await prisma.$transaction(
+      async (prisma) => {
+        // 1. get the workspaces associated with this user
+        // 2. Add any missing workspaceKeys
+        // 3. Find any existing workspaceKeyBoxes matching this device signingPublicKey
+        // 4. Create a new worskpaceKeyBoxes for this signingPublicKey
+        //    on all workspaceKeys for the user's workspaces
+        const userToWorkspaces = await prisma.usersToWorkspaces.findMany({
+          where: {
+            workspaceId: {
+              in: workspaceIds,
+            },
+            userId,
           },
-          userId,
-        },
-        include: {
-          workspace: {
-            include: {
-              workspaceKeys: {
-                orderBy: {
-                  generation: "desc",
+          include: {
+            workspace: {
+              include: {
+                workspaceKeys: {
+                  orderBy: {
+                    generation: "desc",
+                  },
                 },
               },
             },
           },
-        },
-      });
+        });
 
-      // make sure this device belongs to a user that is part of this workspace
-      const verifiedDevice = await prisma.device.findFirst({
-        where: { signingPublicKey: receiverDeviceSigningPublicKey },
-      });
-      if (!verifiedDevice || !verifiedDevice.userId) {
-        throw new ForbiddenError("Unauthorized");
-      }
-      const verifiedDeviceWorkspaces = await prisma.usersToWorkspaces.findMany({
-        where: {
-          userId: verifiedDevice.userId,
-          workspaceId: { in: workspaceIds },
-        },
-      });
-      if (verifiedDeviceWorkspaces.length === 0) {
-        return [];
-      }
-      // make sure the user controls this creatorDevice
-      await getOrCreateCreatorDevice({
-        prisma,
-        userId,
-        signingPublicKey: creatorDeviceSigningPublicKey,
-      });
-      const userWorkspaceIds: string[] = [];
-      const newWorkspaceKeys: WorkspaceKey[] = [];
-      userToWorkspaces.forEach(async (userToWorkspace) => {
-        userWorkspaceIds.push(userToWorkspace.workspaceId);
-        const workspace = userToWorkspace.workspace;
-        const workspaceKeys = workspace.workspaceKeys;
-        if (workspaceKeys.length === 0) {
-          newWorkspaceKeys.push({
-            id: generateId(),
-            workspaceId: workspace.id,
-            generation: 0,
-          });
+        // make sure this device belongs to a user that is part of this workspace
+        const verifiedDevice = await prisma.device.findFirst({
+          where: { signingPublicKey: receiverDeviceSigningPublicKey },
+        });
+        if (!verifiedDevice || !verifiedDevice.userId) {
+          throw new ForbiddenError("Unauthorized");
         }
-      });
-      await prisma.workspaceKey.createMany({
-        data: newWorkspaceKeys,
-      });
-      const verifiedWorkspaceIds: string[] = [];
-      verifiedDeviceWorkspaces.forEach((userToWorkspace) => {
-        verifiedWorkspaceIds.push(userToWorkspace.workspaceId);
-      });
-      const workspaces = await prisma.workspace.findMany({
-        where: { id: { in: verifiedWorkspaceIds } },
-        include: {
-          workspaceKeys: {
-            include: {
-              workspaceKeyBoxes: {
-                include: {
-                  creatorDevice: true,
+        const verifiedDeviceWorkspaces =
+          await prisma.usersToWorkspaces.findMany({
+            where: {
+              userId: verifiedDevice.userId,
+              workspaceId: { in: workspaceIds },
+            },
+          });
+        if (verifiedDeviceWorkspaces.length === 0) {
+          return [];
+        }
+        // make sure the user controls this creatorDevice
+        await getOrCreateCreatorDevice({
+          prisma,
+          userId,
+          signingPublicKey: creatorDeviceSigningPublicKey,
+        });
+        const userWorkspaceIds: string[] = [];
+        const newWorkspaceKeys: WorkspaceKey[] = [];
+        userToWorkspaces.forEach(async (userToWorkspace) => {
+          userWorkspaceIds.push(userToWorkspace.workspaceId);
+          const workspace = userToWorkspace.workspace;
+          const workspaceKeys = workspace.workspaceKeys;
+          if (workspaceKeys.length === 0) {
+            newWorkspaceKeys.push({
+              id: generateId(),
+              workspaceId: workspace.id,
+              generation: 0,
+            });
+          }
+        });
+        await prisma.workspaceKey.createMany({
+          data: newWorkspaceKeys,
+        });
+        const verifiedWorkspaceIds: string[] = [];
+        verifiedDeviceWorkspaces.forEach((userToWorkspace) => {
+          verifiedWorkspaceIds.push(userToWorkspace.workspaceId);
+        });
+        const workspaces = await prisma.workspace.findMany({
+          where: { id: { in: verifiedWorkspaceIds } },
+          include: {
+            workspaceKeys: {
+              include: {
+                workspaceKeyBoxes: {
+                  include: {
+                    creatorDevice: true,
+                  },
                 },
               },
-            },
-            orderBy: {
-              generation: "desc",
+              orderBy: {
+                generation: "desc",
+              },
             },
           },
-        },
-      });
-      const existingWorkspaceKeyBoxes = await prisma.workspaceKeyBox.findMany({
-        where: {
-          deviceSigningPublicKey: receiverDeviceSigningPublicKey,
-          workspaceKey: { workspaceId: { in: workspaceIds } },
-        },
-      });
-      const existingWorkspaceKeyBoxLookup: {
-        [workspaceKeyId: string]: WorkspaceKeyBox;
-      } = {};
-      existingWorkspaceKeyBoxes.forEach((workspaceKeyBox) => {
-        existingWorkspaceKeyBoxLookup[workspaceKeyBox.workspaceKeyId] =
-          workspaceKeyBox;
-      });
-      const workspaceKeyBoxes: WorkspaceKeyBox[] = [];
-      workspaces.forEach((workspace) => {
-        // const workspaceKey = workspace.workspaceKey[0];
-        const currentWorkspaceKeyBoxData = workspaceKeyBoxLookup[workspace.id];
-        currentWorkspaceKeyBoxData.workspaceKeyDevicePairs.forEach(
-          (workspaceKeyDevicePair) => {
-            const workspaceKeyId = workspaceKeyDevicePair.workspaceKeyId;
-            if (!(workspaceKeyId in existingWorkspaceKeyBoxLookup)) {
-              workspaceKeyBoxes.push({
-                id: generateId(),
-                workspaceKeyId: workspaceKeyId,
-                deviceSigningPublicKey: receiverDeviceSigningPublicKey,
-                creatorDeviceSigningPublicKey,
-                nonce: workspaceKeyDevicePair.nonce,
-                ciphertext: workspaceKeyDevicePair.ciphertext,
-              });
-            }
+        });
+        const existingWorkspaceKeyBoxes = await prisma.workspaceKeyBox.findMany(
+          {
+            where: {
+              deviceSigningPublicKey: receiverDeviceSigningPublicKey,
+              workspaceKey: { workspaceId: { in: workspaceIds } },
+            },
           }
         );
-      });
-      await prisma.workspaceKeyBox.createMany({
-        data: workspaceKeyBoxes,
-      });
-      const rawWorkspaceKeys = await prisma.workspaceKey.findMany({
-        where: { workspaceId: { in: userWorkspaceIds } },
-        include: {
-          workspaceKeyBoxes: {
-            where: { deviceSigningPublicKey: receiverDeviceSigningPublicKey },
-            include: {
-              creatorDevice: true,
+        const existingWorkspaceKeyBoxLookup: {
+          [workspaceKeyId: string]: WorkspaceKeyBox;
+        } = {};
+        existingWorkspaceKeyBoxes.forEach((workspaceKeyBox) => {
+          existingWorkspaceKeyBoxLookup[workspaceKeyBox.workspaceKeyId] =
+            workspaceKeyBox;
+        });
+        const workspaceKeyBoxes: WorkspaceKeyBox[] = [];
+        workspaces.forEach((workspace) => {
+          // const workspaceKey = workspace.workspaceKey[0];
+          const currentWorkspaceKeyBoxData =
+            workspaceKeyBoxLookup[workspace.id];
+          currentWorkspaceKeyBoxData.workspaceKeyDevicePairs.forEach(
+            (workspaceKeyDevicePair) => {
+              const workspaceKeyId = workspaceKeyDevicePair.workspaceKeyId;
+              if (!(workspaceKeyId in existingWorkspaceKeyBoxLookup)) {
+                workspaceKeyBoxes.push({
+                  id: generateId(),
+                  workspaceKeyId: workspaceKeyId,
+                  deviceSigningPublicKey: receiverDeviceSigningPublicKey,
+                  creatorDeviceSigningPublicKey,
+                  nonce: workspaceKeyDevicePair.nonce,
+                  ciphertext: workspaceKeyDevicePair.ciphertext,
+                });
+              }
+            }
+          );
+        });
+        await prisma.workspaceKeyBox.createMany({
+          data: workspaceKeyBoxes,
+        });
+        const rawWorkspaceKeys = await prisma.workspaceKey.findMany({
+          where: { workspaceId: { in: userWorkspaceIds } },
+          include: {
+            workspaceKeyBoxes: {
+              where: { deviceSigningPublicKey: receiverDeviceSigningPublicKey },
+              include: {
+                creatorDevice: true,
+              },
             },
           },
-        },
-        orderBy: { generation: "desc" },
-      });
-      const workspaceKeys: WorkspaceKey[] = [];
-      rawWorkspaceKeys.forEach(({ workspaceKeyBoxes, ...workspaceKey }) => {
-        workspaceKeys.push({
-          ...workspaceKey,
-          workspaceKeyBox: workspaceKeyBoxes[0],
+          orderBy: { generation: "desc" },
         });
-      });
-      return workspaceKeys;
-    });
+        const workspaceKeys: WorkspaceKey[] = [];
+        rawWorkspaceKeys.forEach(({ workspaceKeyBoxes, ...workspaceKey }) => {
+          workspaceKeys.push({
+            ...workspaceKey,
+            workspaceKeyBox: workspaceKeyBoxes[0],
+          });
+        });
+        return workspaceKeys;
+      },
+      {
+        isolationLevel: Prisma.TransactionIsolationLevel.Serializable,
+      }
+    );
   } catch (error) {
     throw error;
   }

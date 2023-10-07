@@ -1,6 +1,7 @@
 import * as userChain from "@serenity-kit/user-chain";
 import { Device } from "@serenity-tools/common";
 import { z } from "zod";
+import { Prisma } from "../../../prisma/generated/output";
 import { addDays } from "../../utils/addDays/addDays";
 import { addHours } from "../../utils/addHours/addHours";
 import { addYears } from "../../utils/addYears/addYears";
@@ -63,46 +64,51 @@ export async function createSessionAndDevice({
     sessionExpiresAt = addYears(new Date(), 1000);
   }
 
-  return await prisma.$transaction(async (prisma) => {
-    const user = await prisma.user.findUniqueOrThrow({
-      where: { username },
-    });
-    const userId = user.id;
+  return await prisma.$transaction(
+    async (prisma) => {
+      const user = await prisma.user.findUniqueOrThrow({
+        where: { username },
+      });
+      const userId = user.id;
 
-    const { lastUserChainEvent, userChainState } =
-      await getLastUserChainEventWithState({ prisma, userId });
+      const { lastUserChainEvent, userChainState } =
+        await getLastUserChainEventWithState({ prisma, userId });
 
-    const newUserChainState = userChain.applyEvent({
-      state: userChainState,
-      event: addDeviceEvent,
-      knownVersion: userChain.version,
-    });
+      const newUserChainState = userChain.applyEvent({
+        state: userChainState,
+        event: addDeviceEvent,
+        knownVersion: userChain.version,
+      });
 
-    await prisma.userChainEvent.create({
-      data: {
-        content: addDeviceEvent,
-        state: newUserChainState,
-        userId,
-        position: lastUserChainEvent.position + 1,
-      },
-    });
+      await prisma.userChainEvent.create({
+        data: {
+          content: addDeviceEvent,
+          state: newUserChainState,
+          userId,
+          position: lastUserChainEvent.position + 1,
+        },
+      });
 
-    return await prisma.session.create({
-      data: {
-        sessionKey,
-        expiresAt: sessionExpiresAt,
-        user: { connect: { username } },
-        device: {
-          create: {
-            signingPublicKey: device.signingPublicKey,
-            encryptionPublicKey: device.encryptionPublicKey,
-            encryptionPublicKeySignature: device.encryptionPublicKeySignature,
-            info: device.info,
-            user: { connect: { username } },
-            expiresAt: addDeviceEvent.transaction.expiresAt,
+      return await prisma.session.create({
+        data: {
+          sessionKey,
+          expiresAt: sessionExpiresAt,
+          user: { connect: { username } },
+          device: {
+            create: {
+              signingPublicKey: device.signingPublicKey,
+              encryptionPublicKey: device.encryptionPublicKey,
+              encryptionPublicKeySignature: device.encryptionPublicKeySignature,
+              info: device.info,
+              user: { connect: { username } },
+              expiresAt: addDeviceEvent.transaction.expiresAt,
+            },
           },
         },
-      },
-    });
-  });
+      });
+    },
+    {
+      isolationLevel: Prisma.TransactionIsolationLevel.Serializable,
+    }
+  );
 }

@@ -1,5 +1,5 @@
 import { ForbiddenError } from "apollo-server-express";
-import { Role } from "../../../prisma/generated/output";
+import { Prisma, Role } from "../../../prisma/generated/output";
 import { prisma } from "../prisma";
 
 type DeleteFolderParams = {
@@ -14,18 +14,23 @@ export async function deleteFolders({
   userId,
 }: DeleteFolderParams) {
   const allowedRoles = [Role.ADMIN, Role.EDITOR];
-  return await prisma.$transaction(async (prisma) => {
-    const userToWorkspace = await prisma.usersToWorkspaces.findFirst({
-      where: { userId, workspaceId, role: { in: allowedRoles } },
-    });
-    if (!userToWorkspace) {
-      throw new ForbiddenError("Unauthorized");
+  return await prisma.$transaction(
+    async (prisma) => {
+      const userToWorkspace = await prisma.usersToWorkspaces.findFirst({
+        where: { userId, workspaceId, role: { in: allowedRoles } },
+      });
+      if (!userToWorkspace) {
+        throw new ForbiddenError("Unauthorized");
+      }
+      await prisma.folder.deleteMany({
+        where: {
+          id: { in: folderIds },
+          workspaceId,
+        },
+      });
+    },
+    {
+      isolationLevel: Prisma.TransactionIsolationLevel.Serializable,
     }
-    await prisma.folder.deleteMany({
-      where: {
-        id: { in: folderIds },
-        workspaceId,
-      },
-    });
-  });
+  );
 }

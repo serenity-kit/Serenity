@@ -1,6 +1,6 @@
 import * as userChain from "@serenity-kit/user-chain";
 import { UserInputError } from "apollo-server-express";
-import { WorkspaceKey } from "../../../prisma/generated/output";
+import { Prisma, WorkspaceKey } from "../../../prisma/generated/output";
 import {
   WorkspaceDeviceParing,
   WorkspaceWithWorkspaceDevicesParing,
@@ -24,207 +24,212 @@ export async function deleteDevice({
 }: Params): Promise<WorkspaceKey[]> {
   const deviceSigningPublicKeyToBeDeleted =
     removeDeviceEvent.transaction.signingPublicKey;
-  return await prisma.$transaction(async (prisma) => {
-    // make sure the user owns the requested devices
-    const user = await prisma.user.findFirst({
-      where: { id: userId },
-    });
-    const allUserDevices = await prisma.device.findMany({
-      where: { userId },
-      select: { signingPublicKey: true },
-    });
+  return await prisma.$transaction(
+    async (prisma) => {
+      // make sure the user owns the requested devices
+      const user = await prisma.user.findFirst({
+        where: { id: userId },
+      });
+      const allUserDevices = await prisma.device.findMany({
+        where: { userId },
+        select: { signingPublicKey: true },
+      });
 
-    const { lastUserChainEvent, userChainState } =
-      await getLastUserChainEventWithState({ prisma, userId });
+      const { lastUserChainEvent, userChainState } =
+        await getLastUserChainEventWithState({ prisma, userId });
 
-    const newUserChainState = userChain.applyEvent({
-      state: userChainState,
-      event: removeDeviceEvent,
-      knownVersion: userChain.version,
-    });
+      const newUserChainState = userChain.applyEvent({
+        state: userChainState,
+        event: removeDeviceEvent,
+        knownVersion: userChain.version,
+      });
 
-    await prisma.userChainEvent.create({
-      data: {
-        content: removeDeviceEvent,
-        state: newUserChainState,
-        userId,
-        position: lastUserChainEvent.position + 1,
-      },
-    });
+      await prisma.userChainEvent.create({
+        data: {
+          content: removeDeviceEvent,
+          state: newUserChainState,
+          userId,
+          position: lastUserChainEvent.position + 1,
+        },
+      });
 
-    // build a table to look up user ownership of
-    // workspaces and devices
-    const requestedWorkspaceIds = new Set<string>();
-    const requestedDeviceSigningPublicKeys: {
-      [workspaceId: string]: Set<string>;
-    } = {};
-    const newDeviceWorkspaceKeyBoxesWorkspaceLookup: {
-      [workspaceId: string]: WorkspaceWithWorkspaceDevicesParing;
-    } = {};
-    const newDeviceWorkspaceKeyBoxesDeviceLookup: {
-      [workspaceId: string]: {
-        [signingPublicKey: string]: WorkspaceDeviceParing;
-      };
-    } = {};
-    const allPossibleRequestedDeviceSigningPublicKeys = new Set<string>();
-    newDeviceWorkspaceKeyBoxes.forEach((newDeviceWorkspaceKeyBox) => {
-      const workspaceId = newDeviceWorkspaceKeyBox.id;
-      requestedWorkspaceIds.add(workspaceId);
-      newDeviceWorkspaceKeyBoxesWorkspaceLookup[workspaceId] =
-        newDeviceWorkspaceKeyBox;
-      newDeviceWorkspaceKeyBox.workspaceDevices.forEach(
-        (workspaceDevicePairing) => {
-          if (!(workspaceId in requestedDeviceSigningPublicKeys)) {
-            requestedDeviceSigningPublicKeys[workspaceId] = new Set<string>();
+      // build a table to look up user ownership of
+      // workspaces and devices
+      const requestedWorkspaceIds = new Set<string>();
+      const requestedDeviceSigningPublicKeys: {
+        [workspaceId: string]: Set<string>;
+      } = {};
+      const newDeviceWorkspaceKeyBoxesWorkspaceLookup: {
+        [workspaceId: string]: WorkspaceWithWorkspaceDevicesParing;
+      } = {};
+      const newDeviceWorkspaceKeyBoxesDeviceLookup: {
+        [workspaceId: string]: {
+          [signingPublicKey: string]: WorkspaceDeviceParing;
+        };
+      } = {};
+      const allPossibleRequestedDeviceSigningPublicKeys = new Set<string>();
+      newDeviceWorkspaceKeyBoxes.forEach((newDeviceWorkspaceKeyBox) => {
+        const workspaceId = newDeviceWorkspaceKeyBox.id;
+        requestedWorkspaceIds.add(workspaceId);
+        newDeviceWorkspaceKeyBoxesWorkspaceLookup[workspaceId] =
+          newDeviceWorkspaceKeyBox;
+        newDeviceWorkspaceKeyBox.workspaceDevices.forEach(
+          (workspaceDevicePairing) => {
+            if (!(workspaceId in requestedDeviceSigningPublicKeys)) {
+              requestedDeviceSigningPublicKeys[workspaceId] = new Set<string>();
+            }
+            requestedDeviceSigningPublicKeys[workspaceId].add(
+              workspaceDevicePairing.receiverDeviceSigningPublicKey
+            );
+            if (!(workspaceId in newDeviceWorkspaceKeyBoxesDeviceLookup)) {
+              newDeviceWorkspaceKeyBoxesDeviceLookup[workspaceId] = {};
+            }
+            newDeviceWorkspaceKeyBoxesDeviceLookup[workspaceId][
+              workspaceDevicePairing.receiverDeviceSigningPublicKey
+            ] = workspaceDevicePairing;
+            allPossibleRequestedDeviceSigningPublicKeys.add(
+              workspaceDevicePairing.receiverDeviceSigningPublicKey
+            );
           }
-          requestedDeviceSigningPublicKeys[workspaceId].add(
-            workspaceDevicePairing.receiverDeviceSigningPublicKey
-          );
-          if (!(workspaceId in newDeviceWorkspaceKeyBoxesDeviceLookup)) {
-            newDeviceWorkspaceKeyBoxesDeviceLookup[workspaceId] = {};
-          }
-          newDeviceWorkspaceKeyBoxesDeviceLookup[workspaceId][
-            workspaceDevicePairing.receiverDeviceSigningPublicKey
-          ] = workspaceDevicePairing;
-          allPossibleRequestedDeviceSigningPublicKeys.add(
-            workspaceDevicePairing.receiverDeviceSigningPublicKey
-          );
-        }
-      );
-    });
-
-    // make sure to check `isAuthorizedMember: true` because
-    // the user won't be able to create keyboxes fro workspaces
-    // that they don't yet have access to
-    const userWorkspaces = await prisma.usersToWorkspaces.findMany({
-      where: { userId },
-      select: { workspaceId: true, isAuthorizedMember: true },
-    });
-    const verifiedWorkspaceIds = userWorkspaces.map(
-      (userWorkspace) => userWorkspace.workspaceId
-    );
-    const allWorkspacesKeyBoxes = await prisma.workspaceKeyBox.findMany({
-      where: { workspaceKey: { workspaceId: { in: verifiedWorkspaceIds } } },
-      select: { deviceSigningPublicKey: true },
-    });
-    const allWorkspaceDeviceSigningPublicKeys = allWorkspacesKeyBoxes.map(
-      (keyBox) => keyBox.deviceSigningPublicKey
-    );
-
-    const deletingDeviceSigningPublicKeys: string[] = [];
-    const allDeviceSigningPublicKeysExceptDeletablesArray: string[] = [];
-    for (let userDevice of allUserDevices) {
-      if (
-        !allPossibleRequestedDeviceSigningPublicKeys.has(
-          userDevice.signingPublicKey
-        )
-      ) {
-        deletingDeviceSigningPublicKeys.push(userDevice.signingPublicKey);
-      }
-      allDeviceSigningPublicKeysExceptDeletablesArray.push(
-        userDevice.signingPublicKey
-      );
-    }
-
-    const allDeviceSigningPublicKeysExceptDeletables = new Set(
-      allDeviceSigningPublicKeysExceptDeletablesArray
-    );
-
-    if (
-      allDeviceSigningPublicKeysExceptDeletables.has(
-        deviceSigningPublicKeyToBeDeleted
-      )
-    ) {
-      allDeviceSigningPublicKeysExceptDeletables.delete(
-        deviceSigningPublicKeyToBeDeleted
-      );
-    }
-
-    const verifiedDeviceWorkspaceKeyBoxes: WorkspaceWithWorkspaceDevicesParing[] =
-      [];
-    for (let userWorkspace of userWorkspaces) {
-      const workspaceId = userWorkspace.workspaceId;
-      const newDeviceWorkspaceKeyBox =
-        newDeviceWorkspaceKeyBoxesWorkspaceLookup[userWorkspace.workspaceId];
-      if (!newDeviceWorkspaceKeyBox) {
-        throw new UserInputError(
-          "Not all user workspaces are in the newDeviceWorkspaceKeyBoxes"
         );
-      }
-      if (
-        !requestedDeviceSigningPublicKeys[workspaceId]?.has(
-          user?.mainDeviceSigningPublicKey!
-        )
-      ) {
-        throw new UserInputError(
-          "mainDevice is not included in all newDeviceWorkspaceKeyBoxes"
-        );
-      }
-      const leftoverSigningPublicKeys = new Set(
-        allDeviceSigningPublicKeysExceptDeletables
+      });
+
+      // make sure to check `isAuthorizedMember: true` because
+      // the user won't be able to create keyboxes fro workspaces
+      // that they don't yet have access to
+      const userWorkspaces = await prisma.usersToWorkspaces.findMany({
+        where: { userId },
+        select: { workspaceId: true, isAuthorizedMember: true },
+      });
+      const verifiedWorkspaceIds = userWorkspaces.map(
+        (userWorkspace) => userWorkspace.workspaceId
       );
-      const addableDeviceWorkspaceKeyBoxes: WorkspaceDeviceParing[] = [];
-      for (let workspaceDevice of newDeviceWorkspaceKeyBox.workspaceDevices) {
-        // userDeviceSigningPublicKeys
+      const allWorkspacesKeyBoxes = await prisma.workspaceKeyBox.findMany({
+        where: { workspaceKey: { workspaceId: { in: verifiedWorkspaceIds } } },
+        select: { deviceSigningPublicKey: true },
+      });
+      const allWorkspaceDeviceSigningPublicKeys = allWorkspacesKeyBoxes.map(
+        (keyBox) => keyBox.deviceSigningPublicKey
+      );
+
+      const deletingDeviceSigningPublicKeys: string[] = [];
+      const allDeviceSigningPublicKeysExceptDeletablesArray: string[] = [];
+      for (let userDevice of allUserDevices) {
         if (
-          allWorkspaceDeviceSigningPublicKeys.includes(
-            workspaceDevice.receiverDeviceSigningPublicKey
+          !allPossibleRequestedDeviceSigningPublicKeys.has(
+            userDevice.signingPublicKey
           )
         ) {
-          addableDeviceWorkspaceKeyBoxes.push(workspaceDevice);
+          deletingDeviceSigningPublicKeys.push(userDevice.signingPublicKey);
         }
-        leftoverSigningPublicKeys.delete(
-          workspaceDevice.receiverDeviceSigningPublicKey
+        allDeviceSigningPublicKeysExceptDeletablesArray.push(
+          userDevice.signingPublicKey
         );
       }
-      if (leftoverSigningPublicKeys.size > 0) {
-        throw new UserInputError(
-          `Missing newWorkspaceDevicekeyBox workspaceDevice for workspace ${workspaceId}`
+
+      const allDeviceSigningPublicKeysExceptDeletables = new Set(
+        allDeviceSigningPublicKeysExceptDeletablesArray
+      );
+
+      if (
+        allDeviceSigningPublicKeysExceptDeletables.has(
+          deviceSigningPublicKeyToBeDeleted
+        )
+      ) {
+        allDeviceSigningPublicKeysExceptDeletables.delete(
+          deviceSigningPublicKeyToBeDeleted
         );
       }
-      verifiedDeviceWorkspaceKeyBoxes.push({
-        id: workspaceId,
-        workspaceDevices: addableDeviceWorkspaceKeyBoxes,
-      });
-    }
 
-    if (verifiedDeviceWorkspaceKeyBoxes.length === 0) {
-      throw new UserInputError("Not enough verifiedDeviceWorkspaceKeyBoxes");
-    }
+      const verifiedDeviceWorkspaceKeyBoxes: WorkspaceWithWorkspaceDevicesParing[] =
+        [];
+      for (let userWorkspace of userWorkspaces) {
+        const workspaceId = userWorkspace.workspaceId;
+        const newDeviceWorkspaceKeyBox =
+          newDeviceWorkspaceKeyBoxesWorkspaceLookup[userWorkspace.workspaceId];
+        if (!newDeviceWorkspaceKeyBox) {
+          throw new UserInputError(
+            "Not all user workspaces are in the newDeviceWorkspaceKeyBoxes"
+          );
+        }
+        if (
+          !requestedDeviceSigningPublicKeys[workspaceId]?.has(
+            user?.mainDeviceSigningPublicKey!
+          )
+        ) {
+          throw new UserInputError(
+            "mainDevice is not included in all newDeviceWorkspaceKeyBoxes"
+          );
+        }
+        const leftoverSigningPublicKeys = new Set(
+          allDeviceSigningPublicKeysExceptDeletables
+        );
+        const addableDeviceWorkspaceKeyBoxes: WorkspaceDeviceParing[] = [];
+        for (let workspaceDevice of newDeviceWorkspaceKeyBox.workspaceDevices) {
+          // userDeviceSigningPublicKeys
+          if (
+            allWorkspaceDeviceSigningPublicKeys.includes(
+              workspaceDevice.receiverDeviceSigningPublicKey
+            )
+          ) {
+            addableDeviceWorkspaceKeyBoxes.push(workspaceDevice);
+          }
+          leftoverSigningPublicKeys.delete(
+            workspaceDevice.receiverDeviceSigningPublicKey
+          );
+        }
+        if (leftoverSigningPublicKeys.size > 0) {
+          throw new UserInputError(
+            `Missing newWorkspaceDevicekeyBox workspaceDevice for workspace ${workspaceId}`
+          );
+        }
+        verifiedDeviceWorkspaceKeyBoxes.push({
+          id: workspaceId,
+          workspaceDevices: addableDeviceWorkspaceKeyBoxes,
+        });
+      }
 
-    // rotate keys
-    const updatedWorkspaceKeys: WorkspaceKey[] = [];
-    for (let newDeviceWorkspaceKeyBox of verifiedDeviceWorkspaceKeyBoxes) {
-      const workspaceId = newDeviceWorkspaceKeyBox.id;
-      const addableDeviceWorkspaceKeyBoxes =
-        newDeviceWorkspaceKeyBox.workspaceDevices;
-      const updatedWorkspaceKey = await rotateWorkspaceKey({
-        prisma,
-        deviceWorkspaceKeyBoxes: addableDeviceWorkspaceKeyBoxes,
-        creatorDeviceSigningPublicKey,
-        workspaceId,
-        userId,
-      });
-      updatedWorkspaceKeys.push(updatedWorkspaceKey);
-    }
-    // delete unmatched devices
-    await prisma.device.deleteMany({
-      where: {
-        signingPublicKey: {
-          in: deletingDeviceSigningPublicKeys,
+      if (verifiedDeviceWorkspaceKeyBoxes.length === 0) {
+        throw new UserInputError("Not enough verifiedDeviceWorkspaceKeyBoxes");
+      }
+
+      // rotate keys
+      const updatedWorkspaceKeys: WorkspaceKey[] = [];
+      for (let newDeviceWorkspaceKeyBox of verifiedDeviceWorkspaceKeyBoxes) {
+        const workspaceId = newDeviceWorkspaceKeyBox.id;
+        const addableDeviceWorkspaceKeyBoxes =
+          newDeviceWorkspaceKeyBox.workspaceDevices;
+        const updatedWorkspaceKey = await rotateWorkspaceKey({
+          prisma,
+          deviceWorkspaceKeyBoxes: addableDeviceWorkspaceKeyBoxes,
+          creatorDeviceSigningPublicKey,
+          workspaceId,
+          userId,
+        });
+        updatedWorkspaceKeys.push(updatedWorkspaceKey);
+      }
+      // delete unmatched devices
+      await prisma.device.deleteMany({
+        where: {
+          signingPublicKey: {
+            in: deletingDeviceSigningPublicKeys,
+          },
+          userId,
         },
-        userId,
-      },
-    });
+      });
 
-    // delete all related workspace keyboxes
-    await prisma.workspaceKeyBox.deleteMany({
-      where: {
-        deviceSigningPublicKey: {
-          in: deletingDeviceSigningPublicKeys,
+      // delete all related workspace keyboxes
+      await prisma.workspaceKeyBox.deleteMany({
+        where: {
+          deviceSigningPublicKey: {
+            in: deletingDeviceSigningPublicKeys,
+          },
         },
-      },
-    });
-    return updatedWorkspaceKeys;
-  });
+      });
+      return updatedWorkspaceKeys;
+    },
+    {
+      isolationLevel: Prisma.TransactionIsolationLevel.Serializable,
+    }
+  );
 }
