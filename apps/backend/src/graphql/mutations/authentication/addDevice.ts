@@ -77,7 +77,7 @@ export const addDeviceMutation = mutationField("addDevice", {
 
     const isValidSessionTokenSignature = sodium.crypto_sign_verify_detached(
       sodium.from_base64(args.input.sessionTokenSignature),
-      sessionKey,
+      "login_session_key" + sessionKey,
       sodium.from_base64(args.input.deviceSigningPublicKey)
     );
     if (!isValidSessionTokenSignature) {

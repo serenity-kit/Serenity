@@ -15,6 +15,7 @@ export const SigningDomainContext = z.union([
   z.literal("user_device_encryption_public_key"),
   z.literal("share_document_device_encryption_public_key"),
   z.literal("folder_id"),
+  z.literal("login_session_key"),
 ]);
 export type SigningDomainContext = z.infer<typeof SigningDomainContext>;
 
