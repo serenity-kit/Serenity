@@ -1,5 +1,9 @@
 import { ForbiddenError, UserInputError } from "apollo-server-express";
-import { DocumentShareLink, Role } from "../../../prisma/generated/output";
+import {
+  DocumentShareLink,
+  Prisma,
+  Role,
+} from "../../../prisma/generated/output";
 import { getOrCreateCreatorDevice } from "../../utils/device/getOrCreateCreatorDevice";
 import { prisma } from "../prisma";
 
@@ -58,42 +62,47 @@ export const createDocumentShareLink = async ({
   if (!userToWorkspace) {
     throw new ForbiddenError("Unauthorized");
   }
-  return await prisma.$transaction(async (prisma) => {
-    // create the device
-    const creatorDevice = await getOrCreateCreatorDevice({
-      prisma,
-      signingPublicKey: creatorDeviceSigningPublicKey,
-      userId: sharerUserId,
-    });
+  return await prisma.$transaction(
+    async (prisma) => {
+      // create the device
+      const creatorDevice = await getOrCreateCreatorDevice({
+        prisma,
+        signingPublicKey: creatorDeviceSigningPublicKey,
+        userId: sharerUserId,
+      });
 
-    const documentShareLink = await prisma.documentShareLink.create({
-      data: {
-        documentId,
-        sharerUserId,
-        role: sharingRole,
-        deviceSecretBoxCiphertext,
-        deviceSecretBoxNonce,
-        deviceSigningPublicKey,
-        deviceEncryptionPublicKey,
-        deviceEncryptionPublicKeySignature,
-      },
-    });
-    // get the latest snapshot and set up the snapshot key boxes
-    const latestSnapshot = await prisma.snapshot.findFirst({
-      where: { documentId },
-      orderBy: { createdAt: "desc" },
-    });
-    if (!latestSnapshot) {
-      throw new Error("No snapshot found");
+      const documentShareLink = await prisma.documentShareLink.create({
+        data: {
+          documentId,
+          sharerUserId,
+          role: sharingRole,
+          deviceSecretBoxCiphertext,
+          deviceSecretBoxNonce,
+          deviceSigningPublicKey,
+          deviceEncryptionPublicKey,
+          deviceEncryptionPublicKeySignature,
+        },
+      });
+      // get the latest snapshot and set up the snapshot key boxes
+      const latestSnapshot = await prisma.snapshot.findFirst({
+        where: { documentId },
+        orderBy: { createdAt: "desc" },
+      });
+      if (!latestSnapshot) {
+        throw new Error("No snapshot found");
+      }
+      await prisma.snapshotKeyBox.create({
+        data: {
+          ...snapshotDeviceKeyBox,
+          snapshotId: latestSnapshot.id,
+          creatorDeviceSigningPublicKey: creatorDevice.signingPublicKey,
+          documentShareLinkToken: documentShareLink.token,
+        },
+      });
+      return documentShareLink;
+    },
+    {
+      isolationLevel: Prisma.TransactionIsolationLevel.Serializable,
     }
-    await prisma.snapshotKeyBox.create({
-      data: {
-        ...snapshotDeviceKeyBox,
-        snapshotId: latestSnapshot.id,
-        creatorDeviceSigningPublicKey: creatorDevice.signingPublicKey,
-        documentShareLinkToken: documentShareLink.token,
-      },
-    });
-    return documentShareLink;
-  });
+  );
 };

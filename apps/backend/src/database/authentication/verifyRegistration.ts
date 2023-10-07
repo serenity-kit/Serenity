@@ -126,10 +126,15 @@ export async function verifyRegistration({
     },
   });
   if (unverifiedUser) {
-    return await prisma.$transaction(async (prisma) => {
-      const { user } = await createDevicesAndUser(prisma, unverifiedUser);
-      return user;
-    });
+    return await prisma.$transaction(
+      async (prisma) => {
+        const { user } = await createDevicesAndUser(prisma, unverifiedUser);
+        return user;
+      },
+      {
+        isolationLevel: Prisma.TransactionIsolationLevel.Serializable,
+      }
+    );
   }
   const unverifiedUserWithIncorrectConfirmationCode =
     await prisma.unverifiedUser.findFirst({

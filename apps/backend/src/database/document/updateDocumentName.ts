@@ -1,5 +1,5 @@
 import { ForbiddenError } from "apollo-server-express";
-import { Role } from "../../../prisma/generated/output";
+import { Prisma, Role } from "../../../prisma/generated/output";
 import { prisma } from "../prisma";
 
 type Params = {
@@ -21,39 +21,44 @@ export async function updateDocumentName({
 }: Params) {
   const allowedRoles = [Role.ADMIN, Role.EDITOR];
   try {
-    return await prisma.$transaction(async (prisma) => {
-      const document = await prisma.document.findFirst({
-        where: {
-          id,
-        },
-      });
-      if (!document) {
-        throw new ForbiddenError("Unauthorized");
+    return await prisma.$transaction(
+      async (prisma) => {
+        const document = await prisma.document.findFirst({
+          where: {
+            id,
+          },
+        });
+        if (!document) {
+          throw new ForbiddenError("Unauthorized");
+        }
+        const userToWorkspace = await prisma.usersToWorkspaces.findFirst({
+          where: {
+            userId,
+            workspaceId: document.workspaceId,
+            role: { in: allowedRoles },
+          },
+        });
+        if (
+          !userToWorkspace ||
+          document.workspaceId !== userToWorkspace.workspaceId
+        ) {
+          throw new ForbiddenError("Unauthorized");
+        }
+        const updatedDocument = await prisma.document.update({
+          where: { id },
+          data: {
+            nameCiphertext,
+            nameNonce,
+            workspaceKeyId,
+            subkeyId,
+          },
+        });
+        return updatedDocument;
+      },
+      {
+        isolationLevel: Prisma.TransactionIsolationLevel.Serializable,
       }
-      const userToWorkspace = await prisma.usersToWorkspaces.findFirst({
-        where: {
-          userId,
-          workspaceId: document.workspaceId,
-          role: { in: allowedRoles },
-        },
-      });
-      if (
-        !userToWorkspace ||
-        document.workspaceId !== userToWorkspace.workspaceId
-      ) {
-        throw new ForbiddenError("Unauthorized");
-      }
-      const updatedDocument = await prisma.document.update({
-        where: { id },
-        data: {
-          nameCiphertext,
-          nameNonce,
-          workspaceKeyId,
-          subkeyId,
-        },
-      });
-      return updatedDocument;
-    });
+    );
   } catch (error) {
     throw error;
   }

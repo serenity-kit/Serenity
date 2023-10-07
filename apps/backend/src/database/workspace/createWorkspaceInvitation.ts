@@ -2,7 +2,7 @@ import * as workspaceChain from "@serenity-kit/workspace-chain";
 import { ForbiddenError, UserInputError } from "apollo-server-express";
 import canonicalize from "canonicalize";
 import sodium from "react-native-libsodium";
-import { Role } from "../../../prisma/generated/output";
+import { Prisma, Role } from "../../../prisma/generated/output";
 import { WorkspaceInvitation } from "../../types/workspace";
 import { prisma } from "../prisma";
 import { getLastWorkspaceChainEventWithState } from "../workspaceChain/getLastWorkspaceChainEventWithState";
@@ -53,73 +53,78 @@ export async function createWorkspaceInvitation({
     throw new UserInputError("invalid invitationDataSignature");
   }
 
-  return await prisma.$transaction(async (prisma) => {
-    const userToWorkspace = await prisma.usersToWorkspaces.findFirst({
-      where: {
-        userId: inviterUserId,
-        workspaceId,
-        role: Role.ADMIN,
-      },
-      select: {
-        userId: true,
-        user: {
-          select: {
-            id: true,
-            username: true,
-          },
+  return await prisma.$transaction(
+    async (prisma) => {
+      const userToWorkspace = await prisma.usersToWorkspaces.findFirst({
+        where: {
+          userId: inviterUserId,
+          workspaceId,
+          role: Role.ADMIN,
         },
-        workspaceId: true,
-        workspace: {
-          select: {
-            id: true,
-            name: true,
+        select: {
+          userId: true,
+          user: {
+            select: {
+              id: true,
+              username: true,
+            },
           },
+          workspaceId: true,
+          workspace: {
+            select: {
+              id: true,
+              name: true,
+            },
+          },
+          role: true,
         },
-        role: true,
-      },
-    });
-    if (
-      !userToWorkspace ||
-      !userToWorkspace.role ||
-      userToWorkspace.role !== Role.ADMIN
-    ) {
-      throw new ForbiddenError("Unauthorized");
+      });
+      if (
+        !userToWorkspace ||
+        !userToWorkspace.role ||
+        userToWorkspace.role !== Role.ADMIN
+      ) {
+        throw new ForbiddenError("Unauthorized");
+      }
+
+      const { lastWorkspaceChainEvent, workspaceChainState } =
+        await getLastWorkspaceChainEventWithState({ prisma, workspaceId });
+
+      const newState = workspaceChain.applyEvent(
+        workspaceChainState,
+        workspaceChainEvent
+      );
+
+      await prisma.workspaceChainEvent.create({
+        data: {
+          content: workspaceChainEvent,
+          state: newState,
+          workspaceId,
+          position: lastWorkspaceChainEvent.position + 1,
+        },
+      });
+
+      const rawWorkspaceInvitation = await prisma.workspaceInvitations.create({
+        data: {
+          id: invitationId,
+          workspaceId,
+          inviterUserId,
+          invitationSigningPublicKey,
+          invitationDataSignature,
+          role,
+          // TODO maybe additionally check that the date is not very far in the future
+          expiresAt: workspaceChainEvent.transaction.expiresAt,
+        },
+      });
+      const workspaceInvitation: WorkspaceInvitation = {
+        ...rawWorkspaceInvitation,
+        inviterUsername: userToWorkspace.user.username,
+        workspaceName: userToWorkspace.workspace.name,
+      };
+      return workspaceInvitation;
+    },
+    {
+      isolationLevel: Prisma.TransactionIsolationLevel.Serializable,
     }
-
-    const { lastWorkspaceChainEvent, workspaceChainState } =
-      await getLastWorkspaceChainEventWithState({ prisma, workspaceId });
-
-    const newState = workspaceChain.applyEvent(
-      workspaceChainState,
-      workspaceChainEvent
-    );
-
-    await prisma.workspaceChainEvent.create({
-      data: {
-        content: workspaceChainEvent,
-        state: newState,
-        workspaceId,
-        position: lastWorkspaceChainEvent.position + 1,
-      },
-    });
-
-    const rawWorkspaceInvitation = await prisma.workspaceInvitations.create({
-      data: {
-        id: invitationId,
-        workspaceId,
-        inviterUserId,
-        invitationSigningPublicKey,
-        invitationDataSignature,
-        role,
-        // TODO maybe additionally check that the date is not very far in the future
-        expiresAt: workspaceChainEvent.transaction.expiresAt,
-      },
-    });
-    const workspaceInvitation: WorkspaceInvitation = {
-      ...rawWorkspaceInvitation,
-      inviterUsername: userToWorkspace.user.username,
-      workspaceName: userToWorkspace.workspace.name,
-    };
-    return workspaceInvitation;
-  });
+  );
 }

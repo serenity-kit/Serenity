@@ -15,6 +15,7 @@ import {
   snapshotDerivedKeyContext,
 } from "@serenity-tools/common";
 import sodium from "react-native-libsodium";
+import { Prisma } from "../../../prisma/generated/output";
 import { createInitialWorkspaceStructure } from "../../database/workspace/createInitialWorkspaceStructure";
 import { attachDeviceToWorkspaces } from "../device/attachDeviceToWorkspaces";
 import { prisma } from "../prisma";
@@ -56,57 +57,62 @@ export default async function createUserWithWorkspace({
 
   const mainDevice = createAndEncryptMainDevice(exportKey);
 
-  const result = await prisma.$transaction(async (prisma) => {
-    const device = await prisma.device.create({
-      data: {
-        signingPublicKey: mainDevice.signingPublicKey,
+  const result = await prisma.$transaction(
+    async (prisma) => {
+      const device = await prisma.device.create({
+        data: {
+          signingPublicKey: mainDevice.signingPublicKey,
+          encryptionPublicKey: mainDevice.encryptionPublicKey,
+          encryptionPublicKeySignature: mainDevice.encryptionPublicKeySignature,
+        },
+      });
+
+      const createChainEvent = userChain.createUserChain({
+        authorKeyPair: {
+          privateKey: mainDevice.signingPrivateKey,
+          publicKey: mainDevice.signingPublicKey,
+        },
+        email: username,
         encryptionPublicKey: mainDevice.encryptionPublicKey,
-        encryptionPublicKeySignature: mainDevice.encryptionPublicKeySignature,
-      },
-    });
+      });
+      const userChainState = userChain.resolveState({
+        events: [createChainEvent],
+        knownVersion: userChain.version,
+      });
 
-    const createChainEvent = userChain.createUserChain({
-      authorKeyPair: {
-        privateKey: mainDevice.signingPrivateKey,
-        publicKey: mainDevice.signingPublicKey,
-      },
-      email: username,
-      encryptionPublicKey: mainDevice.encryptionPublicKey,
-    });
-    const userChainState = userChain.resolveState({
-      events: [createChainEvent],
-      knownVersion: userChain.version,
-    });
-
-    const user = await prisma.user.create({
-      data: {
-        id: userChainState.currentState.id,
-        username,
-        registrationRecord: clientRegistrationFinishResult.registrationRecord,
-        mainDeviceCiphertext: mainDevice.ciphertext,
-        mainDeviceNonce: mainDevice.nonce,
-        mainDeviceSigningPublicKey: mainDevice.signingPublicKey,
-        devices: {
-          connect: {
-            signingPublicKey: device.signingPublicKey,
+      const user = await prisma.user.create({
+        data: {
+          id: userChainState.currentState.id,
+          username,
+          registrationRecord: clientRegistrationFinishResult.registrationRecord,
+          mainDeviceCiphertext: mainDevice.ciphertext,
+          mainDeviceNonce: mainDevice.nonce,
+          mainDeviceSigningPublicKey: mainDevice.signingPublicKey,
+          devices: {
+            connect: {
+              signingPublicKey: device.signingPublicKey,
+            },
+          },
+          chain: {
+            create: {
+              content: createChainEvent,
+              state: userChainState.currentState,
+              position: 0,
+            },
           },
         },
-        chain: {
-          create: {
-            content: createChainEvent,
-            state: userChainState.currentState,
-            position: 0,
-          },
-        },
-      },
-    });
-    return {
-      user,
-      device,
-      encryptionPrivateKey: mainDevice.encryptionPrivateKey,
-      signingPrivateKey: mainDevice.signingPrivateKey,
-    };
-  });
+      });
+      return {
+        user,
+        device,
+        encryptionPrivateKey: mainDevice.encryptionPrivateKey,
+        signingPrivateKey: mainDevice.signingPrivateKey,
+      };
+    },
+    {
+      isolationLevel: Prisma.TransactionIsolationLevel.Serializable,
+    }
+  );
 
   const documentId = generateId();
   const folderId = generateId();

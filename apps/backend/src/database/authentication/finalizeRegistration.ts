@@ -1,6 +1,7 @@
 import sendgrid from "@sendgrid/mail";
 import * as userChain from "@serenity-kit/user-chain";
 import { UserInputError } from "apollo-server-express";
+import { Prisma } from "../../../prisma/generated/output";
 import { Device } from "../../types/device";
 import { createConfirmationCode } from "../../utils/confirmationCode";
 import { ExpectedGraphqlError } from "../../utils/expectedGraphqlError/expectedGraphqlError";
@@ -75,90 +76,95 @@ export async function finalizeRegistration({
   }
 
   try {
-    return await prisma.$transaction(async (prisma) => {
-      // if this user has already completed registration, throw an error
-      const existingUserData = await prisma.user.findUnique({
-        where: {
-          username,
-        },
-      });
-      if (existingUserData) {
-        throw new ExpectedGraphqlError(
-          "This email has already been registered."
-        );
-      }
-      const confirmationCode = createConfirmationCode();
-      const unverifiedUser = await prisma.unverifiedUser.create({
-        data: {
-          username,
-          confirmationCode,
-          registrationRecord,
-          mainDeviceCiphertext: mainDevice.ciphertext,
-          mainDeviceNonce: mainDevice.nonce,
-          mainDeviceSigningPublicKey: mainDevice.signingPublicKey,
-          mainDeviceEncryptionPublicKey: mainDevice.encryptionPublicKey,
-          mainDeviceEncryptionPublicKeySignature:
-            mainDevice.encryptionPublicKeySignature,
-          pendingWorkspaceInvitationId,
-          pendingWorkspaceInvitationKeySubkeyId,
-          pendingWorkspaceInvitationKeyCiphertext,
-          pendingWorkspaceInvitationKeyPublicNonce,
-          createChainEvent,
-        },
-      });
-
-      // TODO: consider including user-set flag to trigger universal link
-      // when the user is on a mobile device
-      const rootUrl =
-        process.env.NODE_ENV === "development" ||
-        process.env.SERENITY_ENV === "e2e"
-          ? `http://localhost:19006/`
-          : "https://www.serenity.li";
-      const encodedUsername = encodeURIComponent(unverifiedUser.username);
-      const encodedConfirmationCode = encodeURIComponent(
-        unverifiedUser.confirmationCode
-      );
-      const emailRegistrationLink = `${rootUrl}registration-verification?username=${encodedUsername}&verification=${encodedConfirmationCode}`;
-      const emailRegistrationLines = [
-        `Welcome to Serenity!`,
-        ``,
-        `Please complete your registration by copying your verification code into the app:`,
-        ``,
-        `${unverifiedUser.confirmationCode}`,
-        ``,
-        `Alternatively you can visit ${emailRegistrationLink}`,
-        ``,
-        `If you didn't try to create an account, please ignore this email.`,
-      ];
-      const registrationEmail = {
-        to: username,
-        from: process.env.FROM_EMAIL!,
-        subject: "Verify your Serenity account",
-        text: emailRegistrationLines.join("\n"),
-      };
-      if (
-        process.env.SERENITY_ENV !== "e2e" &&
-        process.env.NODE_ENV !== "development" &&
-        process.env.NODE_ENV !== "test"
-      ) {
-        console.log(`Sending verification email to "${username}"`);
-        try {
-          await sendgrid.send(registrationEmail);
-        } catch (error) {
-          console.error(`Error sending email to "${username}"`);
-          console.error("Sendgrid error response body:");
-          console.error(error.response.body);
-          console.error("Sendgrid error:");
-          console.error(error);
+    return await prisma.$transaction(
+      async (prisma) => {
+        // if this user has already completed registration, throw an error
+        const existingUserData = await prisma.user.findUnique({
+          where: {
+            username,
+          },
+        });
+        if (existingUserData) {
+          throw new ExpectedGraphqlError(
+            "This email has already been registered."
+          );
         }
-      } else {
-        console.log(
-          `New user confirmation code: ${unverifiedUser.confirmationCode}`
-        );
-      }
+        const confirmationCode = createConfirmationCode();
+        const unverifiedUser = await prisma.unverifiedUser.create({
+          data: {
+            username,
+            confirmationCode,
+            registrationRecord,
+            mainDeviceCiphertext: mainDevice.ciphertext,
+            mainDeviceNonce: mainDevice.nonce,
+            mainDeviceSigningPublicKey: mainDevice.signingPublicKey,
+            mainDeviceEncryptionPublicKey: mainDevice.encryptionPublicKey,
+            mainDeviceEncryptionPublicKeySignature:
+              mainDevice.encryptionPublicKeySignature,
+            pendingWorkspaceInvitationId,
+            pendingWorkspaceInvitationKeySubkeyId,
+            pendingWorkspaceInvitationKeyCiphertext,
+            pendingWorkspaceInvitationKeyPublicNonce,
+            createChainEvent,
+          },
+        });
 
-      return unverifiedUser;
-    });
+        // TODO: consider including user-set flag to trigger universal link
+        // when the user is on a mobile device
+        const rootUrl =
+          process.env.NODE_ENV === "development" ||
+          process.env.SERENITY_ENV === "e2e"
+            ? `http://localhost:19006/`
+            : "https://www.serenity.li";
+        const encodedUsername = encodeURIComponent(unverifiedUser.username);
+        const encodedConfirmationCode = encodeURIComponent(
+          unverifiedUser.confirmationCode
+        );
+        const emailRegistrationLink = `${rootUrl}registration-verification?username=${encodedUsername}&verification=${encodedConfirmationCode}`;
+        const emailRegistrationLines = [
+          `Welcome to Serenity!`,
+          ``,
+          `Please complete your registration by copying your verification code into the app:`,
+          ``,
+          `${unverifiedUser.confirmationCode}`,
+          ``,
+          `Alternatively you can visit ${emailRegistrationLink}`,
+          ``,
+          `If you didn't try to create an account, please ignore this email.`,
+        ];
+        const registrationEmail = {
+          to: username,
+          from: process.env.FROM_EMAIL!,
+          subject: "Verify your Serenity account",
+          text: emailRegistrationLines.join("\n"),
+        };
+        if (
+          process.env.SERENITY_ENV !== "e2e" &&
+          process.env.NODE_ENV !== "development" &&
+          process.env.NODE_ENV !== "test"
+        ) {
+          console.log(`Sending verification email to "${username}"`);
+          try {
+            await sendgrid.send(registrationEmail);
+          } catch (error) {
+            console.error(`Error sending email to "${username}"`);
+            console.error("Sendgrid error response body:");
+            console.error(error.response.body);
+            console.error("Sendgrid error:");
+            console.error(error);
+          }
+        } else {
+          console.log(
+            `New user confirmation code: ${unverifiedUser.confirmationCode}`
+          );
+        }
+
+        return unverifiedUser;
+      },
+      {
+        isolationLevel: Prisma.TransactionIsolationLevel.Serializable,
+      }
+    );
   } catch (error) {
     console.error("Error saving user");
     console.log(error);
