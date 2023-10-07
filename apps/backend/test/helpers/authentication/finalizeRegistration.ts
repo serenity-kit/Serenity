@@ -36,7 +36,7 @@ export const finalizeRegistration = async ({
   const { signingPrivateKey, encryptionPrivateKey, ...mainDevice } =
     createAndEncryptMainDevice(sodium.to_base64(exportKey));
 
-  const createChainEvent = userChain.createChain({
+  const createChainEvent = userChain.createUserChain({
     authorKeyPair: {
       privateKey: signingPrivateKey,
       publicKey: mainDevice.signingPublicKey,

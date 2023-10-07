@@ -65,7 +65,7 @@ export default async function createUserWithWorkspace({
       },
     });
 
-    const createChainEvent = userChain.createChain({
+    const createChainEvent = userChain.createUserChain({
       authorKeyPair: {
         privateKey: mainDevice.signingPrivateKey,
         publicKey: mainDevice.signingPublicKey,

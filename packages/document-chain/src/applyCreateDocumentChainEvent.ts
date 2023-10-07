@@ -4,7 +4,7 @@ import {
   UnknownVersionDocumentChainError,
 } from "./errors";
 import {
-  CreateChainEvent,
+  CreateDocumentChainEvent,
   DocumentChainEvent,
   DocumentChainState,
 } from "./types";
@@ -15,11 +15,11 @@ type Params = {
   knownVersion: number;
 };
 
-export const applyCreateChainEvent = ({
+export const applyCreateDocumentChainEvent = ({
   event: rawEvent,
   knownVersion,
 }: Params): DocumentChainState => {
-  const event = CreateChainEvent.parse(rawEvent);
+  const event = CreateDocumentChainEvent.parse(rawEvent);
   const transactionHash = hashTransaction(event.transaction);
   const eventHash = hashEvent(event);
   const isValidSignature = sodium.crypto_sign_verify_detached(

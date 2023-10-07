@@ -22,72 +22,81 @@ export const TransactionBase = z.object({
   version: Version,
 });
 
-export const CreateChainTransaction = z.object({
+export const CreateDocumentChainTransaction = z.object({
   type: z.literal("create"),
   id: z.string(),
   prevEventHash: z.null(), //there is no previous hash for the first event
   version: Version,
 });
-export type CreateChainTransaction = z.infer<typeof CreateChainTransaction>;
+export type CreateDocumentChainTransaction = z.infer<
+  typeof CreateDocumentChainTransaction
+>;
 
-export const CreateChainEvent = z.object({
+export const CreateDocumentChainEvent = z.object({
   author: Author,
-  transaction: CreateChainTransaction,
+  transaction: CreateDocumentChainTransaction,
 });
-export type CreateChainEvent = z.infer<typeof CreateChainEvent>;
+export type CreateDocumentChainEvent = z.infer<typeof CreateDocumentChainEvent>;
 
-export const AddShareDeviceTransaction = TransactionBase.extend({
-  type: z.literal("add-share-device"),
+export const AddShareDocumentDeviceTransaction = TransactionBase.extend({
+  type: z.literal("add-share-document-device"),
   signingPublicKey: z.string(),
   encryptionPublicKey: z.string(),
   encryptionPublicKeySignature: z.string(),
   role: DocumentShareRole,
   expiresAt: z.optional(z.string().datetime()),
 });
-export type AddShareDeviceTransaction = z.infer<
-  typeof AddShareDeviceTransaction
+export type AddShareDocumentDeviceTransaction = z.infer<
+  typeof AddShareDocumentDeviceTransaction
 >;
 
-export const AddShareDeviceEvent = z.object({
+export const AddShareDocumentDeviceEvent = z.object({
   author: Author,
-  transaction: AddShareDeviceTransaction,
+  transaction: AddShareDocumentDeviceTransaction,
 });
-export type AddShareDeviceEvent = z.infer<typeof AddShareDeviceEvent>;
+export type AddShareDocumentDeviceEvent = z.infer<
+  typeof AddShareDocumentDeviceEvent
+>;
 
-export const RemoveShareDeviceTransaction = TransactionBase.extend({
-  type: z.literal("remove-share-device"),
+export const RemoveShareDocumentDeviceTransaction = TransactionBase.extend({
+  type: z.literal("remove-share-document-device"),
   signingPublicKey: z.string(),
 });
-export type RemoveShareDeviceTransaction = z.infer<
-  typeof RemoveShareDeviceTransaction
+export type RemoveShareDocumentDeviceTransaction = z.infer<
+  typeof RemoveShareDocumentDeviceTransaction
 >;
 
-export const RemoveShareDeviceEvent = z.object({
+export const RemoveShareDocumentDeviceEvent = z.object({
   author: Author,
-  transaction: RemoveShareDeviceTransaction,
+  transaction: RemoveShareDocumentDeviceTransaction,
 });
-export type RemoveShareDeviceEvent = z.infer<typeof RemoveShareDeviceEvent>;
+export type RemoveShareDocumentDeviceEvent = z.infer<
+  typeof RemoveShareDocumentDeviceEvent
+>;
 
 export const UpdateChainEvent = z.union([
-  AddShareDeviceEvent,
-  RemoveShareDeviceEvent,
+  AddShareDocumentDeviceEvent,
+  RemoveShareDocumentDeviceEvent,
 ]);
 export type UpdateChainEvent = z.infer<typeof UpdateChainEvent>;
 
-export const DocumentChainEvent = z.union([CreateChainEvent, UpdateChainEvent]);
+export const DocumentChainEvent = z.union([
+  CreateDocumentChainEvent,
+  UpdateChainEvent,
+]);
 export type DocumentChainEvent = z.infer<typeof DocumentChainEvent>;
 
-export const ShareDeviceInfo = z.object({
+export const ShareDocumentDeviceInfo = z.object({
   expiresAt: z.optional(z.string().datetime()),
   encryptionPublicKey: z.string(),
   role: DocumentShareRole,
 });
-export type ShareDeviceInfo = z.infer<typeof ShareDeviceInfo>;
+export type ShareDocumentDeviceInfo = z.infer<typeof ShareDocumentDeviceInfo>;
 
 export const DocumentChainState = z.object({
   id: z.string(),
-  devices: z.record(z.string(), ShareDeviceInfo),
-  removedDevices: z.record(z.string(), ShareDeviceInfo),
+  devices: z.record(z.string(), ShareDocumentDeviceInfo),
+  removedDevices: z.record(z.string(), ShareDocumentDeviceInfo),
   eventHash: z.string(),
   eventVersion: Version,
 });

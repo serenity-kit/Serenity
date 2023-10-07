@@ -1,12 +1,12 @@
 import { shareDocumentDeviceEncryptionPublicKeyDomainContext } from "@serenity-kit/document-chain";
-import { deviceEncryptionPublicKeyDomainContext } from "@serenity-kit/user-chain";
+import { userDeviceEncryptionPublicKeyDomainContext } from "@serenity-kit/user-chain";
 import sodium from "react-native-libsodium";
 import { LocalDevice } from "../types";
 
 export const createDevice = (type: "user" | "share-document"): LocalDevice => {
   const context =
     type === "user"
-      ? deviceEncryptionPublicKeyDomainContext
+      ? userDeviceEncryptionPublicKeyDomainContext
       : shareDocumentDeviceEncryptionPublicKeyDomainContext;
   const signingKeyPair = sodium.crypto_sign_keypair();
   const encryptionKeyPair = sodium.crypto_box_keypair();

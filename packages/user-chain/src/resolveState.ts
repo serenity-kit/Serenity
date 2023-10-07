@@ -1,4 +1,4 @@
-import { applyCreateChainEvent } from "./applyCreateChainEvent";
+import { applyCreateUserChainEvent } from "./applyCreateUserChainEvent";
 import { applyEvent } from "./applyEvent";
 import { InvalidUserChainError } from "./errors";
 import { UserChainEvent, UserChainState } from "./types";
@@ -20,7 +20,7 @@ export const resolveState = ({ events, knownVersion }: Params): ReturnType => {
 
   const statePerEvent = {};
 
-  let state = applyCreateChainEvent({ event: events[0], knownVersion });
+  let state = applyCreateUserChainEvent({ event: events[0], knownVersion });
   statePerEvent[state.eventHash] = state;
 
   events.slice(1).forEach((event) => {

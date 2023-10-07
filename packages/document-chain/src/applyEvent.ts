@@ -59,7 +59,7 @@ export const applyEvent = ({
     );
   }
 
-  if (event.transaction.type === "add-share-device") {
+  if (event.transaction.type === "add-share-document-device") {
     if (devices.hasOwnProperty(event.transaction.signingPublicKey)) {
       throw new InvalidDocumentChainError("Device already exists.");
     }
@@ -78,7 +78,7 @@ export const applyEvent = ({
     };
   }
 
-  if (event.transaction.type === "remove-share-device") {
+  if (event.transaction.type === "remove-share-document-device") {
     if (!devices.hasOwnProperty(event.transaction.signingPublicKey)) {
       throw new InvalidDocumentChainError(
         "Failed to remove non-existing device."

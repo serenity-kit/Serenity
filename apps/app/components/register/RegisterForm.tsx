@@ -134,7 +134,7 @@ export default function RegisterForm(props: Props) {
             encryptedWorkspaceKeyData.publicNonce;
         }
 
-        const createChainEvent = userChain.createChain({
+        const createChainEvent = userChain.createUserChain({
           authorKeyPair: {
             privateKey: signingPrivateKey,
             publicKey: mainDevice.signingPublicKey,

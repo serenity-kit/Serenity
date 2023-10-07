@@ -1,8 +1,8 @@
 import { generateId } from "@serenity-tools/common";
 import sodium from "react-native-libsodium";
 import {
-  CreateChainEvent,
-  CreateChainTransaction,
+  CreateDocumentChainEvent,
+  CreateDocumentChainTransaction,
   KeyPairBase64,
 } from "./types";
 import { hashTransaction } from "./utils";
@@ -12,8 +12,10 @@ type Params = {
   authorKeyPair: KeyPairBase64;
 };
 
-export const createChain = ({ authorKeyPair }: Params): CreateChainEvent => {
-  const transaction: CreateChainTransaction = {
+export const createDocumentChain = ({
+  authorKeyPair,
+}: Params): CreateDocumentChainEvent => {
+  const transaction: CreateDocumentChainTransaction = {
     type: "create",
     id: generateId(),
     prevEventHash: null,

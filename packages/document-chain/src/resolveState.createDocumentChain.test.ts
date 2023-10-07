@@ -2,7 +2,7 @@ import sodium from "react-native-libsodium";
 import { ZodError } from "zod";
 import { getKeyPairsA, getKeyPairsB, KeyPairs } from "../test/testUtils";
 import {
-  createChain,
+  createDocumentChain,
   InvalidDocumentChainError,
   resolveState,
   UnknownVersionDocumentChainError,
@@ -18,7 +18,7 @@ beforeAll(async () => {
 });
 
 test("should resolve to no share device entry after creating a chain", async () => {
-  const event = createChain({
+  const event = createDocumentChain({
     authorKeyPair: keyPairsA.sign,
   });
   const state = resolveState({ events: [event], knownVersion: 0 });
@@ -32,11 +32,11 @@ test("should resolve to no share device entry after creating a chain", async () 
   expect(state.currentState.eventVersion).toBe(0);
 });
 
-test("should fail if two createChain events are applied", async () => {
-  const event = createChain({
+test("should fail if two createDocumentChain events are applied", async () => {
+  const event = createDocumentChain({
     authorKeyPair: keyPairsA.sign,
   });
-  const event2 = createChain({
+  const event2 = createDocumentChain({
     authorKeyPair: keyPairsA.sign,
   });
   expect(() =>
@@ -45,7 +45,7 @@ test("should fail if two createChain events are applied", async () => {
 });
 
 test("should fail if the knownVersion is smaller than the actual event version", async () => {
-  const event = createChain({
+  const event = createDocumentChain({
     authorKeyPair: keyPairsA.sign,
   });
   expect(() => resolveState({ events: [event], knownVersion: -1 })).toThrow(
@@ -54,7 +54,7 @@ test("should fail if the knownVersion is smaller than the actual event version",
 });
 
 test("should fail if the signature has been manipulated", async () => {
-  const event = createChain({
+  const event = createDocumentChain({
     authorKeyPair: keyPairsA.sign,
   });
 

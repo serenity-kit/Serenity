@@ -1,12 +1,12 @@
 import sodium from "react-native-libsodium";
-import { deviceEncryptionPublicKeyDomainContext } from "./constants";
+import { userDeviceEncryptionPublicKeyDomainContext } from "./constants";
 import { verifyDevice, VerifyDeviceParams } from "./verifyDevice";
 
 const createDevice = () => {
   const signingKeyPair = sodium.crypto_sign_keypair();
   const encryptionKeyPair = sodium.crypto_box_keypair();
   const encryptionPublicKeySignature = sodium.crypto_sign_detached(
-    deviceEncryptionPublicKeyDomainContext +
+    userDeviceEncryptionPublicKeyDomainContext +
       sodium.to_base64(encryptionKeyPair.publicKey),
     signingKeyPair.privateKey
   );

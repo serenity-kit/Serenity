@@ -2,11 +2,11 @@ import sodium from "react-native-libsodium";
 import { ZodError } from "zod";
 import { getKeyPairsA, getKeyPairsB, KeyPairs } from "../test/testUtils";
 import {
-  createChain,
-  deviceEncryptionPublicKeyDomainContext,
+  createUserChain,
   InvalidUserChainError,
   resolveState,
   UnknownVersionUserChainError,
+  userDeviceEncryptionPublicKeyDomainContext,
 } from "./index";
 
 let keyPairsA: KeyPairs;
@@ -19,7 +19,7 @@ beforeAll(async () => {
 });
 
 test("should resolve to one device after creating a chain", async () => {
-  const event = createChain({
+  const event = createUserChain({
     authorKeyPair: keyPairsA.sign,
     encryptionPublicKey: keyPairsA.encryption.publicKey,
     email: "jane@example.com",
@@ -49,13 +49,13 @@ test("should resolve to one device after creating a chain", async () => {
   expect(state.currentState.eventVersion).toBe(0);
 });
 
-test("should fail if two createChain events are applied", async () => {
-  const event = createChain({
+test("should fail if two createUserChain events are applied", async () => {
+  const event = createUserChain({
     authorKeyPair: keyPairsA.sign,
     encryptionPublicKey: keyPairsA.encryption.publicKey,
     email: "jane@example.com",
   });
-  const event2 = createChain({
+  const event2 = createUserChain({
     authorKeyPair: keyPairsA.sign,
     encryptionPublicKey: keyPairsA.encryption.publicKey,
     email: "jane@example.com",
@@ -66,7 +66,7 @@ test("should fail if two createChain events are applied", async () => {
 });
 
 test("should fail if the knownVersion is smaller than the actual event version", async () => {
-  const event = createChain({
+  const event = createUserChain({
     authorKeyPair: keyPairsA.sign,
     encryptionPublicKey: keyPairsA.encryption.publicKey,
     email: "jane@example.com",
@@ -77,7 +77,7 @@ test("should fail if the knownVersion is smaller than the actual event version",
 });
 
 test("should fail if the signature has been manipulated", async () => {
-  const event = createChain({
+  const event = createUserChain({
     authorKeyPair: keyPairsA.sign,
     encryptionPublicKey: keyPairsA.encryption.publicKey,
     email: "jane@example.com",
@@ -95,7 +95,7 @@ test("should fail if the signature has been manipulated", async () => {
 });
 
 test("should fail if the encryptionPublicKeySignature has been manipulated", async () => {
-  const event = createChain({
+  const event = createUserChain({
     authorKeyPair: keyPairsA.sign,
     encryptionPublicKey: keyPairsA.encryption.publicKey,
     email: "jane@example.com",
@@ -103,7 +103,7 @@ test("should fail if the encryptionPublicKeySignature has been manipulated", asy
 
   event.transaction.encryptionPublicKeySignature = sodium.to_base64(
     sodium.crypto_sign_detached(
-      deviceEncryptionPublicKeyDomainContext + "something",
+      userDeviceEncryptionPublicKeyDomainContext + "something",
       sodium.from_base64(keyPairsB.sign.privateKey)
     )
   );

@@ -5,15 +5,15 @@ import {
   addDevice,
   AddDeviceEvent,
   AddDeviceTransaction,
-  createChain,
-  CreateChainEvent,
-  CreateChainTransaction,
-  deviceEncryptionPublicKeyDomainContext,
+  createUserChain,
+  CreateUserChainEvent,
+  CreateUserChainTransaction,
   hashEvent,
   hashTransaction,
   InvalidUserChainError,
   resolveState,
   UnknownVersionUserChainError,
+  userDeviceEncryptionPublicKeyDomainContext,
 } from "./index";
 
 let keyPairsA: KeyPairs;
@@ -26,7 +26,7 @@ beforeAll(async () => {
 });
 
 test("should resolve to two devices after adding a device", async () => {
-  const event = createChain({
+  const event = createUserChain({
     authorKeyPair: keyPairsA.sign,
     encryptionPublicKey: keyPairsA.encryption.publicKey,
     email: "jane@example.com",
@@ -66,7 +66,7 @@ test("should resolve to two devices after adding a device", async () => {
 });
 
 test("should resolve to have a device with an expireAt", async () => {
-  const event = createChain({
+  const event = createUserChain({
     authorKeyPair: keyPairsA.sign,
     encryptionPublicKey: keyPairsA.encryption.publicKey,
     email: "jane@example.com",
@@ -98,7 +98,7 @@ test("should resolve to have a device with an expireAt", async () => {
 });
 
 test("should fail if an invalid expireAt is provided", async () => {
-  const event = createChain({
+  const event = createUserChain({
     authorKeyPair: keyPairsA.sign,
     encryptionPublicKey: keyPairsA.encryption.publicKey,
     email: "jane@example.com",
@@ -115,7 +115,7 @@ test("should fail if an invalid expireAt is provided", async () => {
 });
 
 test("should fail if the same event is added twice", async () => {
-  const event = createChain({
+  const event = createUserChain({
     authorKeyPair: keyPairsA.sign,
     encryptionPublicKey: keyPairsA.encryption.publicKey,
     email: "jane@example.com",
@@ -141,7 +141,7 @@ test("should fail if the same event is added twice", async () => {
 });
 
 test("should fail if the signature has been manipulated", async () => {
-  const event = createChain({
+  const event = createUserChain({
     authorKeyPair: keyPairsA.sign,
     encryptionPublicKey: keyPairsA.encryption.publicKey,
     email: "jane@example.com",
@@ -169,7 +169,7 @@ test("should fail if the signature has been manipulated", async () => {
 });
 
 test("should fail if the author (publicKey and signature) have been replaced", async () => {
-  const event = createChain({
+  const event = createUserChain({
     authorKeyPair: keyPairsA.sign,
     encryptionPublicKey: keyPairsA.encryption.publicKey,
     email: "jane@example.com",
@@ -200,7 +200,7 @@ test("should fail if the author (publicKey and signature) have been replaced", a
 });
 
 test("should fail if the encryptionPublicKeySignature have been manipulated", async () => {
-  const event = createChain({
+  const event = createUserChain({
     authorKeyPair: keyPairsA.sign,
     encryptionPublicKey: keyPairsA.encryption.publicKey,
     email: "jane@example.com",
@@ -214,7 +214,7 @@ test("should fail if the encryptionPublicKeySignature have been manipulated", as
 
   addDeviceEvent.transaction.encryptionPublicKeySignature = sodium.to_base64(
     sodium.crypto_sign_detached(
-      deviceEncryptionPublicKeyDomainContext + "something",
+      userDeviceEncryptionPublicKeyDomainContext + "something",
       sodium.from_base64(keyPairsB.sign.privateKey)
     )
   );
@@ -228,7 +228,7 @@ test("should fail if the encryptionPublicKeySignature have been manipulated", as
 });
 
 test("should fail if the knownVersion is smaller than the actual event version", async () => {
-  const event = createChain({
+  const event = createUserChain({
     authorKeyPair: keyPairsA.sign,
     encryptionPublicKey: keyPairsA.encryption.publicKey,
     email: "jane@example.com",
@@ -242,7 +242,7 @@ test("should fail if the knownVersion is smaller than the actual event version",
   }): AddDeviceEvent => {
     const prevEventHash = hashEvent(prevEvent);
     const encryptionPublicKeySignature = sodium.crypto_sign_detached(
-      deviceEncryptionPublicKeyDomainContext +
+      userDeviceEncryptionPublicKeyDomainContext +
         sodium.from_base64(encryptionPublicKey),
       sodium.from_base64(authorKeyPair.privateKey)
     );
@@ -288,16 +288,16 @@ test("should fail if the knownVersion is smaller than the actual event version",
 });
 
 test("should fail if an old event version is applied after a newer one", async () => {
-  const createChainWithVersion1 = ({
+  const createUserChainWithVersion1 = ({
     authorKeyPair,
     email,
     encryptionPublicKey,
-  }): CreateChainEvent => {
+  }): CreateUserChainEvent => {
     const encryptionPublicKeySignature = sodium.crypto_sign_detached(
-      deviceEncryptionPublicKeyDomainContext + encryptionPublicKey,
+      userDeviceEncryptionPublicKeyDomainContext + encryptionPublicKey,
       sodium.from_base64(authorKeyPair.privateKey)
     );
-    const transaction: CreateChainTransaction = {
+    const transaction: CreateUserChainTransaction = {
       type: "create",
       id: generateId(),
       prevEventHash: null,
@@ -324,7 +324,7 @@ test("should fail if an old event version is applied after a newer one", async (
     };
   };
 
-  const event = createChainWithVersion1({
+  const event = createUserChainWithVersion1({
     authorKeyPair: keyPairsA.sign,
     email: "jane@example.com",
     encryptionPublicKey: keyPairsA.encryption.publicKey,
@@ -341,12 +341,12 @@ test("should fail if an old event version is applied after a newer one", async (
 });
 
 test("should fail if the chain is based on a different event", async () => {
-  const event = createChain({
+  const event = createUserChain({
     authorKeyPair: keyPairsA.sign,
     encryptionPublicKey: keyPairsA.encryption.publicKey,
     email: "jane@example.com",
   });
-  const event2 = createChain({
+  const event2 = createUserChain({
     authorKeyPair: keyPairsA.sign,
     encryptionPublicKey: keyPairsA.encryption.publicKey,
     email: "jane@example.com",

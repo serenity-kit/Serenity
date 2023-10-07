@@ -1,4 +1,4 @@
-import { applyCreateChainEvent } from "./applyCreateChainEvent";
+import { applyCreateDocumentChainEvent } from "./applyCreateDocumentChainEvent";
 import { applyEvent } from "./applyEvent";
 import { InvalidDocumentChainError } from "./errors";
 import { DocumentChainEvent, DocumentChainState } from "./types";
@@ -20,7 +20,7 @@ export const resolveState = ({ events, knownVersion }: Params): ReturnType => {
 
   const statePerEvent = {};
 
-  let state = applyCreateChainEvent({ event: events[0], knownVersion });
+  let state = applyCreateDocumentChainEvent({ event: events[0], knownVersion });
   statePerEvent[state.eventHash] = state;
 
   events.slice(1).forEach((event) => {

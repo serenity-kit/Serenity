@@ -2,12 +2,12 @@ import { generateId } from "@serenity-tools/common";
 import sodium from "react-native-libsodium";
 import { getKeyPairsA, getKeyPairsB, KeyPairs } from "../test/testUtils";
 import {
-  addShareDevice,
-  AddShareDeviceEvent,
-  AddShareDeviceTransaction,
-  createChain,
-  CreateChainEvent,
-  CreateChainTransaction,
+  addShareDocumentDevice,
+  AddShareDocumentDeviceEvent,
+  AddShareDocumentDeviceTransaction,
+  createDocumentChain,
+  CreateDocumentChainEvent,
+  CreateDocumentChainTransaction,
   hashEvent,
   hashTransaction,
   InvalidDocumentChainError,
@@ -26,10 +26,10 @@ beforeAll(async () => {
 });
 
 test("should resolve to one share device after adding a device", async () => {
-  const event = createChain({
+  const event = createDocumentChain({
     authorKeyPair: keyPairsA.sign,
   });
-  const addShareDeviceEvent = addShareDevice({
+  const addShareDocumentDeviceEvent = addShareDocumentDevice({
     authorKeyPair: keyPairsA.sign,
     signingPublicKey: keyPairsB.sign.publicKey,
     encryptionPublicKey: keyPairsB.encryption.publicKey,
@@ -37,7 +37,7 @@ test("should resolve to one share device after adding a device", async () => {
     prevEvent: event,
   });
   const state = resolveState({
-    events: [event, addShareDeviceEvent],
+    events: [event, addShareDocumentDeviceEvent],
     knownVersion: 0,
   });
   expect(state.currentState.devices).toMatchInlineSnapshot(`
@@ -59,10 +59,10 @@ test("should resolve to one share device after adding a device", async () => {
 });
 
 test("should resolve to have a device with an expireAt", async () => {
-  const event = createChain({
+  const event = createDocumentChain({
     authorKeyPair: keyPairsA.sign,
   });
-  const addShareDeviceEvent = addShareDevice({
+  const addShareDocumentDeviceEvent = addShareDocumentDevice({
     authorKeyPair: keyPairsA.sign,
     signingPublicKey: keyPairsB.sign.publicKey,
     encryptionPublicKey: keyPairsB.encryption.publicKey,
@@ -71,7 +71,7 @@ test("should resolve to have a device with an expireAt", async () => {
     expiresAt: new Date("2030-01-01"),
   });
   const state = resolveState({
-    events: [event, addShareDeviceEvent],
+    events: [event, addShareDocumentDeviceEvent],
     knownVersion: 0,
   });
   expect(state.currentState.devices).toMatchInlineSnapshot(`
@@ -87,11 +87,11 @@ test("should resolve to have a device with an expireAt", async () => {
 });
 
 test("should fail if an invalid expireAt is provided", async () => {
-  const event = createChain({
+  const event = createDocumentChain({
     authorKeyPair: keyPairsA.sign,
   });
   expect(() =>
-    addShareDevice({
+    addShareDocumentDevice({
       authorKeyPair: keyPairsA.sign,
       signingPublicKey: keyPairsB.sign.publicKey,
       prevEvent: event,
@@ -102,36 +102,40 @@ test("should fail if an invalid expireAt is provided", async () => {
 });
 
 test("should fail if the same event is added twice", async () => {
-  const event = createChain({
+  const event = createDocumentChain({
     authorKeyPair: keyPairsA.sign,
   });
-  const addShareDeviceEvent = addShareDevice({
+  const addShareDocumentDeviceEvent = addShareDocumentDevice({
     authorKeyPair: keyPairsA.sign,
     signingPublicKey: keyPairsB.sign.publicKey,
     encryptionPublicKey: keyPairsB.encryption.publicKey,
     role: "EDITOR",
     prevEvent: event,
   });
-  const addShareDeviceEvent2 = addShareDevice({
+  const addShareDocumentDeviceEvent2 = addShareDocumentDevice({
     authorKeyPair: keyPairsA.sign,
     signingPublicKey: keyPairsB.sign.publicKey,
     encryptionPublicKey: keyPairsB.encryption.publicKey,
     role: "EDITOR",
-    prevEvent: addShareDeviceEvent,
+    prevEvent: addShareDocumentDeviceEvent,
   });
   expect(() =>
     resolveState({
-      events: [event, addShareDeviceEvent, addShareDeviceEvent2],
+      events: [
+        event,
+        addShareDocumentDeviceEvent,
+        addShareDocumentDeviceEvent2,
+      ],
       knownVersion: 0,
     })
   ).toThrow(InvalidDocumentChainError);
 });
 
 test("should fail if the signature has been manipulated", async () => {
-  const event = createChain({
+  const event = createDocumentChain({
     authorKeyPair: keyPairsA.sign,
   });
-  const addShareDeviceEvent = addShareDevice({
+  const addShareDocumentDeviceEvent = addShareDocumentDevice({
     authorKeyPair: keyPairsA.sign,
     signingPublicKey: keyPairsB.sign.publicKey,
     encryptionPublicKey: keyPairsB.encryption.publicKey,
@@ -139,7 +143,7 @@ test("should fail if the signature has been manipulated", async () => {
     prevEvent: event,
   });
 
-  addShareDeviceEvent.author.signature = sodium.to_base64(
+  addShareDocumentDeviceEvent.author.signature = sodium.to_base64(
     sodium.crypto_sign_detached(
       "something",
       sodium.from_base64(keyPairsB.sign.privateKey)
@@ -148,17 +152,17 @@ test("should fail if the signature has been manipulated", async () => {
 
   expect(() =>
     resolveState({
-      events: [event, addShareDeviceEvent],
+      events: [event, addShareDocumentDeviceEvent],
       knownVersion: 0,
     })
   ).toThrow(InvalidDocumentChainError);
 });
 
 test("should fail if the author (publicKey and signature) have been replaced", async () => {
-  const event = createChain({
+  const event = createDocumentChain({
     authorKeyPair: keyPairsA.sign,
   });
-  const addShareDeviceEvent = addShareDevice({
+  const addShareDocumentDeviceEvent = addShareDocumentDevice({
     authorKeyPair: keyPairsA.sign,
     signingPublicKey: keyPairsB.sign.publicKey,
     encryptionPublicKey: keyPairsB.encryption.publicKey,
@@ -166,7 +170,7 @@ test("should fail if the author (publicKey and signature) have been replaced", a
     prevEvent: event,
   });
 
-  addShareDeviceEvent.author = {
+  addShareDocumentDeviceEvent.author = {
     signature: sodium.to_base64(
       sodium.crypto_sign_detached(
         "something",
@@ -178,17 +182,17 @@ test("should fail if the author (publicKey and signature) have been replaced", a
 
   expect(() =>
     resolveState({
-      events: [event, addShareDeviceEvent],
+      events: [event, addShareDocumentDeviceEvent],
       knownVersion: 0,
     })
   ).toThrow(InvalidDocumentChainError);
 });
 
 test("should fail if the encryptionPublicKeySignature have been manipulated", async () => {
-  const event = createChain({
+  const event = createDocumentChain({
     authorKeyPair: keyPairsA.sign,
   });
-  const addShareDeviceEvent = addShareDevice({
+  const addShareDocumentDeviceEvent = addShareDocumentDevice({
     authorKeyPair: keyPairsA.sign,
     signingPublicKey: keyPairsB.sign.publicKey,
     encryptionPublicKey: keyPairsB.encryption.publicKey,
@@ -196,7 +200,7 @@ test("should fail if the encryptionPublicKeySignature have been manipulated", as
     prevEvent: event,
   });
 
-  addShareDeviceEvent.transaction.encryptionPublicKeySignature =
+  addShareDocumentDeviceEvent.transaction.encryptionPublicKeySignature =
     sodium.to_base64(
       sodium.crypto_sign_detached(
         shareDocumentDeviceEncryptionPublicKeyDomainContext + "something",
@@ -206,31 +210,31 @@ test("should fail if the encryptionPublicKeySignature have been manipulated", as
 
   expect(() =>
     resolveState({
-      events: [event, addShareDeviceEvent],
+      events: [event, addShareDocumentDeviceEvent],
       knownVersion: 0,
     })
   ).toThrow(InvalidDocumentChainError);
 });
 
 test("should fail if the knownVersion is smaller than the actual event version", async () => {
-  const event = createChain({
+  const event = createDocumentChain({
     authorKeyPair: keyPairsA.sign,
   });
 
-  const addShareDeviceWithVersion1 = ({
+  const addShareDocumentDeviceWithVersion1 = ({
     authorKeyPair,
     prevEvent,
     signingPublicKey,
     encryptionPublicKey,
-  }): AddShareDeviceEvent => {
+  }): AddShareDocumentDeviceEvent => {
     const prevEventHash = hashEvent(prevEvent);
     const encryptionPublicKeySignature = sodium.crypto_sign_detached(
       shareDocumentDeviceEncryptionPublicKeyDomainContext +
         sodium.from_base64(encryptionPublicKey),
       sodium.from_base64(authorKeyPair.privateKey)
     );
-    const transaction: AddShareDeviceTransaction = {
-      type: "add-share-device",
+    const transaction: AddShareDocumentDeviceTransaction = {
+      type: "add-share-document-device",
       signingPublicKey,
       encryptionPublicKey,
       encryptionPublicKeySignature: sodium.to_base64(
@@ -256,7 +260,7 @@ test("should fail if the knownVersion is smaller than the actual event version",
     };
   };
 
-  const addShareDeviceEvent = addShareDeviceWithVersion1({
+  const addShareDocumentDeviceEvent = addShareDocumentDeviceWithVersion1({
     authorKeyPair: keyPairsA.sign,
     signingPublicKey: keyPairsB.sign.publicKey,
     encryptionPublicKey: keyPairsB.encryption.publicKey,
@@ -265,15 +269,17 @@ test("should fail if the knownVersion is smaller than the actual event version",
 
   expect(() =>
     resolveState({
-      events: [event, addShareDeviceEvent],
+      events: [event, addShareDocumentDeviceEvent],
       knownVersion: 0,
     })
   ).toThrow(UnknownVersionDocumentChainError);
 });
 
 test("should fail if an old event version is applied after a newer one", async () => {
-  const createChainWithVersion1 = ({ authorKeyPair }): CreateChainEvent => {
-    const transaction: CreateChainTransaction = {
+  const createDocumentChainWithVersion1 = ({
+    authorKeyPair,
+  }): CreateDocumentChainEvent => {
+    const transaction: CreateDocumentChainTransaction = {
       type: "create",
       id: generateId(),
       prevEventHash: null,
@@ -295,10 +301,10 @@ test("should fail if an old event version is applied after a newer one", async (
     };
   };
 
-  const event = createChainWithVersion1({
+  const event = createDocumentChainWithVersion1({
     authorKeyPair: keyPairsA.sign,
   });
-  const addShareDeviceEvent = addShareDevice({
+  const addShareDocumentDeviceEvent = addShareDocumentDevice({
     authorKeyPair: keyPairsA.sign,
     signingPublicKey: keyPairsB.sign.publicKey,
     encryptionPublicKey: keyPairsB.encryption.publicKey,
@@ -306,18 +312,21 @@ test("should fail if an old event version is applied after a newer one", async (
     prevEvent: event,
   });
   expect(() =>
-    resolveState({ events: [event, addShareDeviceEvent], knownVersion: 1 })
+    resolveState({
+      events: [event, addShareDocumentDeviceEvent],
+      knownVersion: 1,
+    })
   ).toThrow(InvalidDocumentChainError);
 });
 
 test("should fail if the chain is based on a different event", async () => {
-  const event = createChain({
+  const event = createDocumentChain({
     authorKeyPair: keyPairsA.sign,
   });
-  const event2 = createChain({
+  const event2 = createDocumentChain({
     authorKeyPair: keyPairsA.sign,
   });
-  const addShareDeviceEvent = addShareDevice({
+  const addShareDocumentDeviceEvent = addShareDocumentDevice({
     authorKeyPair: keyPairsA.sign,
     signingPublicKey: keyPairsB.sign.publicKey,
     encryptionPublicKey: keyPairsB.encryption.publicKey,
@@ -327,7 +336,7 @@ test("should fail if the chain is based on a different event", async () => {
 
   expect(() =>
     resolveState({
-      events: [event, addShareDeviceEvent],
+      events: [event, addShareDocumentDeviceEvent],
       knownVersion: 0,
     })
   ).toThrow(InvalidDocumentChainError);

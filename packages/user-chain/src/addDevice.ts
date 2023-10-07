@@ -1,5 +1,5 @@
 import sodium from "react-native-libsodium";
-import { deviceEncryptionPublicKeyDomainContext } from "./constants";
+import { userDeviceEncryptionPublicKeyDomainContext } from "./constants";
 import {
   AddDeviceEvent,
   AddDeviceTransaction,
@@ -26,7 +26,7 @@ export const addDevice = ({
 }: Params): AddDeviceEvent => {
   const prevEventHash = hashEvent(prevEvent);
   const encryptionPublicKeySignature = sodium.crypto_sign_detached(
-    deviceEncryptionPublicKeyDomainContext + encryptionPublicKey,
+    userDeviceEncryptionPublicKeyDomainContext + encryptionPublicKey,
     sodium.from_base64(authorKeyPair.privateKey)
   );
   const transaction: AddDeviceTransaction = {

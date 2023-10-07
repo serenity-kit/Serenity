@@ -26,7 +26,7 @@ type Props = {
   pendingWorkspaceInvitationKeySubkeyId: number | null | undefined;
   pendingWorkspaceInvitationKeyCiphertext: string | null | undefined;
   pendingWorkspaceInvitationKeyPublicNonce: string | null | undefined;
-  createChainEvent: userChain.CreateChainEvent;
+  createChainEvent: userChain.CreateUserChainEvent;
 };
 
 export async function finalizeRegistration({
