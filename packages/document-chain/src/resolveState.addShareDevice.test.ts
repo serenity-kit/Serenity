@@ -8,11 +8,11 @@ import {
   createChain,
   CreateChainEvent,
   CreateChainTransaction,
-  deviceEncryptionPublicKeyDomainContext,
   hashEvent,
   hashTransaction,
   InvalidDocumentChainError,
   resolveState,
+  shareDocumentDeviceEncryptionPublicKeyDomainContext,
   UnknownVersionDocumentChainError,
 } from "./index";
 
@@ -199,7 +199,7 @@ test("should fail if the encryptionPublicKeySignature have been manipulated", as
   addShareDeviceEvent.transaction.encryptionPublicKeySignature =
     sodium.to_base64(
       sodium.crypto_sign_detached(
-        deviceEncryptionPublicKeyDomainContext + "something",
+        shareDocumentDeviceEncryptionPublicKeyDomainContext + "something",
         sodium.from_base64(keyPairsB.sign.privateKey)
       )
     );
@@ -225,7 +225,7 @@ test("should fail if the knownVersion is smaller than the actual event version",
   }): AddShareDeviceEvent => {
     const prevEventHash = hashEvent(prevEvent);
     const encryptionPublicKeySignature = sodium.crypto_sign_detached(
-      deviceEncryptionPublicKeyDomainContext +
+      shareDocumentDeviceEncryptionPublicKeyDomainContext +
         sodium.from_base64(encryptionPublicKey),
       sodium.from_base64(authorKeyPair.privateKey)
     );

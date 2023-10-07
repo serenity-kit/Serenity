@@ -7,7 +7,7 @@ type Params = {
 };
 
 export const createDevice = async ({ userId, expiresAt }: Params) => {
-  const device = createdDeviceHelper();
+  const device = createdDeviceHelper("user");
 
   const deviceInfoJson = {
     type: "web",

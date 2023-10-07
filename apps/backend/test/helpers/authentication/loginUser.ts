@@ -58,7 +58,7 @@ export const loginUser = async ({
     },
   });
 
-  const device = createDevice();
+  const device = createDevice("user");
   const deviceInfoJson = {
     type: "web",
     OS: "MacOS",

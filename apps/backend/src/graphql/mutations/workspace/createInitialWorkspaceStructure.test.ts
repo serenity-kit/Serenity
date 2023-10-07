@@ -136,7 +136,7 @@ test("Unauthenticated", async () => {
 });
 
 test("creator device must belong to user", async () => {
-  const badDevice = createDevice();
+  const badDevice = createDevice("user");
   await expect(
     (async () =>
       await createInitialWorkspaceStructure({

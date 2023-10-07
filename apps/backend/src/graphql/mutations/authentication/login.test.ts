@@ -51,7 +51,7 @@ test("server should login a user", async () => {
   }
   const sessionKey = clientLoginFinishResult.sessionKey;
 
-  const device = createdDeviceHelper();
+  const device = createdDeviceHelper("user");
   const deviceInfoJson = {
     type: "web",
     OS: "MacOS",
