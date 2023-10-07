@@ -1,2 +1,2 @@
-export const deviceEncryptionPublicKeyDomainContext =
-  "device_encryption_public_key";
+export const userDeviceEncryptionPublicKeyDomainContext =
+  "user_device_encryption_public_key";
