@@ -9,7 +9,7 @@ export const createAndEncryptWorkspaceKeyForDevice = ({
   creatorDeviceEncryptionPrivateKey,
 }: Props) => {
   const workspaceKey = sodium.crypto_kdf_keygen();
-  const nonce = sodium.randombytes_buf(sodium.crypto_secretbox_NONCEBYTES);
+  const nonce = sodium.randombytes_buf(sodium.crypto_box_NONCEBYTES);
   const ciphertext = sodium.crypto_box_easy(
     workspaceKey,
     nonce,
