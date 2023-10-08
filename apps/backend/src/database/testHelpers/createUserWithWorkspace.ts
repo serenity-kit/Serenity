@@ -128,7 +128,7 @@ export default async function createUserWithWorkspace({
   const folderName = "Getting Started";
   const folderIdSignature = sodium.to_base64(
     sodium.crypto_sign_detached(
-      folderId,
+      "folder_id" + folderId,
       sodium.from_base64(mainDevice.signingPrivateKey)
     )
   );

@@ -69,7 +69,7 @@ export const loginUser = async ({
   const deviceInfo = JSON.stringify(deviceInfoJson);
 
   const sessionTokenSignature = sodium.crypto_sign_detached(
-    sessionKey,
+    "login_session_key" + sessionKey,
     sodium.from_base64(device.signingPrivateKey)
   );
 

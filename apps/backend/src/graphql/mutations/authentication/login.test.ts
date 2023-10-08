@@ -63,7 +63,7 @@ test("server should login a user", async () => {
 
   const sessionTokenSignature = sodium.to_base64(
     sodium.crypto_sign_detached(
-      sessionKey,
+      "login_session_key" + sessionKey,
       sodium.from_base64(device.signingPrivateKey)
     )
   );
