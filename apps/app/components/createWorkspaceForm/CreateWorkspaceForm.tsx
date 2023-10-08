@@ -96,7 +96,7 @@ export function CreateWorkspaceForm(props: CreateWorkspaceFormProps) {
         parentKey: workspaceKey,
       });
       const folderIdSignature = sodium.crypto_sign_detached(
-        folderId,
+        "folder_id" + folderId,
         sodium.from_base64(activeDevice.signingPrivateKey!)
       );
       const folderKeyDerivationTrace = {
