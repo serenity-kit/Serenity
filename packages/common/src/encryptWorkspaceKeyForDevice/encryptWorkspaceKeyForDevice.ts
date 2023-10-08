@@ -16,7 +16,7 @@ export const encryptWorkspaceKeyForDevice = ({
   if (nonce) {
     theNonce = sodium.from_base64(nonce);
   } else {
-    theNonce = sodium.randombytes_buf(sodium.crypto_secretbox_NONCEBYTES);
+    theNonce = sodium.randombytes_buf(sodium.crypto_box_NONCEBYTES);
   }
   const ciphertext = sodium.crypto_box_easy(
     sodium.from_base64(workspaceKey),

@@ -44,7 +44,7 @@ export const createDocumentShareLink = async ({
   );
 
   const snapshotDeviceNonce = sodium.randombytes_buf(
-    sodium.crypto_secretbox_NONCEBYTES
+    sodium.crypto_box_NONCEBYTES
   );
   const snapshotDeviceCiphertext = sodium.crypto_box_easy(
     sodium.from_base64(snapshotKey),

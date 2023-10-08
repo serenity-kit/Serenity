@@ -94,7 +94,7 @@ export const updateWorkspaceInfo = async ({
   for (const device of devices) {
     // encyrpt the workspaceKey for each device using the creatorDevice's encryptionPublicKey
     const deviceKeyBoxNonce = sodium.randombytes_buf(
-      sodium.crypto_secretbox_NONCEBYTES
+      sodium.crypto_box_NONCEBYTES
     );
     const deviceKeyBoxCiphertext = sodium.crypto_box_easy(
       infoWorkspaceKey,
