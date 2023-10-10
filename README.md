@@ -169,18 +169,25 @@ yarn workspace backend prisma:e2etest:studio
 
 ## Deploy
 
-Backend deployment icluding running migrations is done via Github Actions.
+Backend deployment including running migrations is done via Github Actions.
 Frontend deployment is setup in Netlify.
 
 ### Setup fly.io deployment
 
-Update app name inside fly.toml
+Update app name inside fly.production.toml
 
 ```sh
 fly postgres create
 # store the connection string
 flyctl secrets set DATABASE_URL=<db_connection_url>/serenity
 # set all other secrets usually defined in the .env file
+flyctl secrets set FILE_STORAGE_ACCESS_KEY_ID={value} -a {app_name}
+flyctl secrets set FILE_STORAGE_ACCOUNT_ID={value} -a {app_name}
+flyctl secrets set FILE_STORAGE_BUCKET={value} -a {app_name}
+flyctl secrets set FILE_STORAGE_SECRET_ACCESS_KEY={value} -a {app_name}
+flyctl secrets set FROM_EMAIL={value} -a {app_name}
+flyctl secrets set OPAQUE_SERVER_SETUP={value} -a {app_name}
+flyctl secrets set SENDGRID_API_KEY={value} -a {app_name}
 ```
 
 Update DATABASE_URL in Github secrets with <db_connection_url>/serenity

@@ -1,4 +1,4 @@
-name: "Deploy API"
+name: "Deploy Production"
 
 on:
   push:
@@ -6,7 +6,7 @@ on:
       - main
 
 jobs:
-  deploy-staging-api:
+  deploy-production-api:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -18,12 +18,14 @@ jobs:
         working-directory: ./apps/backend
         run: yarn build
       - uses: superfly/flyctl-actions/setup-flyctl@master
-      - run: flyctl deploy --remote-only ./apps/backend
+      - name: Deploy
+        working-directory: ./apps/backend
+        run: flyctl deploy --remote-only --config ./fly.production.toml
         env:
           FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
-  deploy-staging-frontend:
+  deploy-production-frontend:
     runs-on: ubuntu-latest
-    environment: staging
+    environment: production
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-node@v3 # needed until 18 becomes the default
