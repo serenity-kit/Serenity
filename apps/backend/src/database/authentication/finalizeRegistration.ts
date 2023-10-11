@@ -111,11 +111,16 @@ export async function finalizeRegistration({
 
         // TODO: consider including user-set flag to trigger universal link
         // when the user is on a mobile device
-        const rootUrl =
-          process.env.NODE_ENV === "development" ||
-          process.env.SERENITY_ENV === "e2e"
-            ? `http://localhost:19006/`
-            : "https://www.serenity.li";
+        let rootUrl = "http://localhost:19006/";
+        if (process.env.SERENITY_ENV === "e2e") {
+          rootUrl = "http://localhost:19006/";
+        }
+        if (process.env.SERENITY_ENV === "staging") {
+          rootUrl = "https://www.serenity.li/";
+        }
+        if (process.env.SERENITY_ENV === "production") {
+          rootUrl = "https://www.serenityapp.page/";
+        }
         const encodedUsername = encodeURIComponent(unverifiedUser.username);
         const encodedConfirmationCode = encodeURIComponent(
           unverifiedUser.confirmationCode

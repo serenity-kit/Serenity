@@ -109,13 +109,20 @@ export default async function createServer() {
   await apolloServer.start();
 
   // Note: on staging we also want the dev setup to be able to connect
-  const allowedList = [
-    "https://www.serenity.li", // production web app
-    "http://localhost:19006", // development & e2e web app
-    "http://localhost:4000", // needed for GraphiQL in development
-    "http://localhost:4001", // needed for GraphiQL in e2e
-    "serenity-desktop://app", // desktop app
-  ];
+
+  const allowedList =
+    process.env.SERENITY_ENV === "production"
+      ? [
+          "https://www.serenityapp.page", // production web app
+          "serenity-desktop://app", // electron desktop app
+        ]
+      : [
+          "https://www.serenity.li", // staging web app
+          "http://localhost:19006", // development & e2e web app
+          "http://localhost:4000", // needed for GraphiQL in development
+          "http://localhost:4001", // needed for GraphiQL in e2e
+          "serenity-desktop://app", // electron desktop app
+        ];
   const allowedOrigin = (origin, callback) => {
     if (allowedList.indexOf(origin) !== -1 || !origin) {
       callback(null, true);
