@@ -11,7 +11,7 @@ import {
 } from "@serenity-tools/ui";
 import * as Clipboard from "expo-clipboard";
 import { useState } from "react";
-import { Platform, StyleSheet } from "react-native";
+import { StyleSheet } from "react-native";
 import sodium from "react-native-libsodium";
 import { useWorkspace } from "../../context/WorkspaceContext";
 import {
@@ -20,6 +20,7 @@ import {
   useDeleteWorkspaceInvitationsMutation,
 } from "../../generated/graphql";
 import { getMainDevice } from "../../utils/device/mainDeviceMemoryStore";
+import { getEnvironmentUrls } from "../../utils/getEnvironmentUrls/getEnvironmentUrls";
 import { VerifyPasswordModal } from "../verifyPasswordModal/VerifyPasswordModal";
 import { WorkspaceInvitationList } from "./WorkspaceInvitationList";
 
@@ -77,16 +78,9 @@ export function CreateWorkspaceInvitation(props: Props) {
     if (!selectedWorkspaceInvitationSigningKeyPairSeed) {
       return;
     }
-    const rootUrl =
-      process.env.NODE_ENV === "development" ||
-      process.env.SERENITY_ENV === "e2e"
-        ? Platform.OS === "web"
-          ? `http://${window.location.host}`
-          : // on iOS window.location.host is not available
-            `http://localhost:19006/`
-        : "https://www.serenity.li";
+    const { frontendOrigin } = getEnvironmentUrls();
 
-    return `You are invited to a Serenity Workspace. To join, use this link to accept the invitation:\n${rootUrl}/accept-workspace-invitation/${selectedWorkspaceInvitationId}#key=${selectedWorkspaceInvitationSigningKeyPairSeed}`;
+    return `You are invited to a Serenity Workspace. To join, use this link to accept the invitation:\n${frontendOrigin}/accept-workspace-invitation/${selectedWorkspaceInvitationId}#key=${selectedWorkspaceInvitationSigningKeyPairSeed}`;
   };
 
   const createWorkspaceInvitationPreflight = async () => {

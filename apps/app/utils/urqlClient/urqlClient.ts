@@ -1,9 +1,9 @@
 import { devtoolsExchange } from "@urql/devtools";
 import { authExchange } from "@urql/exchange-auth";
 import { cacheExchange } from "@urql/exchange-graphcache";
-import Constants from "expo-constants";
 import { Client, createClient, dedupExchange, fetchExchange } from "urql";
 import * as SessionKeyStore from "../authentication/sessionKeyStore";
+import { getEnvironmentUrls } from "../getEnvironmentUrls/getEnvironmentUrls";
 
 type AuthState = {
   sessionKey: string;
@@ -107,15 +107,18 @@ const exchanges = [
   fetchExchange,
 ];
 
-const createUrqlClient = () =>
-  createClient({
-    url: Constants.manifest?.extra?.apiUrl,
+const createUrqlClient = () => {
+  const { graphqlEndpoint } = getEnvironmentUrls();
+
+  return createClient({
+    url: graphqlEndpoint,
     requestPolicy: "cache-and-network",
     exchanges:
       process.env.NODE_ENV === "development"
         ? [devtoolsExchange, ...exchanges]
         : exchanges,
   });
+};
 
 let urqlClient: Client = createUrqlClient();
 

@@ -1,10 +1,10 @@
 import { createDevice, Device } from "@serenity-tools/common";
-import { Platform } from "react-native";
 import sodium from "react-native-libsodium";
 import {
   Role,
   runCreateDocumentShareLinkMutation,
 } from "../../generated/graphql";
+import { getEnvironmentUrls } from "../getEnvironmentUrls/getEnvironmentUrls";
 
 type SnapshotDeviceKeyBox = {
   ciphertext: string;
@@ -17,14 +17,8 @@ export const getDocumentShareLinkUrl = (
   token: string,
   key: string
 ) => {
-  const rootUrl =
-    process.env.NODE_ENV === "development" || process.env.SERENITY_ENV === "e2e"
-      ? Platform.OS === "web"
-        ? `http://${window.location.host}`
-        : // on iOS window.location.host is not available
-          `http://localhost:19006/`
-      : "https://www.serenity.li";
-  return `${rootUrl}/page/${documentId}/${token}#key=${key}`;
+  const { frontendOrigin } = getEnvironmentUrls();
+  return `${frontendOrigin}/page/${documentId}/${token}#key=${key}`;
 };
 
 export type Props = {

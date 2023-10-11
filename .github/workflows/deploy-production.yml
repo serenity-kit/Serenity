@@ -34,7 +34,7 @@ jobs:
           cache: yarn
       - name: Build
         working-directory: ./apps/app
-        run: yarn build:web
+        run: yarn build:web:production
       - name: Deploy to Netlify
         uses: nwtgck/actions-netlify@v2
         with:

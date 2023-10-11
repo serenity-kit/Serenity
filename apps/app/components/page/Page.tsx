@@ -47,6 +47,7 @@ import { getDocument } from "../../utils/document/getDocument";
 import { updateDocumentName } from "../../utils/document/updateDocumentName";
 import { useEditorStore } from "../../utils/editorStore/editorStore";
 import { findVerifiedUserByDeviceSigningPublicKey } from "../../utils/findVerifiedUserByDeviceSigningPublicKey/findVerifiedUserByDeviceSigningPublicKey";
+import { getEnvironmentUrls } from "../../utils/getEnvironmentUrls/getEnvironmentUrls";
 import {
   getLocalDocument,
   setLocalDocument,
@@ -105,13 +106,7 @@ export default function Page({
   const ephemeralUpdateErrorsChangedAt = useRef<Date | null>(null);
   const hasEditorSidebar = useHasEditorSidebar();
 
-  let websocketHost = `wss://serenity-dev.fly.dev`;
-  if (process.env.NODE_ENV === "development") {
-    websocketHost = `ws://localhost:4000`;
-  }
-  if (process.env.SERENITY_ENV === "e2e") {
-    websocketHost = `ws://localhost:4001`;
-  }
+  const { websocketOrigin } = getEnvironmentUrls();
   const { users, workspaceChainData } = useWorkspace();
 
   const [state] = useYjsSync({
@@ -119,7 +114,7 @@ export default function Page({
     yAwareness: yAwarenessRef.current,
     documentId: docId,
     signatureKeyPair,
-    websocketHost,
+    websocketHost: websocketOrigin,
     websocketSessionKey: sessionKey,
     onSnapshotSaved: async () => {
       snapshotKeyRef.current = snapshotInFlightKeyRef.current;

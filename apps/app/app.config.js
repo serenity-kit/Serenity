@@ -36,7 +36,7 @@ export default {
       favicon: "./assets/images/favicon.png",
     },
     extra: {
-      apiUrl: process.env.API_URL || "https://serenity-dev.fly.dev/graphql",
+      serenityEnvironment: process.env.SERENITY_ENV || "development",
       eas: {
         projectId: "96bcac09-3fa9-4816-bcf6-5550f4edbd45",
       },
