@@ -1,16 +1,16 @@
 import type { KeyPair } from "libsodium-wrappers";
 import { z } from "zod";
-import { SnapshotProofChainEntry } from "./snapshot/isValidAncestorSnapshot";
 
-export const SnapshotClocks = z.record(z.string(), z.number());
+export const SnapshotUpdateClocks = z.record(z.string(), z.number());
 
-export type SnapshotClocks = z.infer<typeof SnapshotClocks>;
+export type SnapshotUpdateClocks = z.infer<typeof SnapshotUpdateClocks>;
 
 export const SnapshotPublicData = z.object({
   docId: z.string(),
   pubKey: z.string(), // public signing key
   snapshotId: z.string(),
-  parentSnapshotClocks: SnapshotClocks,
+  parentSnapshotId: z.string(),
+  parentSnapshotUpdateClocks: SnapshotUpdateClocks,
 });
 
 export type SnapshotPublicData = z.infer<typeof SnapshotPublicData>;
@@ -19,19 +19,14 @@ export const SnapshotPublicDataWithParentSnapshotProof = z.object({
   docId: z.string(),
   pubKey: z.string(), // public signing key
   snapshotId: z.string(),
+  parentSnapshotId: z.string(),
   parentSnapshotProof: z.string(),
-  parentSnapshotClocks: SnapshotClocks,
+  parentSnapshotUpdateClocks: SnapshotUpdateClocks,
 });
 
 export type SnapshotPublicDataWithParentSnapshotProof = z.infer<
   typeof SnapshotPublicDataWithParentSnapshotProof
 >;
-
-export const SnapshotServerData = z.object({
-  latestVersion: z.number(),
-});
-
-export type SnapshotServerData = z.infer<typeof SnapshotServerData>;
 
 export const UpdatePublicData = z.object({
   docId: z.string(),
@@ -52,19 +47,13 @@ export type UpdatePublicDataWithClock = z.infer<
   typeof UpdatePublicDataWithClock
 >;
 
-export const UpdateServerData = z.object({
-  version: z.number(),
-});
-
-export type UpdateServerData = z.infer<typeof UpdateServerData>;
-
-export const EphemeralUpdatePublicData = z.object({
+export const EphemeralMessagePublicData = z.object({
   docId: z.string(),
   pubKey: z.string(), // public signing key
 });
 
-export type EphemeralUpdatePublicData = z.infer<
-  typeof EphemeralUpdatePublicData
+export type EphemeralMessagePublicData = z.infer<
+  typeof EphemeralMessagePublicData
 >;
 
 export const Snapshot = z.object({
@@ -77,18 +66,10 @@ export const Snapshot = z.object({
 export type Snapshot = z.infer<typeof Snapshot>;
 
 export const SnapshotWithClientData = Snapshot.extend({
-  lastKnownSnapshotId: z.string().nullable().optional(),
-  latestServerVersion: z.number().nullable().optional(),
   additionalServerData: z.unknown().optional(),
 });
 
 export type SnapshotWithClientData = z.infer<typeof SnapshotWithClientData>;
-
-export const SnapshotWithServerData = Snapshot.extend({
-  serverData: SnapshotServerData,
-});
-
-export type SnapshotWithServerData = z.infer<typeof SnapshotWithServerData>;
 
 export const Update = z.object({
   ciphertext: z.string(),
@@ -99,47 +80,34 @@ export const Update = z.object({
 
 export type Update = z.infer<typeof Update>;
 
-export const UpdateWithServerData = Update.extend({
-  serverData: UpdateServerData,
-});
-
-export type UpdateWithServerData = z.infer<typeof UpdateWithServerData>;
-
-export const EphemeralUpdate = z.object({
+export const EphemeralMessage = z.object({
   ciphertext: z.string(),
   nonce: z.string(),
   signature: z.string(), // ciphertext + nonce + publicData
-  publicData: EphemeralUpdatePublicData,
+  publicData: EphemeralMessagePublicData,
 });
 
-export type EphemeralUpdate = z.infer<typeof EphemeralUpdate>;
+export type EphemeralMessage = z.infer<typeof EphemeralMessage>;
 
-export const ClientEvent = z.union([Snapshot, Update, EphemeralUpdate]);
+export const Event = z.union([Snapshot, Update, EphemeralMessage]);
 
-export type ClientEvent = z.infer<typeof ClientEvent>;
+export type Event = z.infer<typeof Event>;
 
-export const ServerEvent = z.union([
-  SnapshotWithServerData,
-  UpdateWithServerData,
-  EphemeralUpdate,
-]);
+export type OnDocumentUpdatedEventType =
+  | "snapshot-saved"
+  | "snapshot-received"
+  | "update-saved"
+  | "update-received";
 
-export type ServerEvent = z.infer<typeof ServerEvent>;
-
-export type ParentSnapshotProofInfo = {
-  id: string;
-  ciphertext: string;
-  parentSnapshotProof: string;
-};
-
-type KnownSnapshotInfo = SnapshotProofChainEntry & {
-  id: string;
+export type LoadDocumentParams = {
+  knownSnapshotInfo: SnapshotInfoWithUpdateClocks;
+  mode: GetDocumentMode;
 };
 
 export type AdditionalAuthenticationDataValidations = {
   snapshot?: z.SomeZodObject;
   update?: z.SomeZodObject;
-  ephemeralUpdate?: z.SomeZodObject;
+  ephemeralMessage?: z.SomeZodObject;
 };
 
 export type SyncMachineConfig = {
@@ -149,53 +117,96 @@ export type SyncMachineConfig = {
   websocketSessionKey: string;
   applySnapshot: (decryptedSnapshot: any) => void;
   getSnapshotKey: (
-    snapshot: any | undefined
+    snapshotInfo: SnapshotProofInfo | null
   ) => Promise<Uint8Array> | Uint8Array;
-  getNewSnapshotData: () => Promise<{
-    readonly id: string;
-    readonly data: Uint8Array | string;
-    readonly key: Uint8Array;
-    readonly publicData: any;
-    readonly additionalServerData?: any;
-  }>;
+  getNewSnapshotData: ({ id }: { id: string }) =>
+    | Promise<{
+        readonly data: Uint8Array | string;
+        readonly key: Uint8Array;
+        readonly publicData: any;
+        readonly additionalServerData?: any;
+      }>
+    | {
+        readonly data: Uint8Array | string;
+        readonly key: Uint8Array;
+        readonly publicData: any;
+        readonly additionalServerData?: any;
+      };
   applyChanges: (updates: any[]) => void;
-  getUpdateKey: (update: any) => Promise<Uint8Array> | Uint8Array;
-  applyEphemeralUpdates: (ephemeralUpdates: any[]) => void;
-  getEphemeralUpdateKey: () => Promise<Uint8Array> | Uint8Array;
+  applyEphemeralMessage: (
+    ephemeralMessages: any,
+    authorPublicKey: string
+  ) => void;
   shouldSendSnapshot: (info: {
     activeSnapshotId: string | null;
-    latestServerVersion: number | null;
+    snapshotUpdatesCount: number;
   }) => boolean;
-  isValidCollaborator: (signingPublicKey: string) => boolean | Promise<boolean>;
+  isValidClient: (signingPublicKey: string) => boolean | Promise<boolean>;
   serializeChanges: (changes: any[]) => string;
   deserializeChanges: (serializeChanges: string) => any;
   sodium: any;
-  onSnapshotSaved?: () => void | Promise<void>;
+  onDocumentUpdated?: (params: {
+    type: OnDocumentUpdatedEventType;
+    knownSnapshotInfo: SnapshotInfoWithUpdateClocks;
+  }) => void | Promise<void>;
   onCustomMessage?: (message: any) => Promise<void> | void;
-  knownSnapshotInfo?: KnownSnapshotInfo;
+  loadDocumentParams?: LoadDocumentParams;
   additionalAuthenticationDataValidations?: AdditionalAuthenticationDataValidations;
+  /** default: "off" */
+  logging?: "off" | "error" | "debug";
 };
 
 export type CreateSnapshotParams = {
   snapshot: SnapshotWithClientData;
-  activeSnapshotInfo?: {
-    latestVersion: number;
-    snapshotId: string;
-  };
 };
 
 export type CreateUpdateParams = {
   update: Update;
 };
 
+export type GetDocumentMode = "complete" | "delta";
+
 export type GetDocumentParams = {
   documentId: string;
-  lastKnownSnapshotId?: string;
-  lastKnownUpdateServerVersion?: number;
+  knownSnapshotId?: string;
+  knownSnapshotUpdateClocks?: SnapshotUpdateClocks;
+  mode: GetDocumentMode;
 };
 
-export type HasAccessParams = {
-  action: "read" | "write-snapshot" | "write-update" | "send-ephemeral-update";
+export type HasAccessParams =
+  | {
+      action: "read";
+      documentId: string;
+      websocketSessionKey: string | undefined;
+    }
+  | {
+      action: "write-snapshot" | "write-update" | "send-ephemeral-message";
+      documentId: string;
+      publicKey: string;
+      websocketSessionKey: string | undefined;
+    };
+
+export type HasBroadcastAccessParams = {
   documentId: string;
-  context: any;
+  websocketSessionKeys: string[];
+};
+
+export type ValidSessions = {
+  [authorPublicKey: string]: { sessionId: string; sessionCounter: number };
+};
+
+export type EphemeralMessagesSession = {
+  id: string;
+  counter: number;
+  validSessions: ValidSessions;
+};
+
+export type SnapshotProofInfo = {
+  snapshotId: string;
+  snapshotCiphertextHash: string;
+  parentSnapshotProof: string;
+};
+
+export type SnapshotInfoWithUpdateClocks = SnapshotProofInfo & {
+  updateClocks: SnapshotUpdateClocks;
 };

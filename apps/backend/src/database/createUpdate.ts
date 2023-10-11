@@ -1,43 +1,35 @@
 import { KeyDerivationTrace } from "@serenity-tools/common";
 import {
+  CreateUpdateParams,
   SecsyncNewSnapshotRequiredError,
-  Update,
 } from "@serenity-tools/secsync";
 import { Prisma } from "../../prisma/generated/output";
 import { serializeUpdate } from "../utils/serialize";
 import { prisma } from "./prisma";
 
-type CreateUpdateParams = {
-  update: Update;
-  workspaceId: string;
-};
-
-export async function createUpdate({
-  update,
-  workspaceId,
-}: CreateUpdateParams) {
+export async function createUpdate({ update }: CreateUpdateParams) {
   return await prisma.$transaction(
     async (prisma) => {
-      const snapshotPromise = prisma.snapshot.findUniqueOrThrow({
+      const snapshot = await prisma.snapshot.findUniqueOrThrow({
         where: { id: update.publicData.refSnapshotId },
         select: {
           latestVersion: true,
           clocks: true,
           document: {
-            select: { activeSnapshotId: true, requiresSnapshot: true },
+            select: {
+              activeSnapshotId: true,
+              requiresSnapshot: true,
+              workspaceId: true,
+            },
           },
           keyDerivationTrace: true,
         },
       });
-      const currentWorkspaceKeyPromise = prisma.workspaceKey.findFirstOrThrow({
-        where: { workspaceId },
+      const currentWorkspaceKey = await prisma.workspaceKey.findFirstOrThrow({
+        where: { workspaceId: snapshot.document.workspaceId },
         select: { id: true },
         orderBy: { generation: "desc" },
       });
-      const [snapshot, currentWorkspaceKey] = await Promise.all([
-        snapshotPromise,
-        currentWorkspaceKeyPromise,
-      ]);
 
       if (
         snapshot.document.activeSnapshotId !== update.publicData.refSnapshotId
@@ -64,23 +56,19 @@ export async function createUpdate({
         if (snapshot.clocks[update.publicData.pubKey] === undefined) {
           if (update.publicData.clock !== 0) {
             throw new Error(
-              `Update clock incorrect: ${update.publicData.clock} 0`
-            ); // TODO return additional data with the error?
+              `Update clock incorrect. Clock: ${update.publicData.clock}, but should be 0`
+            );
           }
           // update the clock for the public key
           snapshot.clocks[update.publicData.pubKey] = update.publicData.clock;
         } else {
-          if (
+          const expectedClockValue =
             // @ts-expect-error
-            snapshot.clocks[update.publicData.pubKey] + 1 !==
-            update.publicData.clock
-          ) {
+            snapshot.clocks[update.publicData.pubKey] + 1;
+          if (expectedClockValue !== update.publicData.clock) {
             throw new Error(
-              `Update clock incorrect. ${update.publicData.clock} ${
-                // @ts-expect-error
-                snapshot.clocks[update.publicData.pubKey] + 1
-              } `
-            ); // TODO return additional data with the error?
+              `Update clock incorrect. Clock: ${update.publicData.clock}, but should be ${expectedClockValue}`
+            );
           }
           // update the clock for the public key
           snapshot.clocks[update.publicData.pubKey] = update.publicData.clock;
@@ -98,6 +86,7 @@ export async function createUpdate({
       return serializeUpdate(
         await prisma.update.create({
           data: {
+            id: `${update.publicData.refSnapshotId}-${update.publicData.pubKey}-${update.publicData.clock}`,
             data: JSON.stringify(update),
             version: snapshot.latestVersion + 1,
             snapshot: {
@@ -105,7 +94,7 @@ export async function createUpdate({
                 id: update.publicData.refSnapshotId,
               },
             },
-            snapshotVersion: update.publicData.clock,
+            clock: update.publicData.clock,
             pubKey: update.publicData.pubKey,
           },
         })

@@ -1,37 +1,13 @@
-import canonicalize from "canonicalize";
 import { hash } from "../crypto/hash";
-import { Snapshot } from "../types";
-
-export type SnapshotProofChainEntry = {
-  parentSnapshotProof: string;
-  snapshotCiphertextHash: string;
-};
+import { Snapshot, SnapshotProofInfo } from "../types";
+import { createParentSnapshotProof } from "./createParentSnapshotProof";
 
 type IsValidAncestorSnapshotParams = {
-  knownSnapshotProofEntry: SnapshotProofChainEntry;
-  snapshotProofChain: SnapshotProofChainEntry[];
+  knownSnapshotProofEntry: SnapshotProofInfo;
+  snapshotProofChain: SnapshotProofInfo[];
   currentSnapshot: Snapshot;
   sodium: typeof import("libsodium-wrappers");
 };
-
-type CreateParentSnapshotProofBasedOnHashParams = {
-  grandParentSnapshotProof: string;
-  parentSnapshotCiphertextHash: string;
-  sodium: typeof import("libsodium-wrappers");
-};
-
-export function createParentSnapshotProofBasedOnHash({
-  grandParentSnapshotProof,
-  parentSnapshotCiphertextHash,
-  sodium,
-}: CreateParentSnapshotProofBasedOnHashParams) {
-  const snapshotProofData = canonicalize({
-    grandParentSnapshotProof,
-    parentSnapshotCiphertext: parentSnapshotCiphertextHash,
-  })!;
-  const parentSnapshotProof = hash(snapshotProofData, sodium);
-  return parentSnapshotProof;
-}
 
 export function isValidAncestorSnapshot({
   knownSnapshotProofEntry,
@@ -40,17 +16,35 @@ export function isValidAncestorSnapshot({
   sodium,
 }: IsValidAncestorSnapshotParams) {
   let isValid = true;
+
+  if (
+    knownSnapshotProofEntry.snapshotId ===
+      currentSnapshot.publicData.snapshotId &&
+    knownSnapshotProofEntry.snapshotCiphertextHash ===
+      hash(currentSnapshot.ciphertext, sodium) &&
+    knownSnapshotProofEntry.parentSnapshotProof ===
+      currentSnapshot.publicData.parentSnapshotProof
+  ) {
+    return true;
+  }
+
+  if (!Array.isArray(snapshotProofChain)) {
+    return false;
+  }
+
   if (snapshotProofChain.length === 0) {
     return false;
   }
 
   // check the first entry with the known entry
-  const known = createParentSnapshotProofBasedOnHash({
+  const known = createParentSnapshotProof({
     grandParentSnapshotProof: knownSnapshotProofEntry.parentSnapshotProof,
+    parentSnapshotId: knownSnapshotProofEntry.snapshotId,
     parentSnapshotCiphertextHash:
       knownSnapshotProofEntry.snapshotCiphertextHash,
     sodium,
   });
+
   if (
     snapshotProofChain.length > 0 &&
     snapshotProofChain[0].parentSnapshotProof !== known
@@ -63,22 +57,23 @@ export function isValidAncestorSnapshot({
     snapshotProofChain[snapshotProofChain.length - 1].parentSnapshotProof !==
       currentSnapshot.publicData.parentSnapshotProof ||
     snapshotProofChain[snapshotProofChain.length - 1].snapshotCiphertextHash !==
-      hash(currentSnapshot.ciphertext, sodium)
+      hash(currentSnapshot.ciphertext, sodium) ||
+    snapshotProofChain[snapshotProofChain.length - 1].snapshotId !==
+      currentSnapshot.publicData.snapshotId
   ) {
     return false;
   }
 
   // check all items in between
   snapshotProofChain.forEach((snapshotProofChainEntry, index) => {
-    const { parentSnapshotProof, snapshotCiphertextHash } =
+    const { parentSnapshotProof, snapshotCiphertextHash, snapshotId } =
       snapshotProofChainEntry;
-    const parentSnapshotProofBasedOnHash = createParentSnapshotProofBasedOnHash(
-      {
-        grandParentSnapshotProof: parentSnapshotProof,
-        parentSnapshotCiphertextHash: snapshotCiphertextHash,
-        sodium,
-      }
-    );
+    const parentSnapshotProofBasedOnHash = createParentSnapshotProof({
+      grandParentSnapshotProof: parentSnapshotProof,
+      parentSnapshotId: snapshotId,
+      parentSnapshotCiphertextHash: snapshotCiphertextHash,
+      sodium,
+    });
     if (
       index < snapshotProofChain.length - 1 &&
       parentSnapshotProofBasedOnHash !==

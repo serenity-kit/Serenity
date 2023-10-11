@@ -82,7 +82,6 @@ export default function Page({
     keyDerivationTrace: KeyDerivationTrace;
     key: Uint8Array;
   } | null>(null);
-  const yAwarenessRef = useRef<Awareness>(new Awareness(yDocRef.current));
   const [documentLoadedFromLocalDb, setDocumentLoadedFromLocalDb] =
     useState(false);
   const [documentLoadedOnceFromRemote, setDocumentLoadedOnceFromRemote] =
@@ -109,16 +108,17 @@ export default function Page({
   const { websocketOrigin } = getEnvironmentUrls();
   const { users, workspaceChainData } = useWorkspace();
 
-  const [state] = useYjsSync({
+  const [state, , , yAwareness] = useYjsSync({
     yDoc: yDocRef.current,
-    yAwareness: yAwarenessRef.current,
     documentId: docId,
     signatureKeyPair,
     websocketHost: websocketOrigin,
     websocketSessionKey: sessionKey,
-    onSnapshotSaved: async () => {
-      snapshotKeyRef.current = snapshotInFlightKeyRef.current;
-      snapshotInFlightKeyRef.current = null;
+    onDocumentUpdated: ({ type, knownSnapshotInfo }) => {
+      if (type === "snapshot-saved") {
+        snapshotKeyRef.current = snapshotInFlightKeyRef.current;
+        snapshotInFlightKeyRef.current = null;
+      }
     },
     getNewSnapshotData: async () => {
       const documentResult = await runDocumentQuery({ id: docId });
@@ -170,13 +170,21 @@ export default function Page({
         publicData: {
           keyDerivationTrace: snapshotKeyData.keyDerivationTrace,
         },
+        // TODO make it part of the publicData
         additionalServerData: { documentTitleData },
       };
     },
-    getSnapshotKey: async (snapshot) => {
+    getSnapshotKey: async (snapshotProofInfo) => {
+      if (!snapshotProofInfo) {
+        throw new Error(
+          "SnapshotProofInfo not provided when trying to derive a new key"
+        );
+      }
+
+      // TODO fetch snapshotKeyDerivationTrace from server
       const snapshotKeyData = await deriveExistingSnapshotKey(
         docId,
-        snapshot,
+        snapshot, // keyTrace
         activeDevice as LocalDevice
       );
 
@@ -187,7 +195,7 @@ export default function Page({
       };
       setActiveSnapshotAndCommentKeys(
         {
-          id: snapshot.publicData.snapshotId,
+          id: snapshotProofInfo.snapshotId,
           key: snapshotKeyData.key,
         },
         {}
@@ -195,17 +203,11 @@ export default function Page({
 
       return key;
     },
-    getUpdateKey: async (update) => {
-      return snapshotKeyRef.current?.key as Uint8Array;
-    },
-    shouldSendSnapshot: ({ latestServerVersion }) => {
+    shouldSendSnapshot: ({ snapshotUpdatesCount }) => {
       // create a new snapshot if the active snapshot has more than 100 updates
-      return latestServerVersion !== null && latestServerVersion > 100;
+      return snapshotUpdatesCount !== null && snapshotUpdatesCount > 100;
     },
-    getEphemeralUpdateKey: async () => {
-      return snapshotKeyRef.current?.key as Uint8Array;
-    },
-    isValidCollaborator: async (signingPublicKey: string) => {
+    isValidClient: async (signingPublicKey: string) => {
       // TODO this should also work for users that have been removed
       // allow to fetch a user that is or was part of the workspace
       // the must be cross-checked with workspaceChainData
@@ -251,11 +253,12 @@ export default function Page({
     //   console.log("CUSTOM MESSAGE:", message);
     // },
     additionalAuthenticationDataValidations: {
-      // @ts-ignore works on the ci, but not locally
       snapshot: SerenitySnapshotPublicData,
     },
     sodium,
   });
+
+  const yAwarenessRef = useRef<Awareness>(yAwareness);
 
   useEffect(() => {
     setTimeout(() => {
@@ -333,8 +336,8 @@ export default function Page({
   }, [state.context._documentDecryptionState]);
 
   useEffect(() => {
-    console.log(state.context._ephemeralUpdateErrors);
-    if (state.context._ephemeralUpdateErrors.length > 0) {
+    console.log(state.context._ephemeralMessageReceivingErrors);
+    if (state.context._ephemeralMessageReceivingErrors.length > 0) {
       const now = new Date(); // Current date and time
       const fiveMinInMs = 60000 * 5;
       const fiveMinsAgo = new Date(now.getTime() - fiveMinInMs);
@@ -351,7 +354,8 @@ export default function Page({
       }
       ephemeralUpdateErrorsChangedAt.current = new Date();
     }
-  }, [state.context._ephemeralUpdateErrors.length]);
+    // TODO since they are limited to a max length, the length will not be good enough
+  }, [state.context._ephemeralMessageReceivingErrors.length]);
 
   useEffect(() => {
     if (state.matches("failed")) {

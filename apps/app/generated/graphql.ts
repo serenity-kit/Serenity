@@ -321,11 +321,8 @@ export type DeleteWorkspacesResult = {
 export type Device = {
   __typename?: 'Device';
   createdAt?: Maybe<Scalars['Date']>;
-  encryptionPublicKey: Scalars['String'];
-  encryptionPublicKeySignature: Scalars['String'];
   info?: Maybe<Scalars['String']>;
   signingPublicKey: Scalars['String'];
-  userId: Scalars['String'];
 };
 
 export type DeviceConnection = {
@@ -422,8 +419,9 @@ export type DocumentSnapshotInput = {
 export type DocumentSnapshotPublicDataInput = {
   docId: Scalars['String'];
   keyDerivationTrace: KeyDerivationTraceInput;
-  parentSnapshotClocks: DocumentSnapshotPublicDataParentSnapshotClocksInput;
+  parentSnapshotId: Scalars['String'];
   parentSnapshotProof: Scalars['String'];
+  parentSnapshotUpdateClocks: DocumentSnapshotPublicDataParentSnapshotClocksInput;
   pubKey: Scalars['String'];
   snapshotId?: InputMaybe<Scalars['String']>;
 };
@@ -1087,12 +1085,12 @@ export type UnauthorizedMemberResult = {
 
 export type Update = {
   __typename?: 'Update';
+  clock: Scalars['Int'];
   data: Scalars['String'];
   id: Scalars['String'];
   pubKey: Scalars['String'];
   snapshot?: Maybe<Snapshot>;
   snapshotId: Scalars['String'];
-  snapshotVersion: Scalars['Int'];
   version: Scalars['Int'];
 };
 
@@ -1261,18 +1259,6 @@ export type WorkspaceEdge = {
   cursor: Scalars['String'];
   /** https://facebook.github.io/relay/graphql/connections.htm#sec-Node */
   node?: Maybe<Workspace>;
-};
-
-export type WorkspaceIdWithDevices = {
-  __typename?: 'WorkspaceIdWithDevices';
-  devices: Array<Device>;
-  id: Scalars['String'];
-};
-
-export type WorkspaceIdWithMemberDevices = {
-  __typename?: 'WorkspaceIdWithMemberDevices';
-  id: Scalars['String'];
-  members: Array<WorkspaceIdWithDevices>;
 };
 
 export type WorkspaceInvitation = {

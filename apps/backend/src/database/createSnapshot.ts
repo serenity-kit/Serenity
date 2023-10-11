@@ -1,13 +1,13 @@
 import {
   KeyDerivationTrace,
-  SerenitySnapshotWithClientData,
+  SerenitySnapshot,
   hash,
 } from "@serenity-tools/common";
 import {
-  CreateSnapshotParams,
   SecsyncNewSnapshotRequiredError,
   SecsyncSnapshotBasedOnOutdatedSnapshotError,
   SecsyncSnapshotMissesUpdatesError,
+  compareUpdateClocks,
 } from "@serenity-tools/secsync";
 import { Prisma } from "../../prisma/generated/output";
 import { serializeSnapshot } from "../utils/serialize";
@@ -21,39 +21,32 @@ export type CreateSnapshotDocumentTitleData = {
   subkeyId: number;
 };
 
-type Params = CreateSnapshotParams & {
-  snapshot: SerenitySnapshotWithClientData;
-  workspaceId: string;
+type Params = {
+  snapshot: SerenitySnapshot;
 };
 
-export async function createSnapshot({
-  snapshot,
-  workspaceId,
-  activeSnapshotInfo,
-}: Params) {
+export async function createSnapshot({ snapshot }: Params) {
   return await prisma.$transaction(
     async (prisma) => {
+      // TODO documentTitleData should be part of the public data
+      const documentTitleData = undefined;
       // TODO parse it with zod?
-      const documentTitle: CreateSnapshotDocumentTitleData =
-        // @ts-expect-error need to better type it
-        snapshot.additionalServerData?.documentTitleData;
+      // const documentTitle: CreateSnapshotDocumentTitleData =
+      //   snapshot.additionalServerData?.documentTitleData;
 
-      const documentPromise = prisma.document.findUniqueOrThrow({
+      const document = await prisma.document.findUniqueOrThrow({
         where: { id: snapshot.publicData.docId },
         select: {
           activeSnapshot: true,
           requiresSnapshot: true,
+          workspaceId: true,
         },
       });
-      const currentWorkspaceKeyPromise = prisma.workspaceKey.findFirstOrThrow({
-        where: { workspaceId },
+      const currentWorkspaceKey = await prisma.workspaceKey.findFirstOrThrow({
+        where: { workspaceId: document.workspaceId },
         select: { id: true },
         orderBy: { generation: "desc" },
       });
-      const [document, currentWorkspaceKey] = await Promise.all([
-        documentPromise,
-        currentWorkspaceKeyPromise,
-      ]);
 
       const snapshotKeyDerivationTrace = snapshot.publicData
         .keyDerivationTrace as KeyDerivationTrace;
@@ -84,38 +77,41 @@ export async function createSnapshot({
       //   );
       // }
 
-      if (
-        document.activeSnapshot &&
-        activeSnapshotInfo !== undefined &&
-        document.activeSnapshot.id !== activeSnapshotInfo.snapshotId
-      ) {
-        throw new SecsyncSnapshotBasedOnOutdatedSnapshotError(
-          "Snapshot is out of date."
+      if (document.activeSnapshot) {
+        if (
+          snapshot.publicData.parentSnapshotId !== undefined &&
+          snapshot.publicData.parentSnapshotId !== document.activeSnapshot.id
+        ) {
+          throw new SecsyncSnapshotBasedOnOutdatedSnapshotError(
+            "Snapshot is out of date."
+          );
+        }
+
+        const compareUpdateClocksResult = compareUpdateClocks(
+          // @ts-expect-error the values are parsed by the function
+          document.activeSnapshot.clocks,
+          snapshot.publicData.parentSnapshotUpdateClocks
         );
+
+        if (!compareUpdateClocksResult.equal) {
+          throw new SecsyncSnapshotMissesUpdatesError(
+            "Snapshot does not include the latest changes."
+          );
+        }
       }
 
-      if (
-        document.activeSnapshot &&
-        activeSnapshotInfo !== undefined &&
-        document.activeSnapshot.latestVersion !==
-          activeSnapshotInfo.latestVersion
-      ) {
-        throw new SecsyncSnapshotMissesUpdatesError(
-          "Snapshot does not include the latest changes."
-        );
-      }
-
-      if (documentTitle) {
-        await prisma.document.update({
-          where: { id: snapshot.publicData.docId },
-          data: {
-            nameCiphertext: documentTitle.ciphertext,
-            nameNonce: documentTitle.publicNonce,
-            workspaceKeyId: documentTitle.workspaceKeyId,
-            subkeyId: documentTitle.subkeyId,
-          },
-        });
-      }
+      // TODO bring back updating the documentTitle
+      // if (documentTitleData) {
+      //   await prisma.document.update({
+      //     where: { id: snapshot.publicData.docId },
+      //     data: {
+      //       nameCiphertext: documentTitleData.ciphertext,
+      //       nameNonce: documentTitleData.publicNonce,
+      //       workspaceKeyId: documentTitleData.workspaceKeyId,
+      //       subkeyId: documentTitleData.subkeyId,
+      //     },
+      //   });
+      // }
 
       // only update when necessary
       if (document.requiresSnapshot) {
@@ -138,8 +134,8 @@ export async function createSnapshot({
           keyDerivationTrace: snapshot.publicData.keyDerivationTrace,
           clocks: {},
           parentSnapshotProof: snapshot.publicData.parentSnapshotProof,
-          // TODO additionally could verify that the parentSnapshotClocks of the saved parent snapshot
-          parentSnapshotClocks: snapshot.publicData.parentSnapshotClocks,
+          parentSnapshotUpdateClocks:
+            snapshot.publicData.parentSnapshotUpdateClocks,
         },
       });
       return serializeSnapshot(newSnapshot);

@@ -13,7 +13,10 @@ import {
   generateId,
   snapshotDerivedKeyContext,
 } from "@serenity-tools/common";
-import { createInitialSnapshot } from "@serenity-tools/secsync";
+import {
+  SnapshotPublicData,
+  createInitialSnapshot,
+} from "@serenity-tools/secsync";
 import {
   Icon,
   IconButton,
@@ -298,12 +301,13 @@ export default function SidebarFolder(props: Props) {
       privateKey: sodium.from_base64(activeDevice.signingPrivateKey!),
       keyType: "ed25519",
     };
-    const publicData = {
+    const publicData: SnapshotPublicData & SerenitySnapshotPublicData = {
       snapshotId: snapshotId,
       docId: documentId,
       pubKey: sodium.to_base64(signatureKeyPair.publicKey),
       keyDerivationTrace: snapshotKeyDerivationTrace,
-      parentSnapshotClocks: {},
+      parentSnapshotId: "",
+      parentSnapshotUpdateClocks: {},
     };
     // created using:
     // const yDocState = Yjs.encodeStateAsUpdateV2(yDocRef.current);

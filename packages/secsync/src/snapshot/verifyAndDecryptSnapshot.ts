@@ -1,68 +1,122 @@
-import canonicalize from "canonicalize";
 import { decryptAead } from "../crypto/decryptAead";
 import { verifySignature } from "../crypto/verifySignature";
-import { ParentSnapshotProofInfo, Snapshot } from "../types";
+import { Snapshot, SnapshotProofInfo } from "../types";
+import { canonicalizeAndToBase64 } from "../utils/canonicalizeAndToBase64";
 import { isValidParentSnapshot } from "./isValidParentSnapshot";
 
 export function verifyAndDecryptSnapshot(
   snapshot: Snapshot,
   key: Uint8Array,
-  publicKey: Uint8Array,
+  currentDocId: string,
   currentClientPublicKey: Uint8Array,
   sodium: typeof import("libsodium-wrappers"),
-  parentSnapshotProofInfo?: ParentSnapshotProofInfo,
-  parentSnapshotUpdateClock?: number
+  parentSnapshotProofInfo?: SnapshotProofInfo,
+  parentSnapshotUpdateClock?: number,
+  logging?: "error" | "debug" | "off"
 ) {
-  const publicDataAsBase64 = sodium.to_base64(
-    canonicalize(snapshot.publicData) as string
-  );
+  try {
+    let publicKey: Uint8Array;
+    let publicDataAsBase64: string;
 
-  const isValid = verifySignature(
-    {
-      nonce: snapshot.nonce,
-      ciphertext: snapshot.ciphertext,
-      publicData: publicDataAsBase64,
-    },
-    snapshot.signature,
-    publicKey,
-    sodium
-  );
-  if (!isValid) {
-    throw new Error("Invalid snapshot");
-  }
+    try {
+      publicKey = sodium.from_base64(snapshot.publicData.pubKey);
 
-  if (parentSnapshotProofInfo) {
-    const isValid = isValidParentSnapshot({
-      snapshot,
-      parentSnapshotCiphertext: parentSnapshotProofInfo.ciphertext,
-      grandParentSnapshotProof: parentSnapshotProofInfo.parentSnapshotProof,
-      sodium,
-    });
-    if (!isValid) {
-      throw new Error("Invalid parent snapshot verification");
+      publicDataAsBase64 = canonicalizeAndToBase64(snapshot.publicData, sodium);
+
+      const isValid = verifySignature(
+        {
+          nonce: snapshot.nonce,
+          ciphertext: snapshot.ciphertext,
+          publicData: publicDataAsBase64,
+        },
+        snapshot.signature,
+        publicKey,
+        sodium
+      );
+      if (!isValid) {
+        return {
+          error: new Error("SECSYNC_ERROR_111"),
+        };
+      }
+    } catch (err) {
+      if (logging === "error" || logging === "debug") {
+        console.error(err);
+      }
+      return {
+        error: new Error("SECSYNC_ERROR_111"),
+      };
     }
-  }
 
-  if (parentSnapshotUpdateClock) {
-    const currentClientPublicKeyString = sodium.to_base64(
-      currentClientPublicKey
-    );
-
-    if (
-      snapshot.publicData.parentSnapshotClocks[currentClientPublicKeyString] !==
-        undefined &&
-      parentSnapshotUpdateClock ===
-        snapshot.publicData.parentSnapshotClocks[currentClientPublicKeyString]
-    ) {
-      throw new Error("Invalid updateClock for the parent snapshot");
+    if (currentDocId !== snapshot.publicData.docId) {
+      return {
+        error: new Error("SECSYNC_ERROR_113"),
+      };
     }
-  }
 
-  return decryptAead(
-    sodium.from_base64(snapshot.ciphertext),
-    publicDataAsBase64,
-    key,
-    snapshot.nonce,
-    sodium
-  );
+    if (parentSnapshotProofInfo) {
+      try {
+        const isValid = isValidParentSnapshot({
+          snapshot,
+          parentSnapshotCiphertextHash:
+            parentSnapshotProofInfo.snapshotCiphertextHash,
+          parentSnapshotId: parentSnapshotProofInfo.snapshotId,
+          grandParentSnapshotProof: parentSnapshotProofInfo.parentSnapshotProof,
+          sodium,
+        });
+        if (!isValid) {
+          return {
+            error: new Error("SECSYNC_ERROR_112"),
+          };
+        }
+      } catch (err) {
+        if (logging === "error" || logging === "debug") {
+          console.error(err);
+        }
+        return {
+          error: new Error("SECSYNC_ERROR_112"),
+        };
+      }
+    }
+
+    if (parentSnapshotUpdateClock !== undefined) {
+      const currentClientPublicKeyString = sodium.to_base64(
+        currentClientPublicKey
+      );
+
+      if (
+        snapshot.publicData.parentSnapshotUpdateClocks[
+          currentClientPublicKeyString
+        ] !== parentSnapshotUpdateClock
+      ) {
+        return {
+          error: new Error("SECSYNC_ERROR_102"),
+        };
+      }
+    }
+
+    try {
+      const content = decryptAead(
+        sodium.from_base64(snapshot.ciphertext),
+        publicDataAsBase64,
+        key,
+        snapshot.nonce,
+        sodium
+      );
+      return { content };
+    } catch (err) {
+      if (logging === "error" || logging === "debug") {
+        console.error(err);
+      }
+      return {
+        error: new Error("SECSYNC_ERROR_101"),
+      };
+    }
+  } catch (err) {
+    if (logging === "error" || logging === "debug") {
+      console.error(err);
+    }
+    return {
+      error: new Error("SECSYNC_ERROR_100"),
+    };
+  }
 }

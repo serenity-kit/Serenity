@@ -10,7 +10,7 @@ export const Update = objectType({
     t.nonNull.string("data");
     t.nonNull.string("snapshotId");
     t.field("snapshot", { type: Snapshot });
-    t.nonNull.int("snapshotVersion");
+    t.nonNull.int("clock");
     t.nonNull.string("pubKey");
   },
 });
