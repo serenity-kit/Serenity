@@ -47,10 +47,7 @@ export async function createDocument({
     },
   });
   if (document) {
-    await createSnapshot({
-      snapshot,
-      workspaceId: document.workspaceId,
-    });
+    await createSnapshot({ snapshot });
   }
   return document;
 }

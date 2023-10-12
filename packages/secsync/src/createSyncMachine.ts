@@ -24,6 +24,7 @@ import {
   OnDocumentUpdatedEventType,
   Snapshot,
   SnapshotInfoWithUpdateClocks,
+  SnapshotProofChainEntry,
   SnapshotProofInfo,
   SnapshotPublicData,
   SyncMachineConfig,
@@ -685,6 +686,12 @@ export const createSyncMachine = () =>
                 if (context.logging === "debug") {
                   console.log("createAndSendSnapshot", snapshotData);
                 }
+                // only if there is an entry we provide the object, and empty object is not
+                // desired as it would be inconsistent
+                const additionalPublicData =
+                  Object.keys(snapshotData.publicData).length === 0
+                    ? undefined
+                    : snapshotData.publicData;
 
                 // no snapshot exists so far
                 if (activeSnapshotInfoWithUpdateClocks === null) {
@@ -717,7 +724,7 @@ export const createSyncMachine = () =>
                       snapshot.publicData.parentSnapshotProof,
                     parentSnapshotId: snapshot.publicData.parentSnapshotId,
                     changes: pendingChangesQueue,
-                    additionalPublicData: snapshotData.publicData,
+                    additionalPublicData,
                   };
                   pendingChangesQueue = [];
 
@@ -765,7 +772,7 @@ export const createSyncMachine = () =>
                       snapshot.publicData.parentSnapshotProof,
                     parentSnapshotId: snapshot.publicData.parentSnapshotId,
                     changes: pendingChangesQueue,
-                    additionalPublicData: snapshotData.publicData,
+                    additionalPublicData,
                   };
                   pendingChangesQueue = [];
 
@@ -842,7 +849,7 @@ export const createSyncMachine = () =>
 
             const processSnapshot = async (
               rawSnapshot: Snapshot,
-              snapshotProofChain: SnapshotProofInfo[],
+              snapshotProofChain: SnapshotProofChainEntry[],
               knownSnapshotInfo?: SnapshotInfoWithUpdateClocks
             ) => {
               try {

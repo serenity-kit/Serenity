@@ -201,10 +201,13 @@ export type EphemeralMessagesSession = {
   validSessions: ValidSessions;
 };
 
-export type SnapshotProofInfo = {
+export type SnapshotProofChainEntry = {
   snapshotId: string;
   snapshotCiphertextHash: string;
   parentSnapshotProof: string;
+};
+
+export type SnapshotProofInfo = SnapshotProofChainEntry & {
   additionalPublicData: any;
 };
 
