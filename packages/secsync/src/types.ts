@@ -205,6 +205,7 @@ export type SnapshotProofInfo = {
   snapshotId: string;
   snapshotCiphertextHash: string;
   parentSnapshotProof: string;
+  additionalPublicData: any;
 };
 
 export type SnapshotInfoWithUpdateClocks = SnapshotProofInfo & {

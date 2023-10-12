@@ -7,7 +7,6 @@ import {
   generateId,
   notNull,
 } from "@serenity-tools/common";
-import { decryptDocumentTitleBasedOnSnapshotKey } from "@serenity-tools/common/src/decryptDocumentTitleBasedOnSnapshotKey/decryptDocumentTitleBasedOnSnapshotKey";
 import { AwarenessUserInfo } from "@serenity-tools/editor";
 import { useYjsSync } from "@serenity-tools/secsync";
 import {
@@ -147,15 +146,15 @@ export default function Page({
         throw new Error("Workspace or workspaceKeys not found");
       }
 
-      const documentTitle = decryptDocumentTitleBasedOnSnapshotKey({
-        snapshotKey: sodium.to_base64(snapshotKeyRef.current!.key),
-        ciphertext: document.nameCiphertext,
-        nonce: document.nameNonce,
-        subkeyId: document.subkeyId,
-      });
+      // const documentTitle = decryptDocumentTitleBasedOnSnapshotKey({
+      //   snapshotKey: sodium.to_base64(snapshotKeyRef.current!.key),
+      //   ciphertext: document.nameCiphertext,
+      //   nonce: document.nameNonce,
+      //   subkeyId: document.subkeyId,
+      // });
 
       const documentTitleData = encryptDocumentTitle({
-        title: documentTitle,
+        title: "TODO FIX TITLE",
         activeDevice,
         snapshot: {
           keyDerivationTrace: snapshotKeyData.keyDerivationTrace,
@@ -181,16 +180,16 @@ export default function Page({
         );
       }
 
-      // TODO fetch snapshotKeyDerivationTrace from server
       const snapshotKeyData = await deriveExistingSnapshotKey(
         docId,
-        snapshot, // keyTrace
+        snapshotProofInfo.additionalPublicData.keyDerivationTrace,
         activeDevice as LocalDevice
       );
 
       const key = sodium.from_base64(snapshotKeyData.key);
       snapshotKeyRef.current = {
-        keyDerivationTrace: snapshot.publicData.keyDerivationTrace,
+        keyDerivationTrace:
+          snapshotProofInfo.additionalPublicData.keyDerivationTrace,
         key,
       };
       setActiveSnapshotAndCommentKeys(
@@ -204,8 +203,9 @@ export default function Page({
       return key;
     },
     shouldSendSnapshot: ({ snapshotUpdatesCount }) => {
+      console.log({ snapshotUpdatesCount });
       // create a new snapshot if the active snapshot has more than 100 updates
-      return snapshotUpdatesCount !== null && snapshotUpdatesCount > 100;
+      return snapshotUpdatesCount !== null && snapshotUpdatesCount > 10;
     },
     isValidClient: async (signingPublicKey: string) => {
       // TODO this should also work for users that have been removed
@@ -255,6 +255,7 @@ export default function Page({
     additionalAuthenticationDataValidations: {
       snapshot: SerenitySnapshotPublicData,
     },
+    logging: "debug",
     sodium,
   });
 
@@ -336,7 +337,7 @@ export default function Page({
   }, [state.context._documentDecryptionState]);
 
   useEffect(() => {
-    console.log(state.context._ephemeralMessageReceivingErrors);
+    console.warn(state.context._ephemeralMessageReceivingErrors);
     if (state.context._ephemeralMessageReceivingErrors.length > 0) {
       const now = new Date(); // Current date and time
       const fiveMinInMs = 60000 * 5;
