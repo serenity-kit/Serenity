@@ -196,9 +196,8 @@ export default function Page({
       return key;
     },
     shouldSendSnapshot: ({ snapshotUpdatesCount }) => {
-      console.log({ snapshotUpdatesCount });
       // create a new snapshot if the active snapshot has more than 100 updates
-      return snapshotUpdatesCount !== null && snapshotUpdatesCount > 10;
+      return snapshotUpdatesCount !== null && snapshotUpdatesCount > 100;
     },
     isValidClient: async (signingPublicKey: string) => {
       // TODO this should also work for users that have been removed
@@ -248,7 +247,7 @@ export default function Page({
     additionalAuthenticationDataValidations: {
       snapshot: SerenitySnapshotPublicData,
     },
-    logging: "debug",
+    logging: "error",
     sodium,
   });
 
