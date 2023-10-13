@@ -7,7 +7,6 @@ import {
   generateId,
   notNull,
 } from "@serenity-tools/common";
-import { AwarenessUserInfo } from "@serenity-tools/editor";
 import { useYjsSync } from "@serenity-tools/secsync";
 import {
   Button,
@@ -17,8 +16,6 @@ import {
   ModalHeader,
   Text,
   View,
-  collaboratorColorToHex,
-  hashToCollaboratorColor,
   tw,
   useHasEditorSidebar,
 } from "@serenity-tools/ui";
@@ -87,10 +84,6 @@ export default function Page({
     useState(false);
   const [passedDocumentLoadingTimeout, setPassedDocumentLoadingTimeout] =
     useState(false);
-  const [userInfo, setUserInfo] = useState<AwarenessUserInfo>({
-    name: "Unknown user",
-    color: "#000000",
-  });
   const syncState = useEditorStore((state) => state.syncState);
   const setSyncState = useEditorStore((state) => state.setSyncState);
   const setDocumentState = useEditorStore((state) => state.setDocumentState);
@@ -280,12 +273,6 @@ export default function Page({
       }
 
       const me = await runMeQuery({});
-      setUserInfo({
-        name: me.data?.me?.username ?? "Unknown user",
-        color: me.data?.me?.id
-          ? collaboratorColorToHex(hashToCollaboratorColor(me.data?.me?.id))
-          : "#000000",
-      });
 
       let document: Document | undefined = undefined;
       try {
@@ -517,7 +504,6 @@ export default function Page({
         updateTitle={updateTitle}
         isNew={isNew}
         documentLoaded={documentLoaded || state.matches("failed")}
-        userInfo={userInfo}
         documentState={documentState}
       />
     </>

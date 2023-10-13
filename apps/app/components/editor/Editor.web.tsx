@@ -32,7 +32,6 @@ export default function Editor({
   workspaceId,
   isNew,
   updateTitle,
-  userInfo,
   editable,
   documentState,
 }: EditorProps) {
@@ -108,13 +107,6 @@ export default function Editor({
       editorToolbarService.off(onEventListener);
     };
   }, []);
-
-  useEffect(() => {
-    yAwarenessRef.current.setLocalStateField("user", {
-      name: userInfo.name,
-      color: userInfo.color,
-    });
-  }, [userInfo.color, userInfo.name, yAwarenessRef]);
 
   const encryptAndUploadFile = useMemo(() => {
     return createEncryptAndUploadFileFunction({

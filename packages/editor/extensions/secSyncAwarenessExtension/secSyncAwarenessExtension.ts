@@ -2,34 +2,37 @@ import { Extension } from "@tiptap/core";
 import { yCursorPlugin } from "y-prosemirror";
 import { Awareness } from "y-protocols/awareness";
 
-export interface AwarenessExtensionOptions {
+export interface YAwarenessExtensionOptions {
   awareness?: Awareness;
   // user: Record<string, any>;
   render(user: Record<string, any>): HTMLElement;
 }
 
-type AwarenessExtensionStorage = {
+type YAwarenessExtensionStorage = {
   users: { clientId: number; [key: string]: any }[];
 };
 
-export const AwarenessExtension = Extension.create<
-  AwarenessExtensionOptions,
-  AwarenessExtensionStorage
+export const YAwarenessExtension = Extension.create<
+  YAwarenessExtensionOptions,
+  YAwarenessExtensionStorage
 >({
-  name: "awarenessExtension",
+  name: "yAwarenessExtension",
 
   addOptions() {
     return {
       awareness: undefined,
       render: (user) => {
         const cursor = document.createElement("span");
-        cursor.style.setProperty("--collab-color", user.color);
+        cursor.style.setProperty("--collab-color", "#444");
         cursor.classList.add("collaboration-cursor__caret");
 
         const label = document.createElement("div");
         label.classList.add("collaboration-cursor__label");
 
-        label.insertBefore(document.createTextNode(user.name), null);
+        label.insertBefore(
+          document.createTextNode(`Client publicKey: ${user.publicKey}`),
+          null
+        );
         cursor.insertBefore(label, null);
 
         return cursor;
