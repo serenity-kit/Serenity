@@ -7,6 +7,7 @@ import {
   generateId,
   notNull,
 } from "@serenity-tools/common";
+import { decryptDocumentTitleBasedOnSnapshotKey } from "@serenity-tools/common/src/decryptDocumentTitleBasedOnSnapshotKey/decryptDocumentTitleBasedOnSnapshotKey";
 import { useYjsSync } from "@serenity-tools/secsync";
 import {
   Button,
@@ -139,15 +140,15 @@ export default function Page({
         throw new Error("Workspace or workspaceKeys not found");
       }
 
-      // const documentTitle = decryptDocumentTitleBasedOnSnapshotKey({
-      //   snapshotKey: sodium.to_base64(snapshotKeyRef.current!.key),
-      //   ciphertext: document.nameCiphertext,
-      //   nonce: document.nameNonce,
-      //   subkeyId: document.subkeyId,
-      // });
+      const documentTitle = decryptDocumentTitleBasedOnSnapshotKey({
+        snapshotKey: sodium.to_base64(snapshotKeyRef.current!.key),
+        ciphertext: document.nameCiphertext,
+        nonce: document.nameNonce,
+        subkeyId: document.subkeyId,
+      });
 
       const documentTitleData = encryptDocumentTitle({
-        title: "TODO FIX TITLE",
+        title: documentTitle,
         activeDevice,
         snapshot: {
           keyDerivationTrace: snapshotKeyData.keyDerivationTrace,
@@ -162,7 +163,6 @@ export default function Page({
         publicData: {
           keyDerivationTrace: snapshotKeyData.keyDerivationTrace,
         },
-        // TODO make it part of the publicData
         additionalServerData: { documentTitleData },
       };
     },

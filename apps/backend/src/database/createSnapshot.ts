@@ -1,6 +1,6 @@
 import {
   KeyDerivationTrace,
-  SerenitySnapshot,
+  SerenitySnapshotWithClientData,
   hash,
 } from "@serenity-tools/common";
 import {
@@ -15,24 +15,20 @@ import { prisma } from "./prisma";
 
 export type CreateSnapshotDocumentTitleData = {
   ciphertext: string;
-  publicNonce: string;
-  publicData: string;
+  nonce: string;
   workspaceKeyId: string;
   subkeyId: number;
 };
 
 type Params = {
-  snapshot: SerenitySnapshot;
+  snapshot: SerenitySnapshotWithClientData;
 };
 
 export async function createSnapshot({ snapshot }: Params) {
   return await prisma.$transaction(
     async (prisma) => {
-      // TODO documentTitleData should be part of the public data
-      const documentTitleData = undefined;
-      // TODO parse it with zod?
-      // const documentTitle: CreateSnapshotDocumentTitleData =
-      //   snapshot.additionalServerData?.documentTitleData;
+      const documentTitleData: CreateSnapshotDocumentTitleData | undefined =
+        snapshot.additionalServerData?.documentTitleData;
 
       const document = await prisma.document.findUniqueOrThrow({
         where: { id: snapshot.publicData.docId },
@@ -100,18 +96,17 @@ export async function createSnapshot({ snapshot }: Params) {
         }
       }
 
-      // TODO bring back updating the documentTitle
-      // if (documentTitleData) {
-      //   await prisma.document.update({
-      //     where: { id: snapshot.publicData.docId },
-      //     data: {
-      //       nameCiphertext: documentTitleData.ciphertext,
-      //       nameNonce: documentTitleData.publicNonce,
-      //       workspaceKeyId: documentTitleData.workspaceKeyId,
-      //       subkeyId: documentTitleData.subkeyId,
-      //     },
-      //   });
-      // }
+      if (documentTitleData) {
+        await prisma.document.update({
+          where: { id: snapshot.publicData.docId },
+          data: {
+            nameCiphertext: documentTitleData.ciphertext,
+            nameNonce: documentTitleData.publicNonce,
+            workspaceKeyId: documentTitleData.workspaceKeyId,
+            subkeyId: documentTitleData.subkeyId,
+          },
+        });
+      }
 
       // only update when necessary
       if (document.requiresSnapshot) {
