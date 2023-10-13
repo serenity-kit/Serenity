@@ -19,13 +19,6 @@ export async function getDocumentWithContent({
         throw new Error("Active Snapshot not found");
       }
 
-      // let parentFolder: Folder | null = null;
-      // if (doc.parentFolderId) {
-      //   parentFolder = await prisma.folder.findUnique({
-      //     where: { id: doc.parentFolderId },
-      //   });
-      // }
-
       let snapshotProofChain: {
         id: string;
         parentSnapshotProof: string;
@@ -96,18 +89,6 @@ export async function getDocumentWithContent({
       }
 
       return {
-        // doc: {
-        //   id: doc.id,
-        //   parentFolderId: doc.parentFolderId,
-        //   workspaceKeyId: doc.workspaceKeyId,
-        //   workspaceId: doc.workspaceId,
-        // },
-        // parentFolder: {
-        //   id: parentFolder?.id,
-        //   parentFolderId: parentFolder?.parentFolderId,
-        //   subkeyId: parentFolder?.subkeyId, // TODO: remove
-        //   keyDerivationTrace: parentFolder?.keyDerivationTrace,
-        // },
         snapshot: serializeSnapshot(activeSnapshot),
         updates: serializeUpdates(activeSnapshot.updates),
         snapshotProofChain: snapshotProofChain.map(
