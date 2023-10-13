@@ -1,5 +1,8 @@
 import * as workspaceChain from "@serenity-kit/workspace-chain";
-import { KeyDerivationTrace, SerenitySnapshot } from "@serenity-tools/common";
+import {
+  KeyDerivationTrace,
+  SerenitySnapshotWithClientData,
+} from "@serenity-tools/common";
 import { formatFolder } from "../../types/folder";
 import { createSnapshot } from "../createSnapshot";
 import { createFolder } from "../folder/createFolder";
@@ -29,7 +32,7 @@ export type DocumentParams = {
   nameCiphertext: string;
   nameNonce: string;
   subkeyId: number;
-  snapshot: SerenitySnapshot;
+  snapshot: SerenitySnapshotWithClientData;
 };
 
 export type Params = {

@@ -101,7 +101,7 @@ export async function createSnapshot({ snapshot }: Params) {
           where: { id: snapshot.publicData.docId },
           data: {
             nameCiphertext: documentTitleData.ciphertext,
-            nameNonce: documentTitleData.publicNonce,
+            nameNonce: documentTitleData.nonce,
             workspaceKeyId: documentTitleData.workspaceKeyId,
             subkeyId: documentTitleData.subkeyId,
           },
