@@ -3,14 +3,16 @@ import {
   decryptWorkspaceKey,
   folderDerivedKeyContext,
   LocalDevice,
+  SerenitySnapshotPublicData,
   snapshotDerivedKeyContext,
 } from "@serenity-tools/common";
 import { kdfDeriveFromKey } from "@serenity-tools/common/src/kdfDeriveFromKey/kdfDeriveFromKey";
 import {
-  createInitialSnapshot,
   createSnapshot,
   createUpdate,
+  hash,
   Snapshot,
+  SnapshotPublicData,
 } from "@serenity-tools/secsync";
 import sodium, { KeyPair } from "react-native-libsodium";
 import { Device } from "../prisma/generated/output";
@@ -23,11 +25,13 @@ import {
 } from "../test/helpers/websocket";
 import { getWorkspace } from "../test/helpers/workspace/getWorkspace";
 import { prisma } from "./database/prisma";
+import { getSnapshot } from "./database/snapshot/getSnapshot";
 import createUserWithWorkspace from "./database/testHelpers/createUserWithWorkspace";
 
 const graphql = setupGraphql();
 const username = "59f80f08-c065-4acc-a542-2725fb2dff6c@example.com";
 let workspaceId = "";
+let userId = "";
 const documentId = "72fbd941-42b7-4263-89fe-65bf43f455a7";
 let device: Device | null = null;
 let webDevice: LocalDevice | null = null;
@@ -37,7 +41,6 @@ let addedFolder: any = null;
 let folderKey = "";
 let addedWorkspace: any = null;
 let snapshotId: string = "";
-let latestServerVersion = null;
 let encryptionPrivateKey = "";
 let lastSnapshotKey = "";
 let firstSnapshot: Snapshot;
@@ -46,6 +49,7 @@ const setup = async () => {
   const result = await createUserWithWorkspace({
     username,
   });
+  userId = result.user.id;
   workspaceId = result.workspace.id;
   device = result.device;
   webDevice = result.webDevice;
@@ -83,6 +87,9 @@ beforeAll(async () => {
 });
 
 test("successfully creates a snapshot", async () => {
+  const initialSnapshot = await getSnapshot({ documentId, userId });
+  if (!initialSnapshot) throw new Error("No initial snapshot");
+
   const { client, messages } = await createSocketClient(
     graphql.port,
     `/${documentId}?sessionKey=${sessionKey}`,
@@ -115,25 +122,27 @@ test("successfully creates a snapshot", async () => {
     privateKey: sodium.from_base64(webDevice!.signingPrivateKey),
     keyType: "ed25519",
   };
-  const publicData = {
+  const publicData: SnapshotPublicData & SerenitySnapshotPublicData = {
     snapshotId: id,
     docId: documentId,
     pubKey: sodium.to_base64(signatureKeyPair.publicKey),
     keyDerivationTrace,
-    parentSnapshotClocks: {},
+    parentSnapshotId: initialSnapshot.id,
+    parentSnapshotUpdateClocks: {},
   };
-  firstSnapshot = createInitialSnapshot(
+  firstSnapshot = createSnapshot(
     "CONTENT DUMMY",
     publicData,
     sodium.from_base64(snapshotKey.key),
     signatureKeyPair,
+    initialSnapshot.ciphertextHash,
+    initialSnapshot.parentSnapshotProof,
     sodium
   );
   snapshotId = firstSnapshot.publicData.snapshotId;
   client.send(
     JSON.stringify({
       ...firstSnapshot,
-      latestServerVersion,
     })
   );
 
@@ -177,8 +186,6 @@ test("successfully creates an update", async () => {
   expect(messages[1].type).toEqual("update-saved");
   expect(messages[1].clock).toEqual(0);
   expect(messages[1].snapshotId).toEqual(snapshotId);
-  expect(messages[1].serverVersion).toEqual(1);
-  latestServerVersion = messages[1].serverVersion;
 });
 
 test("if document is set to requiresSnapshot updates will fail", async () => {
@@ -281,19 +288,22 @@ test("successfully creates a snapshot", async () => {
     privateKey: sodium.from_base64(webDevice!.signingPrivateKey),
     keyType: "ed25519",
   };
-  const publicData = {
+  const publicData: SnapshotPublicData & SerenitySnapshotPublicData = {
     snapshotId: id,
     docId: documentId,
     pubKey: sodium.to_base64(signatureKeyPair.publicKey),
     keyDerivationTrace,
-    parentSnapshotClocks: {},
+    parentSnapshotId: firstSnapshot.publicData.snapshotId,
+    parentSnapshotUpdateClocks: {
+      [webDevice!.signingPublicKey]: 0,
+    },
   };
   const snapshot = createSnapshot(
     "CONTENT DUMMY",
     publicData,
     sodium.from_base64(snapshotKey.key),
     signatureKeyPair,
-    firstSnapshot.ciphertext,
+    hash(firstSnapshot.ciphertext, sodium),
     firstSnapshot.publicData.parentSnapshotProof,
     sodium
   );
@@ -301,7 +311,6 @@ test("successfully creates a snapshot", async () => {
     JSON.stringify({
       ...snapshot,
       lastKnownSnapshotId: snapshotId,
-      latestServerVersion,
     })
   );
   snapshotId = snapshot.publicData.snapshotId;
@@ -348,6 +357,4 @@ test("successfully creates an update", async () => {
   expect(messages[1].type).toEqual("update-saved");
   expect(messages[1].clock).toEqual(0);
   expect(messages[1].snapshotId).toEqual(snapshotId);
-  expect(messages[1].serverVersion).toEqual(1);
-  latestServerVersion = messages[1].serverVersion;
 });

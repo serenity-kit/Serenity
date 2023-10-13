@@ -1,5 +1,6 @@
 import { useMachine } from "@xstate/react";
-import { useEffect, useState } from "react";
+import * as decoding from "lib0/decoding";
+import { useEffect, useRef, useState } from "react";
 import {
   Awareness,
   applyAwarenessUpdate,
@@ -7,25 +8,43 @@ import {
   removeAwarenessStates,
 } from "y-protocols/awareness";
 import * as Yjs from "yjs";
-import { createSyncMachine } from "./createSyncMachine";
-import { SyncMachineConfig } from "./types";
-import { deserializeUint8ArrayUpdates } from "./utils/deserializeUint8ArrayUpdates";
-import { serializeUint8ArrayUpdates } from "./utils/serializeUint8ArrayUpdates";
+import {
+  SyncMachineConfig,
+  createSyncMachine,
+  deserializeUint8ArrayUpdates,
+  serializeUint8ArrayUpdates,
+} from "./";
 
 export type YjsSyncMachineConfig = Omit<
   SyncMachineConfig,
   | "applySnapshot"
   | "applyChanges"
-  | "applyEphemeralUpdates"
+  | "applyEphemeralMessage"
   | "serializeChanges"
   | "deserializeChanges"
 > & {
   yDoc: Yjs.Doc;
-  yAwareness: Awareness;
 };
 
+type AppendToTuple<T extends any[], U> = [...T, U];
+
+function appendAwareness<T extends any[]>(
+  tuple: T,
+  awareness: Awareness
+): AppendToTuple<T, Awareness> {
+  return [...tuple, awareness];
+}
+
 export const useYjsSync = (config: YjsSyncMachineConfig) => {
-  const { yDoc, yAwareness, ...rest } = config;
+  const { yDoc, ...rest } = config;
+
+  const yAwarenessRef = useRef<Awareness>(new Awareness(yDoc));
+  useState(() => {
+    yAwarenessRef.current.setLocalStateField("user", {
+      publicKey: config.sodium.to_base64(config.signatureKeyPair.publicKey),
+    });
+  });
+
   // necessary to avoid that the same machine context is re-used for different or remounted pages
   // more info here:
   //
@@ -55,10 +74,22 @@ export const useYjsSync = (config: YjsSyncMachineConfig) => {
           Yjs.applyUpdateV2(config.yDoc, change, "sec-sync-remote");
         });
       },
-      applyEphemeralUpdates: (decryptedEphemeralUpdates) => {
-        decryptedEphemeralUpdates.map((ephemeralUpdate) => {
-          applyAwarenessUpdate(config.yAwareness, ephemeralUpdate, null);
-        });
+      applyEphemeralMessage: (ephemeralMessage, authorClientPublicKey) => {
+        const decoder = decoding.createDecoder(ephemeralMessage);
+        const len = decoding.readVarUint(decoder);
+        let clientMatches = true;
+        for (let i = 0; i < len; i++) {
+          decoding.readVarUint(decoder); // clientId
+          decoding.readVarUint(decoder); // clock
+          const state = JSON.parse(decoding.readVarString(decoder));
+          if (authorClientPublicKey !== state.user.publicKey) {
+            clientMatches = false;
+          }
+        }
+
+        if (clientMatches) {
+          applyAwarenessUpdate(yAwarenessRef.current, ephemeralMessage, null);
+        }
       },
       serializeChanges: (changes: Uint8Array[]) =>
         serializeUint8ArrayUpdates(changes, config.sodium),
@@ -83,24 +114,40 @@ export const useYjsSync = (config: YjsSyncMachineConfig) => {
     }
 
     const onAwarenessUpdate = ({ added, updated, removed }: any) => {
+      // NOTE: an endless loop of sending ephemeral messages can happen if there are
+      // two prosemirror EditorViews are attached to the same DOM element
       const changedClients = added.concat(updated).concat(removed);
       const yAwarenessUpdate = encodeAwarenessUpdate(
-        yAwareness,
+        yAwarenessRef.current,
         changedClients
       );
-      send({ type: "ADD_EPHEMERAL_UPDATE", data: yAwarenessUpdate });
+      send({ type: "ADD_EPHEMERAL_MESSAGE", data: yAwarenessUpdate });
     };
 
-    yAwareness.on("update", onAwarenessUpdate);
+    yAwarenessRef.current.on("update", onAwarenessUpdate);
+
+    // remove awareness state when closing the browser tab
+    if (global.window) {
+      global.window.addEventListener("beforeunload", () => {
+        removeAwarenessStates(
+          yAwarenessRef.current,
+          [yDoc.clientID],
+          "window unload"
+        );
+      });
+    }
 
     return () => {
-      removeAwarenessStates(yAwareness, [yDoc.clientID], "document unmount");
-      yAwareness.off("update", onAwarenessUpdate);
-      yDoc.off("updateV2", onUpdate);
+      removeAwarenessStates(
+        yAwarenessRef.current,
+        [yDoc.clientID],
+        "hook unmount"
+      );
+      yAwarenessRef.current.off("update", onAwarenessUpdate);
+      yDoc.off("update", onUpdate);
     };
     // causes issues if ran multiple times e.g. awareness sharing to not work anymore
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [state.context._documentDecryptionState]);
 
-  return machine;
+  return appendAwareness(machine, yAwarenessRef.current);
 };

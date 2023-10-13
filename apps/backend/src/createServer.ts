@@ -1,11 +1,6 @@
 import { InvalidAuthorWorkspaceChainError } from "@serenity-kit/workspace-chain";
 import { SerenitySnapshotPublicData } from "@serenity-tools/common";
-import {
-  CreateSnapshotParams,
-  CreateUpdateParams,
-  GetDocumentParams,
-  createWebSocketConnection,
-} from "@serenity-tools/secsync";
+import { createWebSocketConnection } from "@serenity-tools/secsync";
 import {
   ApolloServerPluginLandingPageDisabled,
   ApolloServerPluginLandingPageGraphQLPlayground,
@@ -26,9 +21,7 @@ import { WebSocketServer } from "ws";
 import { getSessionIncludingUser } from "./database/authentication/getSessionIncludingUser";
 import { createSnapshot } from "./database/createSnapshot";
 import { createUpdate } from "./database/createUpdate";
-import { getDocument } from "./database/getDocument";
-import { getUpdatesForDocument } from "./database/getUpdatesForDocument";
-import { prisma } from "./database/prisma";
+import { getDocumentWithContent } from "./database/getDocumentWithContent";
 import { schema } from "./schema";
 import { ExpectedGraphqlError } from "./utils/expectedGraphqlError/expectedGraphqlError";
 
@@ -141,68 +134,60 @@ export default async function createServer() {
   webSocketServer.on(
     "connection",
     createWebSocketConnection({
-      getDocument: async (params: GetDocumentParams) => {
-        return getUpdatesForDocument(params);
-      },
-      createSnapshot: async (params: CreateSnapshotParams) => {
-        let doc = await getDocument(params.snapshot.publicData.docId);
-        if (!doc) {
-          throw new Error("Document not found");
-        }
-        // @ts-expect-error TODO fix types via generics in the future
-        return createSnapshot({ ...params, workspaceId: doc.doc.workspaceId });
-      },
-      createUpdate: async (params: CreateUpdateParams) => {
-        let doc = await getDocument(params.update.publicData.docId);
-        if (!doc) {
-          throw new Error("Document not found");
-        }
-        return createUpdate({ ...params, workspaceId: doc.doc.workspaceId });
-      },
-      hasAccess: async (params) => {
-        if (!params.context.user) {
-          return false;
-        }
+      getDocument: getDocumentWithContent,
+      createSnapshot,
+      createUpdate,
+      // TODO implement properly
+      hasAccess: async (params) => true,
+      // hasAccess: async (params) => {
+      //   if (!params.context.user) {
+      //     return false;
+      //   }
 
-        let doc = await getDocument(params.documentId);
-        if (!doc) {
-          return false;
-        }
-        const userToWorkspace = await prisma.usersToWorkspaces.findFirst({
-          where: {
-            userId: params.context.user.id,
-            workspaceId: doc.doc.workspaceId,
-            isAuthorizedMember: true,
-          },
-        });
+      //   let doc = await getDocument(params.documentId);
+      //   if (!doc) {
+      //     return false;
+      //   }
+      //   const userToWorkspace = await prisma.usersToWorkspaces.findFirst({
+      //     where: {
+      //       userId: params.context.user.id,
+      //       workspaceId: doc.doc.workspaceId,
+      //       isAuthorizedMember: true,
+      //     },
+      //   });
 
-        if (!userToWorkspace) {
-          return false;
-        }
+      //   if (!userToWorkspace) {
+      //     return false;
+      //   }
 
-        if (
-          params.action === "write-update" &&
-          (userToWorkspace.role === "ADMIN" ||
-            userToWorkspace.role === "EDITOR")
-        ) {
-          return true;
-        }
-        if (
-          params.action === "write-snapshot" &&
-          (userToWorkspace.role === "ADMIN" ||
-            userToWorkspace.role === "EDITOR")
-        ) {
-          return true;
-        }
-        if (
-          params.action === "read" ||
-          params.action === "send-ephemeral-update"
-        ) {
-          return true;
-        }
+      //   if (
+      //     params.action === "write-update" &&
+      //     (userToWorkspace.role === "ADMIN" ||
+      //       userToWorkspace.role === "EDITOR")
+      //   ) {
+      //     return true;
+      //   }
+      //   if (
+      //     params.action === "write-snapshot" &&
+      //     (userToWorkspace.role === "ADMIN" ||
+      //       userToWorkspace.role === "EDITOR")
+      //   ) {
+      //     return true;
+      //   }
+      //   if (
+      //     params.action === "read" ||
+      //     params.action === "send-ephemeral-message"
+      //   ) {
+      //     return true;
+      //   }
 
-        return false;
-      },
+      //   return false;
+      // },
+
+      // TODO implement properly
+      hasBroadcastAccess: async ({ websocketSessionKeys }) =>
+        websocketSessionKeys.map(() => true),
+      logging: "error",
       additionalAuthenticationDataValidations: {
         // @ts-ignore works on the ci, but not locally
         snapshot: SerenitySnapshotPublicData,

@@ -56,6 +56,7 @@ export const createDocumentMutation = mutationField("createDocument", {
       subkeyId: args.input.subkeyId,
       parentFolderId: args.input.parentFolderId,
       workspaceId: args.input.workspaceId,
+      // @ts-expect-error due the documentTitleData missing in additionalServerData
       snapshot,
     });
     return {

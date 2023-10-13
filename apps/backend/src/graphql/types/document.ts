@@ -32,7 +32,8 @@ export const DocumentSnapshotPublicDataInput = inputObjectType({
     t.string("snapshotId");
     t.nonNull.field("keyDerivationTrace", { type: KeyDerivationTraceInput });
     t.nonNull.string("parentSnapshotProof");
-    t.nonNull.field("parentSnapshotClocks", {
+    t.nonNull.string("parentSnapshotId");
+    t.nonNull.field("parentSnapshotUpdateClocks", {
       type: DocumentSnapshotPublicDataParentSnapshotClocksInput,
     });
   },

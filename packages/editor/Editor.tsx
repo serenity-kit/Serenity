@@ -42,7 +42,7 @@ import { CommentsExtension } from "./extensions/commentsExtension/commentsExtens
 import { findCommentForPos } from "./extensions/commentsExtension/findCommentForPos";
 import { updateCommentsDataAndScrollToHighlighted } from "./extensions/commentsExtension/updateCommentsDataAndScrollToHighlighted";
 import { SerenityScrollIntoViewForEditModeExtension } from "./extensions/scrollIntoViewForEditModeExtensions/scrollIntoViewForEditModeExtensions";
-import { AwarenessExtension } from "./extensions/secSyncAwarenessExtension/secSyncAwarenessExtension";
+import { YAwarenessExtension } from "./extensions/secSyncAwarenessExtension/secSyncAwarenessExtension";
 import { TableCellExtension } from "./extensions/tableCellExtension/tableCellExtension";
 import { isCellSelection } from "./extensions/tableExtension/isCellSelection";
 import { TableExtension } from "./extensions/tableExtension/tableExtension";
@@ -143,7 +143,7 @@ export const Editor = (props: EditorProps) => {
           document: props.yDocRef.current,
           field: "page",
         }),
-        AwarenessExtension.configure({
+        YAwarenessExtension.configure({
           awareness: props.yAwarenessRef.current,
         }),
         SerenityScrollIntoViewForEditModeExtension.configure({}),

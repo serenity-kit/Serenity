@@ -66,5 +66,13 @@ export type SerenitySnapshot = Snapshot & {
 };
 
 export type SerenitySnapshotWithClientData = SnapshotWithClientData & {
-  publicData: SnapshotWithClientData["publicData"] & SerenitySnapshotPublicData;
+  publicData: Snapshot["publicData"] & SerenitySnapshotPublicData;
+  additionalServerData: {
+    documentTitleData: {
+      ciphertext: string;
+      nonce: string;
+      subkeyId: number;
+      workspaceKeyId: string;
+    };
+  };
 };

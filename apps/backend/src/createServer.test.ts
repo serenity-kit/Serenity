@@ -6,7 +6,7 @@ import {
   snapshotDerivedKeyContext,
 } from "@serenity-tools/common";
 import { kdfDeriveFromKey } from "@serenity-tools/common/src/kdfDeriveFromKey/kdfDeriveFromKey";
-import { createInitialSnapshot, createUpdate } from "@serenity-tools/secsync";
+import { createSnapshot, createUpdate } from "@serenity-tools/secsync";
 import sodium, { KeyPair } from "react-native-libsodium";
 import deleteAllRecords from "../test/helpers/deleteAllRecords";
 import { createDocument } from "../test/helpers/document/createDocument";
@@ -15,11 +15,13 @@ import {
   createSocketClient,
   waitForClientState,
 } from "../test/helpers/websocket";
+import { getSnapshot } from "./database/snapshot/getSnapshot";
 import createUserWithWorkspace from "./database/testHelpers/createUserWithWorkspace";
 
 const graphql = setupGraphql();
 const username = "74176fce-8391-4f12-bbd5-d30a91e9ee7f@example.com";
 let workspaceId = "";
+let userId = "";
 const documentId = "10f99b10-62a3-427f-9928-c1e0b32648e2";
 let webDevice: LocalDevice | null = null;
 let sessionKey = "";
@@ -28,13 +30,13 @@ let addedFolder: any = null;
 let folderKey = "";
 let addedWorkspace: any = null;
 let snapshotId: string = "";
-let latestServerVersion = null;
 let lastSnapshotKey = "";
 
 const setup = async () => {
   const result = await createUserWithWorkspace({
     username,
   });
+  userId = result.user.id;
   workspaceId = result.workspace.id;
   webDevice = result.webDevice;
   sessionKey = result.sessionKey;
@@ -82,7 +84,7 @@ test("document-error if no id is provided", async () => {
   expect(client.readyState).toEqual(client.CLOSED);
 });
 
-test("unauthorized if the document does not exist", async () => {
+test("document-error if the document does not exist", async () => {
   const { client, messages } = await createSocketClient(
     graphql.port,
     `/id-that-does-not-exist`,
@@ -92,14 +94,14 @@ test("unauthorized if the document does not exist", async () => {
   expect(messages).toMatchInlineSnapshot(`
     [
       {
-        "type": "unauthorized",
+        "type": "document-error",
       },
     ]
   `);
   expect(client.readyState).toEqual(client.CLOSED);
 });
 
-test("unauthorized if no valid session key is provided", async () => {
+test("document-error if no valid session key is provided", async () => {
   const { client, messages } = await createSocketClient(
     graphql.port,
     `/${documentId}`,
@@ -109,7 +111,7 @@ test("unauthorized if no valid session key is provided", async () => {
   expect(messages).toMatchInlineSnapshot(`
     [
       {
-        "type": "unauthorized",
+        "type": "document-error",
       },
     ]
   `);
@@ -128,6 +130,9 @@ test("successfully retrieves a document", async () => {
 });
 
 test("successfully creates a snapshot", async () => {
+  const initialSnapshot = await getSnapshot({ documentId, userId });
+  if (!initialSnapshot) throw new Error("No initial snapshot");
+
   const { client, messages } = await createSocketClient(
     graphql.port,
     `/${documentId}?sessionKey=${sessionKey}`,
@@ -164,20 +169,22 @@ test("successfully creates a snapshot", async () => {
     docId: documentId,
     pubKey: sodium.to_base64(signatureKeyPair.publicKey),
     keyDerivationTrace,
-    parentSnapshotClocks: {},
+    parentSnapshotId: initialSnapshot.id,
+    parentSnapshotUpdateClocks: {},
   };
-  const snapshot = createInitialSnapshot(
+  const snapshot = createSnapshot(
     "CONTENT DUMMY",
     publicData,
     sodium.from_base64(snapshotKey.key),
     signatureKeyPair,
+    initialSnapshot.ciphertextHash,
+    initialSnapshot.parentSnapshotProof,
     sodium
   );
   snapshotId = snapshot.publicData.snapshotId;
   client.send(
     JSON.stringify({
       ...snapshot,
-      latestServerVersion,
     })
   );
 
@@ -223,6 +230,4 @@ test("successfully creates an update", async () => {
   expect(messages[1].type).toEqual("update-saved");
   expect(messages[1].clock).toEqual(0);
   expect(messages[1].snapshotId).toEqual(snapshotId);
-  expect(messages[1].serverVersion).toEqual(1);
-  latestServerVersion = messages[1].serverVersion;
 });

@@ -90,7 +90,6 @@ export default function Editor({
   documentId,
   documentLoaded,
   workspaceId,
-  userInfo,
   editable,
   documentState,
 }: EditorProps) {
@@ -356,10 +355,6 @@ export default function Editor({
           window.initialContent = ${JSON.stringify(
             Array.apply([], Y.encodeStateAsUpdateV2(yDocRef.current))
           )};
-          window.userInfo = {
-            name: "${userInfo.name}",
-            color: "${userInfo.color}"
-          };
           window.editorEditable = ${editable};
           true; // this is required, or you'll sometimes get silent failures
         `}

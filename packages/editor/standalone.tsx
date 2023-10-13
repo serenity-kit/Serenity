@@ -20,7 +20,6 @@ window.ydoc = ydoc;
 window.isNew = window.isNew === undefined ? false : window.isNew;
 window.editorEditable =
   window.editorEditable === undefined ? false : window.editorEditable;
-window.userInfo = window.userInfo || { name: "Unknown user", color: "#000000" }; // should neber be an Unknown user
 
 if (window.initialContent) {
   const update = new Uint8Array(window.initialContent);
@@ -67,10 +66,6 @@ yAwareness.on("update", ({ added, updated, removed }: any, origin: string) => {
       })
     );
   }
-});
-yAwareness.setLocalStateField("user", {
-  name: window.userInfo.name,
-  color: window.userInfo.color,
 });
 
 const openDrawer = () => {

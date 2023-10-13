@@ -1,8 +1,53 @@
-import { createEphemeralUpdate } from "../ephemeralUpdate/createEphemeralUpdate";
-import { SyncMachineConfig } from "../types";
+import { hash } from "../crypto/hash";
+import {
+  createEphemeralMessage,
+  messageTypes,
+} from "../ephemeralMessage/createEphemeralMessage";
+import { parseSnapshot } from "../snapshot/parseSnapshot";
+import {
+  EphemeralMessagesSession,
+  SnapshotUpdateClocks,
+  SyncMachineConfig,
+} from "../types";
 
 export const websocketService =
-  (context: SyncMachineConfig) => (send: any, onReceive: any) => {
+  (
+    context: SyncMachineConfig,
+    ephemeralMessagesSession: EphemeralMessagesSession
+  ) =>
+  (send: any, onReceive: any) => {
+    let ephemeralSessionCounter = ephemeralMessagesSession.counter;
+    const prepareAndSendEphemeralMessage = async (
+      data: any,
+      messageType: keyof typeof messageTypes,
+      key: Uint8Array
+    ) => {
+      const publicData = {
+        docId: context.documentId,
+        pubKey: context.sodium.to_base64(context.signatureKeyPair.publicKey),
+      };
+      const ephemeralMessage = createEphemeralMessage(
+        data,
+        messageType,
+        publicData,
+        key,
+        context.signatureKeyPair,
+        ephemeralMessagesSession.id,
+        ephemeralSessionCounter,
+        context.sodium
+      );
+      ephemeralSessionCounter++;
+      if (context.logging === "debug") {
+        console.debug("send ephemeralMessage");
+      }
+      send({
+        type: "SEND",
+        message: JSON.stringify(ephemeralMessage),
+        // Note: send a faulty message to test the error handling
+        // message: JSON.stringify({ ...ephemeralMessage, ciphertext: "lala" }),
+      });
+    };
+
     let connected = false;
 
     // timeout the connection try after 5 seconds
@@ -12,12 +57,32 @@ export const websocketService =
       }
     }, 5000);
 
-    const knownSnapshotIdParam = context.knownSnapshotInfo
-      ? `&knownSnapshotId={context.knownSnapshotInfo.id}`
+    const knownSnapshotIdParam = context.loadDocumentParams
+      ? `&knownSnapshotId=${context.loadDocumentParams.knownSnapshotInfo.snapshotId}`
       : "";
 
+    const modeParam = context.loadDocumentParams
+      ? `&mode=${context.loadDocumentParams.mode}`
+      : `&mode=complete`;
+
+    let knownSnapshotUpdateClocks = "";
+    if (knownSnapshotIdParam !== "" && context.loadDocumentParams) {
+      try {
+        const updateClocks = SnapshotUpdateClocks.parse(
+          context.loadDocumentParams.knownSnapshotInfo.updateClocks
+        );
+        knownSnapshotUpdateClocks = `&knownSnapshotUpdateClocks=${encodeURIComponent(
+          JSON.stringify(updateClocks)
+        )}`;
+      } catch (err) {}
+    }
+
     const websocketConnection = new WebSocket(
-      `${context.websocketHost}/${context.documentId}?sessionKey=${context.websocketSessionKey}${knownSnapshotIdParam}`
+      `${context.websocketHost}/${context.documentId}?sessionKey=${
+        context.websocketSessionKey
+      }${modeParam}${knownSnapshotIdParam}${
+        knownSnapshotUpdateClocks ? `${knownSnapshotUpdateClocks}` : ""
+      }`
     );
 
     const onWebsocketMessage = async (event: any) => {
@@ -33,13 +98,45 @@ export const websocketService =
           send({ type: "WEBSOCKET_DOCUMENT_ERROR" });
           break;
         case "document":
+          // At this point the server will have added the user to the active session of
+          // the document, so we can start sending ephemeral messages.
+          // An empty ephemeralMessage right away to initiate the session signing.
+          // NOTE: There is no break and send with WEBSOCKET_ADD_TO_INCOMING_QUEUE is still invoked
+          try {
+            const parseSnapshotResult = parseSnapshot(
+              data.snapshot,
+              context.additionalAuthenticationDataValidations?.snapshot
+            );
+            const snapshot = parseSnapshotResult.snapshot;
+            const key = await context.getSnapshotKey({
+              snapshotId: snapshot.publicData.snapshotId,
+              parentSnapshotProof: snapshot.publicData.parentSnapshotProof,
+              snapshotCiphertextHash: hash(snapshot.ciphertext, context.sodium),
+              additionalPublicData: parseSnapshotResult.additionalPublicData,
+            });
+            prepareAndSendEphemeralMessage(
+              new Uint8Array(),
+              "initialize",
+              key
+            ).catch((reason) => {
+              if (context.logging === "debug" || context.logging === "error") {
+                console.error(reason);
+              }
+              send({
+                type: "FAILED_CREATING_EPHEMERAL_MESSAGE",
+                error: new Error("SECSYNC_ERROR_601"),
+              });
+            });
+          } catch (err) {
+            // can be ignored since a session will just be established later
+          }
         case "snapshot":
         case "snapshot-saved":
         case "snapshot-save-failed":
         case "update":
         case "update-saved":
         case "update-save-failed":
-        case "ephemeral-update":
+        case "ephemeral-message":
           send({ type: "WEBSOCKET_ADD_TO_INCOMING_QUEUE", data });
           break;
         default:
@@ -55,55 +152,55 @@ export const websocketService =
     });
 
     websocketConnection.addEventListener("error", (event) => {
-      console.debug("websocket error", event);
+      if (context.logging === "debug") {
+        console.debug("websocket error", event);
+      }
       send({ type: "WEBSOCKET_DISCONNECTED" });
     });
 
     websocketConnection.addEventListener("close", function (event) {
-      console.debug("websocket closed");
+      if (context.logging === "debug") {
+        console.debug("websocket closed");
+      }
       send({ type: "WEBSOCKET_DISCONNECTED" });
     });
 
-    onReceive((event: any) => {
+    onReceive(async (event: any) => {
       if (event.type === "SEND") {
         websocketConnection.send(event.message);
       }
-      if (event.type === "SEND_EPHEMERAL_UPDATE") {
-        const prepareAndSendEphemeralUpdate = async () => {
-          const publicData = {
-            docId: context.documentId,
-            pubKey: context.sodium.to_base64(
-              context.signatureKeyPair.publicKey
-            ),
-          };
-          const ephemeralUpdateKey = await event.getEphemeralUpdateKey();
-          const ephemeralUpdate = createEphemeralUpdate(
-            event.data,
-            publicData,
-            ephemeralUpdateKey,
-            context.signatureKeyPair,
-            context.sodium
-          );
-          console.debug("send ephemeralUpdate");
-          send({
-            type: "SEND",
-            message: JSON.stringify(ephemeralUpdate),
-            // Note: send a faulty message to test the error handling
-            // message: JSON.stringify({ ...ephemeralUpdate, ciphertext: "lala" }),
-          });
-        };
-
+      if (event.type === "SEND_EPHEMERAL_MESSAGE") {
         try {
-          prepareAndSendEphemeralUpdate();
+          const key = await event.getKey();
+          prepareAndSendEphemeralMessage(
+            event.data,
+            event.messageType,
+            key
+          ).catch((reason) => {
+            if (context.logging === "debug" || context.logging === "error") {
+              console.error(reason);
+            }
+            send({
+              type: "FAILED_CREATING_EPHEMERAL_MESSAGE",
+              error: new Error("SECSYNC_ERROR_601"),
+            });
+          });
         } catch (error) {
-          // TODO send a error event to the parent
-          console.error(error);
+          if (context.logging === "debug" || context.logging === "error") {
+            console.error(error);
+          }
+          send({
+            type: "FAILED_CREATING_EPHEMERAL_MESSAGE",
+            error: new Error("SECSYNC_ERROR_601"),
+          });
         }
       }
     });
 
     return () => {
-      console.debug("CLOSE WEBSOCKET");
+      if (context.logging === "debug") {
+        console.debug("CLOSE WEBSOCKET");
+      }
       websocketConnection.close();
     };
   };

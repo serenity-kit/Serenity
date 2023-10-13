@@ -1,18 +1,17 @@
 import {
   deriveKeysFromKeyDerivationTrace,
+  KeyDerivationTrace,
   LocalDevice,
   recreateSnapshotKey,
-  SerenitySnapshot,
 } from "@serenity-tools/common";
 import { getDocument } from "../document/getDocument";
 import { getWorkspace } from "../workspace/getWorkspace";
 
 export const deriveExistingSnapshotKey = async (
   docId: string,
-  snapshot: SerenitySnapshot,
+  snapshotKeyDerivationTrace: KeyDerivationTrace,
   activeDevice: LocalDevice
 ) => {
-  const snapshotKeyDerivationTrace = snapshot.publicData.keyDerivationTrace;
   // derive existing key if snapshot exists
   const document = await getDocument({ documentId: docId });
   const workspace = await getWorkspace({

@@ -214,6 +214,7 @@ export default async function createUserWithWorkspace({
       nameCiphertext: encryptedDocumentTitleResult.ciphertext,
       nameNonce: encryptedDocumentTitleResult.publicNonce,
       subkeyId: documentTitleKeyResult.subkeyId,
+      // @ts-expect-error due the documentTitleData missing in additionalServerData
       snapshot,
     },
     creatorDeviceSigningPublicKey: device.signingPublicKey,

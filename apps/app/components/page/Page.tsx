@@ -8,7 +8,6 @@ import {
   notNull,
 } from "@serenity-tools/common";
 import { decryptDocumentTitleBasedOnSnapshotKey } from "@serenity-tools/common/src/decryptDocumentTitleBasedOnSnapshotKey/decryptDocumentTitleBasedOnSnapshotKey";
-import { AwarenessUserInfo } from "@serenity-tools/editor";
 import { useYjsSync } from "@serenity-tools/secsync";
 import {
   Button,
@@ -18,8 +17,6 @@ import {
   ModalHeader,
   Text,
   View,
-  collaboratorColorToHex,
-  hashToCollaboratorColor,
   tw,
   useHasEditorSidebar,
 } from "@serenity-tools/ui";
@@ -82,17 +79,12 @@ export default function Page({
     keyDerivationTrace: KeyDerivationTrace;
     key: Uint8Array;
   } | null>(null);
-  const yAwarenessRef = useRef<Awareness>(new Awareness(yDocRef.current));
   const [documentLoadedFromLocalDb, setDocumentLoadedFromLocalDb] =
     useState(false);
   const [documentLoadedOnceFromRemote, setDocumentLoadedOnceFromRemote] =
     useState(false);
   const [passedDocumentLoadingTimeout, setPassedDocumentLoadingTimeout] =
     useState(false);
-  const [userInfo, setUserInfo] = useState<AwarenessUserInfo>({
-    name: "Unknown user",
-    color: "#000000",
-  });
   const syncState = useEditorStore((state) => state.syncState);
   const setSyncState = useEditorStore((state) => state.setSyncState);
   const setDocumentState = useEditorStore((state) => state.setDocumentState);
@@ -109,16 +101,17 @@ export default function Page({
   const { websocketOrigin } = getEnvironmentUrls();
   const { users, workspaceChainData } = useWorkspace();
 
-  const [state] = useYjsSync({
+  const [state, , , yAwareness] = useYjsSync({
     yDoc: yDocRef.current,
-    yAwareness: yAwarenessRef.current,
     documentId: docId,
     signatureKeyPair,
     websocketHost: websocketOrigin,
     websocketSessionKey: sessionKey,
-    onSnapshotSaved: async () => {
-      snapshotKeyRef.current = snapshotInFlightKeyRef.current;
-      snapshotInFlightKeyRef.current = null;
+    onDocumentUpdated: ({ type, knownSnapshotInfo }) => {
+      if (type === "snapshot-saved") {
+        snapshotKeyRef.current = snapshotInFlightKeyRef.current;
+        snapshotInFlightKeyRef.current = null;
+      }
     },
     getNewSnapshotData: async () => {
       const documentResult = await runDocumentQuery({ id: docId });
@@ -173,21 +166,28 @@ export default function Page({
         additionalServerData: { documentTitleData },
       };
     },
-    getSnapshotKey: async (snapshot) => {
+    getSnapshotKey: async (snapshotProofInfo) => {
+      if (!snapshotProofInfo) {
+        throw new Error(
+          "SnapshotProofInfo not provided when trying to derive a new key"
+        );
+      }
+
       const snapshotKeyData = await deriveExistingSnapshotKey(
         docId,
-        snapshot,
+        snapshotProofInfo.additionalPublicData.keyDerivationTrace,
         activeDevice as LocalDevice
       );
 
       const key = sodium.from_base64(snapshotKeyData.key);
       snapshotKeyRef.current = {
-        keyDerivationTrace: snapshot.publicData.keyDerivationTrace,
+        keyDerivationTrace:
+          snapshotProofInfo.additionalPublicData.keyDerivationTrace,
         key,
       };
       setActiveSnapshotAndCommentKeys(
         {
-          id: snapshot.publicData.snapshotId,
+          id: snapshotProofInfo.snapshotId,
           key: snapshotKeyData.key,
         },
         {}
@@ -195,17 +195,11 @@ export default function Page({
 
       return key;
     },
-    getUpdateKey: async (update) => {
-      return snapshotKeyRef.current?.key as Uint8Array;
-    },
-    shouldSendSnapshot: ({ latestServerVersion }) => {
+    shouldSendSnapshot: ({ snapshotUpdatesCount }) => {
       // create a new snapshot if the active snapshot has more than 100 updates
-      return latestServerVersion !== null && latestServerVersion > 100;
+      return snapshotUpdatesCount !== null && snapshotUpdatesCount > 100;
     },
-    getEphemeralUpdateKey: async () => {
-      return snapshotKeyRef.current?.key as Uint8Array;
-    },
-    isValidCollaborator: async (signingPublicKey: string) => {
+    isValidClient: async (signingPublicKey: string) => {
       // TODO this should also work for users that have been removed
       // allow to fetch a user that is or was part of the workspace
       // the must be cross-checked with workspaceChainData
@@ -251,11 +245,13 @@ export default function Page({
     //   console.log("CUSTOM MESSAGE:", message);
     // },
     additionalAuthenticationDataValidations: {
-      // @ts-ignore works on the ci, but not locally
       snapshot: SerenitySnapshotPublicData,
     },
+    logging: "error",
     sodium,
   });
+
+  const yAwarenessRef = useRef<Awareness>(yAwareness);
 
   useEffect(() => {
     setTimeout(() => {
@@ -276,12 +272,6 @@ export default function Page({
       }
 
       const me = await runMeQuery({});
-      setUserInfo({
-        name: me.data?.me?.username ?? "Unknown user",
-        color: me.data?.me?.id
-          ? collaboratorColorToHex(hashToCollaboratorColor(me.data?.me?.id))
-          : "#000000",
-      });
 
       let document: Document | undefined = undefined;
       try {
@@ -333,8 +323,8 @@ export default function Page({
   }, [state.context._documentDecryptionState]);
 
   useEffect(() => {
-    console.log(state.context._ephemeralUpdateErrors);
-    if (state.context._ephemeralUpdateErrors.length > 0) {
+    console.warn(state.context._ephemeralMessageReceivingErrors);
+    if (state.context._ephemeralMessageReceivingErrors.length > 0) {
       const now = new Date(); // Current date and time
       const fiveMinInMs = 60000 * 5;
       const fiveMinsAgo = new Date(now.getTime() - fiveMinInMs);
@@ -351,7 +341,8 @@ export default function Page({
       }
       ephemeralUpdateErrorsChangedAt.current = new Date();
     }
-  }, [state.context._ephemeralUpdateErrors.length]);
+    // TODO since they are limited to a max length, the length will not be good enough
+  }, [state.context._ephemeralMessageReceivingErrors.length]);
 
   useEffect(() => {
     if (state.matches("failed")) {
@@ -512,7 +503,6 @@ export default function Page({
         updateTitle={updateTitle}
         isNew={isNew}
         documentLoaded={documentLoaded || state.matches("failed")}
-        userInfo={userInfo}
         documentState={documentState}
       />
     </>

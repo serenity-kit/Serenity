@@ -122,7 +122,6 @@ declare global {
     editorEditable: boolean;
     isNew: boolean;
     initialContent: any;
-    userInfo: AwarenessUserInfo;
     updateEditor: (paramsString: string) => void;
     applyYjsUpdate: (update: any) => void;
     applyYAwarenessUpdate: (update: any) => void;

@@ -13,6 +13,7 @@ generator client {
 model Document {
   id                 String              @id
   // can be optional because a document is created without a snapshot at first
+  // TODO check if this is still true since on workspace and document create a snapshot is provided
   activeSnapshot     Snapshot?           @relation(name: "activeSnapshot", fields: [activeSnapshotId], references: [id], onDelete: Cascade)
   activeSnapshotId   String?             @unique
   snapshots          Snapshot[]
@@ -35,35 +36,36 @@ model Document {
 }
 
 model Snapshot {
-  id                     String           @id @default(uuid())
-  latestVersion          Int
-  data                   String
-  ciphertextHash         String
-  document               Document         @relation(fields: [documentId], references: [id], onDelete: Cascade)
-  documentId             String
-  updates                Update[]
-  activeSnapshotDocument Document?        @relation("activeSnapshot")
-  createdAt              DateTime         @default(now())
-  keyDerivationTrace     Json             @default("{}")
-  clocks                 Json
-  parentSnapshotClocks   Json
-  parentSnapshotProof    String
-  snapshotKeyBoxes       SnapshotKeyBox[] // used for document share link
-  comments               Comment[]
-  commentReplies         CommentReply[]
+  id                         String           @id @default(uuid())
+  latestVersion              Int
+  data                       String
+  ciphertextHash             String
+  document                   Document         @relation(fields: [documentId], references: [id], onDelete: Cascade)
+  documentId                 String
+  updates                    Update[]
+  activeSnapshotDocument     Document?        @relation("activeSnapshot")
+  createdAt                  DateTime         @default(now())
+  keyDerivationTrace         Json             @default("{}")
+  clocks                     Json
+  parentSnapshotUpdateClocks Json
+  parentSnapshotProof        String
+  snapshotKeyBoxes           SnapshotKeyBox[] // used for document share link
+  comments                   Comment[]
+  commentReplies             CommentReply[]
 }
 
 model Update {
-  id              String   @id @default(uuid())
-  version         Int
-  data            String
-  snapshot        Snapshot @relation(fields: [snapshotId], references: [id], onDelete: Cascade)
-  snapshotId      String
-  snapshotVersion Int
-  pubKey          String
+  id         String   @id @default(uuid())
+  version    Int
+  data       String
+  snapshot   Snapshot @relation(fields: [snapshotId], references: [id], onDelete: Cascade)
+  snapshotId String
+  clock      Int
+  pubKey     String
 
   @@unique([snapshotId, version])
-  @@unique([snapshotId, pubKey, snapshotVersion])
+  @@unique([snapshotId, pubKey, clock]) // matches the id
+  @@index([id, version])
 }
 
 model UnverifiedUser {

@@ -2,25 +2,40 @@ import sodium, { KeyPair } from "libsodium-wrappers";
 import { assign, interpret, spawn } from "xstate";
 import { createSyncMachine } from "./createSyncMachine";
 import { generateId } from "./crypto/generateId";
-import { createEphemeralUpdate } from "./ephemeralUpdate/createEphemeralUpdate";
+import { hash } from "./crypto/hash";
+import { createEphemeralMessage } from "./ephemeralMessage/createEphemeralMessage";
+import { createEphemeralSession } from "./ephemeralMessage/createEphemeralSession";
+import { createEphemeralMessageProof } from "./ephemeralMessage/createEphemeralSessionProof";
 import { createSnapshot } from "./snapshot/createSnapshot";
 import {
-  EphemeralUpdatePublicData,
+  EphemeralMessagePublicData,
   SnapshotPublicData,
+  SnapshotUpdateClocks,
   UpdatePublicData,
 } from "./types";
 import { createUpdate } from "./update/createUpdate";
 
 const url = "wss://www.example.com";
+const docId = "6e46c006-5541-11ec-bf63-0242ac130002";
 
-let signatureKeyPair: KeyPair;
+let clientAKeyPair: KeyPair;
+let clientAPublicKey: string;
+let clientACounter: number;
+let clientASessionId: string;
+let clientAPublicData: EphemeralMessagePublicData;
+
+let clientBKeyPair: KeyPair;
+let clientBPublicKey: string;
+let clientBSessionId: string;
+let clientBPublicData: EphemeralMessagePublicData;
+
 let key: Uint8Array;
-let docId: string;
 let snapshotId: string;
 
-beforeEach(() => {
-  docId = generateId(sodium);
-  signatureKeyPair = {
+beforeEach(async () => {
+  await sodium.ready;
+
+  clientAKeyPair = {
     privateKey: sodium.from_base64(
       "g3dtwb9XzhSzZGkxTfg11t1KEIb4D8rO7K54R6dnxArvgg_OzZ2GgREtG7F5LvNp3MS8p9vsio4r6Mq7SZDEgw"
     ),
@@ -29,20 +44,44 @@ beforeEach(() => {
     ),
     keyType: "ed25519",
   };
+  clientAPublicKey = sodium.to_base64(clientAKeyPair.publicKey);
+  clientAPublicData = {
+    docId: "6e46c006-5541-11ec-bf63-0242ac130002",
+    pubKey: clientAPublicKey,
+  };
+  clientASessionId = generateId(sodium);
+  clientACounter = 0;
+
+  clientBKeyPair = {
+    privateKey: sodium.from_base64(
+      "ElVI9nkbOypSu2quCTXH1i1gGlcd-Sxd7S6ym9sNZj48ben-hOmefr13D9Y1Lnys3CuhwuPb6DMh_oDln913_g"
+    ),
+    publicKey: sodium.from_base64(
+      "PG3p_oTpnn69dw_WNS58rNwrocLj2-gzIf6A5Z_dd_4"
+    ),
+    keyType: "ed25519",
+  };
+  clientBPublicKey = sodium.to_base64(clientBKeyPair.publicKey);
+  clientBSessionId = generateId(sodium);
 });
 
-afterEach(() => {});
-
 type CreateSnapshotTestHelperParams = {
-  parentSnapshotCiphertext: string;
+  parentSnapshotId: string;
+  parentSnapshotCiphertextHash: string;
   grandParentSnapshotProof: string;
   content: string;
+  parentSnapshotUpdateClocks?: SnapshotUpdateClocks;
 };
 
 const createSnapshotTestHelper = (params?: CreateSnapshotTestHelperParams) => {
   snapshotId = generateId(sodium);
-  const { parentSnapshotCiphertext, grandParentSnapshotProof, content } =
-    params || {};
+  const {
+    parentSnapshotId,
+    parentSnapshotCiphertextHash,
+    grandParentSnapshotProof,
+    content,
+    parentSnapshotUpdateClocks,
+  } = params || {};
   key = sodium.from_hex(
     "724b092810ec86d7e35c9d067702b31ef90bc43a7b598626749914d6a3e033ed"
   );
@@ -50,26 +89,24 @@ const createSnapshotTestHelper = (params?: CreateSnapshotTestHelperParams) => {
   const publicData: SnapshotPublicData = {
     snapshotId,
     docId: "6e46c006-5541-11ec-bf63-0242ac130002",
-    pubKey: sodium.to_base64(signatureKeyPair.publicKey),
-    parentSnapshotClocks: {},
+    pubKey: sodium.to_base64(clientAKeyPair.publicKey),
+    parentSnapshotId: parentSnapshotId || "",
+    parentSnapshotUpdateClocks: parentSnapshotUpdateClocks || {},
   };
 
   const snapshot = createSnapshot(
     content || "Hello World",
     publicData,
     key,
-    signatureKeyPair,
-    parentSnapshotCiphertext || "",
+    clientAKeyPair,
+    parentSnapshotCiphertextHash || "",
     grandParentSnapshotProof || "",
     sodium
   );
   return {
-    snapshot: {
-      ...snapshot,
-      serverData: { latestVersion: 0 },
-    },
+    snapshot,
     key,
-    signatureKeyPair,
+    clientAKeyPair,
   };
 };
 
@@ -77,43 +114,72 @@ type CreateUpdateTestHelperParams = {
   version: number;
 };
 
-const createUpdateHelper = (params?: CreateUpdateTestHelperParams) => {
+const createUpdateTestHelper = (params?: CreateUpdateTestHelperParams) => {
   const version = params?.version || 0;
   const publicData: UpdatePublicData = {
     refSnapshotId: snapshotId,
     docId,
-    pubKey: sodium.to_base64(signatureKeyPair.publicKey),
+    pubKey: sodium.to_base64(clientAKeyPair.publicKey),
   };
 
   const update = createUpdate(
     "u",
     publicData,
     key,
-    signatureKeyPair,
+    clientAKeyPair,
     version,
     sodium
   );
 
-  return { update: { ...update, serverData: { version } } };
+  return { update };
 };
 
-const createTestEphemeralUpdate = () => {
-  const publicData: EphemeralUpdatePublicData = {
-    docId,
-    pubKey: sodium.to_base64(signatureKeyPair.publicKey),
-  };
+const createEphemeralMessageTestHelper = ({
+  messageType,
+  receiverSessionId,
+  content,
+}: {
+  messageType: "proof" | "message";
+  receiverSessionId: string;
+  content?: Uint8Array;
+}) => {
+  if (messageType === "proof") {
+    const proof = createEphemeralMessageProof(
+      receiverSessionId,
+      clientASessionId,
+      clientAKeyPair,
+      sodium
+    );
 
-  const ephemeralUpdate = createEphemeralUpdate(
-    new Uint8Array([42]),
-    publicData,
-    key,
-    signatureKeyPair,
-    sodium
-  );
-  return { ephemeralUpdate };
+    const ephemeralMessage = createEphemeralMessage(
+      proof,
+      "proof",
+      clientAPublicData,
+      key,
+      clientAKeyPair,
+      clientASessionId,
+      clientACounter,
+      sodium
+    );
+    clientACounter++;
+    return { ephemeralMessage };
+  } else {
+    const ephemeralMessage = createEphemeralMessage(
+      content ? content : new Uint8Array([22]),
+      "message",
+      clientAPublicData,
+      key,
+      clientAKeyPair,
+      clientASessionId,
+      clientACounter,
+      sodium
+    );
+    clientACounter++;
+    return { ephemeralMessage };
+  }
 };
 
-it("should connect to the websocket", (done) => {
+test("should connect to the websocket", (done) => {
   const websocketServiceMock = (context: any) => () => {};
 
   const syncMachine = createSyncMachine();
@@ -121,14 +187,20 @@ it("should connect to the websocket", (done) => {
     syncMachine
       .withContext({
         ...syncMachine.context,
+        documentId: docId,
         websocketHost: url,
         websocketSessionKey: "sessionKey",
-        signatureKeyPair,
+        signatureKeyPair: clientAKeyPair,
+        sodium,
       })
       .withConfig({
         actions: {
           spawnWebsocketActor: assign((context) => {
+            const ephemeralMessagesSession = createEphemeralSession(
+              context.sodium
+            );
             return {
+              _ephemeralMessagesSession: ephemeralMessagesSession,
               _websocketActor: spawn(
                 websocketServiceMock(context),
                 "websocketActor"
@@ -144,10 +216,11 @@ it("should connect to the websocket", (done) => {
   });
 
   syncService.start();
+  syncService.send({ type: "WEBSOCKET_RETRY" });
   syncService.send({ type: "WEBSOCKET_CONNECTED" });
 });
 
-it("should initially have _documentDecryptionState state", (done) => {
+test("should initially have _documentDecryptionState state", (done) => {
   const websocketServiceMock = (context: any) => () => {};
 
   let docValue = "";
@@ -157,21 +230,26 @@ it("should initially have _documentDecryptionState state", (done) => {
     syncMachine
       .withContext({
         ...syncMachine.context,
+        documentId: docId,
         websocketHost: url,
         websocketSessionKey: "sessionKey",
-        isValidCollaborator: (signingPublicKey) =>
-          sodium.to_base64(signatureKeyPair.publicKey) === signingPublicKey,
+        isValidClient: (signingPublicKey) =>
+          sodium.to_base64(clientAKeyPair.publicKey) === signingPublicKey,
         getSnapshotKey: () => key,
         applySnapshot: (snapshot) => {
           docValue = sodium.to_string(snapshot);
         },
         sodium: sodium,
-        signatureKeyPair,
+        signatureKeyPair: clientAKeyPair,
       })
       .withConfig({
         actions: {
           spawnWebsocketActor: assign((context) => {
+            const ephemeralMessagesSession = createEphemeralSession(
+              context.sodium
+            );
             return {
+              _ephemeralMessagesSession: ephemeralMessagesSession,
               _websocketActor: spawn(
                 websocketServiceMock(context),
                 "websocketActor"
@@ -189,10 +267,11 @@ it("should initially have _documentDecryptionState state", (done) => {
   });
 
   syncService.start();
+  syncService.send({ type: "WEBSOCKET_RETRY" });
   syncService.send({ type: "WEBSOCKET_CONNECTED" });
 });
 
-it("should load a document", (done) => {
+test("should load a document", (done) => {
   const websocketServiceMock = (context: any) => () => {};
 
   let docValue = "";
@@ -202,21 +281,26 @@ it("should load a document", (done) => {
     syncMachine
       .withContext({
         ...syncMachine.context,
+        documentId: docId,
         websocketHost: url,
         websocketSessionKey: "sessionKey",
-        isValidCollaborator: (signingPublicKey) =>
-          sodium.to_base64(signatureKeyPair.publicKey) === signingPublicKey,
+        isValidClient: (signingPublicKey) =>
+          sodium.to_base64(clientAKeyPair.publicKey) === signingPublicKey,
         getSnapshotKey: () => key,
         applySnapshot: (snapshot) => {
           docValue = sodium.to_string(snapshot);
         },
         sodium: sodium,
-        signatureKeyPair,
+        signatureKeyPair: clientAKeyPair,
       })
       .withConfig({
         actions: {
           spawnWebsocketActor: assign((context) => {
+            const ephemeralMessagesSession = createEphemeralSession(
+              context.sodium
+            );
             return {
+              _ephemeralMessagesSession: ephemeralMessagesSession,
               _websocketActor: spawn(
                 websocketServiceMock(context),
                 "websocketActor"
@@ -236,6 +320,7 @@ it("should load a document", (done) => {
   });
 
   syncService.start();
+  syncService.send({ type: "WEBSOCKET_RETRY" });
   syncService.send({ type: "WEBSOCKET_CONNECTED" });
 
   const { snapshot } = createSnapshotTestHelper();
@@ -248,7 +333,7 @@ it("should load a document", (done) => {
   });
 });
 
-it("should load a document with updates", (done) => {
+test("should load a document with updates", (done) => {
   const websocketServiceMock = (context: any) => () => {};
 
   let docValue = "";
@@ -258,15 +343,15 @@ it("should load a document with updates", (done) => {
     syncMachine
       .withContext({
         ...syncMachine.context,
+        documentId: docId,
         websocketHost: url,
         websocketSessionKey: "sessionKey",
-        isValidCollaborator: (signingPublicKey) =>
-          sodium.to_base64(signatureKeyPair.publicKey) === signingPublicKey,
+        isValidClient: (signingPublicKey) =>
+          sodium.to_base64(clientAKeyPair.publicKey) === signingPublicKey,
         getSnapshotKey: () => key,
         applySnapshot: (snapshot) => {
           docValue = sodium.to_string(snapshot);
         },
-        getUpdateKey: () => key,
         deserializeChanges: (changes) => {
           return changes;
         },
@@ -276,12 +361,16 @@ it("should load a document with updates", (done) => {
           });
         },
         sodium: sodium,
-        signatureKeyPair,
+        signatureKeyPair: clientAKeyPair,
       })
       .withConfig({
         actions: {
           spawnWebsocketActor: assign((context) => {
+            const ephemeralMessagesSession = createEphemeralSession(
+              context.sodium
+            );
             return {
+              _ephemeralMessagesSession: ephemeralMessagesSession,
               _websocketActor: spawn(
                 websocketServiceMock(context),
                 "websocketActor"
@@ -301,6 +390,7 @@ it("should load a document with updates", (done) => {
   });
 
   syncService.start();
+  syncService.send({ type: "WEBSOCKET_RETRY" });
   syncService.send({ type: "WEBSOCKET_CONNECTED" });
 
   const { snapshot } = createSnapshotTestHelper();
@@ -310,14 +400,14 @@ it("should load a document with updates", (done) => {
       type: "document",
       snapshot,
       updates: [
-        createUpdateHelper().update,
-        createUpdateHelper({ version: 1 }).update,
+        createUpdateTestHelper().update,
+        createUpdateTestHelper({ version: 1 }).update,
       ],
     },
   });
 });
 
-it("should load a document and two additional updates", (done) => {
+test("should load a document and two additional updates", (done) => {
   const websocketServiceMock = (context: any) => () => {};
 
   let docValue = "";
@@ -327,15 +417,15 @@ it("should load a document and two additional updates", (done) => {
     syncMachine
       .withContext({
         ...syncMachine.context,
+        documentId: docId,
         websocketHost: url,
         websocketSessionKey: "sessionKey",
-        isValidCollaborator: (signingPublicKey) =>
-          sodium.to_base64(signatureKeyPair.publicKey) === signingPublicKey,
+        isValidClient: (signingPublicKey) =>
+          sodium.to_base64(clientAKeyPair.publicKey) === signingPublicKey,
         getSnapshotKey: () => key,
         applySnapshot: (snapshot) => {
           docValue = sodium.to_string(snapshot);
         },
-        getUpdateKey: () => key,
         deserializeChanges: (changes) => {
           return changes;
         },
@@ -345,12 +435,16 @@ it("should load a document and two additional updates", (done) => {
           });
         },
         sodium: sodium,
-        signatureKeyPair,
+        signatureKeyPair: clientAKeyPair,
       })
       .withConfig({
         actions: {
           spawnWebsocketActor: assign((context) => {
+            const ephemeralMessagesSession = createEphemeralSession(
+              context.sodium
+            );
             return {
+              _ephemeralMessagesSession: ephemeralMessagesSession,
               _websocketActor: spawn(
                 websocketServiceMock(context),
                 "websocketActor"
@@ -367,6 +461,7 @@ it("should load a document and two additional updates", (done) => {
   });
 
   syncService.start();
+  syncService.send({ type: "WEBSOCKET_RETRY" });
   syncService.send({ type: "WEBSOCKET_CONNECTED" });
 
   expect(syncService.getSnapshot().context._documentDecryptionState).toBe(
@@ -382,7 +477,7 @@ it("should load a document and two additional updates", (done) => {
     },
   });
 
-  const { update } = createUpdateHelper();
+  const { update } = createUpdateTestHelper();
   syncService.send({
     type: "WEBSOCKET_ADD_TO_INCOMING_QUEUE",
     data: {
@@ -391,7 +486,7 @@ it("should load a document and two additional updates", (done) => {
     },
   });
 
-  const { update: update2 } = createUpdateHelper({ version: 1 });
+  const { update: update2 } = createUpdateTestHelper({ version: 1 });
   syncService.send({
     type: "WEBSOCKET_ADD_TO_INCOMING_QUEUE",
     data: {
@@ -401,7 +496,7 @@ it("should load a document and two additional updates", (done) => {
   });
 });
 
-it("should load a document and an additional snapshot", (done) => {
+test("should load a document and an additional snapshot", (done) => {
   const websocketServiceMock = (context: any) => () => {};
 
   let docValue = "";
@@ -411,15 +506,15 @@ it("should load a document and an additional snapshot", (done) => {
     syncMachine
       .withContext({
         ...syncMachine.context,
+        documentId: docId,
         websocketHost: url,
         websocketSessionKey: "sessionKey",
-        isValidCollaborator: (signingPublicKey) =>
-          sodium.to_base64(signatureKeyPair.publicKey) === signingPublicKey,
+        isValidClient: (signingPublicKey) =>
+          sodium.to_base64(clientAKeyPair.publicKey) === signingPublicKey,
         getSnapshotKey: () => key,
         applySnapshot: (snapshot) => {
           docValue = sodium.to_string(snapshot);
         },
-        getUpdateKey: () => key,
         deserializeChanges: (changes) => {
           return changes;
         },
@@ -429,12 +524,16 @@ it("should load a document and an additional snapshot", (done) => {
           });
         },
         sodium: sodium,
-        signatureKeyPair,
+        signatureKeyPair: clientAKeyPair,
       })
       .withConfig({
         actions: {
           spawnWebsocketActor: assign((context) => {
+            const ephemeralMessagesSession = createEphemeralSession(
+              context.sodium
+            );
             return {
+              _ephemeralMessagesSession: ephemeralMessagesSession,
               _websocketActor: spawn(
                 websocketServiceMock(context),
                 "websocketActor"
@@ -450,6 +549,7 @@ it("should load a document and an additional snapshot", (done) => {
   });
 
   syncService.start();
+  syncService.send({ type: "WEBSOCKET_RETRY" });
   syncService.send({ type: "WEBSOCKET_CONNECTED" });
 
   const { snapshot } = createSnapshotTestHelper();
@@ -462,7 +562,8 @@ it("should load a document and an additional snapshot", (done) => {
   });
 
   const { snapshot: snapshot2 } = createSnapshotTestHelper({
-    parentSnapshotCiphertext: snapshot.ciphertext,
+    parentSnapshotId: snapshot.publicData.snapshotId,
+    parentSnapshotCiphertextHash: hash(snapshot.ciphertext, sodium),
     grandParentSnapshotProof: snapshot.publicData.parentSnapshotProof,
     content: "Hello World again",
   });
@@ -475,7 +576,7 @@ it("should load a document and an additional snapshot", (done) => {
   });
 });
 
-it("should load a document with updates and two additional updates", (done) => {
+test("should load a document with updates and two additional updates", (done) => {
   const websocketServiceMock = (context: any) => () => {};
 
   let docValue = "";
@@ -485,15 +586,15 @@ it("should load a document with updates and two additional updates", (done) => {
     syncMachine
       .withContext({
         ...syncMachine.context,
+        documentId: docId,
         websocketHost: url,
         websocketSessionKey: "sessionKey",
-        isValidCollaborator: (signingPublicKey) =>
-          sodium.to_base64(signatureKeyPair.publicKey) === signingPublicKey,
+        isValidClient: (signingPublicKey) =>
+          sodium.to_base64(clientAKeyPair.publicKey) === signingPublicKey,
         getSnapshotKey: () => key,
         applySnapshot: (snapshot) => {
           docValue = sodium.to_string(snapshot);
         },
-        getUpdateKey: () => key,
         deserializeChanges: (changes) => {
           return changes;
         },
@@ -503,12 +604,16 @@ it("should load a document with updates and two additional updates", (done) => {
           });
         },
         sodium: sodium,
-        signatureKeyPair,
+        signatureKeyPair: clientAKeyPair,
       })
       .withConfig({
         actions: {
           spawnWebsocketActor: assign((context) => {
+            const ephemeralMessagesSession = createEphemeralSession(
+              context.sodium
+            );
             return {
+              _ephemeralMessagesSession: ephemeralMessagesSession,
               _websocketActor: spawn(
                 websocketServiceMock(context),
                 "websocketActor"
@@ -524,6 +629,7 @@ it("should load a document with updates and two additional updates", (done) => {
   });
 
   syncService.start();
+  syncService.send({ type: "WEBSOCKET_RETRY" });
   syncService.send({ type: "WEBSOCKET_CONNECTED" });
 
   const { snapshot } = createSnapshotTestHelper();
@@ -533,13 +639,13 @@ it("should load a document with updates and two additional updates", (done) => {
       type: "document",
       snapshot,
       updates: [
-        createUpdateHelper().update,
-        createUpdateHelper({ version: 1 }).update,
+        createUpdateTestHelper().update,
+        createUpdateTestHelper({ version: 1 }).update,
       ],
     },
   });
 
-  const { update } = createUpdateHelper({ version: 2 });
+  const { update } = createUpdateTestHelper({ version: 2 });
   syncService.send({
     type: "WEBSOCKET_ADD_TO_INCOMING_QUEUE",
     data: {
@@ -548,7 +654,7 @@ it("should load a document with updates and two additional updates", (done) => {
     },
   });
 
-  const { update: update2 } = createUpdateHelper({ version: 3 });
+  const { update: update2 } = createUpdateTestHelper({ version: 3 });
   syncService.send({
     type: "WEBSOCKET_ADD_TO_INCOMING_QUEUE",
     data: {
@@ -558,7 +664,7 @@ it("should load a document with updates and two additional updates", (done) => {
   });
 });
 
-it("should load a document with updates and two two additional snapshots", (done) => {
+test("should load a document with updates and two additional snapshots", (done) => {
   const websocketServiceMock = (context: any) => () => {};
 
   let docValue = "";
@@ -568,15 +674,15 @@ it("should load a document with updates and two two additional snapshots", (done
     syncMachine
       .withContext({
         ...syncMachine.context,
+        documentId: docId,
         websocketHost: url,
         websocketSessionKey: "sessionKey",
-        isValidCollaborator: (signingPublicKey) =>
-          sodium.to_base64(signatureKeyPair.publicKey) === signingPublicKey,
+        isValidClient: (signingPublicKey) =>
+          sodium.to_base64(clientAKeyPair.publicKey) === signingPublicKey,
         getSnapshotKey: () => key,
         applySnapshot: (snapshot) => {
           docValue = sodium.to_string(snapshot);
         },
-        getUpdateKey: () => key,
         deserializeChanges: (changes) => {
           return changes;
         },
@@ -586,12 +692,16 @@ it("should load a document with updates and two two additional snapshots", (done
           });
         },
         sodium: sodium,
-        signatureKeyPair,
+        signatureKeyPair: clientAKeyPair,
       })
       .withConfig({
         actions: {
           spawnWebsocketActor: assign((context) => {
+            const ephemeralMessagesSession = createEphemeralSession(
+              context.sodium
+            );
             return {
+              _ephemeralMessagesSession: ephemeralMessagesSession,
               _websocketActor: spawn(
                 websocketServiceMock(context),
                 "websocketActor"
@@ -607,6 +717,7 @@ it("should load a document with updates and two two additional snapshots", (done
   });
 
   syncService.start();
+  syncService.send({ type: "WEBSOCKET_RETRY" });
   syncService.send({ type: "WEBSOCKET_CONNECTED" });
 
   const { snapshot } = createSnapshotTestHelper();
@@ -616,16 +727,20 @@ it("should load a document with updates and two two additional snapshots", (done
       type: "document",
       snapshot,
       updates: [
-        createUpdateHelper().update,
-        createUpdateHelper({ version: 1 }).update,
+        createUpdateTestHelper().update,
+        createUpdateTestHelper({ version: 1 }).update,
       ],
     },
   });
 
   const { snapshot: snapshot2 } = createSnapshotTestHelper({
-    parentSnapshotCiphertext: snapshot.ciphertext,
+    parentSnapshotId: snapshot.publicData.snapshotId,
+    parentSnapshotCiphertextHash: hash(snapshot.ciphertext, sodium),
     grandParentSnapshotProof: snapshot.publicData.parentSnapshotProof,
     content: "Hello World again",
+    parentSnapshotUpdateClocks: {
+      [sodium.to_base64(clientAKeyPair.publicKey)]: 1,
+    },
   });
   syncService.send({
     type: "WEBSOCKET_ADD_TO_INCOMING_QUEUE",
@@ -636,7 +751,8 @@ it("should load a document with updates and two two additional snapshots", (done
   });
 
   const { snapshot: snapshot3 } = createSnapshotTestHelper({
-    parentSnapshotCiphertext: snapshot2.ciphertext,
+    parentSnapshotId: snapshot2.publicData.snapshotId,
+    parentSnapshotCiphertextHash: hash(snapshot2.ciphertext, sodium),
     grandParentSnapshotProof: snapshot2.publicData.parentSnapshotProof,
     content: "Hello World again and again",
   });
@@ -649,26 +765,26 @@ it("should load a document with updates and two two additional snapshots", (done
   });
 });
 
-it("should load a document and process three additional ephemeral updates", (done) => {
+test("should load a document and process three additional ephemeral messages", (done) => {
   const websocketServiceMock = (context: any) => () => {};
 
   let docValue = "";
-  let ephemeralUpdatesValue = new Uint8Array();
+  let ephemeralMessagesValue = new Uint8Array();
 
   const syncMachine = createSyncMachine();
   const syncService = interpret(
     syncMachine
       .withContext({
         ...syncMachine.context,
+        documentId: docId,
         websocketHost: url,
         websocketSessionKey: "sessionKey",
-        isValidCollaborator: (signingPublicKey) =>
-          sodium.to_base64(signatureKeyPair.publicKey) === signingPublicKey,
+        isValidClient: (signingPublicKey) =>
+          sodium.to_base64(clientAKeyPair.publicKey) === signingPublicKey,
         getSnapshotKey: () => key,
         applySnapshot: (snapshot) => {
           docValue = sodium.to_string(snapshot);
         },
-        getUpdateKey: () => key,
         deserializeChanges: (changes) => {
           return changes;
         },
@@ -677,20 +793,23 @@ it("should load a document and process three additional ephemeral updates", (don
             docValue = docValue + change;
           });
         },
-        getEphemeralUpdateKey: () => key,
-        applyEphemeralUpdates: (ephemeralUpdates) => {
-          ephemeralUpdatesValue = new Uint8Array([
-            ...ephemeralUpdatesValue,
-            ...ephemeralUpdates,
+        applyEphemeralMessage: (ephemeralMessage) => {
+          ephemeralMessagesValue = new Uint8Array([
+            ...ephemeralMessagesValue,
+            ephemeralMessage,
           ]);
         },
         sodium: sodium,
-        signatureKeyPair,
+        signatureKeyPair: clientAKeyPair,
       })
       .withConfig({
         actions: {
           spawnWebsocketActor: assign((context) => {
+            const ephemeralMessagesSession = createEphemeralSession(
+              context.sodium
+            );
             return {
+              _ephemeralMessagesSession: ephemeralMessagesSession,
               _websocketActor: spawn(
                 websocketServiceMock(context),
                 "websocketActor"
@@ -700,15 +819,15 @@ it("should load a document and process three additional ephemeral updates", (don
         },
       })
   ).onTransition((state) => {
-    if (ephemeralUpdatesValue.length === 3) {
-      expect(ephemeralUpdatesValue[0]).toEqual(42);
-      expect(ephemeralUpdatesValue[1]).toEqual(42);
-      expect(ephemeralUpdatesValue[2]).toEqual(42);
+    if (ephemeralMessagesValue.length === 2) {
+      expect(ephemeralMessagesValue[0]).toEqual(22);
+      expect(ephemeralMessagesValue[1]).toEqual(22);
       done();
     }
   });
 
   syncService.start();
+  syncService.send({ type: "WEBSOCKET_RETRY" });
   syncService.send({ type: "WEBSOCKET_CONNECTED" });
 
   const { snapshot } = createSnapshotTestHelper();
@@ -720,30 +839,46 @@ it("should load a document and process three additional ephemeral updates", (don
     },
   });
 
-  const { ephemeralUpdate } = createTestEphemeralUpdate();
+  const receiverSessionId =
+    // @ts-expect-error _ephemeralMessagesSession is defined once the machine is initiate
+    syncService.getSnapshot().context._ephemeralMessagesSession.id;
+
+  const { ephemeralMessage } = createEphemeralMessageTestHelper({
+    messageType: "proof",
+    receiverSessionId,
+  });
   syncService.send({
     type: "WEBSOCKET_ADD_TO_INCOMING_QUEUE",
     data: {
-      ...ephemeralUpdate,
-      type: "ephemeral-update",
+      ...ephemeralMessage,
+      type: "ephemeral-message",
     },
   });
+
   setTimeout(() => {
-    const { ephemeralUpdate: ephemeralUpdate2 } = createTestEphemeralUpdate();
+    const { ephemeralMessage: ephemeralMessage2 } =
+      createEphemeralMessageTestHelper({
+        messageType: "message",
+        receiverSessionId,
+      });
     syncService.send({
       type: "WEBSOCKET_ADD_TO_INCOMING_QUEUE",
       data: {
-        ...ephemeralUpdate2,
-        type: "ephemeral-update",
+        ...ephemeralMessage2,
+        type: "ephemeral-message",
       },
     });
     setTimeout(() => {
-      const { ephemeralUpdate: ephemeralUpdate3 } = createTestEphemeralUpdate();
+      const { ephemeralMessage: ephemeralMessage3 } =
+        createEphemeralMessageTestHelper({
+          messageType: "message",
+          receiverSessionId,
+        });
       syncService.send({
         type: "WEBSOCKET_ADD_TO_INCOMING_QUEUE",
         data: {
-          ...ephemeralUpdate3,
-          type: "ephemeral-update",
+          ...ephemeralMessage3,
+          type: "ephemeral-message",
         },
       });
     }, 1);

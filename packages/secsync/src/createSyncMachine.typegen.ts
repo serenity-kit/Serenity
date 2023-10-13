@@ -43,7 +43,10 @@ export interface Typegen0 {
     addToPendingUpdatesQueue: "ADD_CHANGES";
     increaseWebsocketRetry: "WEBSOCKET_RETRY";
     removeOldestItemFromQueueAndUpdateContext: "done.invoke.processQueues";
-    resetContext: "DISCONNECT" | "WEBSOCKET_DISCONNECTED";
+    resetContext:
+      | "DISCONNECT"
+      | "WEBSOCKET_DISCONNECTED"
+      | "done.invoke.processQueues";
     resetWebsocketRetries: "WEBSOCKET_CONNECTED";
     spawnWebsocketActor: "WEBSOCKET_RETRY";
     stopWebsocketActor:
@@ -52,12 +55,15 @@ export interface Typegen0 {
       | "WEBSOCKET_DOCUMENT_ERROR"
       | "WEBSOCKET_DOCUMENT_NOT_FOUND"
       | "WEBSOCKET_UNAUTHORIZED"
+      | "done.invoke.processQueues"
       | "error.platform.processQueues";
-    storeErrorInErrorTrace: "error.platform.processQueues";
+    storeErrorInSnapshotAndUpdateErrors: "error.platform.processQueues";
+    updateEphemeralMessageAuthoringErrors: "FAILED_CREATING_EPHEMERAL_MESSAGE";
   };
   eventsCausingDelays: {};
   eventsCausingGuards: {
     hasMoreItemsInQueues: "xstate.after(0)#syncMachine.connected.checkingForMoreQueueItems";
+    hasNoErrorTriggeringADisconnect: "done.invoke.processQueues";
     shouldReconnect: "";
   };
   eventsCausingServices: {

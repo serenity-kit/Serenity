@@ -34,7 +34,8 @@ export const createIntroductionDocumentSnapshot = ({
     docId: documentId,
     pubKey: sodium.to_base64(signatureKeyPair.publicKey),
     keyDerivationTrace,
-    parentSnapshotClocks: {},
+    parentSnapshotId: "",
+    parentSnapshotUpdateClocks: {},
   };
 
   return createInitialSnapshot(

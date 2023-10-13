@@ -1,7 +1,9 @@
 import { IncomingMessage } from "http";
+import sodium from "libsodium-wrappers";
 import { parse as parseUrl } from "url";
 import { WebSocket } from "ws";
-import { parseEphemeralUpdate } from "../ephemeralUpdate/parseEphemeralUpdate";
+import { verifySignature } from "../crypto/verifySignature";
+import { parseEphemeralMessage } from "../ephemeralMessage/parseEphemeralMessage";
 import {
   SecsyncNewSnapshotRequiredError,
   SecsyncSnapshotBasedOnOutdatedSnapshotError,
@@ -14,35 +16,36 @@ import {
   CreateUpdateParams,
   GetDocumentParams,
   HasAccessParams,
-  SnapshotWithServerData,
-  UpdateWithServerData,
+  HasBroadcastAccessParams,
+  Snapshot,
+  SnapshotProofChainEntry,
+  SnapshotUpdateClocks,
+  Update,
 } from "../types";
 import { parseUpdate } from "../update/parseUpdate";
+import { canonicalizeAndToBase64 } from "../utils/canonicalizeAndToBase64";
 import { retryAsyncFunction } from "../utils/retryAsyncFunction";
-import { addConnection, addUpdate, removeConnection } from "./store";
+import { addConnection, broadcastMessage, removeConnection } from "./store";
 
 type GetDocumentResult = {
-  snapshot?: SnapshotWithServerData;
-  updates: UpdateWithServerData[];
-  snapshotProofChain: {
-    id: string;
-    parentSnapshotProof: string;
-    snapshotCiphertextHash: string;
-  }[];
+  snapshot?: Snapshot;
+  snapshotProofChain?: SnapshotProofChainEntry[];
+  updates: Update[];
 };
 
 type WebsocketConnectionParams = {
   getDocument(
     getDocumentParams: GetDocumentParams
   ): Promise<GetDocumentResult | undefined>;
-  createSnapshot(
-    createSnapshotParams: CreateSnapshotParams
-  ): Promise<SnapshotWithServerData>;
-  createUpdate(
-    createUpdateParams: CreateUpdateParams
-  ): Promise<UpdateWithServerData>;
+  createSnapshot(createSnapshotParams: CreateSnapshotParams): Promise<Snapshot>;
+  createUpdate(createUpdateParams: CreateUpdateParams): Promise<Update>;
   hasAccess(hasAccessParams: HasAccessParams): Promise<boolean>;
+  hasBroadcastAccess(
+    hasBroadcastAccessParams: HasBroadcastAccessParams
+  ): Promise<boolean[]>;
   additionalAuthenticationDataValidations?: AdditionalAuthenticationDataValidations;
+  /** default: "off" */
+  logging?: "off" | "error";
 };
 
 export const createWebSocketConnection =
@@ -51,15 +54,21 @@ export const createWebSocketConnection =
     createSnapshot,
     createUpdate,
     hasAccess,
+    hasBroadcastAccess,
     additionalAuthenticationDataValidations,
+    logging: loggingParam,
   }: WebsocketConnectionParams) =>
-  async (connection: WebSocket, request: IncomingMessage, context: any) => {
+  async (connection: WebSocket, request: IncomingMessage) => {
+    const logging = loggingParam || "off";
     let documentId = "";
 
     const handleDocumentError = () => {
       connection.send(JSON.stringify({ type: "document-error" }));
       connection.close();
-      removeConnection(documentId, connection);
+      removeConnection({
+        documentId,
+        websocket: connection,
+      });
     };
 
     try {
@@ -70,6 +79,22 @@ export const createWebSocketConnection =
       const urlParts = parseUrl(request.url, true);
       documentId = request.url?.slice(1)?.split("?")[0] || "";
 
+      const websocketSessionKey = Array.isArray(urlParts.query.sessionKey)
+        ? urlParts.query.sessionKey[0]
+        : urlParts.query.sessionKey;
+
+      // invalid connection without a sessionKey
+      if (websocketSessionKey === undefined) {
+        handleDocumentError();
+        return;
+      }
+
+      const getDocumentModeString = Array.isArray(urlParts.query.mode)
+        ? urlParts.query.mode[0]
+        : urlParts.query.mode;
+      const getDocumentMode =
+        getDocumentModeString === "delta" ? "delta" : "complete";
+
       if (documentId === "") {
         handleDocumentError();
         return;
@@ -78,7 +103,7 @@ export const createWebSocketConnection =
       const documentAccess = await hasAccess({
         action: "read",
         documentId,
-        context,
+        websocketSessionKey,
       });
       if (!documentAccess) {
         connection.send(JSON.stringify({ type: "unauthorized" }));
@@ -86,18 +111,28 @@ export const createWebSocketConnection =
         return;
       }
 
+      let knownSnapshotUpdateClocks: SnapshotUpdateClocks | undefined =
+        undefined;
+      try {
+        const knownSnapshotUpdateClocksQueryEntry = Array.isArray(
+          urlParts.query.knownSnapshotUpdateClocks
+        )
+          ? urlParts.query.knownSnapshotUpdateClocks[0]
+          : urlParts.query.knownSnapshotUpdateClocks;
+        if (knownSnapshotUpdateClocksQueryEntry) {
+          knownSnapshotUpdateClocks = SnapshotUpdateClocks.parse(
+            JSON.parse(decodeURIComponent(knownSnapshotUpdateClocksQueryEntry))
+          );
+        }
+      } catch (err) {}
+
       const doc = await getDocument({
         documentId,
-        lastKnownSnapshotId: Array.isArray(urlParts.query.lastKnownSnapshotId)
-          ? urlParts.query.lastKnownSnapshotId[0]
-          : urlParts.query.lastKnownSnapshotId,
-        lastKnownUpdateServerVersion: Array.isArray(
-          urlParts.query.latestServerVersion
-        )
-          ? parseInt(urlParts.query.latestServerVersion[0], 10)
-          : urlParts.query.latestServerVersion
-          ? parseInt(urlParts.query.latestServerVersion, 10)
-          : undefined,
+        knownSnapshotId: Array.isArray(urlParts.query.knownSnapshotId)
+          ? urlParts.query.knownSnapshotId[0]
+          : urlParts.query.knownSnapshotId,
+        knownSnapshotUpdateClocks,
+        mode: getDocumentMode,
       });
 
       if (!doc) {
@@ -106,7 +141,7 @@ export const createWebSocketConnection =
         return;
       }
 
-      addConnection(documentId, connection);
+      addConnection({ documentId, websocket: connection, websocketSessionKey });
       connection.send(JSON.stringify({ type: "document", ...doc }));
 
       connection.on("message", async function message(messageContent) {
@@ -114,33 +149,47 @@ export const createWebSocketConnection =
 
         // new snapshot
         if (data?.publicData?.snapshotId) {
-          const documentAccess = await hasAccess({
-            action: "write-snapshot",
-            documentId,
-            context,
-          });
-          if (!documentAccess) {
-            connection.send(JSON.stringify({ type: "unauthorized" }));
-            connection.close();
-            return;
-          }
-
-          const snapshotMessage = parseSnapshotWithClientData(
-            data,
-            additionalAuthenticationDataValidations?.snapshot
-          );
           try {
-            const activeSnapshotInfo =
-              snapshotMessage.lastKnownSnapshotId &&
-              snapshotMessage.latestServerVersion
-                ? {
-                    latestVersion: snapshotMessage.latestServerVersion,
-                    snapshotId: snapshotMessage.lastKnownSnapshotId,
-                  }
-                : undefined;
-            const snapshot: SnapshotWithServerData = await createSnapshot({
+            const snapshotMessage = parseSnapshotWithClientData(
+              data,
+              additionalAuthenticationDataValidations?.snapshot
+            );
+
+            const documentAccess = await hasAccess({
+              action: "write-snapshot",
+              documentId,
+              publicKey: snapshotMessage.publicData.pubKey,
+              websocketSessionKey,
+            });
+            if (!documentAccess) {
+              connection.send(JSON.stringify({ type: "unauthorized" }));
+              connection.close();
+              return;
+            }
+
+            const snapshotPublicKey = sodium.from_base64(
+              snapshotMessage.publicData.pubKey
+            );
+            const snapshotPublicDataAsBase64 = canonicalizeAndToBase64(
+              snapshotMessage.publicData,
+              sodium
+            );
+            const isValid = verifySignature(
+              {
+                nonce: snapshotMessage.nonce,
+                ciphertext: snapshotMessage.ciphertext,
+                publicData: snapshotPublicDataAsBase64,
+              },
+              snapshotMessage.signature,
+              snapshotPublicKey,
+              sodium
+            );
+            if (!isValid) {
+              throw new Error("Snapshot message signature is not valid.");
+            }
+
+            const snapshot: Snapshot = await createSnapshot({
               snapshot: snapshotMessage,
-              activeSnapshotInfo,
             });
             connection.send(
               JSON.stringify({
@@ -148,93 +197,143 @@ export const createWebSocketConnection =
                 snapshotId: snapshot.publicData.snapshotId,
               })
             );
-            const snapshotMsgForOtherClients: SnapshotWithServerData = {
+            const snapshotMsgForOtherClients: Snapshot = {
               ciphertext: snapshotMessage.ciphertext,
               nonce: snapshotMessage.nonce,
               publicData: snapshotMessage.publicData,
               signature: snapshotMessage.signature,
-              serverData: {
-                latestVersion: snapshot.serverData.latestVersion,
-              },
             };
-            addUpdate(
+            broadcastMessage({
               documentId,
-              { type: "snapshot", snapshot: snapshotMsgForOtherClients },
-              connection
-            );
+              message: {
+                type: "snapshot",
+                snapshot: snapshotMsgForOtherClients,
+              },
+              currentWebsocket: connection,
+              hasBroadcastAccess,
+            });
           } catch (error) {
-            console.error("SNAPSHOT FAILED ERROR:", error);
-            if (error instanceof SecsyncSnapshotBasedOnOutdatedSnapshotError) {
-              let document = await getDocument({
-                documentId,
-                lastKnownSnapshotId: data.lastKnownSnapshotId,
-              });
-              if (document) {
+            if (logging === "error") {
+              console.error("SNAPSHOT FAILED ERROR:", error, data);
+            }
+            try {
+              if (
+                error instanceof SecsyncSnapshotBasedOnOutdatedSnapshotError
+              ) {
+                let document = await getDocument({
+                  documentId,
+                  knownSnapshotId: data.knownSnapshotId,
+                  mode: "delta",
+                });
+                if (document) {
+                  connection.send(
+                    JSON.stringify({
+                      type: "snapshot-save-failed",
+                      snapshot: document.snapshot,
+                      updates: document.updates,
+                      snapshotProofChain: document.snapshotProofChain,
+                    })
+                  );
+                } else {
+                  if (logging === "error") {
+                    console.error(
+                      'document not found for "snapshotBasedOnOutdatedSnapshot" error'
+                    );
+                  }
+                  connection.send(
+                    JSON.stringify({
+                      type: "snapshot-save-failed",
+                    })
+                  );
+                }
+              } else if (error instanceof SecsyncSnapshotMissesUpdatesError) {
+                const document = await getDocument({
+                  documentId,
+                  knownSnapshotId: data.knownSnapshotId,
+                  mode: "delta",
+                });
+                if (document) {
+                  connection.send(
+                    JSON.stringify({
+                      type: "snapshot-save-failed",
+                      updates: document.updates,
+                    })
+                  );
+                } else {
+                  // log since it's an unexpected error
+                  if (logging === "error") {
+                    console.error(
+                      'document not found for "snapshotMissesUpdates" error'
+                    );
+                  }
+                  connection.send(
+                    JSON.stringify({
+                      type: "snapshot-save-failed",
+                    })
+                  );
+                }
+              } else if (error instanceof SecsyncNewSnapshotRequiredError) {
                 connection.send(
                   JSON.stringify({
                     type: "snapshot-save-failed",
-                    snapshot: document.snapshot,
-                    updates: document.updates,
-                    snapshotProofChain: document.snapshotProofChain,
                   })
                 );
               } else {
-                console.error(
-                  'document not found for "snapshotBasedOnOutdatedSnapshot" error'
-                );
-                handleDocumentError();
-              }
-            } else if (error instanceof SecsyncSnapshotMissesUpdatesError) {
-              const document = await getDocument({
-                documentId,
-                lastKnownSnapshotId: data.lastKnownSnapshotId,
-                lastKnownUpdateServerVersion: data.latestServerVersion,
-              });
-              if (document) {
                 connection.send(
                   JSON.stringify({
                     type: "snapshot-save-failed",
-                    updates: document.updates,
                   })
                 );
-              } else {
-                // log since it's an unexpected error
-                console.error(
-                  'document not found for "snapshotMissesUpdates" error'
-                );
-                handleDocumentError();
               }
-            } else if (error instanceof SecsyncNewSnapshotRequiredError) {
+            } catch (err) {
+              // log since it's an unexpected error
+              if (logging === "error") {
+                console.error("SNAPSHOT FAILED ERROR HANDLING FAILED:", err);
+              }
               connection.send(
                 JSON.stringify({
                   type: "snapshot-save-failed",
                 })
               );
-            } else {
-              // log since it's an unexpected error
-              console.error(error);
-              handleDocumentError();
             }
           }
           // new update
         } else if (data?.publicData?.refSnapshotId) {
-          const documentAccess = await hasAccess({
-            action: "write-update",
-            documentId,
-            context,
-          });
-          if (!documentAccess) {
-            connection.send(JSON.stringify({ type: "unauthorized" }));
-            connection.close();
-            return;
-          }
-
-          const updateMessage = parseUpdate(
-            data,
-            additionalAuthenticationDataValidations?.update
-          );
-          let savedUpdate: undefined | UpdateWithServerData = undefined;
+          let savedUpdate: undefined | Update = undefined;
           try {
+            const updateMessage = parseUpdate(
+              data,
+              additionalAuthenticationDataValidations?.update
+            );
+
+            const documentAccess = await hasAccess({
+              action: "write-update",
+              documentId,
+              publicKey: updateMessage.publicData.pubKey,
+              websocketSessionKey,
+            });
+            if (!documentAccess) {
+              connection.send(JSON.stringify({ type: "unauthorized" }));
+              connection.close();
+              return;
+            }
+
+            const isValid = verifySignature(
+              {
+                nonce: updateMessage.nonce,
+                ciphertext: updateMessage.ciphertext,
+                publicData: canonicalizeAndToBase64(
+                  updateMessage.publicData,
+                  sodium
+                ),
+              },
+              updateMessage.signature,
+              sodium.from_base64(updateMessage.publicData.pubKey),
+              sodium
+            );
+            if (!isValid) {
+              throw new Error("Update message signature is not valid.");
+            }
             // const random = Math.floor(Math.random() * 10);
             // if (random < 8) {
             //   throw new Error("CUSTOM ERROR");
@@ -256,16 +355,18 @@ export const createWebSocketConnection =
                 type: "update-saved",
                 snapshotId: savedUpdate.publicData.refSnapshotId,
                 clock: savedUpdate.publicData.clock,
-                serverVersion: savedUpdate.serverData.version,
               })
             );
-            addUpdate(
+            broadcastMessage({
               documentId,
-              { ...savedUpdate, type: "update" },
-              connection
-            );
+              message: { ...savedUpdate, type: "update" },
+              currentWebsocket: connection,
+              hasBroadcastAccess,
+            });
           } catch (err) {
-            console.error("update failed", err);
+            if (logging === "error") {
+              console.error("update failed", err);
+            }
             if (savedUpdate === null || savedUpdate === undefined) {
               connection.send(
                 JSON.stringify({
@@ -278,36 +379,67 @@ export const createWebSocketConnection =
               );
             }
           }
-          // new ephemeral update
+          // new ephemeral message
         } else {
-          const documentAccess = await hasAccess({
-            action: "send-ephemeral-update",
-            documentId,
-            context,
-          });
-          if (!documentAccess) {
-            connection.send(JSON.stringify({ type: "unauthorized" }));
-            connection.close();
-            return;
-          }
+          try {
+            const ephemeralMessageMessage = parseEphemeralMessage(
+              data,
+              additionalAuthenticationDataValidations?.ephemeralMessage
+            );
 
-          const ephemeralUpdateMessage = parseEphemeralUpdate(
-            data,
-            additionalAuthenticationDataValidations?.ephemeralUpdate
-          );
-          addUpdate(
-            documentId,
-            { ...ephemeralUpdateMessage, type: "ephemeral-update" },
-            connection
-          );
+            const documentAccess = await hasAccess({
+              action: "send-ephemeral-message",
+              documentId,
+              publicKey: ephemeralMessageMessage.publicData.pubKey,
+              websocketSessionKey,
+            });
+            if (!documentAccess) {
+              connection.send(JSON.stringify({ type: "unauthorized" }));
+              connection.close();
+              return;
+            }
+
+            const isValid = verifySignature(
+              {
+                nonce: ephemeralMessageMessage.nonce,
+                ciphertext: ephemeralMessageMessage.ciphertext,
+                publicData: canonicalizeAndToBase64(
+                  ephemeralMessageMessage.publicData,
+                  sodium
+                ),
+              },
+              ephemeralMessageMessage.signature,
+              sodium.from_base64(ephemeralMessageMessage.publicData.pubKey),
+              sodium
+            );
+            if (!isValid) {
+              return {
+                error: new Error("SECSYNC_ERROR_308"),
+              };
+            }
+
+            broadcastMessage({
+              documentId,
+              message: {
+                ...ephemeralMessageMessage,
+                type: "ephemeral-message",
+              },
+              currentWebsocket: connection,
+              hasBroadcastAccess,
+            });
+          } catch (err) {
+            console.error("Ephemeral message failed due:", err);
+          }
         }
       });
 
       connection.on("close", function () {
-        removeConnection(documentId, connection);
+        removeConnection({ documentId, websocket: connection });
       });
     } catch (error) {
-      console.error(error);
+      if (logging === "error") {
+        console.error(error);
+      }
       handleDocumentError();
     }
   };
