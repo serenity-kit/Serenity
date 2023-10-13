@@ -751,7 +751,8 @@ test("should increase context._snapshotSaveFailedCounter on every snapshot-save-
 
     if (state.context._snapshotSaveFailedCounter === 2) {
       expect(state.context._snapshotSaveFailedCounter).toBe(2);
-      expect(state.context._snapshotInFlight?.changes.length).toBe(2);
+      expect(state.context._snapshotInFlight?.changes.length).toBe(0);
+      expect(state.context._pendingChangesQueue.length).toBe(2);
       done();
     }
   });
