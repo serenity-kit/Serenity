@@ -98,9 +98,6 @@ test("retrieve a snapshot", async () => {
   });
   const snapshot = result.snapshot;
   expect(snapshot.id).toBe(userData1.snapshot.publicData.snapshotId);
-  expect(snapshot.latestVersion).toBe(
-    userData1.snapshot.serverData.latestVersion
-  );
   expect(snapshot.documentId).toBe(userData1.snapshot.publicData.docId);
   expect(snapshot.keyDerivationTrace.workspaceKeyId).toBe(
     userData1.snapshot.publicData.keyDerivationTrace.workspaceKeyId
@@ -142,9 +139,6 @@ test("retrieve a snapshot from documentShareLinkToken", async () => {
   });
   const snapshot = result.snapshot;
   expect(snapshot.id).toBe(userData1.snapshot.publicData.snapshotId);
-  expect(snapshot.latestVersion).toBe(
-    userData1.snapshot.serverData.latestVersion
-  );
   expect(snapshot.documentId).toBe(userData1.snapshot.publicData.docId);
   expect(snapshot.keyDerivationTrace.workspaceKeyId).toBe(
     userData1.snapshot.publicData.keyDerivationTrace.workspaceKeyId

@@ -5,19 +5,11 @@ import {
 import { Snapshot, Update } from "../../prisma/generated/output";
 
 export function serializeSnapshot(snapshot: Snapshot): SecsyncSnapshot {
-  return {
-    ...JSON.parse(snapshot.data),
-    serverData: {
-      latestVersion: snapshot.latestVersion,
-    },
-  };
+  return { ...JSON.parse(snapshot.data) };
 }
 
 export function serializeUpdate(update: Update): SecsyncUpdate {
-  return {
-    ...JSON.parse(update.data),
-    serverData: { version: update.version },
-  };
+  return { ...JSON.parse(update.data) };
 }
 
 export function serializeUpdates(updates: Update[]): SecsyncUpdate[] {
