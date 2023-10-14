@@ -20,7 +20,6 @@ export const getSnapshot = async ({
     query snapshot($documentId: ID!) {
       snapshot(documentId: $documentId) {
         id
-        latestVersion
         data
         documentId
         keyDerivationTrace {

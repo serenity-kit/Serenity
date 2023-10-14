@@ -19,7 +19,6 @@ export const Snapshot = objectType({
   name: "Snapshot",
   definition(t) {
     t.nonNull.string("id");
-    t.nonNull.int("latestVersion");
     t.nonNull.string("data");
     t.field("document", { type: Document });
     t.nonNull.string("documentId");

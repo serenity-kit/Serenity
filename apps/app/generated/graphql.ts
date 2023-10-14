@@ -1035,7 +1035,6 @@ export type Snapshot = {
   documentId: Scalars['String'];
   id: Scalars['String'];
   keyDerivationTrace: KeyDerivationTrace;
-  latestVersion: Scalars['Int'];
   updates?: Maybe<Array<Update>>;
 };
 
@@ -1721,7 +1720,7 @@ export type SnapshotQueryVariables = Exact<{
 }>;
 
 
-export type SnapshotQuery = { __typename?: 'Query', snapshot?: { __typename?: 'Snapshot', id: string, latestVersion: number, data: string, documentId: string, keyDerivationTrace: { __typename?: 'KeyDerivationTrace', workspaceKeyId: string, trace: Array<{ __typename?: 'KeyDerivationTraceEntry', entryId: string, subkeyId: number, parentId?: string | null, context: string }> } } | null };
+export type SnapshotQuery = { __typename?: 'Query', snapshot?: { __typename?: 'Snapshot', id: string, data: string, documentId: string, keyDerivationTrace: { __typename?: 'KeyDerivationTrace', workspaceKeyId: string, trace: Array<{ __typename?: 'KeyDerivationTraceEntry', entryId: string, subkeyId: number, parentId?: string | null, context: string }> } } | null };
 
 export type UnauthorizedMemberQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -2646,7 +2645,6 @@ export const SnapshotDocument = gql`
     query snapshot($documentId: ID!) {
   snapshot(documentId: $documentId) {
     id
-    latestVersion
     data
     documentId
     keyDerivationTrace {
