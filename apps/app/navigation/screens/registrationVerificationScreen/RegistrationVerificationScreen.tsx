@@ -269,10 +269,6 @@ export default function RegistrationVerificationScreen(
           testID="verify-registration__input"
         />
 
-        <InfoMessage>
-          Note: The verification code is prefilled on staging.
-        </InfoMessage>
-
         <Button
           onPress={onSubmit}
           isLoading={isSubmitting}

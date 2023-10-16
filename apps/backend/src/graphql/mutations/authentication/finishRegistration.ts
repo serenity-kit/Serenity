@@ -70,9 +70,22 @@ export const finishRegistrationMutation = mutationField("finishRegistration", {
         args.input.pendingWorkspaceInvitationKeyPublicNonce,
       createChainEvent,
     });
+
+    let verificationCode: null | string = null;
+
+    // expose verification code to the client only in the following
+    // environments: development, staging and e2e
+    if (
+      process.env.SERENITY_ENV === "e2e" ||
+      process.env.SERENITY_ENV === "development" ||
+      process.env.SERENITY_ENV === "staging"
+    ) {
+      verificationCode = unverifiedUser.confirmationCode;
+    }
+
     return {
       id: unverifiedUser.id,
-      verificationCode: unverifiedUser.confirmationCode,
+      verificationCode,
     };
   },
 });
