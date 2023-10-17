@@ -187,7 +187,7 @@ flyctl secrets set FILE_STORAGE_BUCKET={value} -a {app_name}
 flyctl secrets set FILE_STORAGE_SECRET_ACCESS_KEY={value} -a {app_name}
 flyctl secrets set FROM_EMAIL={value} -a {app_name}
 flyctl secrets set OPAQUE_SERVER_SETUP={value} -a {app_name}
-flyctl secrets set SENDGRID_API_KEY={value} -a {app_name}
+flyctl secrets set POSTMARK_API_KEY={value} -a {app_name}
 ```
 
 Update DATABASE_URL in Github secrets with <db_connection_url>/serenity

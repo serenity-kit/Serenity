@@ -1,6 +1,6 @@
-import sendgrid from "@sendgrid/mail";
 import * as userChain from "@serenity-kit/user-chain";
 import { UserInputError } from "apollo-server-express";
+import { ServerClient } from "postmark";
 import { Prisma } from "../../../prisma/generated/output";
 import { Device } from "../../types/device";
 import { createConfirmationCode } from "../../utils/confirmationCode";
@@ -10,10 +10,10 @@ import { prisma } from "../prisma";
 if (!process.env.FROM_EMAIL) {
   throw new Error("Missing process.env.FROM_EMAIL");
 }
-if (!process.env.SENDGRID_API_KEY) {
-  throw new Error("Missing process.env.SENDGRID_API_KEY");
+if (!process.env.POSTMARK_API_KEY) {
+  throw new Error("Missing process.env.POSTMARK_API_KEY");
 }
-sendgrid.setApiKey(process.env.SENDGRID_API_KEY);
+const postmarkClient = new ServerClient(process.env.POSTMARK_API_KEY);
 
 type DeviceInput = Device & {
   ciphertext: string;
@@ -137,31 +137,30 @@ export async function finalizeRegistration({
           ``,
           `If you didn't try to create an account, please ignore this email.`,
         ];
-        const registrationEmail = {
-          to: username,
-          from: process.env.FROM_EMAIL!,
-          subject: "Verify your Serenity account",
-          text: emailRegistrationLines.join("\n"),
-        };
         if (
-          process.env.SERENITY_ENV !== "e2e" &&
-          process.env.NODE_ENV !== "development" &&
-          process.env.NODE_ENV !== "test"
+          process.env.SERENITY_ENV === "e2e" ||
+          process.env.SERENITY_ENV === "development" ||
+          process.env.SERENITY_ENV === "staging"
         ) {
-          console.log(`Sending verification email to "${username}"`);
-          try {
-            await sendgrid.send(registrationEmail);
-          } catch (error) {
-            console.error(`Error sending email to "${username}"`);
-            console.error("Sendgrid error response body:");
-            console.error(error.response.body);
-            console.error("Sendgrid error:");
-            console.error(error);
-          }
-        } else {
           console.log(
             `New user confirmation code: ${unverifiedUser.confirmationCode}`
           );
+        } else {
+          console.log(`Sending verification email to "${username}"`);
+          try {
+            await postmarkClient.sendEmail({
+              From: process.env.FROM_EMAIL!,
+              To: username,
+              Subject: "Verify your Serenity account",
+              HtmlBody: emailRegistrationLines.join("<br />"),
+              TextBody: emailRegistrationLines.join("\n"),
+              MessageStream: "outbound",
+            });
+          } catch (error) {
+            console.error(`Error sending email to "${username}"`);
+            console.error("Postmark error:");
+            console.error(error);
+          }
         }
 
         return unverifiedUser;
