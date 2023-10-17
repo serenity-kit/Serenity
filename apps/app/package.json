@@ -37,7 +37,6 @@
     "@serenity-tools/common": "*",
     "@serenity-tools/editor": "*",
     "@serenity-tools/editor-file-extension": "*",
-    "@serenity-tools/libsodium": "*",
     "@serenity-tools/secsync": "*",
     "@serenity-tools/ui": "*",
     "@tiptap/extension-placeholder": "^2.0.0-beta.217",
