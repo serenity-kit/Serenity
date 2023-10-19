@@ -147,10 +147,10 @@ export type CreateCommentResult = {
 };
 
 export type CreateDocumentInput = {
-  id: Scalars['String'];
   nameCiphertext: Scalars['String'];
   nameNonce: Scalars['String'];
   parentFolderId: Scalars['String'];
+  serializedDocumentChainEvent: Scalars['String'];
   snapshot: DocumentSnapshotInput;
   subkeyId: Scalars['Int'];
   workspaceId: Scalars['String'];
@@ -196,9 +196,9 @@ export type CreateFolderResult = {
 };
 
 export type CreateInitialDocumentInput = {
-  id: Scalars['String'];
   nameCiphertext: Scalars['String'];
   nameNonce: Scalars['String'];
+  serializedDocumentChainEvent: Scalars['String'];
   snapshot: DocumentSnapshotInput;
   subkeyId: Scalars['Int'];
 };

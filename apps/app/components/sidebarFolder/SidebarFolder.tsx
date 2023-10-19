@@ -1,5 +1,6 @@
 import { useFocusRing } from "@react-native-aria/focus";
 import { useNavigation, useRoute } from "@react-navigation/native";
+import * as documentChain from "@serenity-kit/document-chain";
 import {
   KeyDerivationTrace,
   SerenitySnapshotPublicData,
@@ -51,7 +52,6 @@ import { useDocumentTitleStore } from "../../utils/document/documentTitleStore";
 import { createFolderKeyDerivationTrace } from "../../utils/folder/createFolderKeyDerivationTrace";
 import { useFolderKeyStore } from "../../utils/folder/folderKeyStore";
 import { useOpenFolderStore } from "../../utils/folder/openFolderStore";
-
 import { getWorkspace } from "../../utils/workspace/getWorkspace";
 import { retrieveWorkspaceKey } from "../../utils/workspace/retrieveWorkspaceKey";
 import SidebarFolderMenu from "../sidebarFolderMenu/SidebarFolderMenu";
@@ -261,7 +261,13 @@ export default function SidebarFolder(props: Props) {
   };
 
   const createDocument = async () => {
-    const documentId = generateId();
+    const createDocumentChainEvent = documentChain.createDocumentChain({
+      authorKeyPair: {
+        privateKey: activeDevice.signingPrivateKey,
+        publicKey: activeDevice.signingPublicKey,
+      },
+    });
+    const documentId = createDocumentChainEvent.transaction.id;
     const snapshotId = generateId();
     const documentName = "Untitled";
     const workspace = await getWorkspace({
@@ -337,13 +343,15 @@ export default function SidebarFolder(props: Props) {
     const result = await runCreateDocumentMutation(
       {
         input: {
-          id: documentId,
           nameCiphertext: documentNameData.ciphertext,
           nameNonce: documentNameData.publicNonce,
           subkeyId: documentNameKey.subkeyId,
           workspaceId: props.workspaceId,
           parentFolderId: props.folderId,
           snapshot,
+          serializedDocumentChainEvent: JSON.stringify(
+            createDocumentChainEvent
+          ),
         },
       },
       {}

@@ -23,9 +23,9 @@ const parentFolderId = "4e9a4c29-2295-471c-84b5-5bf55169ff8c";
 const folderId = "3530b9ed-11f3-44c7-9e16-7dba1e14815f";
 const childFolderId = "98b3f4d9-141a-4e11-a0f5-7437a6d1eb4b";
 const otherFolderId = "c1c65251-7471-4893-a1b5-e3df937caf66";
-const documentId1 = "3530b9ed-11f3-44c7-9e16-7dba1e14815f";
-const documentId2 = "9e911f29-7a86-480b-89d7-5c647f21317f";
-const childDocumentId = "929ca262-f144-40f7-8fe2-d3147f415f26";
+let documentId1: string;
+let documentId2: string;
+let childDocumentId: string;
 
 type GetDocumentsProps = {
   graphql: TestContext;
@@ -175,123 +175,108 @@ test("user should be able to list documents in a folder when empty", async () =>
 });
 
 test("user should be able to list documents in a folder with one item", async () => {
-  await createDocument({
+  const createDocumentResult = await createDocument({
     graphql,
-    id: documentId1,
     parentFolderId,
     workspaceId: userData1.workspace.id,
     activeDevice: userData1.webDevice,
     authorizationHeader: userData1.sessionKey,
   });
+  documentId1 = createDocumentResult.createDocument.id;
+
   const result = await getDocuments({
     graphql,
     authorizationHeader: userData1.sessionKey,
     parentFolderId,
     usingOldKeys: false,
   });
-  expect(result.documents).toMatchInlineSnapshot(`
-    {
-      "edges": [
-        {
-          "node": {
-            "id": "3530b9ed-11f3-44c7-9e16-7dba1e14815f",
-            "parentFolderId": "4e9a4c29-2295-471c-84b5-5bf55169ff8c",
-            "rootFolderId": null,
-            "workspaceId": "${userData1.workspace.id}",
-          },
+  expect(result.documents.edges).toMatchInlineSnapshot(`
+    [
+      {
+        "node": {
+          "id": "${documentId1}",
+          "parentFolderId": "4e9a4c29-2295-471c-84b5-5bf55169ff8c",
+          "rootFolderId": null,
+          "workspaceId": "${userData1.workspace.id}",
         },
-      ],
-      "pageInfo": {
-        "endCursor": "MzUzMGI5ZWQtMTFmMy00NGM3LTllMTYtN2RiYTFlMTQ4MTVm",
-        "hasNextPage": false,
       },
-    }
+    ]
   `);
 });
 
 test("user should be able to list documents in a folder with multiple items", async () => {
-  await createDocument({
+  const createDocumentResult = await createDocument({
     graphql,
-    id: documentId2,
     parentFolderId,
     workspaceId: userData1.workspace.id,
     activeDevice: userData1.webDevice,
     authorizationHeader: userData1.sessionKey,
   });
+  documentId2 = createDocumentResult.createDocument.id;
+
   const result = await getDocuments({
     graphql,
     authorizationHeader: userData1.sessionKey,
     parentFolderId,
     usingOldKeys: false,
   });
-  expect(result.documents).toMatchInlineSnapshot(`
-    {
-      "edges": [
-        {
-          "node": {
-            "id": "9e911f29-7a86-480b-89d7-5c647f21317f",
-            "parentFolderId": "${parentFolderId}",
-            "rootFolderId": null,
-            "workspaceId": "${userData1.workspace.id}",
-          },
+  expect(result.documents.edges).toMatchInlineSnapshot(`
+    [
+      {
+        "node": {
+          "id": "${documentId2}",
+          "parentFolderId": "4e9a4c29-2295-471c-84b5-5bf55169ff8c",
+          "rootFolderId": null,
+          "workspaceId": "${userData1.workspace.id}",
         },
-        {
-          "node": {
-            "id": "3530b9ed-11f3-44c7-9e16-7dba1e14815f",
-            "parentFolderId": "${parentFolderId}",
-            "rootFolderId": null,
-            "workspaceId": "${userData1.workspace.id}",
-          },
-        },
-      ],
-      "pageInfo": {
-        "endCursor": "MzUzMGI5ZWQtMTFmMy00NGM3LTllMTYtN2RiYTFlMTQ4MTVm",
-        "hasNextPage": false,
       },
-    }
+      {
+        "node": {
+          "id": "${documentId1}",
+          "parentFolderId": "4e9a4c29-2295-471c-84b5-5bf55169ff8c",
+          "rootFolderId": null,
+          "workspaceId": "${userData1.workspace.id}",
+        },
+      },
+    ]
   `);
 });
 
 test("user should be able to list without showing subfolder documents", async () => {
-  await createDocument({
+  const createDocumentResult = await createDocument({
     graphql,
-    id: childDocumentId,
     parentFolderId: folderId,
     workspaceId: userData1.workspace.id,
     activeDevice: userData1.webDevice,
     authorizationHeader: userData1.sessionKey,
   });
+  childDocumentId = createDocumentResult.createDocument.id;
+
   const result = await getDocuments({
     graphql,
     authorizationHeader: userData1.sessionKey,
     parentFolderId,
     usingOldKeys: false,
   });
-  expect(result.documents).toMatchInlineSnapshot(`
-    {
-      "edges": [
-        {
-          "node": {
-            "id": "9e911f29-7a86-480b-89d7-5c647f21317f",
-            "parentFolderId": "${parentFolderId}",
-            "rootFolderId": null,
-            "workspaceId": "${userData1.workspace.id}",
-          },
+  expect(result.documents.edges).toMatchInlineSnapshot(`
+    [
+      {
+        "node": {
+          "id": "${documentId2}",
+          "parentFolderId": "4e9a4c29-2295-471c-84b5-5bf55169ff8c",
+          "rootFolderId": null,
+          "workspaceId": "${userData1.workspace.id}",
         },
-        {
-          "node": {
-            "id": "3530b9ed-11f3-44c7-9e16-7dba1e14815f",
-            "parentFolderId": "${parentFolderId}",
-            "rootFolderId": null,
-            "workspaceId": "${userData1.workspace.id}",
-          },
-        },
-      ],
-      "pageInfo": {
-        "endCursor": "MzUzMGI5ZWQtMTFmMy00NGM3LTllMTYtN2RiYTFlMTQ4MTVm",
-        "hasNextPage": false,
       },
-    }
+      {
+        "node": {
+          "id": "${documentId1}",
+          "parentFolderId": "4e9a4c29-2295-471c-84b5-5bf55169ff8c",
+          "rootFolderId": null,
+          "workspaceId": "${userData1.workspace.id}",
+        },
+      },
+    ]
   `);
 });
 

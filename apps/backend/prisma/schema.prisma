@@ -10,27 +10,40 @@ generator client {
   output          = "./generated/output"
 }
 
+model DocumentChainEvent {
+  position   Int
+  content    Json
+  state      Json
+  document   Document @relation(fields: [documentId], references: [id], onDelete: Cascade)
+  documentId String
+  createdAt  DateTime @default(now())
+
+  @@id([documentId, position])
+  @@index([documentId, position(sort: Asc)])
+}
+
 model Document {
-  id                 String              @id
+  id                 String               @id
   // can be optional because a document is created without a snapshot at first
   // TODO check if this is still true since on workspace and document create a snapshot is provided
-  activeSnapshot     Snapshot?           @relation(name: "activeSnapshot", fields: [activeSnapshotId], references: [id], onDelete: Cascade)
-  activeSnapshotId   String?             @unique
+  activeSnapshot     Snapshot?            @relation(name: "activeSnapshot", fields: [activeSnapshotId], references: [id], onDelete: Cascade)
+  activeSnapshotId   String?              @unique
   snapshots          Snapshot[]
-  createdAt          DateTime            @default(now())
-  workspace          Workspace           @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  createdAt          DateTime             @default(now())
+  workspace          Workspace            @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
   workspaceId        String
-  workspaceKey       WorkspaceKey?       @relation(fields: [workspaceKeyId], references: [id], onDelete: SetNull)
+  workspaceKey       WorkspaceKey?        @relation(fields: [workspaceKeyId], references: [id], onDelete: SetNull)
   workspaceKeyId     String?
-  parentFolder       Folder              @relation(fields: [parentFolderId], references: [id], onDelete: Cascade)
+  parentFolder       Folder               @relation(fields: [parentFolderId], references: [id], onDelete: Cascade)
   parentFolderId     String
   nameCiphertext     String
   nameNonce          String
   subkeyId           Int
   documentShareLinks DocumentShareLink[]
-  requiresSnapshot   Boolean             @default(false)
+  requiresSnapshot   Boolean              @default(false)
   comments           Comment[]
   commentReplies     CommentReply[]
+  chain              DocumentChainEvent[]
 
   @@unique([subkeyId, workspaceId])
 }

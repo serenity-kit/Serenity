@@ -32,7 +32,6 @@ beforeAll(async () => {
 });
 
 test("user should be able to create a document", async () => {
-  const id = generateId();
   // can be removed in case we don't need the workpaceKeyId
   // const workspaceKey = getWorkspaceKeyForWorkspaceAndDevice({
   //   device: userData1.device,
@@ -40,14 +39,13 @@ test("user should be able to create a document", async () => {
   //   workspace: userData1.workspace,
   // });
   const result = await createDocument({
-    id,
     graphql,
     authorizationHeader: userData1.sessionKey,
     parentFolderId: userData1.folder.id,
     activeDevice: userData1.webDevice,
     workspaceId: userData1.workspace.id,
   });
-  expect(result.createDocument.id).toBe(id);
+  expect(result.createDocument.id).toBeDefined();
 });
 
 test("commenter tries to create", async () => {
@@ -66,7 +64,6 @@ test("commenter tries to create", async () => {
   await expect(
     (async () =>
       await createDocument({
-        id: generateId(),
         graphql,
         authorizationHeader: otherUser.sessionKey,
         parentFolderId: userData1.folder.id,
@@ -92,7 +89,6 @@ test("viewer attempts to create", async () => {
   await expect(
     (async () =>
       await createDocument({
-        id: generateId(),
         graphql,
         authorizationHeader: otherUser.sessionKey,
         parentFolderId: userData1.folder.id,
@@ -106,7 +102,6 @@ test("Unauthenticated", async () => {
   await expect(
     (async () =>
       await createDocument({
-        id: generateId(),
         graphql,
         authorizationHeader: "badauthkey",
         parentFolderId: userData1.folder.id,
@@ -120,7 +115,6 @@ describe("Input errors", () => {
   const authorizationHeaders = {
     authorization: sessionKey,
   };
-  const id = generateId();
   const query = gql`
     mutation createDocument($input: CreateDocumentInput!) {
       createDocument(input: $input) {
@@ -128,22 +122,6 @@ describe("Input errors", () => {
       }
     }
   `;
-  test("Invalid Id", async () => {
-    await expect(
-      (async () =>
-        await graphql.client.request(
-          query,
-          {
-            input: {
-              id: null,
-              parentFolderId: userData1.folder.parentFolderId,
-              workspaceId: userData1.workspace.id,
-            },
-          },
-          authorizationHeaders
-        ))()
-    ).rejects.toThrowError(/BAD_USER_INPUT/);
-  });
   test("Invalid workspaceId", async () => {
     await expect(
       (async () =>

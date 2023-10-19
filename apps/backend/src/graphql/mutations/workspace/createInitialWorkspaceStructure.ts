@@ -1,3 +1,4 @@
+import * as documentChain from "@serenity-kit/document-chain";
 import * as workspaceChain from "@serenity-kit/workspace-chain";
 import { AuthenticationError } from "apollo-server-express";
 import {
@@ -49,11 +50,11 @@ export const CreateInitialFolderInput = inputObjectType({
 export const CreateInitialDocumentInput = inputObjectType({
   name: "CreateInitialDocumentInput",
   definition(t) {
-    t.nonNull.string("id");
     t.nonNull.string("nameCiphertext");
     t.nonNull.string("nameNonce");
     t.nonNull.int("subkeyId");
     t.nonNull.field("snapshot", { type: DocumentSnapshotInput });
+    t.nonNull.string("serializedDocumentChainEvent");
   },
 });
 
@@ -115,14 +116,19 @@ export const createInitialWorkspaceStructureMutation = mutationField(
         throw new Error("Invalid workspace chain state");
       }
 
+      const documentChainEvent = documentChain.CreateDocumentChainEvent.parse(
+        JSON.parse(args.input.document.serializedDocumentChainEvent)
+      );
+
       const workspaceStructure = await createInitialWorkspaceStructure({
         userId: context.user.id,
         workspace: { ...args.input.workspace, id: workspaceState.id },
         workspaceChainEvent,
         folder: args.input.folder,
-        // @ts-ignore we need to force the snapshot.publicData to have a snapshot Id
+        // @ts-expect-error we need to force the snapshot.publicData to have a snapshot Id
         document: args.input.document,
         creatorDeviceSigningPublicKey: args.input.creatorDeviceSigningPublicKey,
+        documentChainEvent,
       });
       return workspaceStructure;
     },

@@ -27,9 +27,9 @@ const folderId = "3530b9ed-11f3-44c7-9e16-7dba1e14815f";
 const childFolderId = "98b3f4d9-141a-4e11-a0f5-7437a6d1eb4b";
 const otherFolderId = "c1c65251-7471-4893-a1b5-e3df937caf66";
 
-const parentDocumentId = "4e9a4c29-2295-471c-84b5-5bf55169ff8c";
-const documentId = "3530b9ed-11f3-44c7-9e16-7dba1e14815f";
-const otherDocumentId = "929ca262-f144-40f7-8fe2-d3147f415f26";
+let parentDocumentId: string;
+let documentId: string;
+let otherDocumentId: string;
 
 const setup = async () => {
   userData1 = await createUserWithWorkspace({
@@ -74,22 +74,23 @@ const setup = async () => {
     workspaceKeyId: userData1.workspace.currentWorkspaceKey.id,
     authorizationHeader: userData1.sessionKey,
   });
-  await createDocument({
+  const createDocumentResult = await createDocument({
     graphql,
-    id: parentDocumentId,
     parentFolderId: parentFolderId,
     workspaceId: userData1.workspace.id,
     activeDevice: userData1.webDevice,
     authorizationHeader: userData1.sessionKey,
   });
-  await createDocument({
+  parentDocumentId = createDocumentResult.createDocument.id;
+
+  const createDocumentResult2 = await createDocument({
     graphql,
-    id: documentId,
     parentFolderId: folderId,
     workspaceId: userData1.workspace.id,
     activeDevice: userData1.webDevice,
     authorizationHeader: userData1.sessionKey,
   });
+  documentId = createDocumentResult2.createDocument.id;
 
   userData2 = await createUserWithWorkspace({
     username: `${generateId()}@example.com`,
@@ -113,14 +114,14 @@ const setup = async () => {
     workspaceKeyId: userData2.workspace.currentWorkspaceKey.id,
     authorizationHeader: userData2.sessionKey,
   });
-  await createDocument({
+  const createDocumentResult3 = await createDocument({
     graphql,
-    id: otherDocumentId,
     parentFolderId: otherFolderId,
     workspaceId: userData2.workspace.id,
     activeDevice: userData2.webDevice,
     authorizationHeader: userData2.sessionKey,
   });
+  otherDocumentId = createDocumentResult3.createDocument.id;
 };
 
 beforeAll(async () => {
