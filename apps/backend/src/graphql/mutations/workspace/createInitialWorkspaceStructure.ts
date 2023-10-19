@@ -125,7 +125,6 @@ export const createInitialWorkspaceStructureMutation = mutationField(
         workspace: { ...args.input.workspace, id: workspaceState.id },
         workspaceChainEvent,
         folder: args.input.folder,
-        // @ts-expect-error we need to force the snapshot.publicData to have a snapshot Id
         document: args.input.document,
         creatorDeviceSigningPublicKey: args.input.creatorDeviceSigningPublicKey,
         documentChainEvent,
