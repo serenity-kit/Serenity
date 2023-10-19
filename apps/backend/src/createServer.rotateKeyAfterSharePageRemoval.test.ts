@@ -32,7 +32,7 @@ const graphql = setupGraphql();
 const username = "59f80f08-c065-4acc-a542-2725fb2dff6c@example.com";
 let workspaceId = "";
 let userId = "";
-const documentId = "72fbd941-42b7-4263-89fe-65bf43f455a7";
+let documentId: string;
 let device: Device | null = null;
 let webDevice: LocalDevice | null = null;
 let sessionKey = "";
@@ -71,14 +71,14 @@ const setup = async () => {
   });
   folderKey = folderKeyResult.key;
 
-  const createDocumentResponse = await createDocument({
+  const createDocumentResult = await createDocument({
     graphql,
-    id: documentId,
     parentFolderId: addedFolder.id,
     workspaceId,
     activeDevice: result.webDevice,
     authorizationHeader: sessionKey,
   });
+  documentId = createDocumentResult.createDocument.id;
 };
 
 beforeAll(async () => {

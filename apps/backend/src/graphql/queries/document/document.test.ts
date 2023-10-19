@@ -45,16 +45,15 @@ beforeAll(async () => {
 
 test("user should be retrieve a document", async () => {
   const authorizationHeader = userData1.sessionKey;
-  const documentId = generateId();
   const documentName = "Test document";
   const createDocumentResponse = await createDocument({
     graphql,
-    id: documentId,
     parentFolderId: userData1.folder.id,
     workspaceId: userData1.workspace.id,
     activeDevice: userData1.webDevice,
     authorizationHeader,
   });
+  const documentId = createDocumentResponse.createDocument.id;
   await updateDocumentName({
     graphql,
     id: documentId,

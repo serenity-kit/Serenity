@@ -1,12 +1,12 @@
+import * as documentChain from "@serenity-kit/document-chain";
 import * as workspaceChain from "@serenity-kit/workspace-chain";
 import {
   KeyDerivationTrace,
   SerenitySnapshotWithClientData,
 } from "@serenity-tools/common";
 import { formatFolder } from "../../types/folder";
-import { createSnapshot } from "../createSnapshot";
+import { createDocument } from "../document/createDocument";
 import { createFolder } from "../folder/createFolder";
-import { prisma } from "../prisma";
 import {
   DeviceWorkspaceKeyBoxParams,
   createWorkspace,
@@ -28,7 +28,6 @@ export type FolderParams = {
 };
 
 export type DocumentParams = {
-  id: string;
   nameCiphertext: string;
   nameNonce: string;
   subkeyId: number;
@@ -42,8 +41,10 @@ export type Params = {
   folder: FolderParams;
   document: DocumentParams;
   creatorDeviceSigningPublicKey: string;
+  documentChainEvent: documentChain.CreateDocumentChainEvent;
 };
 
+// TODO run all of these operations in a transaction
 export async function createInitialWorkspaceStructure({
   userId,
   workspace,
@@ -51,6 +52,7 @@ export async function createInitialWorkspaceStructure({
   folder,
   document,
   creatorDeviceSigningPublicKey,
+  documentChainEvent,
 }: Params) {
   const createdWorkspace = await createWorkspace({
     id: workspace.id,
@@ -74,19 +76,18 @@ export async function createInitialWorkspaceStructure({
     keyDerivationTrace: folder.keyDerivationTrace,
   });
 
-  const createdDocument = await prisma.document.create({
-    data: {
-      id: document.id,
-      nameCiphertext: document.nameCiphertext,
-      nameNonce: document.nameNonce,
-      workspaceKeyId: createdWorkspace.currentWorkspaceKey?.id,
-      subkeyId: document.subkeyId,
-      parentFolderId: folder.id,
-      workspaceId: createdWorkspace.id,
-    },
+  const { document: createdDocument, snapshot } = await createDocument({
+    userId,
+    nameCiphertext: document.nameCiphertext,
+    nameNonce: document.nameNonce,
+    workspaceKeyId: createdWorkspace.currentWorkspaceKey?.id,
+    subkeyId: document.subkeyId,
+    parentFolderId: folder.id,
+    workspaceId: createdWorkspace.id,
+    snapshot: document.snapshot,
+    documentChainEvent,
   });
 
-  const snapshot = await createSnapshot({ snapshot: document.snapshot });
   return {
     workspace: createdWorkspace,
     document: createdDocument,

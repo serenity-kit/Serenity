@@ -53,7 +53,6 @@ const setup = async () => {
   folderKey = folderKeyResult.key;
   const createDocumentResult = await createDocument({
     graphql,
-    id: "5a3484e6-c46e-42ce-a285-088fc1fd6915",
     parentFolderId: addedFolder.id,
     workspaceId: addedWorkspace.id,
     activeDevice: userData1.webDevice,
@@ -130,7 +129,6 @@ test("Throw error when user doesn't have access", async () => {
 
   const otherUserDocumentResult = await createDocument({
     graphql,
-    id: "97a4c517-5ef2-4ea8-ac40-86a1e182bf23",
     parentFolderId: userData1.folder.id,
     workspaceId: userData1.workspace.id,
     activeDevice: userData1.webDevice,

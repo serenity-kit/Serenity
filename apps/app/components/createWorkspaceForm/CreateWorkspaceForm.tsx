@@ -1,4 +1,5 @@
 import { useNavigation } from "@react-navigation/native";
+import * as documentChain from "@serenity-kit/document-chain";
 import * as workspaceChain from "@serenity-kit/workspace-chain";
 import {
   createIntroductionDocumentSnapshot,
@@ -75,7 +76,6 @@ export function CreateWorkspaceForm(props: CreateWorkspaceFormProps) {
       });
       const workspaceKeyId = generateId();
       const folderId = generateId();
-      const documentId = generateId();
       const folderName = "Getting started";
       const documentName = "Introduction";
 
@@ -115,9 +115,16 @@ export function CreateWorkspaceForm(props: CreateWorkspaceFormProps) {
       const snapshotKey = createSnapshotKey({
         folderKey: encryptedFolderResult.folderSubkey,
       });
+
+      const createDocumentChainEvent = documentChain.createDocumentChain({
+        authorKeyPair: {
+          privateKey: activeDevice.signingPrivateKey,
+          publicKey: activeDevice.signingPublicKey,
+        },
+      });
       const snapshotId = generateId();
       const snapshot = createIntroductionDocumentSnapshot({
-        documentId,
+        documentId: createDocumentChainEvent.transaction.id,
         snapshotEncryptionKey: sodium.from_base64(snapshotKey.key),
         keyDerivationTrace: {
           workspaceKeyId,
@@ -173,11 +180,13 @@ export function CreateWorkspaceForm(props: CreateWorkspaceFormProps) {
               keyDerivationTrace: folderKeyDerivationTrace,
             },
             document: {
-              id: documentId,
               nameCiphertext: encryptedDocumentTitle.ciphertext,
               nameNonce: encryptedDocumentTitle.publicNonce,
               subkeyId: encryptedDocumentTitle.subkeyId,
               snapshot,
+              serializedDocumentChainEvent: JSON.stringify(
+                createDocumentChainEvent
+              ),
             },
             creatorDeviceSigningPublicKey: activeDevice?.signingPublicKey!,
           },

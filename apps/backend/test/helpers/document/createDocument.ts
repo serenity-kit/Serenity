@@ -1,3 +1,4 @@
+import * as documentChain from "@serenity-kit/document-chain";
 import {
   createDocumentTitleKey,
   createSnapshotKey,
@@ -22,24 +23,24 @@ import { createFolderKeyDerivationTrace } from "../folder/createFolderKeyDerivat
 
 type RunCreateDocumentMutationParams = {
   graphql: any;
-  id: string;
   nameCiphertext: string;
   nameNonce: string;
   subkeyId: number;
   parentFolderId: string | null;
   workspaceId: string;
   snapshot?: Snapshot | null | undefined;
+  createDocumentChainEvent: documentChain.CreateDocumentChainEvent;
   authorizationHeader: string;
 };
 const runCreateDocumentMutation = async ({
   graphql,
-  id,
   nameCiphertext,
   nameNonce,
   subkeyId,
   parentFolderId,
   workspaceId,
   snapshot,
+  createDocumentChainEvent,
   authorizationHeader,
 }: RunCreateDocumentMutationParams) => {
   const authorizationHeaders = {
@@ -56,13 +57,13 @@ const runCreateDocumentMutation = async ({
     query,
     {
       input: {
-        id,
         nameCiphertext,
         nameNonce,
         subkeyId,
         parentFolderId,
         workspaceId,
         snapshot,
+        serializedDocumentChainEvent: JSON.stringify(createDocumentChainEvent),
       },
     },
     authorizationHeaders
@@ -71,7 +72,6 @@ const runCreateDocumentMutation = async ({
 
 type Params = {
   graphql: any;
-  id: string;
   name?: string | null | undefined;
   parentFolderId: string | null;
   workspaceId: string;
@@ -81,7 +81,6 @@ type Params = {
 
 export const createDocument = async ({
   graphql,
-  id,
   name,
   parentFolderId,
   workspaceId,
@@ -106,17 +105,25 @@ export const createDocument = async ({
     },
   });
 
+  const createDocumentChainEvent = documentChain.createDocumentChain({
+    authorKeyPair: {
+      privateKey: activeDevice.signingPrivateKey,
+      publicKey: activeDevice.signingPublicKey,
+    },
+  });
+  const id = createDocumentChainEvent.transaction.id;
+
   if (!workspace) {
     // return the query to produce an error
     return runCreateDocumentMutation({
       graphql,
-      id,
       nameCiphertext: "",
       nameNonce: "",
       subkeyId: 1,
       parentFolderId,
       workspaceId,
       snapshot: null,
+      createDocumentChainEvent,
       authorizationHeader,
     });
   }
@@ -132,13 +139,13 @@ export const createDocument = async ({
     // return the query to produce an error
     return runCreateDocumentMutation({
       graphql,
-      id,
       nameCiphertext: "",
       nameNonce: "",
       subkeyId: 1,
       parentFolderId,
       workspaceId,
       snapshot: null,
+      createDocumentChainEvent,
       authorizationHeader,
     });
   }
@@ -202,13 +209,13 @@ export const createDocument = async ({
 
   return runCreateDocumentMutation({
     graphql,
-    id,
     nameCiphertext: documentNameData.ciphertext,
     nameNonce: documentNameData.publicNonce,
     subkeyId: documentNameKey.subkeyId,
     parentFolderId,
     workspaceId,
     snapshot,
+    createDocumentChainEvent,
     authorizationHeader,
   });
 };

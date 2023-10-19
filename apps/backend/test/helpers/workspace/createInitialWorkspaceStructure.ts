@@ -1,3 +1,4 @@
+import * as documentChain from "@serenity-kit/document-chain";
 import * as workspaceChain from "@serenity-kit/workspace-chain";
 import {
   LocalDevice,
@@ -14,7 +15,6 @@ import {
 import { gql } from "graphql-request";
 import sodium from "react-native-libsodium";
 import { DeviceWorkspaceKeyBoxParams } from "../../../src/database/workspace/createWorkspace";
-import { Device } from "../../../src/types/device";
 
 const query = gql`
   mutation createInitialWorkspaceStructure(
@@ -75,7 +75,7 @@ type Params = {
   workspaceName: string;
   creatorDevice: LocalDevice;
   mainDevice: LocalDevice;
-  devices: Device[];
+  devices: LocalDevice[];
   authorizationHeader: string;
 };
 
@@ -95,8 +95,6 @@ export const createInitialWorkspaceStructure = async ({
 
   const workspaceKeyId = generateId();
   const folderId = generateId();
-  const documentId = generateId();
-
   const folderName = "Getting Started";
   const documentName = "Introduction";
 
@@ -174,9 +172,16 @@ export const createInitialWorkspaceStructure = async ({
   const encryptedDocumentName = encryptedDocumentTitleResult.ciphertext;
   const encryptedDocumentNameNonce = encryptedDocumentTitleResult.publicNonce;
 
+  const createDocumentChainEvent = documentChain.createDocumentChain({
+    authorKeyPair: {
+      // devices[0] is the main device, devices[1] is the web device
+      privateKey: devices[1].signingPrivateKey,
+      publicKey: devices[1].signingPublicKey,
+    },
+  });
   const snapshotId = generateId();
   const snapshot = createIntroductionDocumentSnapshot({
-    documentId,
+    documentId: createDocumentChainEvent.transaction.id,
     snapshotEncryptionKey: sodium.from_base64(snapshotKey.key),
     keyDerivationTrace: {
       workspaceKeyId,
@@ -200,11 +205,11 @@ export const createInitialWorkspaceStructure = async ({
 
   // prepare the document
   const readyDocument = {
-    id: documentId,
     nameCiphertext: encryptedDocumentName,
     nameNonce: encryptedDocumentNameNonce,
     subkeyId: documentSubkeyId,
     snapshot,
+    serializedDocumentChainEvent: JSON.stringify(createDocumentChainEvent),
   };
 
   // create the initial workspace structure

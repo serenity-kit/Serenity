@@ -1,3 +1,4 @@
+import * as documentChain from "@serenity-kit/document-chain";
 import { client, server } from "@serenity-kit/opaque";
 import * as userChain from "@serenity-kit/user-chain";
 import * as workspaceChain from "@serenity-kit/workspace-chain";
@@ -114,7 +115,6 @@ export default async function createUserWithWorkspace({
     }
   );
 
-  const documentId = generateId();
   const folderId = generateId();
   const workspaceKeyId = generateId();
   const documentName = "Introduction";
@@ -149,8 +149,15 @@ export default async function createUserWithWorkspace({
     key: documentTitleKey,
   });
   const snapshotId = generateId();
+
+  const createDocumentChainEvent = documentChain.createDocumentChain({
+    authorKeyPair: {
+      privateKey: mainDevice.signingPrivateKey,
+      publicKey: mainDevice.signingPublicKey,
+    },
+  });
   const snapshot = createIntroductionDocumentSnapshot({
-    documentId,
+    documentId: createDocumentChainEvent.transaction.id,
     snapshotEncryptionKey: sodium.from_base64(snapshotKey.key),
     keyDerivationTrace: {
       workspaceKeyId,
@@ -210,7 +217,6 @@ export default async function createUserWithWorkspace({
       },
     },
     document: {
-      id: documentId,
       nameCiphertext: encryptedDocumentTitleResult.ciphertext,
       nameNonce: encryptedDocumentTitleResult.publicNonce,
       subkeyId: documentTitleKeyResult.subkeyId,
@@ -218,6 +224,7 @@ export default async function createUserWithWorkspace({
       snapshot,
     },
     creatorDeviceSigningPublicKey: device.signingPublicKey,
+    documentChainEvent: createDocumentChainEvent,
   });
 
   const { session, sessionKey, webDevice } = await createDeviceAndLogin({
