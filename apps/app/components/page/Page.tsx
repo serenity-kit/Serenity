@@ -275,6 +275,8 @@ export default function Page({
 
       let document: Document | undefined = undefined;
       try {
+        // TODO GET
+
         const fetchedDocument = await getDocument({
           documentId: docId,
         });
@@ -404,6 +406,7 @@ export default function Page({
   }, [documentState, setDocumentState]);
 
   const updateTitle = async (title: string) => {
+    // TODO GET
     const document = await getDocument({
       documentId: docId,
     });

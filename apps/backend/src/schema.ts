@@ -43,6 +43,7 @@ import * as DocumentShareLinksQueryTypes from "./graphql/queries/document/docume
 import * as DocumentsQueryTypes from "./graphql/queries/document/documents";
 import * as FirstDocumentQueryTypes from "./graphql/queries/document/firstDocument";
 import * as WorkspaceKeyByDocumentIdQueryTypes from "./graphql/queries/document/workspaceKeyByDocumentId";
+import * as DocumentChainQueryTypes from "./graphql/queries/documentChain/documentChain";
 import * as FileUrlQueryTypes from "./graphql/queries/file/fileUrl";
 import * as FolderQueryTypes from "./graphql/queries/folder/folder";
 import * as FolderTraceQueryTypes from "./graphql/queries/folder/folderTrace";
@@ -64,6 +65,7 @@ import * as WorkspaceChainQueryTypes from "./graphql/queries/workspaceChain/work
 import * as WorkspaceChainByInvitationIdQueryTypes from "./graphql/queries/workspaceChain/workspaceChainByInvitationId";
 import * as DateTypes from "./graphql/types/date";
 import * as DocumentTypes from "./graphql/types/document";
+import * as DocumentChainTypes from "./graphql/types/documentChain";
 import * as DocumentShareLinkTypes from "./graphql/types/documentShareLink";
 import * as UserTypes from "./graphql/types/user";
 import * as UserChainTypes from "./graphql/types/userChain";
@@ -94,6 +96,8 @@ export const schema = makeSchema({
     DocumentShareLinkTypes,
     DocumentShareLinksQueryTypes,
     DocumentShareLinkQueryTypes,
+    DocumentChainQueryTypes,
+    DocumentChainTypes,
 
     CreateFolderMutationTypes,
     UpdateFolderNameMutationTypes,
