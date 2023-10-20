@@ -1,3 +1,4 @@
+import * as documentChain from "@serenity-kit/document-chain";
 import {
   KeyDerivationTrace,
   LocalDevice,
@@ -30,8 +31,8 @@ import { usePage } from "../../context/PageContext";
 import { useWorkspace } from "../../context/WorkspaceContext";
 import {
   Document,
+  runDocumentChainQuery,
   runDocumentQuery,
-  runMeQuery,
   runWorkspaceMembersQuery,
 } from "../../generated/graphql";
 import { useAuthenticatedAppContext } from "../../hooks/useAuthenticatedAppContext";
@@ -94,6 +95,7 @@ export default function Page({
   const updateDocumentTitle = useDocumentTitleStore(
     (state) => state.updateDocumentTitle
   );
+  const setSnapshotKey = useEditorStore((state) => state.setSnapshotKey);
   const [isClosedErrorModal, setIsClosedErrorModal] = useState(false);
   const ephemeralUpdateErrorsChangedAt = useRef<Date | null>(null);
   const hasEditorSidebar = useHasEditorSidebar();
@@ -111,6 +113,9 @@ export default function Page({
       if (type === "snapshot-saved") {
         snapshotKeyRef.current = snapshotInFlightKeyRef.current;
         snapshotInFlightKeyRef.current = null;
+        if (snapshotKeyRef.current) {
+          setSnapshotKey(snapshotKeyRef.current.key);
+        }
       }
     },
     getNewSnapshotData: async () => {
@@ -185,6 +190,9 @@ export default function Page({
           snapshotProofInfo.additionalPublicData.keyDerivationTrace,
         key,
       };
+      if (snapshotKeyRef.current) {
+        setSnapshotKey(snapshotKeyRef.current.key);
+      }
       setActiveSnapshotAndCommentKeys(
         {
           id: snapshotProofInfo.snapshotId,
@@ -252,6 +260,8 @@ export default function Page({
   });
 
   const yAwarenessRef = useRef<Awareness>(yAwareness);
+  let documentChainStateRef = useRef<documentChain.DocumentChainState>();
+  let lastDocumentChainEventRef = useRef<documentChain.DocumentChainEvent>();
 
   useEffect(() => {
     setTimeout(() => {
@@ -271,16 +281,32 @@ export default function Page({
         setDocumentLoadedFromLocalDb(true);
       }
 
-      const me = await runMeQuery({});
-
       let document: Document | undefined = undefined;
       try {
-        // TODO GET
-
+        // TODO optimize be either parallelizing or merging documentChain and document query into one
+        const documentChainQueryResult = await runDocumentChainQuery({
+          documentId: docId,
+        });
         const fetchedDocument = await getDocument({
           documentId: docId,
         });
         document = fetchedDocument as Document;
+
+        if (documentChainQueryResult.data?.documentChain?.nodes) {
+          const userChainResult = documentChain.resolveState({
+            events: documentChainQueryResult.data.documentChain.nodes
+              .filter(notNull)
+              .map((event) => {
+                const data = documentChain.DocumentChainEvent.parse(
+                  JSON.parse(event.serializedContent)
+                );
+                lastDocumentChainEventRef.current = data;
+                return data;
+              }),
+            knownVersion: documentChain.version,
+          });
+          documentChainStateRef.current = userChainResult.currentState;
+        }
       } catch (err) {
         // TODO
         console.error(err);
@@ -292,16 +318,6 @@ export default function Page({
       // communicate to other components e.g. sidebar or top-bar
       // the currently active document
       setActiveDocumentId({ documentId: docId });
-
-      // remove awareness state when closing the window
-      // TODO re-add
-      // window.addEventListener("beforeunload", () => {
-      // removeAwarenessStates(
-      //   yAwarenessRef.current,
-      //   [yDocRef.current.clientID],
-      //   "window unload"
-      // );
-      // });
 
       yDocRef.current.on("updateV2", async (update, origin) => {
         // TODO pending updates should be stored in the local db if possible (not possible on web)

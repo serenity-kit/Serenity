@@ -39,8 +39,7 @@ const setup = async () => {
     graphql,
     documentId: userData.document.id,
     sharingRole: Role.VIEWER,
-    creatorDevice: userData.device,
-    creatorDeviceEncryptionPrivateKey: userData.encryptionPrivateKey,
+    mainDevice: userData.mainDevice,
     snapshotKey: snapshotKeyData.key,
     authorizationHeader: userData.sessionKey,
   });

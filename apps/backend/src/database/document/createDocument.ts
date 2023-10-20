@@ -80,7 +80,7 @@ export async function createDocument({
       await prisma.documentChainEvent.create({
         data: {
           content: documentChainEvent,
-          state: documentChainState,
+          state: documentChainState.currentState,
           documentId: documentChainState.currentState.id,
           position: 0,
         },

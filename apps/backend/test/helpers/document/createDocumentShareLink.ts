@@ -1,16 +1,19 @@
-import { createDevice } from "@serenity-tools/common";
+import * as documentChain from "@serenity-kit/document-chain";
+import {
+  LocalDevice,
+  ShareDocumentRole,
+  createDevice,
+} from "@serenity-tools/common";
 import { gql } from "graphql-request";
 import sodium from "react-native-libsodium";
-import { Role } from "../../../prisma/generated/output";
 import { SnapshotDeviceKeyBox } from "../../../src/database/document/createDocumentShareLink";
-import { Device } from "../../../src/types/device";
+import { getLastDocumentChainEventByDocumentId } from "../documentChain/getLastDocumentChainEventByDocumentId";
 
 export type Params = {
   graphql: any;
   documentId: string;
-  sharingRole: Role;
-  creatorDevice: Device;
-  creatorDeviceEncryptionPrivateKey: string;
+  sharingRole: ShareDocumentRole;
+  mainDevice: LocalDevice;
   snapshotKey: string;
   authorizationHeader: string;
 };
@@ -19,8 +22,7 @@ export const createDocumentShareLink = async ({
   graphql,
   documentId,
   sharingRole,
-  creatorDevice,
-  creatorDeviceEncryptionPrivateKey,
+  mainDevice,
   snapshotKey,
   authorizationHeader,
 }: Params) => {
@@ -50,7 +52,7 @@ export const createDocumentShareLink = async ({
     sodium.from_base64(snapshotKey),
     snapshotDeviceNonce,
     sodium.from_base64(virtualDevice.encryptionPublicKey),
-    sodium.from_base64(creatorDeviceEncryptionPrivateKey)
+    sodium.from_base64(mainDevice.encryptionPrivateKey)
   );
   const snapshotDeviceKeyBox: SnapshotDeviceKeyBox = {
     ciphertext: sodium.to_base64(snapshotDeviceCiphertext),
@@ -58,11 +60,26 @@ export const createDocumentShareLink = async ({
     deviceSigningPublicKey: virtualDevice.signingPublicKey,
   };
 
+  const { lastChainEvent } = await getLastDocumentChainEventByDocumentId({
+    documentId,
+  });
+
+  const documentChainEvent = documentChain.addShareDocumentDevice({
+    authorKeyPair: {
+      privateKey: mainDevice.signingPrivateKey,
+      publicKey: mainDevice.signingPublicKey,
+    },
+    signingPublicKey: virtualDevice.signingPublicKey,
+    encryptionPublicKey: virtualDevice.encryptionPublicKey,
+    role: sharingRole,
+    prevEvent: lastChainEvent,
+    expiresAt: undefined,
+  });
+
   const query = gql`
     mutation createDocumentShareLink($input: CreateDocumentShareLinkInput!) {
       createDocumentShareLink(input: $input) {
         token
-        role
       }
     }
   `;
@@ -71,15 +88,10 @@ export const createDocumentShareLink = async ({
     {
       input: {
         documentId,
-        sharingRole,
         deviceSecretBoxCiphertext: sodium.to_base64(deviceSecretBoxCiphertext),
         deviceSecretBoxNonce: sodium.to_base64(deviceSecretBoxNonce),
-        creatorDeviceSigningPublicKey: creatorDevice.signingPublicKey,
         snapshotDeviceKeyBox,
-        deviceSigningPublicKey: virtualDevice.signingPublicKey,
-        deviceEncryptionPublicKey: virtualDevice.encryptionPublicKey,
-        deviceEncryptionPublicKeySignature:
-          virtualDevice.encryptionPublicKeySignature,
+        serializedDocumentChainEvent: JSON.stringify(documentChainEvent),
       },
     },
     authorizationHeaders

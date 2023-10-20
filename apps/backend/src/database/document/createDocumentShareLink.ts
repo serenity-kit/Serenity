@@ -1,3 +1,5 @@
+import * as documentChain from "@serenity-kit/document-chain";
+import { AddShareDocumentDeviceEvent } from "@serenity-kit/document-chain";
 import { ForbiddenError, UserInputError } from "apollo-server-express";
 import {
   DocumentShareLink,
@@ -15,72 +17,95 @@ export type SnapshotDeviceKeyBox = {
 
 export type Props = {
   documentId: string;
-  sharingRole: Role;
   sharerUserId: string;
   deviceSecretBoxCiphertext: string;
   deviceSecretBoxNonce: string;
-  creatorDeviceSigningPublicKey: string;
-  deviceSigningPublicKey: string;
-  deviceEncryptionPublicKey: string;
-  deviceEncryptionPublicKeySignature: string;
   snapshotDeviceKeyBox: SnapshotDeviceKeyBox;
+  documentChainEvent: AddShareDocumentDeviceEvent;
 };
 export const createDocumentShareLink = async ({
   documentId,
-  sharingRole,
   sharerUserId,
   deviceSecretBoxCiphertext,
   deviceSecretBoxNonce,
-  creatorDeviceSigningPublicKey,
-  deviceSigningPublicKey,
-  deviceEncryptionPublicKey,
-  deviceEncryptionPublicKeySignature,
   snapshotDeviceKeyBox,
+  documentChainEvent,
 }: Props): Promise<DocumentShareLink> => {
   // admin access not allowed
   if (
-    sharingRole !== Role.EDITOR &&
-    sharingRole !== Role.VIEWER &&
-    sharingRole !== Role.COMMENTER
+    documentChainEvent.transaction.role !== Role.EDITOR &&
+    documentChainEvent.transaction.role !== Role.VIEWER &&
+    documentChainEvent.transaction.role !== Role.COMMENTER
   ) {
     throw new UserInputError("invalid sharing role");
   }
-  // get the document
-  const document = await prisma.document.findFirst({
-    where: { id: documentId },
-  });
-  if (!document) {
-    throw new ForbiddenError("Unauthorized");
-  }
-  const userToWorkspace = await prisma.usersToWorkspaces.findFirst({
-    where: {
-      workspaceId: document.workspaceId,
-      userId: sharerUserId,
-      role: { in: [Role.ADMIN, Role.EDITOR] },
-    },
-  });
-  if (!userToWorkspace) {
-    throw new ForbiddenError("Unauthorized");
-  }
+
   return await prisma.$transaction(
     async (prisma) => {
+      // get the document
+      const document = await prisma.document.findFirst({
+        where: { id: documentId },
+      });
+      if (!document) {
+        throw new ForbiddenError("Unauthorized");
+      }
+      const userToWorkspace = await prisma.usersToWorkspaces.findFirst({
+        where: {
+          workspaceId: document.workspaceId,
+          userId: sharerUserId,
+          role: { in: [Role.ADMIN, Role.EDITOR] },
+        },
+      });
+      if (!userToWorkspace) {
+        throw new ForbiddenError("Unauthorized");
+      }
+
       // create the device
       const creatorDevice = await getOrCreateCreatorDevice({
         prisma,
-        signingPublicKey: creatorDeviceSigningPublicKey,
+        signingPublicKey: documentChainEvent.author.publicKey,
         userId: sharerUserId,
+      });
+
+      const lastDocumentChainEvent =
+        await prisma.documentChainEvent.findFirstOrThrow({
+          where: { documentId },
+          orderBy: { position: "desc" },
+        });
+
+      const documentChainState = documentChain.DocumentChainState.parse(
+        lastDocumentChainEvent.state
+      );
+
+      const newUserChainState = documentChain.applyEvent({
+        state: documentChainState,
+        event: documentChainEvent,
+        knownVersion: documentChain.version,
+      });
+
+      await prisma.documentChainEvent.create({
+        data: {
+          content: documentChainEvent,
+          state: newUserChainState,
+          documentId,
+          position: lastDocumentChainEvent.position + 1,
+        },
       });
 
       const documentShareLink = await prisma.documentShareLink.create({
         data: {
           documentId,
           sharerUserId,
-          role: sharingRole,
+          role: documentChainEvent.transaction.role,
           deviceSecretBoxCiphertext,
           deviceSecretBoxNonce,
-          deviceSigningPublicKey,
-          deviceEncryptionPublicKey,
-          deviceEncryptionPublicKeySignature,
+          deviceSigningPublicKey:
+            documentChainEvent.transaction.signingPublicKey,
+          deviceEncryptionPublicKey:
+            documentChainEvent.transaction.encryptionPublicKey,
+          deviceEncryptionPublicKeySignature:
+            documentChainEvent.transaction.encryptionPublicKeySignature,
+          // documentChainEvent.transaction.expiresAt
         },
       });
       // get the latest snapshot and set up the snapshot key boxes

@@ -162,20 +162,15 @@ export type CreateDocumentResult = {
 };
 
 export type CreateDocumentShareLinkInput = {
-  creatorDeviceSigningPublicKey: Scalars['String'];
-  deviceEncryptionPublicKey: Scalars['String'];
-  deviceEncryptionPublicKeySignature: Scalars['String'];
   deviceSecretBoxCiphertext: Scalars['String'];
   deviceSecretBoxNonce: Scalars['String'];
-  deviceSigningPublicKey: Scalars['String'];
   documentId: Scalars['String'];
-  sharingRole: Role;
+  serializedDocumentChainEvent: Scalars['String'];
   snapshotDeviceKeyBox: SnapshotDeviceKeyBoxInput;
 };
 
 export type CreateDocumentShareLinkResult = {
   __typename?: 'CreateDocumentShareLinkResult';
-  role: Role;
   token: Scalars['String'];
 };
 
@@ -1670,7 +1665,7 @@ export type DocumentShareLinksQueryVariables = Exact<{
 }>;
 
 
-export type DocumentShareLinksQuery = { __typename?: 'Query', documentShareLinks?: { __typename?: 'DocumentShareLinkConnection', nodes?: Array<{ __typename?: 'DocumentShareLink', token: string, role: Role } | null> | null, pageInfo: { __typename?: 'PageInfo', hasNextPage: boolean, hasPreviousPage: boolean, startCursor?: string | null, endCursor?: string | null } } | null };
+export type DocumentShareLinksQuery = { __typename?: 'Query', documentShareLinks?: { __typename?: 'DocumentShareLinkConnection', nodes?: Array<{ __typename?: 'DocumentShareLink', deviceSigningPublicKey: string, token: string } | null> | null, pageInfo: { __typename?: 'PageInfo', hasNextPage: boolean, hasPreviousPage: boolean, startCursor?: string | null, endCursor?: string | null } } | null };
 
 export type DocumentsQueryVariables = Exact<{
   parentFolderId: Scalars['ID'];
@@ -2458,8 +2453,8 @@ export const DocumentShareLinksDocument = gql`
     query documentShareLinks($documentId: ID!, $first: Int! = 50, $after: String) {
   documentShareLinks(documentId: $documentId, first: $first, after: $after) {
     nodes {
+      deviceSigningPublicKey
       token
-      role
     }
     pageInfo {
       hasNextPage

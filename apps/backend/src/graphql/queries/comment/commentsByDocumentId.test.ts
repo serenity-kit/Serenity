@@ -128,8 +128,7 @@ test("document share token", async () => {
     graphql,
     documentId: userData1.document.id,
     sharingRole: Role.VIEWER,
-    creatorDevice: userData1.webDevice,
-    creatorDeviceEncryptionPrivateKey: userData1.webDevice.encryptionPrivateKey,
+    mainDevice: userData1.mainDevice,
     snapshotKey,
     authorizationHeader: userData1.sessionKey,
   });

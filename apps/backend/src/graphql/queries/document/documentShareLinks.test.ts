@@ -53,8 +53,7 @@ test("list share link", async () => {
     graphql,
     documentId: userData1.document.id,
     sharingRole: Role.EDITOR,
-    creatorDeviceEncryptionPrivateKey: encryptionPrivateKey,
-    creatorDevice,
+    mainDevice: userData1.mainDevice,
     snapshotKey: snapshotKeyData.key,
     authorizationHeader: userData1.sessionKey,
   });

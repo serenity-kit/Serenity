@@ -22,6 +22,8 @@ interface EditorState {
   triggerBlur: () => void;
   subscribeToBlurTrigger: (callback: () => void) => void;
   removeAllSubscribers: () => void;
+  snapshotKey: Uint8Array | null;
+  setSnapshotKey: (snapshotKey: Uint8Array) => void;
 }
 
 export const useEditorStore = create<EditorState>((set, get) => ({
@@ -35,6 +37,10 @@ export const useEditorStore = create<EditorState>((set, get) => ({
     })),
   triggerBlur: () => {
     get().subscriptions.forEach((callback) => callback());
+  },
+  snapshotKey: null,
+  setSnapshotKey: (snapshotKey) => {
+    set(() => ({ snapshotKey }));
   },
   removeAllSubscribers: () => {
     set((state) => ({

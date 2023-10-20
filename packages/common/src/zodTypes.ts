@@ -76,3 +76,11 @@ export type SerenitySnapshotWithClientData = SnapshotWithClientData & {
     };
   };
 };
+
+export const ShareDocumentRole = z.union([
+  z.literal("VIEWER"),
+  z.literal("COMMENTER"),
+  z.literal("EDITOR"),
+]);
+
+export type ShareDocumentRole = z.infer<typeof ShareDocumentRole>;

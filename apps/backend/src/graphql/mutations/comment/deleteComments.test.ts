@@ -271,8 +271,7 @@ test("editor share token", async () => {
     graphql,
     documentId: userData1.document.id,
     sharingRole: Role.EDITOR,
-    creatorDevice: userData1.webDevice,
-    creatorDeviceEncryptionPrivateKey: userData1.webDevice.encryptionPrivateKey,
+    mainDevice: userData1.mainDevice,
     snapshotKey,
     authorizationHeader: userData1.sessionKey,
   });
@@ -315,8 +314,7 @@ test("commenter share token", async () => {
     graphql,
     documentId: userData1.document.id,
     sharingRole: Role.COMMENTER,
-    creatorDevice: userData1.webDevice,
-    creatorDeviceEncryptionPrivateKey: userData1.webDevice.encryptionPrivateKey,
+    mainDevice: userData1.mainDevice,
     snapshotKey,
     authorizationHeader: userData1.sessionKey,
   });
@@ -355,8 +353,7 @@ test("viewer share token can't delete", async () => {
     graphql,
     documentId: userData1.document.id,
     sharingRole: Role.COMMENTER,
-    creatorDevice: userData1.webDevice,
-    creatorDeviceEncryptionPrivateKey: userData1.webDevice.encryptionPrivateKey,
+    mainDevice: userData1.mainDevice,
     snapshotKey,
     authorizationHeader: userData1.sessionKey,
   });

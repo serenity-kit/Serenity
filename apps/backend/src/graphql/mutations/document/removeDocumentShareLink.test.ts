@@ -20,15 +20,12 @@ const setup = async () => {
     username: `${generateId()}@example.com`,
     password,
   });
-  const { encryptionPrivateKey, signingPrivateKey, ...creatorDevice } =
-    userData1.webDevice;
   snapshotKey = sodium.to_base64(sodium.crypto_kdf_keygen());
   const documentShareLinkResponse = await createDocumentShareLink({
     graphql,
     documentId: userData1.document.id,
     sharingRole: Role.EDITOR,
-    creatorDevice,
-    creatorDeviceEncryptionPrivateKey: encryptionPrivateKey,
+    mainDevice: userData1.mainDevice,
     snapshotKey,
     authorizationHeader: userData1.sessionKey,
   });

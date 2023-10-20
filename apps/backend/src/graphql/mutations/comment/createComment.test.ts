@@ -66,8 +66,7 @@ test("shared editor comments", async () => {
     graphql,
     documentId: userData1.document.id,
     sharingRole: Role.EDITOR,
-    creatorDevice: userData1.webDevice,
-    creatorDeviceEncryptionPrivateKey: userData1.webDevice.encryptionPrivateKey,
+    mainDevice: userData1.mainDevice,
     snapshotKey,
     authorizationHeader: userData1.sessionKey,
   });
@@ -108,8 +107,7 @@ test("shared commentor comments", async () => {
     graphql,
     documentId: userData1.document.id,
     sharingRole: Role.COMMENTER,
-    creatorDevice: userData1.webDevice,
-    creatorDeviceEncryptionPrivateKey: userData1.webDevice.encryptionPrivateKey,
+    mainDevice: userData1.mainDevice,
     snapshotKey,
     authorizationHeader: userData1.sessionKey,
   });
@@ -150,8 +148,7 @@ test("shared viewer cannot comment", async () => {
     graphql,
     documentId: userData1.document.id,
     sharingRole: Role.VIEWER,
-    creatorDevice: userData1.webDevice,
-    creatorDeviceEncryptionPrivateKey: userData1.webDevice.encryptionPrivateKey,
+    mainDevice: userData1.mainDevice,
     snapshotKey,
     authorizationHeader: userData1.sessionKey,
   });
