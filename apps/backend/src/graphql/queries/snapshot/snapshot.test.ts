@@ -121,12 +121,11 @@ test("retrieve a snapshot", async () => {
 
 test("retrieve a snapshot from documentShareLinkToken", async () => {
   const authorizationHeader = userData1.sessionKey;
-  const documentShareLinkResult = await createDocumentShareLink({
+  const { createDocumentShareLinkQueryResult } = await createDocumentShareLink({
     graphql,
     documentId: userData1.document.id,
     sharingRole: Role.VIEWER,
-    creatorDevice: userData1.webDevice,
-    creatorDeviceEncryptionPrivateKey: userData1.webDevice.encryptionPrivateKey,
+    mainDevice: userData1.mainDevice,
     snapshotKey,
     authorizationHeader: userData1.sessionKey,
   });
@@ -134,7 +133,7 @@ test("retrieve a snapshot from documentShareLinkToken", async () => {
     graphql,
     documentId: userData1.document.id,
     documentShareLinkToken:
-      documentShareLinkResult.createDocumentShareLink.token,
+      createDocumentShareLinkQueryResult.createDocumentShareLink.token,
     authorizationHeader,
   });
   const snapshot = result.snapshot;

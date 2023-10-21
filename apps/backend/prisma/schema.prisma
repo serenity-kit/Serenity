@@ -315,6 +315,8 @@ model DocumentShareLink {
   deviceEncryptionPublicKey          String           @unique
   deviceEncryptionPublicKeySignature String           @unique
   snapshotKeyBoxes                   SnapshotKeyBox[]
+
+  @@index([deviceSigningPublicKey])
 }
 
 model SnapshotKeyBox {

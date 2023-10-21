@@ -1,5 +1,6 @@
 import { useRoute } from "@react-navigation/native";
-import { notNull } from "@serenity-tools/common";
+import * as documentChain from "@serenity-kit/document-chain";
+import { notNull, ShareDocumentRole } from "@serenity-tools/common";
 import {
   Button,
   Description,
@@ -24,16 +25,17 @@ import * as Clipboard from "expo-clipboard";
 import { HStack } from "native-base";
 import { useMemo, useState } from "react";
 import { StyleSheet } from "react-native";
-import sodium, { KeyPair } from "react-native-libsodium";
 import {
-  Role,
   runRemoveDocumentShareLinkMutation,
+  useDocumentChainQuery,
   useDocumentShareLinksQuery,
 } from "../../generated/graphql";
 import { useAuthenticatedAppContext } from "../../hooks/useAuthenticatedAppContext";
 import { WorkspaceDrawerScreenProps } from "../../types/navigationProps";
+import { getMainDevice } from "../../utils/device/mainDeviceMemoryStore";
 import { createDocumentShareLink } from "../../utils/document/createDocumentShareLink";
 import { useEditorStore } from "../../utils/editorStore/editorStore";
+import { VerifyPasswordModal } from "../verifyPasswordModal/VerifyPasswordModal";
 
 const styles = StyleSheet.create({
   createShareLinkButton: tw`self-start`,
@@ -49,74 +51,138 @@ export function PageShareModalContent() {
       variables: { documentId: pageId },
     });
   const isDesktopDevice = useIsDesktopDevice();
-  const { activeDevice } = useAuthenticatedAppContext();
-  const signatureKeyPair: KeyPair = useMemo(() => {
-    return {
-      publicKey: sodium.from_base64(activeDevice.signingPublicKey),
-      privateKey: sodium.from_base64(activeDevice.signingPrivateKey!),
-      keyType: "ed25519",
-    };
-  }, [activeDevice]);
-
   const [isClipboardNoticeActive, setIsClipboardNoticeActive] = useState(false);
   const [pageShareLink, setPageShareLink] = useState<string | null>(null);
   const documentShareLinks =
     documentShareLinksResult.data?.documentShareLinks?.nodes?.filter(notNull) ||
     [];
-  const [sharingRole, _setSharingRole] = useState(Role.Viewer);
+  const [sharingRole, setSharingRole] = useState<ShareDocumentRole>("VIEWER");
   const documentState = useEditorStore((state) => state.documentState);
+  const snapshotKey = useEditorStore((state) => state.snapshotKey);
+  const [
+    isPasswordModalVisibleForCreateShareLink,
+    setIsPasswordModalVisibleForCreateShareLink,
+  ] = useState(false);
+  const [
+    isPasswordModalVisibleForDeleteShareLink,
+    setIsPasswordModalVisibleForDeleteShareLink,
+  ] = useState(false);
+  const [
+    shareDeviceSigningPublicKeyToBeRemoved,
+    setShareDeviceSigningPublicKeyToBeRemoved,
+  ] = useState<null | string>(null);
 
-  const setSharingRole = (role: string) => {
-    // admin sharing is disallowed
-    if (role === "editor") {
-      _setSharingRole(Role.Editor);
-    } else if (role === "commenter") {
-      _setSharingRole(Role.Commenter);
-    } else if (role === "viewer") {
-      _setSharingRole(Role.Viewer);
+  const [documentChainQueryResult, refetchDocumentChainQuery] =
+    useDocumentChainQuery({
+      variables: { documentId: pageId },
+    });
+  const { activeDevice } = useAuthenticatedAppContext();
+
+  const { documentChainState, lastDocumentChainEvent } = useMemo(() => {
+    if (documentChainQueryResult.data?.documentChain?.nodes) {
+      let lastDocumentChainEvent: documentChain.DocumentChainEvent | null =
+        null;
+
+      const userChainResult = documentChain.resolveState({
+        events: documentChainQueryResult.data.documentChain.nodes
+          .filter(notNull)
+          .map((event) => {
+            const data = documentChain.DocumentChainEvent.parse(
+              JSON.parse(event.serializedContent)
+            );
+            lastDocumentChainEvent = data;
+            return data;
+          }),
+        knownVersion: documentChain.version,
+      });
+      return {
+        documentChainState: userChainResult.currentState,
+        lastDocumentChainEvent,
+      };
     } else {
-      console.error("Unknown role: ", role);
-      _setSharingRole(Role.Viewer);
+      return { documentChainState: null, lastDocumentChainEvent: null };
+    }
+  }, [documentChainQueryResult]);
+
+  const createShareLinkPreflight = async (sharingRole: ShareDocumentRole) => {
+    const mainDevice = getMainDevice();
+    if (mainDevice) {
+      await createShareLink(sharingRole);
+      return;
+    } else {
+      setIsPasswordModalVisibleForCreateShareLink(true);
     }
   };
 
-  const getSharingRoleText = (role: Role) => {
-    if (role === Role.Admin) {
-      return "Admin";
-    } else if (role === Role.Editor) {
-      return "Editor";
-    } else if (role === Role.Commenter) {
-      return "Commenter";
-    } else if (role === Role.Viewer) {
-      return "Viewer";
-    }
-    return "Unknown";
-  };
-
-  const createShareLink = async (sharingRole: Role) => {
+  const createShareLink = async (sharingRole: ShareDocumentRole) => {
     if (!activeDevice.encryptionPrivateKey) {
       console.error("active device doesn't have encryptionPrivateKey");
       return;
     }
-    const { encryptionPrivateKey, signingPrivateKey, ...creatorDevice } =
-      activeDevice;
+    const mainDevice = getMainDevice();
+    if (!mainDevice) {
+      throw new Error("No active main device available");
+    }
+    if (lastDocumentChainEvent === null) {
+      throw new Error("Document chain not available");
+    }
+    if (snapshotKey === null) {
+      throw new Error("snapshotKey not available");
+    }
+
     try {
       const shareLinkData = await createDocumentShareLink({
         documentId: pageId,
         sharingRole,
-        creatorDevice,
-        creatorDeviceEncryptionPrivateKey: encryptionPrivateKey,
+        mainDevice,
+        prevDocumentChainEvent: lastDocumentChainEvent,
+        snapshotKey,
       });
       setPageShareLink(shareLinkData.documentShareLink);
+      refetchDocumentChainQuery();
       refetchDocumentShareLinks();
     } catch (error) {
       console.error(error.message);
     }
   };
 
-  const removeShareLink = async (token: string) => {
+  const deleteShareLinkPreflight = async () => {
+    const mainDevice = getMainDevice();
+    if (mainDevice) {
+      await deleteShareLink();
+      return;
+    } else {
+      setIsPasswordModalVisibleForDeleteShareLink(true);
+    }
+  };
+
+  const deleteShareLink = async () => {
+    const mainDevice = getMainDevice();
+    if (!mainDevice) {
+      throw new Error("No active main device available");
+    }
+    if (shareDeviceSigningPublicKeyToBeRemoved === null) {
+      throw new Error("shareDeviceSigningPublicKeyToBeRemoved not available");
+    }
+    if (lastDocumentChainEvent === null) {
+      throw new Error("Document chain not available");
+    }
+
+    const documentChainEvent = documentChain.removeShareDocumentDevice({
+      authorKeyPair: {
+        privateKey: mainDevice.signingPrivateKey,
+        publicKey: mainDevice.signingPublicKey,
+      },
+      signingPublicKey: shareDeviceSigningPublicKeyToBeRemoved,
+      prevEvent: lastDocumentChainEvent,
+    });
+
     const removeDocumentShareLink = await runRemoveDocumentShareLinkMutation(
-      { input: { token } },
+      {
+        input: {
+          serializedDocumentChainEvent: JSON.stringify(documentChainEvent),
+        },
+      },
       {}
     );
     if (!removeDocumentShareLink.data?.removeDocumentShareLink?.success) {
@@ -124,6 +190,7 @@ export function PageShareModalContent() {
         removeDocumentShareLink.error?.message || "Could not remove share link"
       );
     }
+    refetchDocumentChainQuery();
     refetchDocumentShareLinks();
   };
 
@@ -164,20 +231,21 @@ export function PageShareModalContent() {
                 </SharetextBox>
                 <HStack alignItems={"center"} style={tw`mb-4`} space={2}>
                   <Select
-                    onValueChange={(value: Role) => {
-                      setSharingRole(value);
+                    onValueChange={(value) => {
+                      const newSharingRole = ShareDocumentRole.parse(value);
+                      setSharingRole(newSharingRole);
                     }}
                     testID={`document-share-modal__select-role-menu`}
                     accessibilityLabel="Set sharing access level"
-                    defaultValue="viewer"
+                    defaultValue="VIEWER"
                   >
-                    <SelectItem label="Editor" value="editor" />
-                    <SelectItem label="Commenter" value="commenter" />
-                    <SelectItem label="Viewer" value="viewer" />
+                    <SelectItem label="Editor" value="EDITOR" />
+                    <SelectItem label="Commenter" value="COMMENTER" />
+                    <SelectItem label="Viewer" value="VIEWER" />
                   </Select>
                   <Button
                     onPress={() => {
-                      createShareLink(sharingRole);
+                      createShareLinkPreflight(sharingRole);
                     }}
                     style={styles.createShareLinkButton}
                     testID="document-share-modal__create-share-link-button"
@@ -202,43 +270,75 @@ export function PageShareModalContent() {
                 header={<ListHeader data={["Page Share Links"]} />}
                 testID="document-share-modal__share-links-list"
               >
-                {documentShareLinks.map((documentShareLink) => {
-                  return (
-                    <ListItem
-                      key={documentShareLink.token}
-                      // onSelect={() => props.onSelect(documentShareLink.token)}
-                      mainItem={
-                        <>
-                          <ListText style={[tw`w-1/2 md:w-2/3`]}>
-                            https://serenity.re/page
-                          </ListText>
-                          <ListText>/</ListText>
-                          <ListText style={[tw`w-1/2 md:w-1/4`]} bold>
-                            {documentShareLink.token}
-                          </ListText>
-                        </>
-                      }
-                      secondaryItem={
-                        <ListText>
-                          {getSharingRoleText(documentShareLink.role)}
-                        </ListText>
-                      }
-                      actionItem={
-                        <IconButton
-                          name={"delete-bin-line"}
-                          color={isDesktopDevice ? "gray-900" : "gray-700"}
-                          onPress={() => {
-                            // TODO delete documentShareLink
-                            removeShareLink(documentShareLink.token);
-                          }}
+                {documentChainState &&
+                  Object.entries(documentChainState.devices).map(
+                    ([signingPublicKey, documentShareLink]) => {
+                      return (
+                        <ListItem
+                          key={signingPublicKey}
+                          // onSelect={() => props.onSelect(documentShareLink.token)}
+                          mainItem={
+                            <>
+                              <ListText style={[tw`w-1/2 md:w-2/3`]}>
+                                https://serenity.re/page
+                              </ListText>
+                              <ListText>/</ListText>
+                              <ListText style={[tw`w-1/2 md:w-1/4`]} bold>
+                                {documentShareLinks.find(
+                                  (link) =>
+                                    link.deviceSigningPublicKey ===
+                                    signingPublicKey
+                                )?.token || "ERROR"}
+                              </ListText>
+                            </>
+                          }
+                          secondaryItem={
+                            <ListText>
+                              {documentShareLink.role.charAt(0).toUpperCase() +
+                                documentShareLink.role.slice(1).toLowerCase()}
+                            </ListText>
+                          }
+                          actionItem={
+                            <IconButton
+                              name={"delete-bin-line"}
+                              color={isDesktopDevice ? "gray-900" : "gray-700"}
+                              onPress={() => {
+                                setShareDeviceSigningPublicKeyToBeRemoved(
+                                  signingPublicKey
+                                );
+                                deleteShareLinkPreflight();
+                              }}
+                            />
+                          }
                         />
-                      }
-                    />
-                  );
-                })}
+                      );
+                    }
+                  )}
               </List>
             </FormWrapper>
           )}
+          <VerifyPasswordModal
+            isVisible={isPasswordModalVisibleForCreateShareLink}
+            description="Creating a share link requires access to the main account and therefore verifying your password is required"
+            onSuccess={() => {
+              setIsPasswordModalVisibleForCreateShareLink(false);
+              createShareLink(sharingRole);
+            }}
+            onCancel={() => {
+              setIsPasswordModalVisibleForCreateShareLink(false);
+            }}
+          />
+          <VerifyPasswordModal
+            isVisible={isPasswordModalVisibleForDeleteShareLink}
+            description="Deleting a share link requires access to the main account and therefore verifying your password is required"
+            onSuccess={() => {
+              setIsPasswordModalVisibleForDeleteShareLink(false);
+              deleteShareLink();
+            }}
+            onCancel={() => {
+              setIsPasswordModalVisibleForDeleteShareLink(false);
+            }}
+          />
         </>
       )}
     </>

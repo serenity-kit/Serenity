@@ -1,5 +1,4 @@
 import { generateId } from "@serenity-tools/common";
-import { gql } from "graphql-request";
 import sodium from "react-native-libsodium";
 import { Role } from "../../../../prisma/generated/output";
 import deleteAllRecords from "../../../../test/helpers/deleteAllRecords";
@@ -12,7 +11,7 @@ const graphql = setupGraphql();
 const password = "password";
 let userData1: any = null;
 let snapshotKey = "";
-let documentShareLinkToken = "";
+let shareLinkDeviceSigningPublicKey = "";
 
 const setup = async () => {
   await sodium.ready;
@@ -20,20 +19,16 @@ const setup = async () => {
     username: `${generateId()}@example.com`,
     password,
   });
-  const { encryptionPrivateKey, signingPrivateKey, ...creatorDevice } =
-    userData1.webDevice;
   snapshotKey = sodium.to_base64(sodium.crypto_kdf_keygen());
-  const documentShareLinkResponse = await createDocumentShareLink({
+  const { signingPublicKey } = await createDocumentShareLink({
     graphql,
     documentId: userData1.document.id,
     sharingRole: Role.EDITOR,
-    creatorDevice,
-    creatorDeviceEncryptionPrivateKey: encryptionPrivateKey,
+    mainDevice: userData1.mainDevice,
     snapshotKey,
     authorizationHeader: userData1.sessionKey,
   });
-  documentShareLinkToken =
-    documentShareLinkResponse.createDocumentShareLink.token;
+  shareLinkDeviceSigningPublicKey = signingPublicKey;
 };
 
 beforeAll(async () => {
@@ -46,26 +41,38 @@ test("Invalid document ownership", async () => {
     username: `${generateId()}@example.com`,
     password,
   });
-  const { encryptionPrivateKey, signingPrivateKey, ...creatorDevice } =
-    otherUser.webDevice;
-  const receiverDevices = [creatorDevice, otherUser.webDevice];
   await expect(
     (async () =>
       await removeDocumentShareLink({
         graphql,
-        token: documentShareLinkToken,
+        deviceSigningPublicKey: shareLinkDeviceSigningPublicKey,
+        mainDevice: otherUser.mainDevice,
         authorizationHeader: otherUser.sessionKey,
+        documentId: userData1.document.id,
       }))()
   ).rejects.toThrowError("Unauthorized");
 });
 
+test("Not the main device", async () => {
+  await expect(
+    (async () =>
+      await removeDocumentShareLink({
+        graphql,
+        deviceSigningPublicKey: shareLinkDeviceSigningPublicKey,
+        mainDevice: userData1.webDevice,
+        authorizationHeader: userData1.sessionKey,
+        documentId: userData1.document.id,
+      }))()
+  ).rejects.toThrowError("Not the user's main device");
+});
+
 test("remove share link", async () => {
-  const { encryptionPrivateKey, signingPrivateKey, ...creatorDevice } =
-    userData1.webDevice;
   const response = await removeDocumentShareLink({
     graphql,
-    token: documentShareLinkToken,
+    deviceSigningPublicKey: shareLinkDeviceSigningPublicKey,
+    mainDevice: userData1.mainDevice,
     authorizationHeader: userData1.sessionKey,
+    documentId: userData1.document.id,
   });
   expect(response).toMatchInlineSnapshot(`
     {
@@ -77,94 +84,14 @@ test("remove share link", async () => {
 });
 
 test("Unauthenticated", async () => {
-  const { encryptionPrivateKey, signingPrivateKey, ...creatorDevice } =
-    userData1.webDevice;
   await expect(
     (async () =>
       await removeDocumentShareLink({
         graphql,
-        token: documentShareLinkToken,
+        deviceSigningPublicKey: shareLinkDeviceSigningPublicKey,
+        documentId: userData1.document.id,
+        mainDevice: userData1.mainDevice,
         authorizationHeader: "badsessionkey",
       }))()
   ).rejects.toThrowError(/UNAUTHENTICATED/);
-});
-
-describe("Input errors", () => {
-  const query = gql`
-    mutation createDocumentShareLink($input: CreateDocumentShareLinkInput!) {
-      createDocumentShareLink(input: $input) {
-        token
-      }
-    }
-  `;
-  test("Invalid documentId", async () => {
-    const userData1 = await createUserWithWorkspace({
-      username: `${generateId()}@example.com`,
-      password,
-    });
-    await expect(
-      (async () =>
-        await graphql.client.request(
-          query,
-          {
-            input: {
-              graphql,
-              token: null,
-            },
-          },
-          { authorization: userData1.sessionKey }
-        ))()
-    ).rejects.toThrowError(/BAD_USER_INPUT/);
-  });
-  test("Invalid creator device", async () => {
-    const userData1 = await createUserWithWorkspace({
-      username: `${generateId()}@example.com`,
-      password,
-    });
-    const otherUser = await createUserWithWorkspace({
-      username: `${generateId()}@example.com`,
-      password,
-    });
-    await expect(
-      (async () =>
-        await graphql.client.request(
-          query,
-          {
-            input: {
-              graphql,
-              token: documentShareLinkToken,
-            },
-          },
-          { authorization: userData1.sessionKey }
-        ))()
-    ).rejects.toThrowError(/BAD_USER_INPUT/);
-  });
-  test("Invalid input", async () => {
-    const userData1 = await createUserWithWorkspace({
-      username: `${generateId()}@example.com`,
-      password,
-    });
-    await expect(
-      (async () =>
-        await graphql.client.request(
-          query,
-          {
-            input: null,
-          },
-          { authorization: userData1.sessionKey }
-        ))()
-    ).rejects.toThrowError();
-  });
-  test("No input", async () => {
-    const userData1 = await createUserWithWorkspace({
-      username: `${generateId()}@example.com`,
-      password,
-    });
-    await expect(
-      (async () =>
-        await graphql.client.request(query, null, {
-          authorization: userData1.sessionKey,
-        }))()
-    ).rejects.toThrowError();
-  });
 });

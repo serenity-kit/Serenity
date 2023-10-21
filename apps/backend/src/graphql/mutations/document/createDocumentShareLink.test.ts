@@ -38,9 +38,6 @@ beforeAll(async () => {
 });
 
 test("create admin share link fails", async () => {
-  const sharingRole = Role.ADMIN;
-  const { encryptionPrivateKey, signingPrivateKey, ...creatorDevice } =
-    userData1.webDevice;
   const folderKeyTrace = deriveKeysFromKeyDerivationTrace({
     keyDerivationTrace: userData1.folder.keyDerivationTrace,
     activeDevice: userData1.webDevice,
@@ -54,19 +51,17 @@ test("create admin share link fails", async () => {
       await createDocumentShareLink({
         graphql,
         documentId: userData1.document.id,
-        sharingRole,
-        creatorDeviceEncryptionPrivateKey: encryptionPrivateKey,
-        creatorDevice,
+        // @ts-expect-error
+        sharingRole: Role.ADMIN,
+        mainDevice: userData1.mainDevice,
         snapshotKey: snapshotKeyData.key,
         authorizationHeader: userData1.sessionKey,
       }))()
-  ).rejects.toThrowError(/BAD_USER_INPUT/);
+  ).rejects.toThrowError(/Internal server error/);
 });
 
 test("create editor share link", async () => {
   const sharingRole = Role.EDITOR;
-  const { encryptionPrivateKey, signingPrivateKey, ...creatorDevice } =
-    userData1.webDevice;
   const folderKeyTrace = deriveKeysFromKeyDerivationTrace({
     keyDerivationTrace: userData1.folder.keyDerivationTrace,
     activeDevice: userData1.webDevice,
@@ -75,24 +70,21 @@ test("create editor share link", async () => {
   const snapshotKeyData = createSnapshotKey({
     folderKey: folderKeyTrace.trace[folderKeyTrace.trace.length - 1].key,
   });
-  const documentShareLinkResponse = await createDocumentShareLink({
+  const { createDocumentShareLinkQueryResult } = await createDocumentShareLink({
     graphql,
     documentId: userData1.document.id,
     sharingRole,
-    creatorDeviceEncryptionPrivateKey: encryptionPrivateKey,
-    creatorDevice,
+    mainDevice: userData1.mainDevice,
     snapshotKey: snapshotKeyData.key,
     authorizationHeader: userData1.sessionKey,
   });
-  const documentShareLink = documentShareLinkResponse.createDocumentShareLink;
+  const documentShareLink =
+    createDocumentShareLinkQueryResult.createDocumentShareLink;
   expect(typeof documentShareLink.token).toBe("string");
-  expect(documentShareLink.role).toBe(sharingRole);
 });
 
 test("create commenter share link", async () => {
   const sharingRole = Role.COMMENTER;
-  const { encryptionPrivateKey, signingPrivateKey, ...creatorDevice } =
-    userData1.webDevice;
   const folderKeyTrace = deriveKeysFromKeyDerivationTrace({
     keyDerivationTrace: userData1.folder.keyDerivationTrace,
     activeDevice: userData1.webDevice,
@@ -101,24 +93,21 @@ test("create commenter share link", async () => {
   const snapshotKeyData = createSnapshotKey({
     folderKey: folderKeyTrace.trace[folderKeyTrace.trace.length - 1].key,
   });
-  const documentShareLinkResponse = await createDocumentShareLink({
+  const { createDocumentShareLinkQueryResult } = await createDocumentShareLink({
     graphql,
     documentId: userData1.document.id,
     sharingRole,
-    creatorDeviceEncryptionPrivateKey: encryptionPrivateKey,
-    creatorDevice,
+    mainDevice: userData1.mainDevice,
     snapshotKey: snapshotKeyData.key,
     authorizationHeader: userData1.sessionKey,
   });
-  const documentShareLink = documentShareLinkResponse.createDocumentShareLink;
+  const documentShareLink =
+    createDocumentShareLinkQueryResult.createDocumentShareLink;
   expect(typeof documentShareLink.token).toBe("string");
-  expect(documentShareLink.role).toBe(sharingRole);
 });
 
 test("create viewer share link", async () => {
   const sharingRole = Role.VIEWER;
-  const { encryptionPrivateKey, signingPrivateKey, ...creatorDevice } =
-    userData1.webDevice;
   const folderKeyTrace = deriveKeysFromKeyDerivationTrace({
     keyDerivationTrace: userData1.folder.keyDerivationTrace,
     activeDevice: userData1.webDevice,
@@ -127,44 +116,17 @@ test("create viewer share link", async () => {
   const snapshotKeyData = createSnapshotKey({
     folderKey: folderKeyTrace.trace[folderKeyTrace.trace.length - 1].key,
   });
-  const documentShareLinkResponse = await createDocumentShareLink({
+  const { createDocumentShareLinkQueryResult } = await createDocumentShareLink({
     graphql,
     documentId: userData1.document.id,
     sharingRole,
-    creatorDeviceEncryptionPrivateKey: encryptionPrivateKey,
-    creatorDevice,
+    mainDevice: userData1.mainDevice,
     snapshotKey: snapshotKeyData.key,
     authorizationHeader: userData1.sessionKey,
   });
-  const documentShareLink = documentShareLinkResponse.createDocumentShareLink;
+  const documentShareLink =
+    createDocumentShareLinkQueryResult.createDocumentShareLink;
   expect(typeof documentShareLink.token).toBe("string");
-  expect(documentShareLink.role).toBe(sharingRole);
-});
-
-test("Invalid ownership", async () => {
-  const { encryptionPrivateKey, signingPrivateKey, ...creatorDevice } =
-    userData1.webDevice;
-  const folderKeyTrace = deriveKeysFromKeyDerivationTrace({
-    keyDerivationTrace: userData1.folder.keyDerivationTrace,
-    activeDevice: userData1.webDevice,
-    workspaceKeyBox: user1Workspace.currentWorkspaceKey.workspaceKeyBox,
-  });
-  const snapshotKeyData = createSnapshotKey({
-    folderKey: folderKeyTrace.trace[folderKeyTrace.trace.length - 1].key,
-  });
-  await expect(
-    (async () =>
-      await createDocumentShareLink({
-        graphql,
-        documentId: userData1.document.id,
-        //@ts-ignore: invalid role type
-        sharingRole: "bad-role",
-        creatorDeviceEncryptionPrivateKey: encryptionPrivateKey,
-        creatorDevice,
-        snapshotKey: snapshotKeyData.key,
-        authorizationHeader: userData1.sessionKey,
-      }))()
-  ).rejects.toThrowError(/BAD_USER_INPUT/);
 });
 
 test("Invalid ownership", async () => {
@@ -172,8 +134,6 @@ test("Invalid ownership", async () => {
     username: `${generateId()}@example.com`,
     password,
   });
-  const { encryptionPrivateKey, signingPrivateKey, ...creatorDevice } =
-    otherUser.webDevice;
   const documentId = userData1.document.id;
   const authorizationHeader = otherUser.sessionKey;
   const folderKeyTrace = deriveKeysFromKeyDerivationTrace({
@@ -190,8 +150,7 @@ test("Invalid ownership", async () => {
         graphql,
         documentId,
         sharingRole: Role.EDITOR,
-        creatorDeviceEncryptionPrivateKey: encryptionPrivateKey,
-        creatorDevice,
+        mainDevice: otherUser.mainDevice,
         snapshotKey: snapshotKeyData.key,
         authorizationHeader,
       }))()
@@ -199,8 +158,6 @@ test("Invalid ownership", async () => {
 });
 
 test("Unauthenticated", async () => {
-  const { encryptionPrivateKey, signingPrivateKey, ...creatorDevice } =
-    userData1.webDevice;
   const snapshotKey = sodium.to_base64(sodium.crypto_kdf_keygen());
   await expect(
     (async () =>
@@ -208,8 +165,7 @@ test("Unauthenticated", async () => {
         graphql,
         documentId: userData1.document.id,
         sharingRole: Role.EDITOR,
-        creatorDeviceEncryptionPrivateKey: encryptionPrivateKey,
-        creatorDevice,
+        mainDevice: userData1.mainDevice,
         snapshotKey,
         authorizationHeader: "badauthheader",
       }))()
@@ -251,7 +207,7 @@ describe("Input errors", () => {
         ))()
     ).rejects.toThrowError(/BAD_USER_INPUT/);
   });
-  test("Invalid sharing role", async () => {
+  test("Invalid sharing role since it is null", async () => {
     const userData1 = await createUserWithWorkspace({
       username: `${generateId()}@example.com`,
       password,
@@ -278,6 +234,29 @@ describe("Input errors", () => {
         ))()
     ).rejects.toThrowError(/BAD_USER_INPUT/);
   });
+  test("Invalid sharing role", async () => {
+    const folderKeyTrace = deriveKeysFromKeyDerivationTrace({
+      keyDerivationTrace: userData1.folder.keyDerivationTrace,
+      activeDevice: userData1.webDevice,
+      workspaceKeyBox: user1Workspace.currentWorkspaceKey.workspaceKeyBox,
+    });
+    const snapshotKeyData = createSnapshotKey({
+      folderKey: folderKeyTrace.trace[folderKeyTrace.trace.length - 1].key,
+    });
+    await expect(
+      (async () =>
+        await createDocumentShareLink({
+          graphql,
+          documentId: userData1.document.id,
+          //@ts-ignore: invalid role type
+          sharingRole: "bad-role",
+          mainDevice: userData1.mainDevice,
+          snapshotKey: snapshotKeyData.key,
+          authorizationHeader: userData1.sessionKey,
+        }))()
+    ).rejects.toThrowError(/Internal server error/);
+  });
+
   test("Invalid creator device", async () => {
     const userData1 = await createUserWithWorkspace({
       username: `${generateId()}@example.com`,

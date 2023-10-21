@@ -11,7 +11,7 @@ export async function getDocument({ userId, id }: Params) {
   return await prisma.$transaction(
     async (prisma) => {
       // make sure the user has access to the workspace
-      // by retrieving and verifying the workspace
+      // by retrieving and verifying the workspace connection
       const document = await prisma.document.findUnique({
         where: {
           id,

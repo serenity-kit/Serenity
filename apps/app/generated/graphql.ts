@@ -162,20 +162,15 @@ export type CreateDocumentResult = {
 };
 
 export type CreateDocumentShareLinkInput = {
-  creatorDeviceSigningPublicKey: Scalars['String'];
-  deviceEncryptionPublicKey: Scalars['String'];
-  deviceEncryptionPublicKeySignature: Scalars['String'];
   deviceSecretBoxCiphertext: Scalars['String'];
   deviceSecretBoxNonce: Scalars['String'];
-  deviceSigningPublicKey: Scalars['String'];
   documentId: Scalars['String'];
-  sharingRole: Role;
+  serializedDocumentChainEvent: Scalars['String'];
   snapshotDeviceKeyBox: SnapshotDeviceKeyBoxInput;
 };
 
 export type CreateDocumentShareLinkResult = {
   __typename?: 'CreateDocumentShareLinkResult';
-  role: Role;
   token: Scalars['String'];
 };
 
@@ -359,6 +354,30 @@ export type Document = {
   subkeyId: Scalars['Int'];
   workspaceId: Scalars['String'];
   workspaceKey?: Maybe<WorkspaceKey>;
+};
+
+export type DocumentChainEvent = {
+  __typename?: 'DocumentChainEvent';
+  position: Scalars['Int'];
+  serializedContent: Scalars['String'];
+};
+
+export type DocumentChainEventConnection = {
+  __typename?: 'DocumentChainEventConnection';
+  /** https://facebook.github.io/relay/graphql/connections.htm#sec-Edge-Types */
+  edges?: Maybe<Array<Maybe<DocumentChainEventEdge>>>;
+  /** Flattened list of DocumentChainEvent type */
+  nodes?: Maybe<Array<Maybe<DocumentChainEvent>>>;
+  /** https://facebook.github.io/relay/graphql/connections.htm#sec-undefined.PageInfo */
+  pageInfo: PageInfo;
+};
+
+export type DocumentChainEventEdge = {
+  __typename?: 'DocumentChainEventEdge';
+  /** https://facebook.github.io/relay/graphql/connections.htm#sec-Cursor */
+  cursor: Scalars['String'];
+  /** https://facebook.github.io/relay/graphql/connections.htm#sec-Node */
+  node?: Maybe<DocumentChainEvent>;
 };
 
 export type DocumentConnection = {
@@ -804,6 +823,7 @@ export type Query = {
   commentsByDocumentId?: Maybe<CommentConnection>;
   devices?: Maybe<DeviceConnection>;
   document?: Maybe<Document>;
+  documentChain?: Maybe<DocumentChainEventConnection>;
   documentPath?: Maybe<Array<Maybe<Folder>>>;
   documentShareLink?: Maybe<DocumentShareLink>;
   documentShareLinks?: Maybe<DocumentShareLinkConnection>;
@@ -858,6 +878,13 @@ export type QueryDevicesArgs = {
 
 export type QueryDocumentArgs = {
   id: Scalars['ID'];
+};
+
+
+export type QueryDocumentChainArgs = {
+  after?: InputMaybe<Scalars['String']>;
+  documentId: Scalars['ID'];
+  first: Scalars['Int'];
 };
 
 
@@ -998,7 +1025,7 @@ export type QueryWorkspacesArgs = {
 };
 
 export type RemoveDocumentShareLinkInput = {
-  token: Scalars['String'];
+  serializedDocumentChainEvent: Scalars['String'];
 };
 
 export type RemoveDocumentShareLinkResult = {
@@ -1610,6 +1637,13 @@ export type DocumentQueryVariables = Exact<{
 
 export type DocumentQuery = { __typename?: 'Query', document?: { __typename?: 'Document', id: string, nameCiphertext: string, nameNonce: string, parentFolderId?: string | null, workspaceId: string, subkeyId: number } | null };
 
+export type DocumentChainQueryVariables = Exact<{
+  documentId: Scalars['ID'];
+}>;
+
+
+export type DocumentChainQuery = { __typename?: 'Query', documentChain?: { __typename?: 'DocumentChainEventConnection', nodes?: Array<{ __typename?: 'DocumentChainEvent', serializedContent: string, position: number } | null> | null } | null };
+
 export type DocumentPathQueryVariables = Exact<{
   id: Scalars['ID'];
 }>;
@@ -1631,7 +1665,7 @@ export type DocumentShareLinksQueryVariables = Exact<{
 }>;
 
 
-export type DocumentShareLinksQuery = { __typename?: 'Query', documentShareLinks?: { __typename?: 'DocumentShareLinkConnection', nodes?: Array<{ __typename?: 'DocumentShareLink', token: string, role: Role } | null> | null, pageInfo: { __typename?: 'PageInfo', hasNextPage: boolean, hasPreviousPage: boolean, startCursor?: string | null, endCursor?: string | null } } | null };
+export type DocumentShareLinksQuery = { __typename?: 'Query', documentShareLinks?: { __typename?: 'DocumentShareLinkConnection', nodes?: Array<{ __typename?: 'DocumentShareLink', deviceSigningPublicKey: string, token: string } | null> | null, pageInfo: { __typename?: 'PageInfo', hasNextPage: boolean, hasPreviousPage: boolean, startCursor?: string | null, endCursor?: string | null } } | null };
 
 export type DocumentsQueryVariables = Exact<{
   parentFolderId: Scalars['ID'];
@@ -2353,6 +2387,20 @@ export const DocumentDocument = gql`
 export function useDocumentQuery(options: Omit<Urql.UseQueryArgs<DocumentQueryVariables>, 'query'>) {
   return Urql.useQuery<DocumentQuery, DocumentQueryVariables>({ query: DocumentDocument, ...options });
 };
+export const DocumentChainDocument = gql`
+    query documentChain($documentId: ID!) {
+  documentChain(documentId: $documentId, first: 5000) {
+    nodes {
+      serializedContent
+      position
+    }
+  }
+}
+    `;
+
+export function useDocumentChainQuery(options: Omit<Urql.UseQueryArgs<DocumentChainQueryVariables>, 'query'>) {
+  return Urql.useQuery<DocumentChainQuery, DocumentChainQueryVariables>({ query: DocumentChainDocument, ...options });
+};
 export const DocumentPathDocument = gql`
     query documentPath($id: ID!) {
   documentPath(id: $id) {
@@ -2405,8 +2453,8 @@ export const DocumentShareLinksDocument = gql`
     query documentShareLinks($documentId: ID!, $first: Int! = 50, $after: String) {
   documentShareLinks(documentId: $documentId, first: $first, after: $after) {
     nodes {
+      deviceSigningPublicKey
       token
-      role
     }
     pageInfo {
       hasNextPage
@@ -3648,6 +3696,109 @@ export const documentQueryService =
         // perform cleanup
         clearInterval(intervalId);
         documentQueryServiceSubscribers[variablesString].intervalId = null;
+      }
+    };
+  };
+
+
+
+export const runDocumentChainQuery = async (variables: DocumentChainQueryVariables, options?: any) => {
+  return await getUrqlClient()
+    .query<DocumentChainQuery, DocumentChainQueryVariables>(
+      DocumentChainDocument,
+      variables,
+      {
+        // better to be safe here and always refetch
+        requestPolicy: "network-only",
+        ...options
+      }
+    )
+    .toPromise();
+};
+
+export type DocumentChainQueryResult = Urql.OperationResult<DocumentChainQuery, DocumentChainQueryVariables>;
+
+export type DocumentChainQueryUpdateResultEvent = {
+  type: "DocumentChainQuery.UPDATE_RESULT";
+  result: DocumentChainQueryResult;
+};
+
+export type DocumentChainQueryErrorEvent = {
+  type: "DocumentChainQuery.ERROR";
+  result: DocumentChainQueryResult;
+};
+
+export type DocumentChainQueryServiceEvent = DocumentChainQueryUpdateResultEvent | DocumentChainQueryErrorEvent;
+
+type DocumentChainQueryServiceSubscribersEntry = {
+  variables: DocumentChainQueryVariables;
+  callbacks: ((event: DocumentChainQueryServiceEvent) => void)[];
+  intervalId: NodeJS.Timer | null;
+};
+
+type DocumentChainQueryServiceSubscribers = {
+  [variables: string]: DocumentChainQueryServiceSubscribersEntry;
+};
+
+const documentChainQueryServiceSubscribers: DocumentChainQueryServiceSubscribers = {};
+
+const triggerDocumentChainQuery = (variablesString: string, variables: DocumentChainQueryVariables) => {
+  getUrqlClient()
+    .query<DocumentChainQuery, DocumentChainQueryVariables>(DocumentChainDocument, variables)
+    .toPromise()
+    .then((result) => {
+      documentChainQueryServiceSubscribers[variablesString].callbacks.forEach(
+        (callback) => {
+          callback({
+            type: result.error ? "DocumentChainQuery.ERROR" : "DocumentChainQuery.UPDATE_RESULT",
+            result: result,
+          });
+        }
+      );
+    });
+};
+
+/**
+ * This service is used to query results every 4 seconds.
+ *
+ * It allows machines to spawn a service that will fetch the query
+ * and send the result to the machine.
+ * It will share the same interval for all machines.
+ * When the last subscription is stopped, the interval will be cleared.
+ * It also considers the variables passed to the service.
+ */
+export const documentChainQueryService =
+  (variables: DocumentChainQueryVariables, intervalInMs?: number) => (callback, onReceive) => {
+    const variablesString = canonicalize(variables) as string;
+    if (documentChainQueryServiceSubscribers[variablesString]) {
+      documentChainQueryServiceSubscribers[variablesString].callbacks.push(callback);
+    } else {
+      documentChainQueryServiceSubscribers[variablesString] = {
+        variables,
+        callbacks: [callback],
+        intervalId: null,
+      };
+    }
+
+    triggerDocumentChainQuery(variablesString, variables);
+    if (!documentChainQueryServiceSubscribers[variablesString].intervalId) {
+      documentChainQueryServiceSubscribers[variablesString].intervalId = setInterval(
+        () => {
+          triggerDocumentChainQuery(variablesString, variables);
+        },
+        intervalInMs || 4000
+      );
+    }
+
+    const intervalId = documentChainQueryServiceSubscribers[variablesString].intervalId;
+    return () => {
+      if (
+        documentChainQueryServiceSubscribers[variablesString].callbacks.length === 0 &&
+        intervalId
+      ) {
+        // perform cleanup
+        clearInterval(intervalId);
+        documentChainQueryServiceSubscribers[variablesString].intervalId = null;
       }
     };
   };

@@ -1,14 +1,21 @@
+import * as documentChain from "@serenity-kit/document-chain";
+import { LocalDevice } from "@serenity-tools/common";
 import { gql } from "graphql-request";
+import { getLastDocumentChainEventByDocumentId } from "../documentChain/getLastDocumentChainEventByDocumentId";
 
 export type Params = {
   graphql: any;
-  token: string;
+  documentId: string;
+  deviceSigningPublicKey: string;
+  mainDevice: LocalDevice;
   authorizationHeader: string;
 };
 
 export const removeDocumentShareLink = async ({
   graphql,
-  token,
+  documentId,
+  deviceSigningPublicKey,
+  mainDevice,
   authorizationHeader,
 }: Params) => {
   const authorizationHeaders = {
@@ -21,11 +28,25 @@ export const removeDocumentShareLink = async ({
       }
     }
   `;
+
+  const { lastChainEvent } = await getLastDocumentChainEventByDocumentId({
+    documentId,
+  });
+
+  const documentChainEvent = documentChain.removeShareDocumentDevice({
+    authorKeyPair: {
+      privateKey: mainDevice.signingPrivateKey,
+      publicKey: mainDevice.signingPublicKey,
+    },
+    signingPublicKey: deviceSigningPublicKey,
+    prevEvent: lastChainEvent,
+  });
+
   const result = await graphql.client.request(
     query,
     {
       input: {
-        token,
+        serializedDocumentChainEvent: JSON.stringify(documentChainEvent),
       },
     },
     authorizationHeaders
