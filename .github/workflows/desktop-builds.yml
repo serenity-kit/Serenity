@@ -30,6 +30,8 @@ jobs:
           node-version: 18
           cache: yarn
           architecture: ${{ matrix.architecture }}
+      - name: Install node-gyp # needed for apollo server
+        run: yarn global add node-gyp
       - name: Install dependencies
         run: yarn install --frozen-lockfile
       - name: Build Electron Web bundle
