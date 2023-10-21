@@ -2,7 +2,7 @@ import { useFocusEffect } from "@react-navigation/native";
 import { LocalDevice } from "@serenity-tools/common";
 import { CenterContent, InfoMessage, Spinner } from "@serenity-tools/ui";
 import { useActor, useInterpret, useMachine } from "@xstate/react";
-import { useMemo, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import sodium, { KeyPair } from "react-native-libsodium";
 import { SharePage } from "../../../components/sharePage/SharePage";
 import { PageProvider } from "../../../context/PageContext";
@@ -14,6 +14,7 @@ type SharePageContainerProps = RootStackScreenProps<"SharePage"> & {
   documentId: string;
   snapshotKey: string;
   shareDevice: LocalDevice;
+  reloadPage: () => void;
 };
 
 const SharePageContainer: React.FC<SharePageContainerProps> = ({
@@ -22,6 +23,7 @@ const SharePageContainer: React.FC<SharePageContainerProps> = ({
   navigation,
   snapshotKey,
   shareDevice,
+  reloadPage,
 }) => {
   const signatureKeyPair: KeyPair = useMemo(() => {
     return {
@@ -60,19 +62,18 @@ const SharePageContainer: React.FC<SharePageContainerProps> = ({
         route={route}
         // to force unmount and mount the page
         key={documentId}
-        updateTitle={() => {}}
         signatureKeyPair={signatureKeyPair}
         snapshotKey={snapshotKey}
+        reloadPage={reloadPage}
       />
     </PageProvider>
   );
 };
 
-export default function SharePageScreen(
-  props: RootStackScreenProps<"SharePage">
+function ActualSharePageScreen(
+  props: { reloadPage: () => void } & RootStackScreenProps<"SharePage">
 ) {
   const [key] = useState(window.location.hash.split("=")[1]);
-
   const [state, send] = useMachine(sharePageScreenMachine, {
     context: {
       virtualDeviceKey: key,
@@ -116,9 +117,27 @@ export default function SharePageScreen(
         navigation={props.navigation}
         route={props.route}
         shareDevice={state.context.device}
+        reloadPage={props.reloadPage}
       />
     );
   } else {
     throw new Error("Invalid UI state");
   }
+}
+
+export default function SharePageScreen(
+  props: RootStackScreenProps<"SharePage">
+) {
+  const pageId = props.route.params.pageId;
+  const [reloadCounter, setReloadCounter] = useState(0);
+  const reloadPage = useCallback(() => {
+    setReloadCounter((counter) => counter + 1);
+  }, [setReloadCounter]);
+  return (
+    <ActualSharePageScreen
+      key={`${pageId}-${reloadCounter}`}
+      {...props}
+      reloadPage={reloadPage}
+    />
+  );
 }
