@@ -1,6 +1,7 @@
-import React from "react";
 import { EmptyMessage, TableOfContentButton, tw } from "@serenity-tools/ui";
 import { Editor } from "@tiptap/react";
+import canonicalize from "canonicalize";
+import React, { Fragment } from "react";
 
 type Props = {
   editor: Editor | null;
@@ -21,12 +22,20 @@ export default function TableOfContents({ editor }: Props) {
         isEmpty = false;
 
         return (
-          <TableOfContentButton lvl={entry.attrs?.level}>
+          <TableOfContentButton
+            lvl={entry.attrs?.level}
+            // canonicalize creates stable results compared to JSON.stringify
+            key={`${canonicalize(entry.attrs)}-${index}`}
+          >
             {entry.content?.map((subEntry, index) => {
               if (subEntry.type !== "text") {
                 return null;
               }
-              return <>{subEntry.text}</>;
+              return (
+                <Fragment key={`${subEntry}-${index}`}>
+                  {subEntry.text}
+                </Fragment>
+              );
             })}
           </TableOfContentButton>
         );
