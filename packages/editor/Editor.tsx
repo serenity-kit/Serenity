@@ -284,6 +284,7 @@ export const Editor = (props: EditorProps) => {
             headingLevels={headingLevels}
             encryptAndUploadFile={props.encryptAndUploadFile}
             documentState={props.documentState}
+            editable={props.editable}
           />
 
           <BubbleMenu

@@ -211,7 +211,7 @@ export default function Editor({
         }}
         documentState={documentState}
       />
-      {!hasEditorSidebar && (
+      {!hasEditorSidebar && editable && (
         <View
           ref={editorBottombarWrapperRef}
           style={{
