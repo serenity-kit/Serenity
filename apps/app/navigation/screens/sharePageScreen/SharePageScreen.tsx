@@ -1,10 +1,19 @@
 import { useFocusEffect } from "@react-navigation/native";
 import { LocalDevice } from "@serenity-tools/common";
-import { CenterContent, InfoMessage, Spinner } from "@serenity-tools/ui";
+import {
+  CenterContent,
+  InfoMessage,
+  Spinner,
+  tw,
+  useIsPermanentLeftSidebar,
+} from "@serenity-tools/ui";
 import { useActor, useInterpret, useMachine } from "@xstate/react";
 import { useCallback, useMemo, useState } from "react";
+import { Drawer } from "react-native-drawer-layout";
 import sodium, { KeyPair } from "react-native-libsodium";
+import CommentsSidebar from "../../../components/commentsSidebar/CommentsSidebar";
 import { SharePage } from "../../../components/sharePage/SharePage";
+import { commentsDrawerWidth } from "../../../constants";
 import { PageProvider } from "../../../context/PageContext";
 import { commentsMachine } from "../../../machines/commentsMachine";
 import { RootStackScreenProps } from "../../../types/navigationProps";
@@ -37,11 +46,13 @@ const SharePageContainer: React.FC<SharePageContainerProps> = ({
     context: {
       params: {
         pageId: route.params.pageId,
+        shareLinkToken: route.params.token,
         activeDevice: shareDevice,
       },
     },
   });
   const [commentsState, send] = useActor(commentsService);
+  const isPermanentLeftSidebar = useIsPermanentLeftSidebar();
 
   return (
     <PageProvider
@@ -57,15 +68,43 @@ const SharePageContainer: React.FC<SharePageContainerProps> = ({
         },
       }}
     >
-      <SharePage
-        navigation={navigation}
-        route={route}
-        // to force unmount and mount the page
-        key={documentId}
-        signatureKeyPair={signatureKeyPair}
-        snapshotKey={snapshotKey}
-        reloadPage={reloadPage}
-      />
+      <Drawer
+        open={commentsState.context.isOpenSidebar}
+        onOpen={() => {
+          if (!commentsState.context.isOpenSidebar) {
+            send({ type: "OPEN_SIDEBAR" });
+          }
+        }}
+        onClose={() => {
+          if (commentsState.context.isOpenSidebar) {
+            send({ type: "CLOSE_SIDEBAR" });
+          }
+        }}
+        renderDrawerContent={() => {
+          return <CommentsSidebar />;
+        }}
+        drawerType="front"
+        drawerPosition="right"
+        overlayStyle={{
+          display: "none",
+        }}
+        drawerStyle={{
+          width: commentsDrawerWidth,
+          marginLeft: isPermanentLeftSidebar ? -commentsDrawerWidth : undefined,
+          borderLeftWidth: 1,
+          borderLeftColor: tw.color("gray-200"),
+        }}
+      >
+        <SharePage
+          navigation={navigation}
+          route={route}
+          // to force unmount and mount the page
+          key={documentId}
+          signatureKeyPair={signatureKeyPair}
+          snapshotKey={snapshotKey}
+          reloadPage={reloadPage}
+        />
+      </Drawer>
     </PageProvider>
   );
 };

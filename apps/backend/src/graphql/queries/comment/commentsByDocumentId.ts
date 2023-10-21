@@ -18,10 +18,9 @@ export const commentsByDocumentIdQuery = queryField((t) => {
           "Requested too many devices. First value exceeds 50."
         );
       }
-      if (!context.user) {
+      if (!context.user && typeof args.documentShareLinkToken !== "string") {
         throw new AuthenticationError("Not authenticated");
       }
-      const userId = context.user.id;
       const cursor = args.after ? { id: args.after } : undefined;
       // prisma will include the cursor if skip: 1 is not set
       // https://www.prisma.io/docs/concepts/components/prisma-client/pagination#do-i-always-have-to-skip-1
@@ -29,7 +28,7 @@ export const commentsByDocumentIdQuery = queryField((t) => {
       // include one extra project to set hasNextPage value
       const take: any = args.first ? args.first + 1 : undefined;
       const comments = await getCommentsByDocumentId({
-        userId,
+        userId: context.user?.id,
         documentId: args.documentId,
         documentShareLinkToken: args.documentShareLinkToken,
         cursor,

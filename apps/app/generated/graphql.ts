@@ -1614,6 +1614,7 @@ export type VerifyRegistrationMutation = { __typename?: 'Mutation', verifyRegist
 
 export type CommentsByDocumentIdQueryVariables = Exact<{
   documentId: Scalars['ID'];
+  documentShareLinkToken?: InputMaybe<Scalars['String']>;
   first?: InputMaybe<Scalars['Int']>;
   after?: InputMaybe<Scalars['String']>;
 }>;
@@ -2310,8 +2311,13 @@ export function useVerifyRegistrationMutation() {
   return Urql.useMutation<VerifyRegistrationMutation, VerifyRegistrationMutationVariables>(VerifyRegistrationDocument);
 };
 export const CommentsByDocumentIdDocument = gql`
-    query commentsByDocumentId($documentId: ID!, $first: Int = 50, $after: String) {
-  commentsByDocumentId(documentId: $documentId, first: $first, after: $after) {
+    query commentsByDocumentId($documentId: ID!, $documentShareLinkToken: String, $first: Int = 50, $after: String) {
+  commentsByDocumentId(
+    documentId: $documentId
+    documentShareLinkToken: $documentShareLinkToken
+    first: $first
+    after: $after
+  ) {
     nodes {
       id
       documentId

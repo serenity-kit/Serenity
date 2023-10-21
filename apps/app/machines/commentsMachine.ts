@@ -22,6 +22,7 @@ import { showToast } from "../utils/toast/showToast";
 type Params = {
   // these won't change
   pageId: string;
+  shareLinkToken?: string;
   activeDevice: LocalDevice | null;
 };
 
@@ -299,6 +300,7 @@ export const commentsMachine =
               commentsByDocumentIdQueryService(
                 {
                   documentId: context.params.pageId,
+                  documentShareLinkToken: context.params.shareLinkToken,
                 },
                 10000 // poll only every 10 seconds
               )
