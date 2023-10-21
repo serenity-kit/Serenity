@@ -146,24 +146,25 @@ export function PageShareModalContent() {
     }
   };
 
-  const deleteShareLinkPreflight = async () => {
+  const deleteShareLinkPreflight = async (
+    shareDeviceSigningPublicKey: string
+  ) => {
     const mainDevice = getMainDevice();
     if (mainDevice) {
-      await deleteShareLink();
+      await deleteShareLink(shareDeviceSigningPublicKey);
       return;
     } else {
+      setShareDeviceSigningPublicKeyToBeRemoved(shareDeviceSigningPublicKey);
       setIsPasswordModalVisibleForDeleteShareLink(true);
     }
   };
 
-  const deleteShareLink = async () => {
+  const deleteShareLink = async (shareDeviceSigningPublicKey: string) => {
     const mainDevice = getMainDevice();
     if (!mainDevice) {
       throw new Error("No active main device available");
     }
-    if (shareDeviceSigningPublicKeyToBeRemoved === null) {
-      throw new Error("shareDeviceSigningPublicKeyToBeRemoved not available");
-    }
+
     if (lastDocumentChainEvent === null) {
       throw new Error("Document chain not available");
     }
@@ -173,7 +174,7 @@ export function PageShareModalContent() {
         privateKey: mainDevice.signingPrivateKey,
         publicKey: mainDevice.signingPublicKey,
       },
-      signingPublicKey: shareDeviceSigningPublicKeyToBeRemoved,
+      signingPublicKey: shareDeviceSigningPublicKey,
       prevEvent: lastDocumentChainEvent,
     });
 
@@ -303,10 +304,7 @@ export function PageShareModalContent() {
                               name={"delete-bin-line"}
                               color={isDesktopDevice ? "gray-900" : "gray-700"}
                               onPress={() => {
-                                setShareDeviceSigningPublicKeyToBeRemoved(
-                                  signingPublicKey
-                                );
-                                deleteShareLinkPreflight();
+                                deleteShareLinkPreflight(signingPublicKey);
                               }}
                             />
                           }
@@ -332,8 +330,13 @@ export function PageShareModalContent() {
             isVisible={isPasswordModalVisibleForDeleteShareLink}
             description="Deleting a share link requires access to the main account and therefore verifying your password is required"
             onSuccess={() => {
+              if (shareDeviceSigningPublicKeyToBeRemoved === null) {
+                throw new Error(
+                  "ShareDeviceSigningPublicKeyToBeRemoved not defined"
+                );
+              }
               setIsPasswordModalVisibleForDeleteShareLink(false);
-              deleteShareLink();
+              deleteShareLink(shareDeviceSigningPublicKeyToBeRemoved);
             }}
             onCancel={() => {
               setIsPasswordModalVisibleForDeleteShareLink(false);
