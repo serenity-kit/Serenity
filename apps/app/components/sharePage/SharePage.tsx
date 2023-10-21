@@ -20,14 +20,14 @@ import * as Yjs from "yjs";
 import Editor from "../../components/editor/Editor";
 import { usePage } from "../../context/PageContext";
 import { DocumentState } from "../../types/documentState";
-import { RootStackScreenProps } from "../../types/navigationProps";
+import { SharePageDrawerScreenProps } from "../../types/navigationProps";
 import { useEditorStore } from "../../utils/editorStore/editorStore";
 import { getEnvironmentUrls } from "../../utils/getEnvironmentUrls/getEnvironmentUrls";
 import { showToast } from "../../utils/toast/showToast";
 import { PageLoadingError } from "../page/PageLoadingError";
 import { PageNoAccessError } from "../page/PageNoAccessError";
 
-type Props = RootStackScreenProps<"SharePage"> & {
+type Props = SharePageDrawerScreenProps<"SharePageContent"> & {
   signatureKeyPair: KeyPair;
   reloadPage: () => void;
   snapshotKey: string;

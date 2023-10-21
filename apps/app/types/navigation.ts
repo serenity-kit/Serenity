@@ -68,13 +68,17 @@ type LoginParams = {
   next: string;
 };
 
-type SharePageParamList = {
+type SharePageContentParams = {
   pageId: string;
   token: string;
 };
 
-export type SharePageParams = NavigatorScreenParams<SharePageParamList> &
-  SharePageParamList;
+export type SharePageDrawerParamList = {
+  SharePageContent: SharePageContentParams;
+};
+
+export type SharePageParams = NavigatorScreenParams<SharePageDrawerParamList> &
+  SharePageDrawerParamList;
 
 export type RootStackParamList = {
   Workspace: WorkspaceStackParams;

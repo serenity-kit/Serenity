@@ -8,23 +8,26 @@ import {
   useIsPermanentLeftSidebar,
 } from "@serenity-tools/ui";
 import { useActor, useInterpret, useMachine } from "@xstate/react";
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useLayoutEffect, useMemo, useState } from "react";
 import { Drawer } from "react-native-drawer-layout";
 import sodium, { KeyPair } from "react-native-libsodium";
 import CommentsSidebar from "../../../components/commentsSidebar/CommentsSidebar";
+import { PageHeader } from "../../../components/page/PageHeader";
+import { PageHeaderRight } from "../../../components/pageHeaderRight/PageHeaderRight";
 import { SharePage } from "../../../components/sharePage/SharePage";
 import { commentsDrawerWidth } from "../../../constants";
 import { PageProvider } from "../../../context/PageContext";
 import { commentsMachine } from "../../../machines/commentsMachine";
-import { RootStackScreenProps } from "../../../types/navigationProps";
+import { SharePageDrawerScreenProps } from "../../../types/navigationProps";
 import { sharePageScreenMachine } from "./sharePageScreenMachine";
 
-type SharePageContainerProps = RootStackScreenProps<"SharePage"> & {
-  documentId: string;
-  snapshotKey: string;
-  shareDevice: LocalDevice;
-  reloadPage: () => void;
-};
+type SharePageContainerProps =
+  SharePageDrawerScreenProps<"SharePageContent"> & {
+    documentId: string;
+    snapshotKey: string;
+    shareDevice: LocalDevice;
+    reloadPage: () => void;
+  };
 
 const SharePageContainer: React.FC<SharePageContainerProps> = ({
   documentId,
@@ -53,6 +56,27 @@ const SharePageContainer: React.FC<SharePageContainerProps> = ({
   });
   const [commentsState, send] = useActor(commentsService);
   const isPermanentLeftSidebar = useIsPermanentLeftSidebar();
+
+  useLayoutEffect(() => {
+    navigation.setOptions({
+      headerRight: () => (
+        <PageHeaderRight
+          toggleCommentsDrawer={() => {
+            send({ type: "TOGGLE_SIDEBAR" });
+          }}
+        />
+      ),
+      headerTitle: () => (
+        <PageHeader
+          toggleCommentsDrawer={() => {
+            send({ type: "TOGGLE_SIDEBAR" });
+          }}
+          isOpenSidebar={commentsState.context.isOpenSidebar}
+          hasNewComment={false} // not active for share links
+        />
+      ),
+    });
+  }, [commentsState]);
 
   return (
     <PageProvider
@@ -110,7 +134,9 @@ const SharePageContainer: React.FC<SharePageContainerProps> = ({
 };
 
 function ActualSharePageScreen(
-  props: { reloadPage: () => void } & RootStackScreenProps<"SharePage">
+  props: {
+    reloadPage: () => void;
+  } & SharePageDrawerScreenProps<"SharePageContent">
 ) {
   const [key] = useState(window.location.hash.split("=")[1]);
   const [state, send] = useMachine(sharePageScreenMachine, {
@@ -165,7 +191,7 @@ function ActualSharePageScreen(
 }
 
 export default function SharePageScreen(
-  props: RootStackScreenProps<"SharePage">
+  props: SharePageDrawerScreenProps<"SharePageContent">
 ) {
   const pageId = props.route.params.pageId;
   const [reloadCounter, setReloadCounter] = useState(0);
