@@ -1,23 +1,18 @@
 import { expect, Page } from "@playwright/test";
-import { Role } from "../../../../prisma/generated/output";
+import { ShareDocumentRole } from "@serenity-tools/common";
 import { prisma } from "../../../../src/database/prisma";
-import { getRoleAsString } from "../../../../src/utils/getRoleAsString";
 import { delayForSeconds } from "../../delayForSeconds";
 import { selectValueFromOptions } from "../utils/selectValueFromOptions";
 
 export type Props = {
   page: Page;
-  role: Role;
+  role: ShareDocumentRole;
 };
 export const createDocumentShareLink = async ({ page, role }: Props) => {
-  const roleAsString = getRoleAsString(role);
-  if (!roleAsString) {
-    throw new Error("Invalid role");
-  }
   await selectValueFromOptions({
     page,
     testID: "document-share-modal__select-role-menu",
-    value: roleAsString,
+    value: role,
   });
   const numLinksBefore = await prisma.documentShareLink.count();
   await page

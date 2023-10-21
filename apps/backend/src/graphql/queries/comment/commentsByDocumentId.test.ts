@@ -124,7 +124,7 @@ test("document share token", async () => {
     password,
   });
   const snapshotKey = sodium.to_base64(sodium.crypto_kdf_keygen());
-  const documentShareLinkResult = await createDocumentShareLink({
+  const { createDocumentShareLinkQueryResult } = await createDocumentShareLink({
     graphql,
     documentId: userData1.document.id,
     sharingRole: Role.VIEWER,
@@ -133,7 +133,7 @@ test("document share token", async () => {
     authorizationHeader: userData1.sessionKey,
   });
   const documentShareLinkToken =
-    documentShareLinkResult.createDocumentShareLink.token;
+    createDocumentShareLinkQueryResult.createDocumentShareLink.token;
   const result = await commentsByDocumentId({
     graphql,
     documentId: userData1.document.id,

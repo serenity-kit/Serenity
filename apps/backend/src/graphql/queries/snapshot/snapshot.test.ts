@@ -121,7 +121,7 @@ test("retrieve a snapshot", async () => {
 
 test("retrieve a snapshot from documentShareLinkToken", async () => {
   const authorizationHeader = userData1.sessionKey;
-  const documentShareLinkResult = await createDocumentShareLink({
+  const { createDocumentShareLinkQueryResult } = await createDocumentShareLink({
     graphql,
     documentId: userData1.document.id,
     sharingRole: Role.VIEWER,
@@ -133,7 +133,7 @@ test("retrieve a snapshot from documentShareLinkToken", async () => {
     graphql,
     documentId: userData1.document.id,
     documentShareLinkToken:
-      documentShareLinkResult.createDocumentShareLink.token,
+      createDocumentShareLinkQueryResult.createDocumentShareLink.token,
     authorizationHeader,
   });
   const snapshot = result.snapshot;

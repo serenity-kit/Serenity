@@ -35,7 +35,7 @@ const setup = async () => {
   const snapshotKeyData = createSnapshotKey({
     folderKey: folderKeyTrace.trace[folderKeyTrace.trace.length - 1].key,
   });
-  const createDocumentShareLinkResponse = await createDocumentShareLink({
+  const { createDocumentShareLinkQueryResult } = await createDocumentShareLink({
     graphql,
     documentId: userData.document.id,
     sharingRole: Role.VIEWER,
@@ -43,7 +43,7 @@ const setup = async () => {
     snapshotKey: snapshotKeyData.key,
     authorizationHeader: userData.sessionKey,
   });
-  token = createDocumentShareLinkResponse.createDocumentShareLink.token;
+  token = createDocumentShareLinkQueryResult.createDocumentShareLink.token;
 };
 beforeAll(async () => {
   await deleteAllRecords();

@@ -1,4 +1,5 @@
-import { AuthenticationError } from "apollo-server-express";
+import * as documentChain from "@serenity-kit/document-chain";
+import { AuthenticationError, UserInputError } from "apollo-server-express";
 import {
   arg,
   inputObjectType,
@@ -11,7 +12,7 @@ import { removeDocumentShareLink } from "../../../database/document/removeDocume
 export const RemoveDocumentShareLinkInput = inputObjectType({
   name: "RemoveDocumentShareLinkInput",
   definition(t) {
-    t.nonNull.string("token");
+    t.nonNull.string("serializedDocumentChainEvent");
   },
 });
 
@@ -37,9 +38,22 @@ export const removeDocumentLinkShareMutation = mutationField(
       if (!context.user) {
         throw new AuthenticationError("Not authenticated");
       }
+
+      const documentChainEvent =
+        documentChain.RemoveShareDocumentDeviceEvent.parse(
+          JSON.parse(args.input.serializedDocumentChainEvent)
+        );
+
+      if (
+        documentChainEvent.author.publicKey !==
+        context.user.mainDeviceSigningPublicKey
+      ) {
+        throw new UserInputError("Not the user's main device");
+      }
+
       await removeDocumentShareLink({
-        token: args.input.token,
-        sharerUserId: context.user.id,
+        userId: context.user.id,
+        documentChainEvent,
       });
       return {
         success: true,

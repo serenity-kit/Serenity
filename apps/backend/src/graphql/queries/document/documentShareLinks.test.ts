@@ -49,7 +49,7 @@ test("list share link", async () => {
   const snapshotKeyData = createSnapshotKey({
     folderKey: folderKeyTrace.trace[folderKeyTrace.trace.length - 1].key,
   });
-  const documentShareLinkResponse = await createDocumentShareLink({
+  const { createDocumentShareLinkQueryResult } = await createDocumentShareLink({
     graphql,
     documentId: userData1.document.id,
     sharingRole: Role.EDITOR,
@@ -57,7 +57,8 @@ test("list share link", async () => {
     snapshotKey: snapshotKeyData.key,
     authorizationHeader: userData1.sessionKey,
   });
-  const token = documentShareLinkResponse.createDocumentShareLink.token;
+  const token =
+    createDocumentShareLinkQueryResult.createDocumentShareLink.token;
 
   const documentShareLinks = await getDocumentShareLinks({
     documentId: userData1.document.id,

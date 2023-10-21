@@ -96,5 +96,8 @@ export const createDocumentShareLink = async ({
     },
     authorizationHeaders
   );
-  return result;
+  return {
+    createDocumentShareLinkQueryResult: result,
+    signingPublicKey: virtualDevice.signingPublicKey,
+  };
 };

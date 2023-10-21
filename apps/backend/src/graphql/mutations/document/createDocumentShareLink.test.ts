@@ -70,7 +70,7 @@ test("create editor share link", async () => {
   const snapshotKeyData = createSnapshotKey({
     folderKey: folderKeyTrace.trace[folderKeyTrace.trace.length - 1].key,
   });
-  const documentShareLinkResponse = await createDocumentShareLink({
+  const { createDocumentShareLinkQueryResult } = await createDocumentShareLink({
     graphql,
     documentId: userData1.document.id,
     sharingRole,
@@ -78,7 +78,8 @@ test("create editor share link", async () => {
     snapshotKey: snapshotKeyData.key,
     authorizationHeader: userData1.sessionKey,
   });
-  const documentShareLink = documentShareLinkResponse.createDocumentShareLink;
+  const documentShareLink =
+    createDocumentShareLinkQueryResult.createDocumentShareLink;
   expect(typeof documentShareLink.token).toBe("string");
 });
 
@@ -92,7 +93,7 @@ test("create commenter share link", async () => {
   const snapshotKeyData = createSnapshotKey({
     folderKey: folderKeyTrace.trace[folderKeyTrace.trace.length - 1].key,
   });
-  const documentShareLinkResponse = await createDocumentShareLink({
+  const { createDocumentShareLinkQueryResult } = await createDocumentShareLink({
     graphql,
     documentId: userData1.document.id,
     sharingRole,
@@ -100,7 +101,8 @@ test("create commenter share link", async () => {
     snapshotKey: snapshotKeyData.key,
     authorizationHeader: userData1.sessionKey,
   });
-  const documentShareLink = documentShareLinkResponse.createDocumentShareLink;
+  const documentShareLink =
+    createDocumentShareLinkQueryResult.createDocumentShareLink;
   expect(typeof documentShareLink.token).toBe("string");
 });
 
@@ -114,7 +116,7 @@ test("create viewer share link", async () => {
   const snapshotKeyData = createSnapshotKey({
     folderKey: folderKeyTrace.trace[folderKeyTrace.trace.length - 1].key,
   });
-  const documentShareLinkResponse = await createDocumentShareLink({
+  const { createDocumentShareLinkQueryResult } = await createDocumentShareLink({
     graphql,
     documentId: userData1.document.id,
     sharingRole,
@@ -122,7 +124,8 @@ test("create viewer share link", async () => {
     snapshotKey: snapshotKeyData.key,
     authorizationHeader: userData1.sessionKey,
   });
-  const documentShareLink = documentShareLinkResponse.createDocumentShareLink;
+  const documentShareLink =
+    createDocumentShareLinkQueryResult.createDocumentShareLink;
   expect(typeof documentShareLink.token).toBe("string");
 });
 

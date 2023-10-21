@@ -1025,7 +1025,7 @@ export type QueryWorkspacesArgs = {
 };
 
 export type RemoveDocumentShareLinkInput = {
-  token: Scalars['String'];
+  serializedDocumentChainEvent: Scalars['String'];
 };
 
 export type RemoveDocumentShareLinkResult = {

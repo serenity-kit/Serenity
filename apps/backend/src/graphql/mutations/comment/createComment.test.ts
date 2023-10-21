@@ -62,7 +62,7 @@ test("shared editor comments", async () => {
     password: "password",
   });
   const snapshotKey = sodium.to_base64(sodium.crypto_kdf_keygen());
-  const documentShareLinkResult = await createDocumentShareLink({
+  const { createDocumentShareLinkQueryResult } = await createDocumentShareLink({
     graphql,
     documentId: userData1.document.id,
     sharingRole: Role.EDITOR,
@@ -71,7 +71,7 @@ test("shared editor comments", async () => {
     authorizationHeader: userData1.sessionKey,
   });
   const documentShareLinkToken =
-    documentShareLinkResult.createDocumentShareLink.token;
+    createDocumentShareLinkQueryResult.createDocumentShareLink.token;
   const createCommentResult = await createComment({
     graphql,
     snapshotId: snapshotId1,
@@ -103,7 +103,7 @@ test("shared commentor comments", async () => {
     password: "password",
   });
   const snapshotKey = sodium.to_base64(sodium.crypto_kdf_keygen());
-  const documentShareLinkResult = await createDocumentShareLink({
+  const { createDocumentShareLinkQueryResult } = await createDocumentShareLink({
     graphql,
     documentId: userData1.document.id,
     sharingRole: Role.COMMENTER,
@@ -112,7 +112,7 @@ test("shared commentor comments", async () => {
     authorizationHeader: userData1.sessionKey,
   });
   const documentShareLinkToken =
-    documentShareLinkResult.createDocumentShareLink.token;
+    createDocumentShareLinkQueryResult.createDocumentShareLink.token;
   const createCommentResult = await createComment({
     graphql,
     snapshotId: snapshotId1,
@@ -144,7 +144,7 @@ test("shared viewer cannot comment", async () => {
     password: "password",
   });
   const snapshotKey = sodium.to_base64(sodium.crypto_kdf_keygen());
-  const documentShareLinkResult = await createDocumentShareLink({
+  const { createDocumentShareLinkQueryResult } = await createDocumentShareLink({
     graphql,
     documentId: userData1.document.id,
     sharingRole: Role.VIEWER,
@@ -153,7 +153,7 @@ test("shared viewer cannot comment", async () => {
     authorizationHeader: userData1.sessionKey,
   });
   const documentShareLinkToken =
-    documentShareLinkResult.createDocumentShareLink.token;
+    createDocumentShareLinkQueryResult.createDocumentShareLink.token;
   await expect(
     (async () =>
       await createComment({

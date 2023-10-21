@@ -267,7 +267,7 @@ test("editor share token", async () => {
     password: "password",
   });
   const snapshotKey = sodium.to_base64(sodium.crypto_kdf_keygen());
-  const documentShareLinkResult = await createDocumentShareLink({
+  const { createDocumentShareLinkQueryResult } = await createDocumentShareLink({
     graphql,
     documentId: userData1.document.id,
     sharingRole: Role.EDITOR,
@@ -279,7 +279,7 @@ test("editor share token", async () => {
     where: { documentId: userData1.document.id },
   });
   const documentShareLinkToken =
-    documentShareLinkResult.createDocumentShareLink.token;
+    createDocumentShareLinkQueryResult.createDocumentShareLink.token;
   const deleteCommentsResult = await deleteComments({
     graphql,
     commentIds: [comment.id],
@@ -310,7 +310,7 @@ test("commenter share token", async () => {
     password: "password",
   });
   const snapshotKey = sodium.to_base64(sodium.crypto_kdf_keygen());
-  const documentShareLinkResult = await createDocumentShareLink({
+  const { createDocumentShareLinkQueryResult } = await createDocumentShareLink({
     graphql,
     documentId: userData1.document.id,
     sharingRole: Role.COMMENTER,
@@ -319,7 +319,7 @@ test("commenter share token", async () => {
     authorizationHeader: userData1.sessionKey,
   });
   const documentShareLinkToken =
-    documentShareLinkResult.createDocumentShareLink.token;
+    createDocumentShareLinkQueryResult.createDocumentShareLink.token;
   await expect(
     (async () => {
       await deleteComments({
@@ -349,7 +349,7 @@ test("viewer share token can't delete", async () => {
     password: "password",
   });
   const snapshotKey = sodium.to_base64(sodium.crypto_kdf_keygen());
-  const documentShareLinkResult = await createDocumentShareLink({
+  const { createDocumentShareLinkQueryResult } = await createDocumentShareLink({
     graphql,
     documentId: userData1.document.id,
     sharingRole: Role.COMMENTER,
@@ -358,7 +358,7 @@ test("viewer share token can't delete", async () => {
     authorizationHeader: userData1.sessionKey,
   });
   const documentShareLinkToken =
-    documentShareLinkResult.createDocumentShareLink.token;
+    createDocumentShareLinkQueryResult.createDocumentShareLink.token;
   await expect(
     (async () => {
       await deleteComments({

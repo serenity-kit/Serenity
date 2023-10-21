@@ -79,7 +79,7 @@ test("shared editor responds to comment", async () => {
     password: "password",
   });
   const snapshotKey = sodium.to_base64(sodium.crypto_kdf_keygen());
-  const documentShareLinkResult = await createDocumentShareLink({
+  const { createDocumentShareLinkQueryResult } = await createDocumentShareLink({
     graphql,
     documentId: userData1.document.id,
     sharingRole: Role.EDITOR,
@@ -88,7 +88,7 @@ test("shared editor responds to comment", async () => {
     authorizationHeader: userData1.sessionKey,
   });
   const documentShareLinkToken =
-    documentShareLinkResult.createDocumentShareLink.token;
+    createDocumentShareLinkQueryResult.createDocumentShareLink.token;
   const createCommentReplyResult = await createCommentReply({
     graphql,
     commentId: comment.id,
@@ -121,7 +121,7 @@ test("shared commenter responds to comment", async () => {
     password: "password",
   });
   const snapshotKey = sodium.to_base64(sodium.crypto_kdf_keygen());
-  const documentShareLinkResult = await createDocumentShareLink({
+  const { createDocumentShareLinkQueryResult } = await createDocumentShareLink({
     graphql,
     documentId: userData1.document.id,
     sharingRole: Role.COMMENTER,
@@ -130,7 +130,7 @@ test("shared commenter responds to comment", async () => {
     authorizationHeader: userData1.sessionKey,
   });
   const documentShareLinkToken =
-    documentShareLinkResult.createDocumentShareLink.token;
+    createDocumentShareLinkQueryResult.createDocumentShareLink.token;
   const createCommentReplyResult = await createCommentReply({
     graphql,
     commentId: comment.id,
@@ -163,7 +163,7 @@ test("shared viewer cannot respond to comment", async () => {
     password: "password",
   });
   const snapshotKey = sodium.to_base64(sodium.crypto_kdf_keygen());
-  const documentShareLinkResult = await createDocumentShareLink({
+  const { createDocumentShareLinkQueryResult } = await createDocumentShareLink({
     graphql,
     documentId: userData1.document.id,
     sharingRole: Role.VIEWER,
@@ -172,7 +172,7 @@ test("shared viewer cannot respond to comment", async () => {
     authorizationHeader: userData1.sessionKey,
   });
   const documentShareLinkToken =
-    documentShareLinkResult.createDocumentShareLink.token;
+    createDocumentShareLinkQueryResult.createDocumentShareLink.token;
   await expect(
     (async () =>
       await createCommentReply({

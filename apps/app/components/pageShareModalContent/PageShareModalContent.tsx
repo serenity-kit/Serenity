@@ -59,7 +59,18 @@ export function PageShareModalContent() {
   const [sharingRole, setSharingRole] = useState<ShareDocumentRole>("VIEWER");
   const documentState = useEditorStore((state) => state.documentState);
   const snapshotKey = useEditorStore((state) => state.snapshotKey);
-  const [isPasswordModalVisible, setIsPasswordModalVisible] = useState(false);
+  const [
+    isPasswordModalVisibleForCreateShareLink,
+    setIsPasswordModalVisibleForCreateShareLink,
+  ] = useState(false);
+  const [
+    isPasswordModalVisibleForDeleteShareLink,
+    setIsPasswordModalVisibleForDeleteShareLink,
+  ] = useState(false);
+  const [
+    shareDeviceSigningPublicKeyToBeRemoved,
+    setShareDeviceSigningPublicKeyToBeRemoved,
+  ] = useState<null | string>(null);
 
   const [documentChainQueryResult, refetchDocumentChainQuery] =
     useDocumentChainQuery({
@@ -99,7 +110,7 @@ export function PageShareModalContent() {
       await createShareLink(sharingRole);
       return;
     } else {
-      setIsPasswordModalVisible(true);
+      setIsPasswordModalVisibleForCreateShareLink(true);
     }
   };
 
@@ -135,9 +146,43 @@ export function PageShareModalContent() {
     }
   };
 
-  const removeShareLink = async (token: string) => {
+  const deleteShareLinkPreflight = async () => {
+    const mainDevice = getMainDevice();
+    if (mainDevice) {
+      await deleteShareLink();
+      return;
+    } else {
+      setIsPasswordModalVisibleForDeleteShareLink(true);
+    }
+  };
+
+  const deleteShareLink = async () => {
+    const mainDevice = getMainDevice();
+    if (!mainDevice) {
+      throw new Error("No active main device available");
+    }
+    if (shareDeviceSigningPublicKeyToBeRemoved === null) {
+      throw new Error("shareDeviceSigningPublicKeyToBeRemoved not available");
+    }
+    if (lastDocumentChainEvent === null) {
+      throw new Error("Document chain not available");
+    }
+
+    const documentChainEvent = documentChain.removeShareDocumentDevice({
+      authorKeyPair: {
+        privateKey: mainDevice.signingPrivateKey,
+        publicKey: mainDevice.signingPublicKey,
+      },
+      signingPublicKey: shareDeviceSigningPublicKeyToBeRemoved,
+      prevEvent: lastDocumentChainEvent,
+    });
+
     const removeDocumentShareLink = await runRemoveDocumentShareLinkMutation(
-      { input: { token } },
+      {
+        input: {
+          serializedDocumentChainEvent: JSON.stringify(documentChainEvent),
+        },
+      },
       {}
     );
     if (!removeDocumentShareLink.data?.removeDocumentShareLink?.success) {
@@ -258,8 +303,10 @@ export function PageShareModalContent() {
                               name={"delete-bin-line"}
                               color={isDesktopDevice ? "gray-900" : "gray-700"}
                               onPress={() => {
-                                // TODO delete documentShareLink
-                                // removeShareLink(documentShareLink.token);
+                                setShareDeviceSigningPublicKeyToBeRemoved(
+                                  signingPublicKey
+                                );
+                                deleteShareLinkPreflight();
                               }}
                             />
                           }
@@ -271,14 +318,25 @@ export function PageShareModalContent() {
             </FormWrapper>
           )}
           <VerifyPasswordModal
-            isVisible={isPasswordModalVisible}
+            isVisible={isPasswordModalVisibleForCreateShareLink}
             description="Creating a share link requires access to the main account and therefore verifying your password is required"
             onSuccess={() => {
-              setIsPasswordModalVisible(false);
+              setIsPasswordModalVisibleForCreateShareLink(false);
               createShareLink(sharingRole);
             }}
             onCancel={() => {
-              setIsPasswordModalVisible(false);
+              setIsPasswordModalVisibleForCreateShareLink(false);
+            }}
+          />
+          <VerifyPasswordModal
+            isVisible={isPasswordModalVisibleForDeleteShareLink}
+            description="Deleting a share link requires access to the main account and therefore verifying your password is required"
+            onSuccess={() => {
+              setIsPasswordModalVisibleForDeleteShareLink(false);
+              deleteShareLink();
+            }}
+            onCancel={() => {
+              setIsPasswordModalVisibleForDeleteShareLink(false);
             }}
           />
         </>
