@@ -69,7 +69,7 @@ type LoginParams = {
 };
 
 type SharePageParamList = {
-  documentId: string;
+  pageId: string;
   token: string;
 };
 

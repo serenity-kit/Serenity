@@ -269,8 +269,6 @@ export default function Page({
     }, 6000);
 
     async function initDocument() {
-      await sodium.ready;
-
       const localDocument = await getLocalDocument(docId);
       if (localDocument) {
         Yjs.applyUpdateV2(
