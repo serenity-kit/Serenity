@@ -128,7 +128,6 @@ export const SharePage: React.FC<Props> = ({
   }, [state.context._documentDecryptionState]);
 
   useEffect(() => {
-    console.warn(state.context._ephemeralMessageReceivingErrors);
     if (state.context._ephemeralMessageReceivingErrors.length > 0) {
       const now = new Date(); // Current date and time
       const fiveMinInMs = 60000 * 5;
