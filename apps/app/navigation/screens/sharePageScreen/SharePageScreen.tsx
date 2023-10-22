@@ -106,7 +106,7 @@ const SharePageContainer: React.FC<SharePageContainerProps> = ({
           }
         }}
         renderDrawerContent={() => {
-          return <CommentsSidebar />;
+          return <CommentsSidebar canComment={false} />;
         }}
         drawerType="front"
         drawerPosition="right"
