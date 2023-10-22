@@ -21,6 +21,7 @@ import { EditorLoading } from "../../../components/editorLoading/EditorLoading";
 import { PageHeader } from "../../../components/page/PageHeader";
 import { PageNoAccessError } from "../../../components/page/PageNoAccessError";
 import { PageHeaderRight } from "../../../components/pageHeaderRight/PageHeaderRight";
+import { commentsDrawerWidth } from "../../../constants";
 import { PageProvider } from "../../../context/PageContext";
 import { commentsMachine } from "../../../machines/commentsMachine";
 import {
@@ -31,8 +32,6 @@ import { useFolderKeyStore } from "../../../utils/folder/folderKeyStore";
 import { useOpenFolderStore } from "../../../utils/folder/openFolderStore";
 import { setLastUsedDocumentId } from "../../../utils/lastUsedWorkspaceAndDocumentStore/lastUsedWorkspaceAndDocumentStore";
 import { loadPageMachine } from "./loadPageMachine";
-
-const drawerWidth = 240;
 
 const ActualPageScreen = (
   props: WorkspaceDrawerScreenProps<"Page"> & {
@@ -73,6 +72,7 @@ const ActualPageScreen = (
           toggleCommentsDrawer={() => {
             send({ type: "TOGGLE_SIDEBAR" });
           }}
+          hasShareButton={true} // TODO only true for ADMIN and EDITOR
         />
       ),
       headerTitle: () => (
@@ -158,8 +158,10 @@ const ActualPageScreen = (
             display: "none",
           }}
           drawerStyle={{
-            width: drawerWidth,
-            marginLeft: isPermanentLeftSidebar ? -drawerWidth : undefined,
+            width: commentsDrawerWidth,
+            marginLeft: isPermanentLeftSidebar
+              ? -commentsDrawerWidth
+              : undefined,
             borderLeftWidth: 1,
             borderLeftColor: tw.color("gray-200"),
           }}

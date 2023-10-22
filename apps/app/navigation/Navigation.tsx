@@ -75,6 +75,7 @@ import WorkspaceSettingsMobileOverviewScreen from "./screens/workspaceSettingsMo
 const Stack = createNativeStackNavigator<RootStackParamList>();
 const WorkspaceStack = createNativeStackNavigator<WorkspaceStackParamList>();
 const WorkspaceDrawer = createDrawerNavigator();
+const SharePageDrawer = createDrawerNavigator();
 const AccountSettingsDrawer = createDrawerNavigator(); // for desktop and tablet
 const WorkspaceSettingsDrawer = createDrawerNavigator(); // for desktop and tablet
 
@@ -140,6 +141,44 @@ function WorkspaceDrawerNavigator(props) {
         options={{ headerShown: false }}
       />
     </WorkspaceDrawer.Navigator>
+  );
+}
+
+function SharePageDrawerScreen(props) {
+  const isPermanentLeftSidebar = useIsPermanentLeftSidebar();
+  const isDesktopDevice = useIsDesktopDevice();
+  const { width } = useWindowDimensions();
+
+  return (
+    <SharePageDrawer.Navigator
+      drawerContent={(drawerProps) => <div>Hello World</div>}
+      screenOptions={{
+        unmountOnBlur: true,
+        drawerType: isPermanentLeftSidebar ? "permanent" : "front",
+        drawerStyle: { width: isDesktopDevice ? drawerWidth : width },
+        headerShown: true,
+        headerTitle: (props) => <Text>{props.children}</Text>,
+        headerStyle: [styles.header],
+        // headerLeft: () => <PageHeaderLeft navigation={props.navigation} />,
+        headerLeftContainerStyle: {
+          flex: 1,
+        },
+        headerRightContainerStyle: {
+          flexBasis: isDesktopDevice ? drawerWidth : 0,
+          flexGrow: isDesktopDevice ? 0 : 1,
+        },
+        overlayColor:
+          !isPermanentLeftSidebar && isDesktopDevice
+            ? tw.color("backdrop")
+            : "transparent",
+      }}
+    >
+      <SharePageDrawer.Screen
+        name="SharePageContent"
+        component={SharePageScreen}
+        options={{ title: "" }}
+      />
+    </SharePageDrawer.Navigator>
   );
 }
 
@@ -419,7 +458,7 @@ function RootNavigator() {
         />
         <Stack.Screen
           name="SharePage"
-          component={SharePageScreen}
+          component={SharePageDrawerScreen}
           options={{ headerShown: false }}
         />
         <Stack.Screen
@@ -560,7 +599,12 @@ const getLinking = (
         AcceptWorkspaceInvitation:
           "accept-workspace-invitation/:workspaceInvitationId",
         TestLibsodium: "test-libsodium",
-        SharePage: "page/:pageId/:token",
+        SharePage: {
+          path: "page",
+          screens: {
+            SharePageContent: "/:pageId/:token",
+          },
+        },
         WorkspaceNotFound: "workspace/:workspaceId/not-found",
         ...accountSettings,
         Root: "",

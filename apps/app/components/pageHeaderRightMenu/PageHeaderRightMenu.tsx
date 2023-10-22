@@ -4,6 +4,7 @@ import { useState } from "react";
 type Props = {
   onSharePressed: () => void;
   onCommentsPressed: () => void;
+  hasShareButton: boolean;
 };
 
 export default function PageHeaderRightMenu(props: Props) {
@@ -32,15 +33,17 @@ export default function PageHeaderRightMenu(props: Props) {
         ></IconButton>
       }
     >
-      <MenuButton
-        onPress={() => {
-          setIsOpenMenu(false);
-          props.onSharePressed();
-        }}
-        iconName={"share-line"}
-      >
-        Share
-      </MenuButton>
+      {props.hasShareButton ? (
+        <MenuButton
+          onPress={() => {
+            setIsOpenMenu(false);
+            props.onSharePressed();
+          }}
+          iconName={"share-line"}
+        >
+          Share
+        </MenuButton>
+      ) : null}
       <MenuButton
         onPress={() => {
           setIsOpenMenu(false);

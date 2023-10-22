@@ -33,6 +33,7 @@ type EditorSidebarProps = {
   headingLevels: Level[];
   encryptAndUploadFile: EncryptAndUploadFunctionFile;
   documentState: DocumentState;
+  editable: boolean;
 };
 
 export default function EditorSidebar({
@@ -40,13 +41,14 @@ export default function EditorSidebar({
   headingLevels,
   encryptAndUploadFile,
   documentState,
+  editable,
 }: EditorSidebarProps) {
   const [activeTab, setActiveTab] = React.useState<
     "editing" | "tableOfContents"
   >("editing");
 
   const muteHeading = documentState !== "active";
-  const disableButton = documentState !== "active";
+  const disableButton = documentState !== "active" || editable === false;
   const disableTab = documentState === "loading";
 
   return (

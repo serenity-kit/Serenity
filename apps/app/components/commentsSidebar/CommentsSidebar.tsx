@@ -1,9 +1,9 @@
 import {
-  VerticalDivider,
   EditorSidebarHeader,
-  Text,
-  tw,
   EmptyMessage,
+  Text,
+  VerticalDivider,
+  tw,
 } from "@serenity-tools/ui";
 import { useActor } from "@xstate/react";
 import { HStack } from "native-base";
@@ -92,8 +92,7 @@ const CommentsSidebar: React.FC = () => {
     }
   });
 
-  const me = meResult.data?.me;
-  if (!me) return null;
+  const me = meResult.data?.me || { id: "unknown", username: "Unknown" };
 
   return (
     <FlatList

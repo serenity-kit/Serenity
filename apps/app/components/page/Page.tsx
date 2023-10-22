@@ -269,8 +269,6 @@ export default function Page({
     }, 6000);
 
     async function initDocument() {
-      await sodium.ready;
-
       const localDocument = await getLocalDocument(docId);
       if (localDocument) {
         Yjs.applyUpdateV2(
@@ -341,7 +339,6 @@ export default function Page({
   }, [state.context._documentDecryptionState]);
 
   useEffect(() => {
-    console.warn(state.context._ephemeralMessageReceivingErrors);
     if (state.context._ephemeralMessageReceivingErrors.length > 0) {
       const now = new Date(); // Current date and time
       const fiveMinInMs = 60000 * 5;
