@@ -84,7 +84,7 @@ export const sharePageScreenMachine =
             id: "decryptVirtualDevice",
             onDone: [
               {
-                target: "deviceDecrypte",
+                target: "deviceDecrypt",
                 actions: assign({
                   device: (context, event) => {
                     return event.data;
@@ -100,7 +100,7 @@ export const sharePageScreenMachine =
           },
         },
         noAccess: {},
-        deviceDecrypte: {
+        deviceDecrypt: {
           invoke: {
             src: "decryptSnapshotKey",
             id: "decryptSnapshotKey",

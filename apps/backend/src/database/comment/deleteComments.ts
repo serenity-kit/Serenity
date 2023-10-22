@@ -100,40 +100,20 @@ export async function deleteComments({
         }
       });
 
-      // Also allow the user to delete comments if they have
-      // edit rights from a documentShareLinkToken or
-      // if they were the creator of the comment and still have access
+      // allow a documentShareLinkToken to delete a comment if they
+      // were the creator of the comment and still have access
       if (documentShareLinkToken) {
-        const privilegedDocumentShareLink =
-          await prisma.documentShareLink.findFirst({
-            where: {
-              token: documentShareLinkToken,
-              role: { in: privilegedRoles },
-            },
-          });
-        if (privilegedDocumentShareLink) {
-          requestedComments.forEach((requestedComment) => {
-            if (
-              requestedComment.document.id ===
-              privilegedDocumentShareLink.documentId
-            ) {
-              deletableCommentIds.push(requestedComment.id);
-            }
-          });
-        }
-        const userDocumentShareLink = await prisma.documentShareLink.findFirst({
+        const documentShareLink = await prisma.documentShareLink.findFirst({
           where: {
             token: documentShareLinkToken,
-            role: { in: userRoles },
           },
         });
-        if (userDocumentShareLink) {
+        if (documentShareLink) {
           requestedComments.forEach((requestedComment) => {
             if (
-              requestedComment.document.id ===
-                userDocumentShareLink.documentId &&
+              requestedComment.document.id === documentShareLink.documentId &&
               requestedComment.creatorDeviceSigningPublicKey ===
-                userDocumentShareLink.deviceSigningPublicKey
+                documentShareLink.deviceSigningPublicKey
             ) {
               deletableCommentIds.push(requestedComment.id);
             }

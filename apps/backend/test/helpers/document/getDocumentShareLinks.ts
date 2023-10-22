@@ -19,7 +19,6 @@ export const getDocumentShareLinks = async ({
       documentShareLinks(documentId: $documentId, first: $first) {
         nodes {
           token
-          role
         }
         pageInfo {
           hasNextPage

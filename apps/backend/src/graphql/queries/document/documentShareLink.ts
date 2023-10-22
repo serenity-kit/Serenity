@@ -1,10 +1,10 @@
 import { idArg, nonNull, queryField } from "nexus";
 import { getDocumentShareLink } from "../../../database/document/getDocumentShareLink";
-import { DocumentShareLink } from "../../types/documentShareLink";
+import { DocumentShareLinkForSharePage } from "../../types/documentShareLink";
 
 export const documentShareLinkQuery = queryField((t) => {
   t.field("documentShareLink", {
-    type: DocumentShareLink,
+    type: DocumentShareLinkForSharePage,
     args: {
       token: nonNull(idArg()),
     },

@@ -1,6 +1,8 @@
 query documentShareLink($token: ID!) {
   documentShareLink(token: $token) {
     token
+    websocketSessionKey
+    workspaceId
     role
     deviceSecretBoxCiphertext
     deviceSecretBoxNonce

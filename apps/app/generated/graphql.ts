@@ -400,13 +400,7 @@ export type DocumentEdge = {
 
 export type DocumentShareLink = {
   __typename?: 'DocumentShareLink';
-  deviceEncryptionPublicKey: Scalars['String'];
-  deviceEncryptionPublicKeySignature: Scalars['String'];
-  deviceSecretBoxCiphertext: Scalars['String'];
-  deviceSecretBoxNonce: Scalars['String'];
   deviceSigningPublicKey: Scalars['String'];
-  role: Role;
-  snapshotKeyBoxs?: Maybe<Array<SnapshotKeyBox>>;
   token: Scalars['String'];
 };
 
@@ -426,6 +420,20 @@ export type DocumentShareLinkEdge = {
   cursor: Scalars['String'];
   /** https://facebook.github.io/relay/graphql/connections.htm#sec-Node */
   node?: Maybe<DocumentShareLink>;
+};
+
+export type DocumentShareLinkForSharePage = {
+  __typename?: 'DocumentShareLinkForSharePage';
+  deviceEncryptionPublicKey: Scalars['String'];
+  deviceEncryptionPublicKeySignature: Scalars['String'];
+  deviceSecretBoxCiphertext: Scalars['String'];
+  deviceSecretBoxNonce: Scalars['String'];
+  deviceSigningPublicKey: Scalars['String'];
+  role: ShareDocumentRole;
+  snapshotKeyBoxs?: Maybe<Array<SnapshotKeyBox>>;
+  token: Scalars['String'];
+  websocketSessionKey: Scalars['String'];
+  workspaceId: Scalars['String'];
 };
 
 export type DocumentSnapshotInput = {
@@ -825,7 +833,7 @@ export type Query = {
   document?: Maybe<Document>;
   documentChain?: Maybe<DocumentChainEventConnection>;
   documentPath?: Maybe<Array<Maybe<Folder>>>;
-  documentShareLink?: Maybe<DocumentShareLink>;
+  documentShareLink?: Maybe<DocumentShareLinkForSharePage>;
   documentShareLinks?: Maybe<DocumentShareLinkConnection>;
   documents?: Maybe<DocumentConnection>;
   fileUrl?: Maybe<File>;
@@ -1047,6 +1055,12 @@ export type RemoveMemberAndRotateWorkspaceKeyResult = {
 
 export enum Role {
   Admin = 'ADMIN',
+  Commenter = 'COMMENTER',
+  Editor = 'EDITOR',
+  Viewer = 'VIEWER'
+}
+
+export enum ShareDocumentRole {
   Commenter = 'COMMENTER',
   Editor = 'EDITOR',
   Viewer = 'VIEWER'
@@ -1657,7 +1671,7 @@ export type DocumentShareLinkQueryVariables = Exact<{
 }>;
 
 
-export type DocumentShareLinkQuery = { __typename?: 'Query', documentShareLink?: { __typename?: 'DocumentShareLink', token: string, role: Role, deviceSecretBoxCiphertext: string, deviceSecretBoxNonce: string, snapshotKeyBoxs?: Array<{ __typename?: 'SnapshotKeyBox', id: string, ciphertext: string, nonce: string, creatorDevice: { __typename?: 'CreatorDevice', signingPublicKey: string, encryptionPublicKey: string } }> | null } | null };
+export type DocumentShareLinkQuery = { __typename?: 'Query', documentShareLink?: { __typename?: 'DocumentShareLinkForSharePage', token: string, websocketSessionKey: string, workspaceId: string, role: ShareDocumentRole, deviceSecretBoxCiphertext: string, deviceSecretBoxNonce: string, snapshotKeyBoxs?: Array<{ __typename?: 'SnapshotKeyBox', id: string, ciphertext: string, nonce: string, creatorDevice: { __typename?: 'CreatorDevice', signingPublicKey: string, encryptionPublicKey: string } }> | null } | null };
 
 export type DocumentShareLinksQueryVariables = Exact<{
   documentId: Scalars['ID'];
@@ -2436,6 +2450,8 @@ export const DocumentShareLinkDocument = gql`
     query documentShareLink($token: ID!) {
   documentShareLink(token: $token) {
     token
+    websocketSessionKey
+    workspaceId
     role
     deviceSecretBoxCiphertext
     deviceSecretBoxNonce

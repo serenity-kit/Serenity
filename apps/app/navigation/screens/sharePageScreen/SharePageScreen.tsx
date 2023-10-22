@@ -1,5 +1,5 @@
 import { useFocusEffect } from "@react-navigation/native";
-import { LocalDevice } from "@serenity-tools/common";
+import { LocalDevice, ShareDocumentRole } from "@serenity-tools/common";
 import {
   CenterContent,
   InfoMessage,
@@ -27,6 +27,9 @@ type SharePageContainerProps =
     snapshotKey: string;
     shareDevice: LocalDevice;
     reloadPage: () => void;
+    workspaceId: string;
+    websocketSessionKey: string;
+    role: ShareDocumentRole;
   };
 
 const SharePageContainer: React.FC<SharePageContainerProps> = ({
@@ -36,6 +39,9 @@ const SharePageContainer: React.FC<SharePageContainerProps> = ({
   snapshotKey,
   shareDevice,
   reloadPage,
+  workspaceId,
+  websocketSessionKey,
+  role,
 }) => {
   const signatureKeyPair: KeyPair = useMemo(() => {
     return {
@@ -126,8 +132,11 @@ const SharePageContainer: React.FC<SharePageContainerProps> = ({
           // to force unmount and mount the page
           key={documentId}
           signatureKeyPair={signatureKeyPair}
+          websocketSessionKey={websocketSessionKey}
+          workspaceId={workspaceId}
           snapshotKey={snapshotKey}
           reloadPage={reloadPage}
+          role={role}
         />
       </Drawer>
     </PageProvider>
@@ -175,7 +184,11 @@ function ActualSharePageScreen(
         </InfoMessage>
       </CenterContent>
     );
-  } else if (state.context.snapshotKey && state.context.device) {
+  } else if (
+    state.context.snapshotKey &&
+    state.context.device &&
+    state.context.documentShareLinkQueryResult?.data?.documentShareLink
+  ) {
     return (
       <SharePageContainer
         documentId={props.route.params.pageId}
@@ -184,6 +197,17 @@ function ActualSharePageScreen(
         route={props.route}
         shareDevice={state.context.device}
         reloadPage={props.reloadPage}
+        workspaceId={
+          state.context.documentShareLinkQueryResult.data.documentShareLink
+            .workspaceId
+        }
+        websocketSessionKey={
+          state.context.documentShareLinkQueryResult.data.documentShareLink
+            .websocketSessionKey
+        }
+        role={
+          state.context.documentShareLinkQueryResult.data.documentShareLink.role
+        }
       />
     );
   } else {

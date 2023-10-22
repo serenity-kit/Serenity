@@ -16,5 +16,8 @@ export async function getDocumentShareLink({ token }: Params) {
   if (!documentShareLink) {
     throw new ForbiddenError("Unauthorized");
   }
-  return documentShareLink;
+  return {
+    ...documentShareLink,
+    workspaceId: documentShareLink.document.workspaceId,
+  };
 }
