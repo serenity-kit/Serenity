@@ -1,4 +1,4 @@
-import { client } from "@serenity-kit/opaque";
+import { client, ready as opaqueReady } from "@serenity-kit/opaque";
 import * as userChain from "@serenity-kit/user-chain";
 import {
   createAndEncryptMainDevice,
@@ -18,6 +18,7 @@ const password = "password";
 let result: any = null;
 
 beforeAll(async () => {
+  await opaqueReady;
   await deleteAllRecords();
 });
 

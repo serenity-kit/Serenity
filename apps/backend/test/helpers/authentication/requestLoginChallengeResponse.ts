@@ -1,4 +1,4 @@
-import { client } from "@serenity-kit/opaque";
+import { client, ready as opaqueReady } from "@serenity-kit/opaque";
 import { gql } from "graphql-request";
 
 type Params = {
@@ -12,6 +12,7 @@ export const requestLoginChallengeResponse = async ({
   username,
   password,
 }: Params) => {
+  await opaqueReady;
   const clientLoginStartResult = client.startLogin({ password });
   const query = gql`
       mutation {

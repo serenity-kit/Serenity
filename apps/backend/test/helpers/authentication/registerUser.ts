@@ -1,4 +1,4 @@
-import { client } from "@serenity-kit/opaque";
+import { client, ready as opaqueReady } from "@serenity-kit/opaque";
 import * as userChain from "@serenity-kit/user-chain";
 import {
   createAndEncryptMainDevice,
@@ -21,6 +21,7 @@ export const registerUser = async (
   password: string,
   pendingWorkspaceInvitationId?: string
 ) => {
+  await opaqueReady;
   result = await requestRegistrationChallengeResponse(
     graphql,
     username,

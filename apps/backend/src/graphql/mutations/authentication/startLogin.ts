@@ -1,4 +1,4 @@
-import { server } from "@serenity-kit/opaque";
+import { ready as opaqueReady, server } from "@serenity-kit/opaque";
 import { UserInputError } from "apollo-server-express";
 import {
   arg,
@@ -49,6 +49,7 @@ export const startLoginMutation = mutationField("startLogin", {
     if (!process.env.OPAQUE_SERVER_SETUP) {
       throw new Error("Missing process.env.OPAQUE_SERVER_SETUP");
     }
+    await opaqueReady;
 
     try {
       result = await getRegistrationRecord(username);

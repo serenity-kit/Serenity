@@ -1,4 +1,4 @@
-import { client } from "@serenity-kit/opaque";
+import { client, ready as opaqueReady } from "@serenity-kit/opaque";
 import {
   createDevice as createdDeviceHelper,
   generateId,
@@ -15,6 +15,7 @@ const username = `${generateId()}@example.com`;
 const password = "password";
 
 beforeAll(async () => {
+  await opaqueReady;
   await deleteAllRecords();
 });
 
