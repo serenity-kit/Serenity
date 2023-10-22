@@ -1,6 +1,14 @@
-import { objectType } from "nexus";
+import { enumType, objectType } from "nexus";
 import { CreatorDevice } from "./device";
-import { MemberRoleEnum } from "./workspace";
+
+export const ShareDocumentRoleEnum = enumType({
+  name: "ShareDocumentRole",
+  members: {
+    EDITOR: "EDITOR",
+    COMMENTER: "COMMENTER",
+    VIEWER: "VIEWER",
+  },
+});
 
 export const SnapshotKeyBox = objectType({
   name: "SnapshotKeyBox",
@@ -18,7 +26,17 @@ export const DocumentShareLink = objectType({
   name: "DocumentShareLink",
   definition(t) {
     t.nonNull.string("token");
-    t.nonNull.field("role", { type: MemberRoleEnum });
+    t.nonNull.string("deviceSigningPublicKey");
+  },
+});
+
+export const DocumentShareLinkForSharePage = objectType({
+  name: "DocumentShareLinkForSharePage",
+  definition(t) {
+    t.nonNull.string("token");
+    t.nonNull.string("websocketSessionKey");
+    t.nonNull.string("workspaceId");
+    t.nonNull.field("role", { type: ShareDocumentRoleEnum });
     t.nonNull.string("deviceSecretBoxCiphertext");
     t.nonNull.string("deviceSecretBoxNonce");
     t.nonNull.string("deviceSigningPublicKey");

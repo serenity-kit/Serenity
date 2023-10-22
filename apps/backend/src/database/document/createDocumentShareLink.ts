@@ -1,5 +1,6 @@
 import * as documentChain from "@serenity-kit/document-chain";
 import { AddShareDocumentDeviceEvent } from "@serenity-kit/document-chain";
+import { generateId } from "@serenity-tools/common";
 import { ForbiddenError, UserInputError } from "apollo-server-express";
 import {
   DocumentShareLink,
@@ -92,6 +93,8 @@ export const createDocumentShareLink = async ({
         },
       });
 
+      const websocketSessionKey = generateId();
+
       const documentShareLink = await prisma.documentShareLink.create({
         data: {
           documentId,
@@ -105,6 +108,7 @@ export const createDocumentShareLink = async ({
             documentChainEvent.transaction.encryptionPublicKey,
           deviceEncryptionPublicKeySignature:
             documentChainEvent.transaction.encryptionPublicKeySignature,
+          websocketSessionKey,
           // documentChainEvent.transaction.expiresAt
         },
       });

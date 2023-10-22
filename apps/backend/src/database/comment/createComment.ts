@@ -1,6 +1,6 @@
 import { generateId } from "@serenity-tools/common";
 import { ForbiddenError, UserInputError } from "apollo-server-express";
-import { Role } from "../../../prisma/generated/output";
+import { Role, ShareDocumentRole } from "../../../prisma/generated/output";
 import { getOrCreateCreatorDevice } from "../../utils/device/getOrCreateCreatorDevice";
 import { prisma } from "../prisma";
 
@@ -31,6 +31,10 @@ export async function createComment({
     throw new ForbiddenError("Unauthorized");
   }
   const allowedRoles = [Role.ADMIN, Role.EDITOR, Role.COMMENTER];
+  const allowedShareDocumentRoles = [
+    ShareDocumentRole.EDITOR,
+    ShareDocumentRole.COMMENTER,
+  ];
   // if the user has a documentShareLinkToken, verify it
   let documentShareLink: any = null;
   if (documentShareLinkToken) {
@@ -38,7 +42,7 @@ export async function createComment({
       where: {
         token: documentShareLinkToken,
         documentId: document.id,
-        role: { in: allowedRoles },
+        role: { in: allowedShareDocumentRoles },
       },
     });
     if (!documentShareLink) {

@@ -1,6 +1,6 @@
 import { generateId } from "@serenity-tools/common";
 import { ForbiddenError, UserInputError } from "apollo-server-express";
-import { Role } from "../../../prisma/generated/output";
+import { Role, ShareDocumentRole } from "../../../prisma/generated/output";
 import { getOrCreateCreatorDevice } from "../../utils/device/getOrCreateCreatorDevice";
 import { prisma } from "../prisma";
 
@@ -40,6 +40,10 @@ export async function createCommentReply({
     throw new UserInputError("Invalid comment id");
   }
   const allowedRoles = [Role.ADMIN, Role.EDITOR, Role.COMMENTER];
+  const allowedShareDocumentRoles = [
+    ShareDocumentRole.EDITOR,
+    ShareDocumentRole.COMMENTER,
+  ];
   // if the user has a documentShareLinkToken, verify it
   let documentShareLink: any = null;
   if (documentShareLinkToken) {
@@ -47,7 +51,7 @@ export async function createCommentReply({
       where: {
         token: documentShareLinkToken,
         documentId: document.id,
-        role: { in: allowedRoles },
+        role: { in: allowedShareDocumentRoles },
       },
     });
     if (!documentShareLink) {

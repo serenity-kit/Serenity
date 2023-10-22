@@ -280,17 +280,17 @@ test("editor share token", async () => {
   });
   const documentShareLinkToken =
     createDocumentShareLinkQueryResult.createDocumentShareLink.token;
-  const deleteCommentsResult = await deleteComments({
-    graphql,
-    commentIds: [comment.id],
-    documentShareLinkToken,
-    authorizationHeader: userData2.sessionKey,
-  });
-  expect(deleteCommentsResult.deleteComments.status).toBe("success");
-  const numCommentsAfterDelete = await prisma.comment.count({
-    where: { documentId: userData1.document.id },
-  });
-  expect(numCommentsAfterDelete).toBe(numCommentsBeforeDelete - 1);
+
+  await expect(
+    (async () => {
+      await deleteComments({
+        graphql,
+        commentIds: [comment.id],
+        documentShareLinkToken,
+        authorizationHeader: userData2.sessionKey,
+      });
+    })()
+  ).rejects.toThrowError(/BAD_USER_INPUT/);
 });
 
 test("commenter share token", async () => {

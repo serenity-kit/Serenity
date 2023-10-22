@@ -244,6 +244,12 @@ enum Role {
   VIEWER
 }
 
+enum ShareDocumentRole {
+  EDITOR
+  COMMENTER
+  VIEWER
+}
+
 model UsersToWorkspaces {
   user               User      @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId             String
@@ -303,18 +309,19 @@ model Folder {
 }
 
 model DocumentShareLink {
-  token                              String           @id @unique @default(uuid())
-  sharer                             User             @relation(fields: [sharerUserId], references: [id], onDelete: Cascade)
+  token                              String            @id @unique @default(uuid())
+  sharer                             User              @relation(fields: [sharerUserId], references: [id], onDelete: Cascade)
   sharerUserId                       String
-  document                           Document         @relation(fields: [documentId], references: [id], onDelete: Cascade)
+  document                           Document          @relation(fields: [documentId], references: [id], onDelete: Cascade)
   documentId                         String
-  role                               Role             @default(VIEWER)
+  role                               ShareDocumentRole @default(VIEWER)
   deviceSecretBoxCiphertext          String
   deviceSecretBoxNonce               String
-  deviceSigningPublicKey             String           @unique
-  deviceEncryptionPublicKey          String           @unique
-  deviceEncryptionPublicKeySignature String           @unique
+  deviceSigningPublicKey             String            @unique
+  deviceEncryptionPublicKey          String            @unique
+  deviceEncryptionPublicKeySignature String            @unique
   snapshotKeyBoxes                   SnapshotKeyBox[]
+  websocketSessionKey                String            @unique
 
   @@index([deviceSigningPublicKey])
 }

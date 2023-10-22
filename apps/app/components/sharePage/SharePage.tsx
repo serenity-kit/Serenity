@@ -1,5 +1,8 @@
 import * as documentChain from "@serenity-kit/document-chain";
-import { SerenitySnapshotPublicData } from "@serenity-tools/common";
+import {
+  SerenitySnapshotPublicData,
+  ShareDocumentRole,
+} from "@serenity-tools/common";
 import { useYjsSync } from "@serenity-tools/secsync";
 import {
   Button,
@@ -31,6 +34,9 @@ type Props = SharePageDrawerScreenProps<"SharePageContent"> & {
   signatureKeyPair: KeyPair;
   reloadPage: () => void;
   snapshotKey: string;
+  websocketSessionKey: string;
+  workspaceId: string;
+  role: ShareDocumentRole;
 };
 
 export const SharePage: React.FC<Props> = ({
@@ -39,6 +45,9 @@ export const SharePage: React.FC<Props> = ({
   signatureKeyPair,
   reloadPage,
   snapshotKey,
+  websocketSessionKey,
+  workspaceId,
+  role,
 }) => {
   const { pageId: docId, setActiveSnapshotAndCommentKeys } = usePage();
   const yDocRef = useRef<Yjs.Doc>(new Yjs.Doc());
@@ -64,7 +73,7 @@ export const SharePage: React.FC<Props> = ({
     documentId: docId,
     signatureKeyPair,
     websocketHost: websocketOrigin,
-    websocketSessionKey: "TODO",
+    websocketSessionKey,
     getNewSnapshotData: async () => {
       // share page user can't create new snapshots
       throw new Error("Share link client can't create new snapshots");
@@ -277,7 +286,7 @@ export const SharePage: React.FC<Props> = ({
         editable={false} // until we add EDITOR sharing
         // editable={!state.matches("failed")}
         documentId={docId}
-        workspaceId={"QrPeaW-7pt_wSEzgfnaTbsGcrF8E4BIa"} // need to get it via a query
+        workspaceId={workspaceId}
         yDocRef={yDocRef}
         yAwarenessRef={yAwarenessRef}
         // openDrawer={navigation.openDrawer}
