@@ -1,4 +1,4 @@
-import { client, server } from "@serenity-kit/opaque";
+import { client, ready as opaqueReady, server } from "@serenity-kit/opaque";
 import * as userChain from "@serenity-kit/user-chain";
 import { LocalDevice, createDevice } from "@serenity-tools/common";
 import { addHours } from "../../utils/addHours/addHours";
@@ -23,6 +23,7 @@ export const createDeviceAndLogin = async ({
   if (!process.env.OPAQUE_SERVER_SETUP) {
     throw new Error("OPAQUE_SERVER_SETUP is not set");
   }
+  await opaqueReady;
 
   const clientLoginStartResult = client.startLogin({ password });
   const serverLoginStartResult = server.startLogin({

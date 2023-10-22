@@ -1,4 +1,4 @@
-import { client } from "@serenity-kit/opaque";
+import { client, ready as opaqueReady } from "@serenity-kit/opaque";
 import * as userChain from "@serenity-kit/user-chain";
 import { LocalDevice, createDevice } from "@serenity-tools/common";
 import { gql } from "graphql-request";
@@ -19,6 +19,7 @@ export const loginUser = async ({
   password,
   mainDevice,
 }: Params) => {
+  await opaqueReady;
   const startLoginResult = await requestLoginChallengeResponse({
     graphql,
     username,

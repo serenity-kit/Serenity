@@ -1,4 +1,4 @@
-import { client } from "@serenity-kit/opaque";
+import { client, ready as opaqueReady } from "@serenity-kit/opaque";
 import * as userChain from "@serenity-kit/user-chain";
 import { createAndEncryptMainDevice } from "@serenity-tools/common";
 import { gql } from "graphql-request";
@@ -18,6 +18,7 @@ export const finalizeRegistration = async ({
   password,
   username,
 }: Props) => {
+  await opaqueReady;
   const clientRegistrationFinishResult = client.finishRegistration({
     password,
     clientRegistrationState: registration,

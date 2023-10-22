@@ -1,4 +1,4 @@
-import { server } from "@serenity-kit/opaque";
+import { ready as opaqueReady, server } from "@serenity-kit/opaque";
 import {
   arg,
   inputObjectType,
@@ -53,6 +53,7 @@ export const finishLoginMutation = mutationField("finishLogin", {
     if (!process.env.OPAQUE_SERVER_SETUP) {
       throw new Error("Missing process.env.OPAQUE_SERVER_SETUP");
     }
+    await opaqueReady;
 
     const loginAttempt = await getLoginAttempt({
       loginAttemptId: args.input.loginId,

@@ -1,5 +1,5 @@
 import * as documentChain from "@serenity-kit/document-chain";
-import { client, server } from "@serenity-kit/opaque";
+import { client, ready as opaqueReady, server } from "@serenity-kit/opaque";
 import * as userChain from "@serenity-kit/user-chain";
 import * as workspaceChain from "@serenity-kit/workspace-chain";
 import {
@@ -31,6 +31,7 @@ export default async function createUserWithWorkspace({
   username,
   password,
 }: Params) {
+  await opaqueReady;
   let thePassword = "12345689";
   if (password) {
     thePassword = password;

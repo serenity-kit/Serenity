@@ -1,4 +1,4 @@
-import { client } from "@serenity-kit/opaque";
+import { client, ready as opaqueReady } from "@serenity-kit/opaque";
 import { gql } from "graphql-request";
 
 export type RegistrationChallengeResponse = {
@@ -11,6 +11,7 @@ export const requestRegistrationChallengeResponse = async (
   username: string,
   password: string
 ): Promise<RegistrationChallengeResponse> => {
+  await opaqueReady;
   const clientRegistrationStartResult = client.startRegistration({ password });
   const query = gql`
     mutation startRegistration($input: StartRegistrationInput!) {
