@@ -27,6 +27,7 @@ import AccountSettingsSidebar from "../components/accountSettingsSidebar/Account
 import { HeaderLeft } from "../components/headerLeft/HeaderLeft";
 import NavigationDrawerModal from "../components/navigationDrawerModal/NavigationDrawerModal";
 import { PageHeaderLeft } from "../components/pageHeaderLeft/PageHeaderLeft";
+import SharePageSidebar from "../components/sharePageSidebar/SharePageSidebar";
 import Sidebar from "../components/sidebar/Sidebar";
 import WorkspaceSettingsSidebar from "../components/workspaceSettingsSidebar/WorkspaceSettingsSidebar";
 import { WorkspaceProvider } from "../context/WorkspaceContext";
@@ -151,7 +152,7 @@ function SharePageDrawerScreen(props) {
 
   return (
     <SharePageDrawer.Navigator
-      drawerContent={(drawerProps) => <div>Hello World</div>}
+      drawerContent={(drawerProps) => <SharePageSidebar {...drawerProps} />}
       screenOptions={{
         unmountOnBlur: true,
         drawerType: isPermanentLeftSidebar ? "permanent" : "front",
@@ -159,7 +160,7 @@ function SharePageDrawerScreen(props) {
         headerShown: true,
         headerTitle: (props) => <Text>{props.children}</Text>,
         headerStyle: [styles.header],
-        // headerLeft: () => <PageHeaderLeft navigation={props.navigation} />,
+        headerLeft: () => <PageHeaderLeft navigation={props.navigation} />,
         headerLeftContainerStyle: {
           flex: 1,
         },
