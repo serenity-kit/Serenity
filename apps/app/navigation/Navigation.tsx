@@ -176,6 +176,7 @@ function SharePageDrawerScreen(props) {
       <SharePageDrawer.Screen
         name="SharePageContent"
         component={SharePageScreen}
+        options={{ title: "" }}
       />
     </SharePageDrawer.Navigator>
   );

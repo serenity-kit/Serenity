@@ -72,6 +72,7 @@ const ActualPageScreen = (
           toggleCommentsDrawer={() => {
             send({ type: "TOGGLE_SIDEBAR" });
           }}
+          hasShareButton={true} // TODO only true for ADMIN and EDITOR
         />
       ),
       headerTitle: () => (

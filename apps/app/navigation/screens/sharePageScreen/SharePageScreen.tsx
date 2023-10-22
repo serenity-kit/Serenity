@@ -64,6 +64,7 @@ const SharePageContainer: React.FC<SharePageContainerProps> = ({
           toggleCommentsDrawer={() => {
             send({ type: "TOGGLE_SIDEBAR" });
           }}
+          hasShareButton={false}
         />
       ),
       headerTitle: () => (

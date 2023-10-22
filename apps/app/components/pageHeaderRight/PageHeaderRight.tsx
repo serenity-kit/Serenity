@@ -18,9 +18,13 @@ import { PageShareModalContent } from "../pageShareModalContent/PageShareModalCo
 
 type Props = {
   toggleCommentsDrawer: () => void;
+  hasShareButton: boolean;
 };
 
-export const PageHeaderRight: React.FC<Props> = ({ toggleCommentsDrawer }) => {
+export const PageHeaderRight: React.FC<Props> = ({
+  toggleCommentsDrawer,
+  hasShareButton,
+}) => {
   const hasEditorSidebar = useHasEditorSidebar();
   const { workspaceChainData, users } = useWorkspace();
   const [isActiveShareModal, setIsActiveShareModal] = useState(false);
@@ -90,15 +94,19 @@ export const PageHeaderRight: React.FC<Props> = ({ toggleCommentsDrawer }) => {
             ) : null}
 
             {hasEditorSidebar ? (
-              <Button
-                size="sm"
-                onPress={() => {
-                  setIsActiveShareModal(true);
-                }}
-                testID="document-share-button"
-              >
-                Share
-              </Button>
+              <>
+                {hasShareButton ? (
+                  <Button
+                    size="sm"
+                    onPress={() => {
+                      setIsActiveShareModal(true);
+                    }}
+                    testID="document-share-button"
+                  >
+                    Share
+                  </Button>
+                ) : null}
+              </>
             ) : (
               <PageHeaderRightMenu
                 onSharePressed={() => {
@@ -107,6 +115,7 @@ export const PageHeaderRight: React.FC<Props> = ({ toggleCommentsDrawer }) => {
                 onCommentsPressed={() => {
                   toggleCommentsDrawer();
                 }}
+                hasShareButton={hasShareButton}
               />
             )}
           </>
