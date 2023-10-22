@@ -24,9 +24,10 @@ type Props = {
   comment: DecryptedComment;
   meId: string;
   meName: string;
+  canComment: boolean;
 };
 
-export default function Comment({ comment, meId, meName }: Props) {
+export default function Comment({ comment, meId, meName, canComment }: Props) {
   const { users } = useWorkspace();
   const { commentsService } = usePage();
   const [state, send] = useActor(commentsService);
@@ -42,7 +43,7 @@ export default function Comment({ comment, meId, meName }: Props) {
 
   const replyLength = comment.replies.length;
   const replyString = {
-    0: "Reply ...",
+    0: "Reply …",
     1: "1 Reply",
   };
   const replyPlaceholder = replyString[replyLength] || `${replyLength} Replies`;
@@ -146,7 +147,7 @@ export default function Comment({ comment, meId, meName }: Props) {
             })}
           </View>
 
-          {!hasError ? (
+          {!hasError && canComment ? (
             <HStack space="1.5">
               <Avatar color={hashToCollaboratorColor(meId)} size="xs">
                 {meName?.split("@")[0].substring(0, 1)}
@@ -176,7 +177,9 @@ export default function Comment({ comment, meId, meName }: Props) {
         </>
       ) : null}
 
-      {!isActiveComment && (!hasError || (hasError && replyLength > 0)) ? (
+      {!isActiveComment &&
+      canComment &&
+      (!hasError || (hasError && replyLength > 0)) ? (
         <Text
           variant="xxs"
           style={tw`pt-1 pl-0.5 ${

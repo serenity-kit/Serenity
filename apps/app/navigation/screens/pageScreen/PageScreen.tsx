@@ -150,7 +150,7 @@ const ActualPageScreen = (
             }
           }}
           renderDrawerContent={() => {
-            return <CommentsSidebar />;
+            return <CommentsSidebar canComment={true} />; // TODO should be de-active for members with the VIEWER role
           }}
           drawerType="front"
           drawerPosition="right"

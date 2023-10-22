@@ -46,7 +46,11 @@ const EmptyState: React.FC = () => {
   );
 };
 
-const CommentsSidebar: React.FC = () => {
+type Props = {
+  canComment: boolean;
+};
+
+const CommentsSidebar: React.FC<Props> = ({ canComment }) => {
   const { commentsService } = usePage();
   const [meResult] = useMeQuery();
   const [state] = useActor(commentsService);
@@ -103,7 +107,14 @@ const CommentsSidebar: React.FC = () => {
       ref={flatListRef}
       data={comments}
       renderItem={({ item }) => {
-        return <Comment comment={item} meId={me.id} meName={me.username} />;
+        return (
+          <Comment
+            comment={item}
+            meId={me.id}
+            meName={me.username}
+            canComment={canComment}
+          />
+        );
       }}
       keyExtractor={(comment) => comment.id}
       onScrollToIndexFailed={async (info) => {
