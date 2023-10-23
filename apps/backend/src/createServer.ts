@@ -21,7 +21,9 @@ import { WebSocketServer } from "ws";
 import { getSessionIncludingUser } from "./database/authentication/getSessionIncludingUser";
 import { createSnapshot } from "./database/createSnapshot";
 import { createUpdate } from "./database/createUpdate";
+import { getDocument } from "./database/document/getDocument";
 import { getDocumentWithContent } from "./database/getDocumentWithContent";
+import { prisma } from "./database/prisma";
 import { schema } from "./schema";
 import { ExpectedGraphqlError } from "./utils/expectedGraphqlError/expectedGraphqlError";
 
@@ -137,52 +139,77 @@ export default async function createServer() {
       getDocument: getDocumentWithContent,
       createSnapshot,
       createUpdate,
-      // TODO implement properly
-      hasAccess: async (params) => true,
-      // hasAccess: async (params) => {
-      //   if (!params.context.user) {
-      //     return false;
-      //   }
+      hasAccess: async (params) => {
+        if (!params.websocketSessionKey) {
+          return false;
+        }
+        const session = await getSessionIncludingUser({
+          sessionKey: params.websocketSessionKey,
+        });
+        const documentShareLink = await prisma.documentShareLink.findFirst({
+          where: { websocketSessionKey: params.websocketSessionKey },
+        });
+        if (session === null && documentShareLink === null) {
+          return false;
+        }
 
-      //   let doc = await getDocument(params.documentId);
-      //   if (!doc) {
-      //     return false;
-      //   }
-      //   const userToWorkspace = await prisma.usersToWorkspaces.findFirst({
-      //     where: {
-      //       userId: params.context.user.id,
-      //       workspaceId: doc.doc.workspaceId,
-      //       isAuthorizedMember: true,
-      //     },
-      //   });
+        if (documentShareLink) {
+          if (
+            params.action === "write-update" &&
+            documentShareLink.role === "EDITOR"
+          ) {
+            return true;
+          }
 
-      //   if (!userToWorkspace) {
-      //     return false;
-      //   }
+          if (
+            params.action === "read" ||
+            params.action === "send-ephemeral-message"
+          ) {
+            return true;
+          }
+        } else if (session) {
+          let doc = await getDocument({
+            id: params.documentId,
+            userId: session.user.id,
+          });
 
-      //   if (
-      //     params.action === "write-update" &&
-      //     (userToWorkspace.role === "ADMIN" ||
-      //       userToWorkspace.role === "EDITOR")
-      //   ) {
-      //     return true;
-      //   }
-      //   if (
-      //     params.action === "write-snapshot" &&
-      //     (userToWorkspace.role === "ADMIN" ||
-      //       userToWorkspace.role === "EDITOR")
-      //   ) {
-      //     return true;
-      //   }
-      //   if (
-      //     params.action === "read" ||
-      //     params.action === "send-ephemeral-message"
-      //   ) {
-      //     return true;
-      //   }
+          const userToWorkspace = await prisma.usersToWorkspaces.findFirst({
+            where: {
+              userId: session.user.id,
+              workspaceId: doc.workspaceId,
+              isAuthorizedMember: true,
+            },
+          });
 
-      //   return false;
-      // },
+          if (!userToWorkspace) {
+            return false;
+          }
+
+          if (
+            params.action === "write-update" &&
+            (userToWorkspace.role === "ADMIN" ||
+              userToWorkspace.role === "EDITOR")
+          ) {
+            return true;
+          }
+          if (
+            params.action === "write-snapshot" &&
+            (userToWorkspace.role === "ADMIN" ||
+              userToWorkspace.role === "EDITOR")
+          ) {
+            return true;
+          }
+
+          if (
+            params.action === "read" ||
+            params.action === "send-ephemeral-message"
+          ) {
+            return true;
+          }
+        }
+
+        return false;
+      },
 
       // TODO implement properly
       hasBroadcastAccess: async ({ websocketSessionKeys }) =>
