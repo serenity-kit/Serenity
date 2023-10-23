@@ -14,7 +14,7 @@ export const createCommentOnHtmlNode = async ({
   selectElement,
   comment,
 }: Props) => {
-  await delayForSeconds(2); // wait a bit in the beginning until comments are loaded?
+  await delayForSeconds(1); // wait a bit in the beginning until comments are loaded?
   const numCommentsBefore = await prisma.comment.count({
     where: { documentId },
   });
@@ -25,7 +25,7 @@ export const createCommentOnHtmlNode = async ({
     selection?.removeAllRanges();
     selection?.addRange(range);
   });
-  await delayForSeconds(2);
+  await delayForSeconds(1);
   await page
     .locator("data-testid=bubble-menu__initiate-comment-button")
     .click();
@@ -35,7 +35,7 @@ export const createCommentOnHtmlNode = async ({
   );
   await commentInput.type(comment);
   await page.locator("data-testid=bubble-menu__save-comment-button").click();
-  await delayForSeconds(2);
+  await delayForSeconds(1);
   const numCommentsAfter = await prisma.comment.count({
     where: { documentId },
   });
