@@ -56,6 +56,7 @@ export const createDeviceAndLogin = async ({
       privateKey: mainDevice.signingPrivateKey,
       publicKey: mainDevice.signingPublicKey,
     },
+    signingPrivateKey: webDevice.signingPrivateKey,
     signingPublicKey: webDevice.signingPublicKey,
     encryptionPublicKey: webDevice.encryptionPublicKey,
     prevEvent: lastUserChainEvent.content,

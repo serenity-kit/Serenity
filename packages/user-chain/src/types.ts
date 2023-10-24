@@ -40,6 +40,7 @@ export type CreateUserChainEvent = z.infer<typeof CreateUserChainEvent>;
 export const AddDeviceTransaction = TransactionBase.extend({
   type: z.literal("add-device"),
   signingPublicKey: z.string(),
+  deviceSigningKeyProof: z.string(),
   encryptionPublicKey: z.string(),
   encryptionPublicKeySignature: z.string(),
   expiresAt: z.optional(z.string().datetime()),

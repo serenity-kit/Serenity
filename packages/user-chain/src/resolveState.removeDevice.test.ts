@@ -25,6 +25,7 @@ test("should resolve to one device after adding and removing a device", async ()
   });
   const addDeviceEvent = addDevice({
     authorKeyPair: keyPairsA.sign,
+    signingPrivateKey: keyPairsB.sign.privateKey,
     signingPublicKey: keyPairsB.sign.publicKey,
     encryptionPublicKey: keyPairsB.encryption.publicKey,
     prevEvent: event,
@@ -73,6 +74,7 @@ test("should fail if a device is removed twice", async () => {
   });
   const addDeviceEvent = addDevice({
     authorKeyPair: keyPairsA.sign,
+    signingPrivateKey: keyPairsB.sign.privateKey,
     signingPublicKey: keyPairsB.sign.publicKey,
     encryptionPublicKey: keyPairsB.encryption.publicKey,
     prevEvent: event,
@@ -103,6 +105,7 @@ test("should fail if a device is removed that doesn't exist", async () => {
   });
   const addDeviceEvent = addDevice({
     authorKeyPair: keyPairsA.sign,
+    signingPrivateKey: keyPairsB.sign.privateKey,
     signingPublicKey: keyPairsB.sign.publicKey,
     encryptionPublicKey: keyPairsB.encryption.publicKey,
     prevEvent: event,
@@ -130,6 +133,7 @@ test("should fail if the signature has been manipulated", async () => {
   });
   const addDeviceEvent = addDevice({
     authorKeyPair: keyPairsA.sign,
+    signingPrivateKey: keyPairsB.sign.privateKey,
     signingPublicKey: keyPairsB.sign.publicKey,
     encryptionPublicKey: keyPairsB.encryption.publicKey,
     prevEvent: event,
@@ -163,6 +167,7 @@ test("should fail if the author (publicKey and signature) have been replaced", a
   });
   const addDeviceEvent = addDevice({
     authorKeyPair: keyPairsA.sign,
+    signingPrivateKey: keyPairsB.sign.privateKey,
     signingPublicKey: keyPairsB.sign.publicKey,
     encryptionPublicKey: keyPairsB.encryption.publicKey,
     prevEvent: event,
@@ -199,12 +204,14 @@ test("should fail if the chain is based on a different event", async () => {
   });
   const addDeviceEvent = addDevice({
     authorKeyPair: keyPairsA.sign,
+    signingPrivateKey: keyPairsB.sign.privateKey,
     signingPublicKey: keyPairsB.sign.publicKey,
     encryptionPublicKey: keyPairsB.encryption.publicKey,
     prevEvent: event,
   });
   const addDeviceEvent2 = addDevice({
     authorKeyPair: keyPairsA.sign,
+    signingPrivateKey: keyPairsB.sign.privateKey,
     signingPublicKey: keyPairsB.sign.publicKey,
     encryptionPublicKey: keyPairsB.encryption.publicKey,
     prevEvent: event,

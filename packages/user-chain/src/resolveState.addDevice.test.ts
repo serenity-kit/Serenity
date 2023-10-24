@@ -1,19 +1,23 @@
 import { generateId } from "@serenity-tools/common";
+import canonicalize from "canonicalize";
 import sodium from "react-native-libsodium";
-import { getKeyPairsA, getKeyPairsB, KeyPairs } from "../test/testUtils";
+import { KeyPairs, getKeyPairsA, getKeyPairsB } from "../test/testUtils";
 import {
-  addDevice,
+  userDeviceEncryptionPublicKeyDomainContext,
+  userDeviceSigningKeyProofDomainContext,
+} from "./constants";
+import {
   AddDeviceEvent,
   AddDeviceTransaction,
-  createUserChain,
   CreateUserChainEvent,
   CreateUserChainTransaction,
+  InvalidUserChainError,
+  UnknownVersionUserChainError,
+  addDevice,
+  createUserChain,
   hashEvent,
   hashTransaction,
-  InvalidUserChainError,
   resolveState,
-  UnknownVersionUserChainError,
-  userDeviceEncryptionPublicKeyDomainContext,
 } from "./index";
 
 let keyPairsA: KeyPairs;
@@ -33,6 +37,7 @@ test("should resolve to two devices after adding a device", async () => {
   });
   const addDeviceEvent = addDevice({
     authorKeyPair: keyPairsA.sign,
+    signingPrivateKey: keyPairsB.sign.privateKey,
     signingPublicKey: keyPairsB.sign.publicKey,
     encryptionPublicKey: keyPairsB.encryption.publicKey,
     prevEvent: event,
@@ -73,6 +78,7 @@ test("should resolve to have a device with an expireAt", async () => {
   });
   const addDeviceEvent = addDevice({
     authorKeyPair: keyPairsA.sign,
+    signingPrivateKey: keyPairsB.sign.privateKey,
     signingPublicKey: keyPairsB.sign.publicKey,
     encryptionPublicKey: keyPairsB.encryption.publicKey,
     prevEvent: event,
@@ -122,12 +128,14 @@ test("should fail if the same event is added twice", async () => {
   });
   const addDeviceEvent = addDevice({
     authorKeyPair: keyPairsA.sign,
+    signingPrivateKey: keyPairsB.sign.privateKey,
     signingPublicKey: keyPairsB.sign.publicKey,
     encryptionPublicKey: keyPairsB.encryption.publicKey,
     prevEvent: event,
   });
   const addDeviceEvent2 = addDevice({
     authorKeyPair: keyPairsA.sign,
+    signingPrivateKey: keyPairsB.sign.privateKey,
     signingPublicKey: keyPairsB.sign.publicKey,
     encryptionPublicKey: keyPairsB.encryption.publicKey,
     prevEvent: addDeviceEvent,
@@ -148,6 +156,7 @@ test("should fail if the signature has been manipulated", async () => {
   });
   const addDeviceEvent = addDevice({
     authorKeyPair: keyPairsA.sign,
+    signingPrivateKey: keyPairsB.sign.privateKey,
     signingPublicKey: keyPairsB.sign.publicKey,
     encryptionPublicKey: keyPairsB.encryption.publicKey,
     prevEvent: event,
@@ -176,6 +185,7 @@ test("should fail if the author (publicKey and signature) have been replaced", a
   });
   const addDeviceEvent = addDevice({
     authorKeyPair: keyPairsA.sign,
+    signingPrivateKey: keyPairsB.sign.privateKey,
     signingPublicKey: keyPairsB.sign.publicKey,
     encryptionPublicKey: keyPairsB.encryption.publicKey,
     prevEvent: event,
@@ -207,6 +217,7 @@ test("should fail if the encryptionPublicKeySignature have been manipulated", as
   });
   const addDeviceEvent = addDevice({
     authorKeyPair: keyPairsA.sign,
+    signingPrivateKey: keyPairsB.sign.privateKey,
     signingPublicKey: keyPairsB.sign.publicKey,
     encryptionPublicKey: keyPairsB.encryption.publicKey,
     prevEvent: event,
@@ -237,6 +248,7 @@ test("should fail if the knownVersion is smaller than the actual event version",
   const addDeviceWithVersion1 = ({
     authorKeyPair,
     prevEvent,
+    signingPrivateKey,
     signingPublicKey,
     encryptionPublicKey,
   }): AddDeviceEvent => {
@@ -244,11 +256,26 @@ test("should fail if the knownVersion is smaller than the actual event version",
     const encryptionPublicKeySignature = sodium.crypto_sign_detached(
       userDeviceEncryptionPublicKeyDomainContext +
         sodium.from_base64(encryptionPublicKey),
-      sodium.from_base64(authorKeyPair.privateKey)
+      sodium.from_base64(signingPrivateKey)
     );
+
+    const deviceSigningContent = canonicalize({
+      userDeviceSigningKeyProofDomainContext,
+      prevEventHash,
+    });
+    if (!deviceSigningContent) {
+      throw new Error("Failed to canonicalize device signing content");
+    }
+
+    const deviceSigningKeyProof = sodium.crypto_sign_detached(
+      deviceSigningContent,
+      sodium.from_base64(signingPrivateKey)
+    );
+
     const transaction: AddDeviceTransaction = {
       type: "add-device",
       signingPublicKey,
+      deviceSigningKeyProof: sodium.to_base64(deviceSigningKeyProof),
       encryptionPublicKey,
       encryptionPublicKeySignature: sodium.to_base64(
         encryptionPublicKeySignature
@@ -274,6 +301,7 @@ test("should fail if the knownVersion is smaller than the actual event version",
 
   const addDeviceEvent = addDeviceWithVersion1({
     authorKeyPair: keyPairsA.sign,
+    signingPrivateKey: keyPairsB.sign.privateKey,
     signingPublicKey: keyPairsB.sign.publicKey,
     encryptionPublicKey: keyPairsB.encryption.publicKey,
     prevEvent: event,
@@ -331,6 +359,7 @@ test("should fail if an old event version is applied after a newer one", async (
   });
   const addDeviceEvent = addDevice({
     authorKeyPair: keyPairsA.sign,
+    signingPrivateKey: keyPairsB.sign.privateKey,
     signingPublicKey: keyPairsB.sign.publicKey,
     encryptionPublicKey: keyPairsB.encryption.publicKey,
     prevEvent: event,
@@ -353,6 +382,7 @@ test("should fail if the chain is based on a different event", async () => {
   });
   const addDeviceEvent = addDevice({
     authorKeyPair: keyPairsA.sign,
+    signingPrivateKey: keyPairsB.sign.privateKey,
     signingPublicKey: keyPairsB.sign.publicKey,
     encryptionPublicKey: keyPairsB.encryption.publicKey,
     prevEvent: event2,
