@@ -1,0 +1,11 @@
+query documentShareLinkSnapshotKeyBox($token: ID!, $snapshotId: ID!) {
+  documentShareLinkSnapshotKeyBox(token: $token, snapshotId: $snapshotId) {
+    id
+    ciphertext
+    nonce
+    creatorDevice {
+      signingPublicKey
+      encryptionPublicKey
+    }
+  }
+}

@@ -22,7 +22,6 @@ export const documentShareLinkQuery = queryField((t) => {
           deviceSigningPublicKey:
             documentShareLink.activeSnapshotKeyBox
               .documentShareLinkDeviceSigningPublicKey,
-          creatorDevice: documentShareLink.activeSnapshotKeyBox.creatorDevice,
         },
       };
     },

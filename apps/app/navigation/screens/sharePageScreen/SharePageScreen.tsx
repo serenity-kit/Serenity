@@ -24,7 +24,6 @@ import { sharePageScreenMachine } from "./sharePageScreenMachine";
 type SharePageContainerProps =
   SharePageDrawerScreenProps<"SharePageContent"> & {
     documentId: string;
-    snapshotKey: string;
     shareDevice: LocalDevice;
     reloadPage: () => void;
     workspaceId: string;
@@ -36,7 +35,6 @@ const SharePageContainer: React.FC<SharePageContainerProps> = ({
   documentId,
   route,
   navigation,
-  snapshotKey,
   shareDevice,
   reloadPage,
   workspaceId,
@@ -134,9 +132,10 @@ const SharePageContainer: React.FC<SharePageContainerProps> = ({
           signatureKeyPair={signatureKeyPair}
           websocketSessionKey={websocketSessionKey}
           workspaceId={workspaceId}
-          snapshotKey={snapshotKey}
           reloadPage={reloadPage}
           role={role}
+          token={route.params.token}
+          shareLinkDevice={shareDevice}
         />
       </Drawer>
     </PageProvider>
@@ -192,7 +191,6 @@ function ActualSharePageScreen(
     return (
       <SharePageContainer
         documentId={props.route.params.pageId}
-        snapshotKey={state.context.snapshotKey}
         navigation={props.navigation}
         route={props.route}
         shareDevice={state.context.device}

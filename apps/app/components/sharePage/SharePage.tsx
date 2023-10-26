@@ -1,5 +1,6 @@
 import * as documentChain from "@serenity-kit/document-chain";
 import {
+  LocalDevice,
   SerenitySnapshotPublicData,
   ShareDocumentRole,
 } from "@serenity-tools/common";
@@ -22,6 +23,7 @@ import { Awareness } from "y-protocols/awareness";
 import * as Yjs from "yjs";
 import Editor from "../../components/editor/Editor";
 import { usePage } from "../../context/PageContext";
+import { runDocumentShareLinkSnapshotKeyBoxQuery } from "../../generated/graphql";
 import { DocumentState } from "../../types/documentState";
 import { SharePageDrawerScreenProps } from "../../types/navigationProps";
 import { useEditorStore } from "../../utils/editorStore/editorStore";
@@ -33,10 +35,11 @@ import { PageNoAccessError } from "../page/PageNoAccessError";
 type Props = SharePageDrawerScreenProps<"SharePageContent"> & {
   signatureKeyPair: KeyPair;
   reloadPage: () => void;
-  snapshotKey: string;
   websocketSessionKey: string;
   workspaceId: string;
   role: ShareDocumentRole;
+  token: string;
+  shareLinkDevice: LocalDevice;
 };
 
 export const SharePage: React.FC<Props> = ({
@@ -44,16 +47,14 @@ export const SharePage: React.FC<Props> = ({
   route,
   signatureKeyPair,
   reloadPage,
-  snapshotKey,
   websocketSessionKey,
   workspaceId,
   role,
+  token,
+  shareLinkDevice,
 }) => {
   const { pageId: docId, setActiveSnapshotAndCommentKeys } = usePage();
   const yDocRef = useRef<Yjs.Doc>(new Yjs.Doc());
-  const snapshotKeyRef = useRef<Uint8Array | null>(
-    sodium.from_base64(snapshotKey)
-  );
   const [documentLoadedOnceFromRemote, setDocumentLoadedOnceFromRemote] =
     useState(false);
   const [passedDocumentLoadingTimeout, setPassedDocumentLoadingTimeout] =
@@ -84,24 +85,37 @@ export const SharePage: React.FC<Props> = ({
           "SnapshotProofInfo not provided when trying to derive a new key"
         );
       }
-      if (!snapshotKeyRef.current) {
-        throw new Error(
-          "Snapshot key not provided when trying get the snapshot key"
-        );
+
+      const runDocumentShareLinkSnapshotKeyBoxQueryResult =
+        await runDocumentShareLinkSnapshotKeyBoxQuery({
+          token,
+          snapshotId: snapshotProofInfo.snapshotId,
+        });
+
+      const snapshotKeyBox =
+        runDocumentShareLinkSnapshotKeyBoxQueryResult.data
+          ?.documentShareLinkSnapshotKeyBox;
+      if (!snapshotKeyBox) {
+        throw new Error("Snapshot key box not found");
       }
 
-      if (snapshotKeyRef.current) {
-        setSnapshotKey(snapshotKeyRef.current);
-      }
+      const snapshotKey = sodium.crypto_box_open_easy(
+        sodium.from_base64(snapshotKeyBox.ciphertext),
+        sodium.from_base64(snapshotKeyBox.nonce),
+        sodium.from_base64(snapshotKeyBox.creatorDevice.encryptionPublicKey),
+        sodium.from_base64(shareLinkDevice.encryptionPrivateKey)
+      );
+
+      setSnapshotKey(snapshotKey);
       setActiveSnapshotAndCommentKeys(
         {
           id: snapshotProofInfo.snapshotId,
-          key: sodium.to_base64(snapshotKeyRef.current),
+          key: sodium.to_base64(snapshotKey),
         },
         {}
       );
 
-      return snapshotKeyRef.current;
+      return snapshotKey;
     },
     shouldSendSnapshot: ({ snapshotUpdatesCount }) => {
       // create a new snapshot if the active snapshot has more than 100 updates
