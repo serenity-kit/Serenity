@@ -25,9 +25,6 @@ type Props = ViewProps & {
   documentId: string;
   workspaceId: string;
   parentFolderId: string;
-  nameCiphertext: string;
-  nameNonce: string;
-  subkeyId: number;
   depth?: number;
   onRefetchDocumentsPress: () => void;
 };
@@ -133,10 +130,7 @@ export default function SidebarPage(props: Props) {
       decryptTitle();
     }
   }, [
-    props.nameCiphertext,
-    props.subkeyId,
     documentResult.data?.document,
-    documentTitleStore,
     props.documentId,
     props.workspaceId,
     activeDevice,

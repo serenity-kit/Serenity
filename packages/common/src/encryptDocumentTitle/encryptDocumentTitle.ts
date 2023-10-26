@@ -69,7 +69,7 @@ export const encryptDocumentTitle = (params: Params) => {
   });
   return {
     ciphertext: result.ciphertext,
-    publicNonce: result.publicNonce,
+    nonce: result.publicNonce,
     publicData,
     subkeyId: documentTitleKeyData.subkeyId,
     workspaceKeyId: params.snapshot.keyDerivationTrace.workspaceKeyId,
