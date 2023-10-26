@@ -32,7 +32,7 @@ export const createDocumentShareLink = async ({
   const virtualDevice = createDevice("share-document");
 
   // create virtual device
-  const virtualDeviceKey = sodium.crypto_secretbox_keygen();
+  const shareLinkDeviceKey = sodium.crypto_secretbox_keygen();
 
   // encrypt virtual device
   const serializedVirtualDevice = JSON.stringify(virtualDevice);
@@ -42,7 +42,7 @@ export const createDocumentShareLink = async ({
   const deviceSecretBoxCiphertext = sodium.crypto_secretbox_easy(
     serializedVirtualDevice,
     deviceSecretBoxNonce,
-    virtualDeviceKey
+    shareLinkDeviceKey
   );
 
   const snapshotDeviceNonce = sodium.randombytes_buf(

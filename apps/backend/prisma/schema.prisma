@@ -309,7 +309,10 @@ model Folder {
 }
 
 model DocumentShareLink {
-  token                              String            @id @unique @default(uuid())
+  deviceSigningPublicKey             String            @id @unique
+  deviceEncryptionPublicKey          String            @unique
+  deviceEncryptionPublicKeySignature String            @unique
+  token                              String            @unique @default(uuid())
   sharer                             User              @relation(fields: [sharerUserId], references: [id], onDelete: Cascade)
   sharerUserId                       String
   document                           Document          @relation(fields: [documentId], references: [id], onDelete: Cascade)
@@ -317,26 +320,22 @@ model DocumentShareLink {
   role                               ShareDocumentRole @default(VIEWER)
   deviceSecretBoxCiphertext          String
   deviceSecretBoxNonce               String
-  deviceSigningPublicKey             String            @unique
-  deviceEncryptionPublicKey          String            @unique
-  deviceEncryptionPublicKeySignature String            @unique
   snapshotKeyBoxes                   SnapshotKeyBox[]
   websocketSessionKey                String            @unique
 
-  @@index([deviceSigningPublicKey])
+  @@index([token])
 }
 
 model SnapshotKeyBox {
-  id                            String            @id @unique @default(uuid())
-  snapshot                      Snapshot          @relation(fields: [snapshotId], references: [id], onDelete: Cascade)
-  snapshotId                    String
-  deviceSigningPublicKey        String
-  creatorDeviceSigningPublicKey String
-  nonce                         String
-  ciphertext                    String
-  documentShareLink             DocumentShareLink @relation(fields: [documentShareLinkToken], references: [token], onDelete: Cascade)
-  documentShareLinkToken        String
-  creatorDevice                 CreatorDevice     @relation(fields: [creatorDeviceSigningPublicKey], references: [signingPublicKey], onDelete: SetDefault)
+  id                                      String            @id @unique @default(uuid())
+  snapshot                                Snapshot          @relation(fields: [snapshotId], references: [id], onDelete: Cascade)
+  snapshotId                              String
+  creatorDeviceSigningPublicKey           String
+  nonce                                   String
+  ciphertext                              String
+  documentShareLink                       DocumentShareLink @relation(fields: [documentShareLinkDeviceSigningPublicKey], references: [deviceSigningPublicKey], onDelete: Cascade)
+  documentShareLinkDeviceSigningPublicKey String
+  creatorDevice                           CreatorDevice     @relation(fields: [creatorDeviceSigningPublicKey], references: [signingPublicKey], onDelete: SetDefault)
 }
 
 model Comment {

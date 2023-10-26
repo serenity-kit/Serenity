@@ -424,13 +424,13 @@ export type DocumentShareLinkEdge = {
 
 export type DocumentShareLinkForSharePage = {
   __typename?: 'DocumentShareLinkForSharePage';
+  activeSnapshotKeyBox: SnapshotKeyBox;
   deviceEncryptionPublicKey: Scalars['String'];
   deviceEncryptionPublicKeySignature: Scalars['String'];
   deviceSecretBoxCiphertext: Scalars['String'];
   deviceSecretBoxNonce: Scalars['String'];
   deviceSigningPublicKey: Scalars['String'];
   role: ShareDocumentRole;
-  snapshotKeyBoxs?: Maybe<Array<SnapshotKeyBox>>;
   token: Scalars['String'];
   websocketSessionKey: Scalars['String'];
   workspaceId: Scalars['String'];
@@ -1671,7 +1671,7 @@ export type DocumentShareLinkQueryVariables = Exact<{
 }>;
 
 
-export type DocumentShareLinkQuery = { __typename?: 'Query', documentShareLink?: { __typename?: 'DocumentShareLinkForSharePage', token: string, websocketSessionKey: string, workspaceId: string, role: ShareDocumentRole, deviceSecretBoxCiphertext: string, deviceSecretBoxNonce: string, snapshotKeyBoxs?: Array<{ __typename?: 'SnapshotKeyBox', id: string, ciphertext: string, nonce: string, creatorDevice: { __typename?: 'CreatorDevice', signingPublicKey: string, encryptionPublicKey: string } }> | null } | null };
+export type DocumentShareLinkQuery = { __typename?: 'Query', documentShareLink?: { __typename?: 'DocumentShareLinkForSharePage', token: string, websocketSessionKey: string, workspaceId: string, role: ShareDocumentRole, deviceSecretBoxCiphertext: string, deviceSecretBoxNonce: string, activeSnapshotKeyBox: { __typename?: 'SnapshotKeyBox', id: string, ciphertext: string, nonce: string, creatorDevice: { __typename?: 'CreatorDevice', signingPublicKey: string, encryptionPublicKey: string } } } | null };
 
 export type DocumentShareLinksQueryVariables = Exact<{
   documentId: Scalars['ID'];
@@ -2455,7 +2455,7 @@ export const DocumentShareLinkDocument = gql`
     role
     deviceSecretBoxCiphertext
     deviceSecretBoxNonce
-    snapshotKeyBoxs {
+    activeSnapshotKeyBox {
       id
       ciphertext
       nonce

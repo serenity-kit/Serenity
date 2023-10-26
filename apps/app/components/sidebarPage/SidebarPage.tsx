@@ -37,9 +37,12 @@ export default function SidebarPage(props: Props) {
   const { activeDevice } = useAuthenticatedAppContext();
   const [isEditing, setIsEditing] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
-  const [documentTitle, setDocumentTitle] = useState("decrypting…");
   const { isFocusVisible, focusProps: focusRingProps }: any = useFocusRing();
   const documentTitleStore = useDocumentTitleStore();
+  const documentTitle =
+    useDocumentTitleStore((state) => state.documentTitles[props.documentId]) ||
+    "";
+
   const [documentResult] = useDocumentQuery({
     variables: { id: props.documentId },
   });
@@ -60,69 +63,85 @@ export default function SidebarPage(props: Props) {
     },
   });
 
-  const decryptTitle = async () => {
-    try {
-      const document = documentResult.data?.document;
-      if (!document) {
-        throw new Error("Unable to retrieve document!");
-      }
-      const snapshotResult = await runSnapshotQuery({
-        documentId: document.id,
-      });
-      if (!snapshotResult.data?.snapshot) {
-        throw new Error(
-          snapshotResult.error?.message || "Unable to retrieve snapshot!"
-        );
-      }
-      const snapshot = snapshotResult.data.snapshot;
-      if (!snapshotResult.data?.snapshot) {
-        throw new Error(
-          snapshotResult.error?.message || "Unable to retrieve snapshot!"
-        );
-      }
-      const workspace = await getWorkspace({
-        workspaceId: props.workspaceId,
-        deviceSigningPublicKey: activeDevice.signingPublicKey,
-      });
-      if (!workspace?.workspaceKeys) {
-        throw new Error("No workspace key for this workspace and device");
-      }
-      let documentWorkspaceKey: any = undefined;
-      for (const workspaceKey of workspace.workspaceKeys!) {
-        if (workspaceKey.id === snapshot.keyDerivationTrace.workspaceKeyId) {
-          documentWorkspaceKey = workspaceKey;
-        }
-      }
-      if (!documentWorkspaceKey?.workspaceKeyBox) {
-        throw new Error("Document workspace key not found");
-      }
-      const documentTitle = decryptDocumentTitle({
-        ciphertext: props.nameCiphertext,
-        nonce: props.nameNonce,
-        activeDevice,
-        subkeyId: props.subkeyId,
-        snapshot: {
-          keyDerivationTrace: snapshot.keyDerivationTrace,
-        },
-        workspaceKeyBox: documentWorkspaceKey.workspaceKeyBox!,
-      });
-      setDocumentTitle(documentTitle);
-      documentTitleStore.updateDocumentTitle({
-        documentId: document.id,
-        title: documentTitle,
-      });
-    } catch (error) {
-      console.error(error);
-      setDocumentTitle("decryption error");
-    }
-  };
   const { depth = 0 } = props;
 
   useEffect(() => {
-    if (documentResult.data?.document?.id) {
+    const decryptTitle = async () => {
+      try {
+        const document = documentResult.data?.document;
+        if (!document) {
+          throw new Error("Unable to retrieve document!");
+        }
+        const snapshotResult = await runSnapshotQuery({
+          documentId: document.id,
+        });
+        if (!snapshotResult.data?.snapshot) {
+          throw new Error(
+            snapshotResult.error?.message || "Unable to retrieve snapshot!"
+          );
+        }
+        const snapshot = snapshotResult.data.snapshot;
+        if (!snapshotResult.data?.snapshot) {
+          throw new Error(
+            snapshotResult.error?.message || "Unable to retrieve snapshot!"
+          );
+        }
+        const workspace = await getWorkspace({
+          workspaceId: props.workspaceId,
+          deviceSigningPublicKey: activeDevice.signingPublicKey,
+        });
+        if (!workspace?.workspaceKeys) {
+          throw new Error("No workspace key for this workspace and device");
+        }
+        let documentWorkspaceKey: any = undefined;
+        for (const workspaceKey of workspace.workspaceKeys!) {
+          if (workspaceKey.id === snapshot.keyDerivationTrace.workspaceKeyId) {
+            documentWorkspaceKey = workspaceKey;
+          }
+        }
+        if (!documentWorkspaceKey?.workspaceKeyBox) {
+          throw new Error("Document workspace key not found");
+        }
+
+        const documentTitle = decryptDocumentTitle({
+          ciphertext: document.nameCiphertext,
+          nonce: document.nameNonce,
+          activeDevice,
+          subkeyId: document.subkeyId,
+          snapshot: {
+            keyDerivationTrace: snapshot.keyDerivationTrace,
+          },
+          workspaceKeyBox: documentWorkspaceKey.workspaceKeyBox!,
+        });
+        documentTitleStore.updateDocumentTitle({
+          documentId: props.documentId,
+          title: documentTitle,
+        });
+      } catch (error) {
+        console.error(error);
+        documentTitleStore.updateDocumentTitle({
+          documentId: props.documentId,
+          title: "decryption error",
+        });
+      }
+    };
+
+    if (
+      documentResult.data?.document?.id &&
+      documentTitle !== "decryption error"
+    ) {
       decryptTitle();
     }
-  }, [props.nameCiphertext, props.subkeyId, documentResult.data?.document?.id]);
+  }, [
+    props.nameCiphertext,
+    props.subkeyId,
+    documentResult.data?.document,
+    documentTitleStore,
+    props.documentId,
+    props.workspaceId,
+    activeDevice,
+    documentTitle,
+  ]);
 
   const updateDocumentTitle = async (name: string) => {
     const document = documentResult.data?.document;

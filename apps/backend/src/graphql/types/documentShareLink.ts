@@ -42,8 +42,6 @@ export const DocumentShareLinkForSharePage = objectType({
     t.nonNull.string("deviceSigningPublicKey");
     t.nonNull.string("deviceEncryptionPublicKey");
     t.nonNull.string("deviceEncryptionPublicKeySignature");
-    t.list.nonNull.field("snapshotKeyBoxs", {
-      type: SnapshotKeyBox,
-    });
+    t.nonNull.field("activeSnapshotKeyBox", { type: SnapshotKeyBox });
   },
 });

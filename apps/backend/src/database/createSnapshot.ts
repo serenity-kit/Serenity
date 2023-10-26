@@ -1,6 +1,8 @@
 import {
+  DocumentShareLinkDeviceBox,
   KeyDerivationTrace,
   SerenitySnapshotWithClientData,
+  equalStringArrays,
   hash,
 } from "@serenity-tools/common";
 import {
@@ -33,12 +35,16 @@ export async function createSnapshot({
     const documentTitleData: CreateSnapshotDocumentTitleData | undefined =
       snapshot.additionalServerData?.documentTitleData;
 
+    const documentShareLinkDeviceBoxes: DocumentShareLinkDeviceBox[] =
+      snapshot.additionalServerData?.documentShareLinkDeviceBoxes || [];
+
     const document = await prisma.document.findUniqueOrThrow({
       where: { id: snapshot.publicData.docId },
       select: {
         activeSnapshot: true,
         requiresSnapshot: true,
         workspaceId: true,
+        documentShareLinks: true,
       },
     });
     const currentWorkspaceKey = await prisma.workspaceKey.findFirstOrThrow({
@@ -99,6 +105,24 @@ export async function createSnapshot({
       }
     }
 
+    if (
+      !equalStringArrays(
+        document.documentShareLinks
+          .map((entry) => entry.deviceSigningPublicKey)
+          .sort(),
+        documentShareLinkDeviceBoxes
+          .map((entry) => entry.deviceSigningPublicKey)
+          .sort()
+      )
+    ) {
+      console.log("documentShareLinkDeviceBoxes", documentShareLinkDeviceBoxes);
+      console.log(
+        "documentShareLinks",
+        document.documentShareLinks.map((entry) => entry.deviceSigningPublicKey)
+      );
+      throw new Error("Missing or too many documentShareLinkDeviceBoxes");
+    }
+
     if (documentTitleData) {
       await prisma.document.update({
         where: { id: snapshot.publicData.docId },
@@ -134,8 +158,22 @@ export async function createSnapshot({
         parentSnapshotProof: snapshot.publicData.parentSnapshotProof,
         parentSnapshotUpdateClocks:
           snapshot.publicData.parentSnapshotUpdateClocks,
+        snapshotKeyBoxes: {
+          createMany: {
+            data: documentShareLinkDeviceBoxes.map((deviceBox) => {
+              return {
+                ciphertext: deviceBox.ciphertext,
+                creatorDeviceSigningPublicKey: snapshot.publicData.pubKey,
+                nonce: deviceBox.nonce,
+                documentShareLinkDeviceSigningPublicKey:
+                  deviceBox.deviceSigningPublicKey,
+              };
+            }),
+          },
+        },
       },
     });
+
     return serializeSnapshot(newSnapshot);
   };
 

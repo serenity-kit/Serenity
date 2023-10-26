@@ -14,16 +14,16 @@ export const documentShareLinkQuery = queryField((t) => {
       const documentShareLink = await getDocumentShareLink({
         token: args.token,
       });
+
       return {
         ...documentShareLink,
-        snapshotKeyBoxs: documentShareLink.snapshotKeyBoxes.map(
-          (snapshotKeyBox) => {
-            return {
-              ...snapshotKeyBox,
-              creatorDevice: snapshotKeyBox.creatorDevice,
-            };
-          }
-        ),
+        activeSnapshotKeyBox: {
+          ...documentShareLink.activeSnapshotKeyBox,
+          deviceSigningPublicKey:
+            documentShareLink.activeSnapshotKeyBox
+              .documentShareLinkDeviceSigningPublicKey,
+          creatorDevice: documentShareLink.activeSnapshotKeyBox.creatorDevice,
+        },
       };
     },
   });

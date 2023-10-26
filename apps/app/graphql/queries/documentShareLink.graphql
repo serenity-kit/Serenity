@@ -6,7 +6,7 @@ query documentShareLink($token: ID!) {
     role
     deviceSecretBoxCiphertext
     deviceSecretBoxNonce
-    snapshotKeyBoxs {
+    activeSnapshotKeyBox {
       id
       ciphertext
       nonce

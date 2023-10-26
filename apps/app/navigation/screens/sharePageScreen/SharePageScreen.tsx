@@ -151,7 +151,7 @@ function ActualSharePageScreen(
   const [key] = useState(window.location.hash.split("=")[1]);
   const [state, send] = useMachine(sharePageScreenMachine, {
     context: {
-      virtualDeviceKey: key,
+      shareLinkDeviceKey: key,
       documentId: props.route.params.pageId,
       token: props.route.params.token,
     },
