@@ -36,6 +36,9 @@ export default function SidebarPage(props: Props) {
   const [isHovered, setIsHovered] = useState(false);
   const { isFocusVisible, focusProps: focusRingProps }: any = useFocusRing();
   const documentTitleStore = useDocumentTitleStore();
+  const updateDocumentTitleInStore = useDocumentTitleStore(
+    (state) => state.updateDocumentTitle
+  );
   const documentTitle =
     useDocumentTitleStore((state) => state.documentTitles[props.documentId]) ||
     "";
@@ -110,13 +113,13 @@ export default function SidebarPage(props: Props) {
           },
           workspaceKeyBox: documentWorkspaceKey.workspaceKeyBox!,
         });
-        documentTitleStore.updateDocumentTitle({
+        updateDocumentTitleInStore({
           documentId: props.documentId,
           title: documentTitle,
         });
       } catch (error) {
         console.error(error);
-        documentTitleStore.updateDocumentTitle({
+        updateDocumentTitleInStore({
           documentId: props.documentId,
           title: "decryption error",
         });
@@ -144,6 +147,10 @@ export default function SidebarPage(props: Props) {
       return;
     }
     try {
+      updateDocumentTitleInStore({
+        documentId: props.documentId,
+        title: documentTitle,
+      });
       await updateDocumentName({
         documentId: document.id,
         workspaceId: document.workspaceId,

@@ -181,7 +181,7 @@ export function CreateWorkspaceForm(props: CreateWorkspaceFormProps) {
             },
             document: {
               nameCiphertext: encryptedDocumentTitle.ciphertext,
-              nameNonce: encryptedDocumentTitle.publicNonce,
+              nameNonce: encryptedDocumentTitle.nonce,
               subkeyId: encryptedDocumentTitle.subkeyId,
               snapshot,
               serializedDocumentChainEvent: JSON.stringify(

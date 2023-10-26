@@ -344,7 +344,7 @@ export default function SidebarFolder(props: Props) {
       {
         input: {
           nameCiphertext: documentNameData.ciphertext,
-          nameNonce: documentNameData.publicNonce,
+          nameNonce: documentNameData.nonce,
           subkeyId: documentNameKey.subkeyId,
           workspaceId: props.workspaceId,
           parentFolderId: props.folderId,
@@ -674,9 +674,6 @@ export default function SidebarFolder(props: Props) {
                     key={document.id}
                     parentFolderId={props.folderId}
                     documentId={document.id}
-                    nameCiphertext={document.nameCiphertext}
-                    nameNonce={document.nameNonce}
-                    subkeyId={document.subkeyId}
                     workspaceId={props.workspaceId}
                     onRefetchDocumentsPress={refetchDocuments}
                     depth={depth}

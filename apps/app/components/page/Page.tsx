@@ -94,13 +94,13 @@ export default function Page({
   const setActiveDocumentId = useDocumentTitleStore(
     (state) => state.setActiveDocumentId
   );
-  const updateDocumentTitle = useDocumentTitleStore(
-    (state) => state.updateDocumentTitle
-  );
   const setSnapshotKey = useEditorStore((state) => state.setSnapshotKey);
   const [isClosedErrorModal, setIsClosedErrorModal] = useState(false);
   const ephemeralUpdateErrorsChangedAt = useRef<Date | null>(null);
   const hasEditorSidebar = useHasEditorSidebar();
+  const updateDocumentTitleInStore = useDocumentTitleStore(
+    (state) => state.updateDocumentTitle
+  );
 
   const { websocketOrigin } = getEnvironmentUrls();
   const { users, workspaceChainData } = useWorkspace();
@@ -448,7 +448,10 @@ export default function Page({
       documentId: docId,
     });
     // this is necessary to propagate document name update to the sidebar and header
-    updateDocumentTitle({ documentId: docId, title });
+    updateDocumentTitleInStore({
+      documentId: docId,
+      title,
+    });
     if (document?.id !== docId) {
       console.error("document ID doesn't match page ID");
       return;
