@@ -7,12 +7,7 @@ import {
 import sodium from "react-native-libsodium";
 import { runCreateDocumentShareLinkMutation } from "../../generated/graphql";
 import { getEnvironmentUrls } from "../getEnvironmentUrls/getEnvironmentUrls";
-
-type SnapshotDeviceKeyBox = {
-  ciphertext: string;
-  nonce: string;
-  deviceSigningPublicKey: string;
-};
+import { createDocumentShareLinkDeviceBox } from "./createDocumentShareLinkDeviceBox";
 
 export const getDocumentShareLinkUrl = (
   documentId: string,
@@ -37,20 +32,20 @@ export const createDocumentShareLink = async ({
   mainDevice,
   prevDocumentChainEvent,
 }: Props) => {
-  const virtualDevice = createDevice("share-document");
+  const shareLinkDevice = createDevice("share-document");
 
   // create virtual device
-  const virtualDeviceKey = sodium.crypto_secretbox_keygen();
+  const shareLinkDeviceKey = sodium.crypto_secretbox_keygen();
 
   // encrypt virtual device
-  const serializedVirtualDevice = JSON.stringify(virtualDevice);
+  const serializedShareLinkDevice = JSON.stringify(shareLinkDevice);
   const deviceSecretBoxNonce = sodium.randombytes_buf(
     sodium.crypto_secretbox_NONCEBYTES
   );
   const deviceSecretBoxCiphertext = sodium.crypto_secretbox_easy(
-    serializedVirtualDevice,
+    serializedShareLinkDevice,
     deviceSecretBoxNonce,
-    virtualDeviceKey
+    shareLinkDeviceKey
   );
 
   const documentChainEvent = documentChain.addShareDocumentDevice({
@@ -58,27 +53,18 @@ export const createDocumentShareLink = async ({
       privateKey: mainDevice.signingPrivateKey,
       publicKey: mainDevice.signingPublicKey,
     },
-    signingPublicKey: virtualDevice.signingPublicKey,
-    encryptionPublicKey: virtualDevice.encryptionPublicKey,
+    signingPublicKey: shareLinkDevice.signingPublicKey,
+    encryptionPublicKey: shareLinkDevice.encryptionPublicKey,
     role: sharingRole,
     prevEvent: prevDocumentChainEvent,
     expiresAt: undefined,
   });
 
-  const snapshotDeviceNonce = sodium.randombytes_buf(
-    sodium.crypto_box_NONCEBYTES
-  );
-  const snapshotDeviceCiphertext = sodium.crypto_box_easy(
+  const { documentShareLinkDeviceBox } = createDocumentShareLinkDeviceBox({
+    shareLinkDevice,
     snapshotKey,
-    snapshotDeviceNonce,
-    sodium.from_base64(virtualDevice.encryptionPublicKey),
-    sodium.from_base64(mainDevice.encryptionPrivateKey)
-  );
-  const snapshotDeviceKeyBox: SnapshotDeviceKeyBox = {
-    ciphertext: sodium.to_base64(snapshotDeviceCiphertext),
-    nonce: sodium.to_base64(snapshotDeviceNonce),
-    deviceSigningPublicKey: virtualDevice.signingPublicKey,
-  };
+    authorDevice: mainDevice,
+  });
 
   const response = await runCreateDocumentShareLinkMutation(
     {
@@ -86,7 +72,7 @@ export const createDocumentShareLink = async ({
         deviceSecretBoxCiphertext: sodium.to_base64(deviceSecretBoxCiphertext),
         deviceSecretBoxNonce: sodium.to_base64(deviceSecretBoxNonce),
         documentId: documentId,
-        snapshotDeviceKeyBox,
+        snapshotDeviceKeyBox: documentShareLinkDeviceBox,
         serializedDocumentChainEvent: JSON.stringify(documentChainEvent),
       },
     },
@@ -100,11 +86,11 @@ export const createDocumentShareLink = async ({
   const documentShareLink = getDocumentShareLinkUrl(
     documentId,
     token,
-    sodium.to_base64(virtualDeviceKey)
+    sodium.to_base64(shareLinkDeviceKey)
   );
   return {
     token,
-    virtualDeviceKey: sodium.to_base64(virtualDeviceKey),
+    shareLinkDeviceKey: sodium.to_base64(shareLinkDeviceKey),
     snapshotKey: sodium.to_base64(snapshotKey),
     documentShareLink,
   };

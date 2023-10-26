@@ -16,7 +16,7 @@ export type DocumentShareLinkQueryResult = {
 type Context = {
   documentId?: string;
   token: string;
-  virtualDeviceKey?: string;
+  shareLinkDeviceKey?: string;
   navigation: any;
   device?: LocalDevice;
   snapshotKey?: string;
@@ -141,13 +141,13 @@ export const sharePageScreenMachine =
           return documentShareLinkResult;
         },
         decryptVirtualDevice: async (context, event) => {
-          const virtualDeviceKey = context.virtualDeviceKey;
+          const shareLinkDeviceKey = context.shareLinkDeviceKey;
           const documentShareLink =
             context.documentShareLinkQueryResult?.data?.documentShareLink;
           const base64DeviceData = sodium.crypto_secretbox_open_easy(
             sodium.from_base64(documentShareLink?.deviceSecretBoxCiphertext!),
             sodium.from_base64(documentShareLink?.deviceSecretBoxNonce!),
-            sodium.from_base64(virtualDeviceKey!)
+            sodium.from_base64(shareLinkDeviceKey!)
           );
           const device = JSON.parse(sodium.to_string(base64DeviceData));
           return device;
@@ -156,13 +156,11 @@ export const sharePageScreenMachine =
           if (
             context.device &&
             context.documentShareLinkQueryResult?.data?.documentShareLink
-              ?.snapshotKeyBoxs &&
-            context.documentShareLinkQueryResult.data.documentShareLink
-              .snapshotKeyBoxs.length > 0
+              ?.activeSnapshotKeyBox
           ) {
             const snapshotKeyBox =
               context.documentShareLinkQueryResult.data.documentShareLink
-                .snapshotKeyBoxs[0];
+                .activeSnapshotKeyBox;
 
             const snapshotKey = sodium.crypto_box_open_easy(
               sodium.from_base64(snapshotKeyBox.ciphertext),

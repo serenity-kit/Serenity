@@ -122,10 +122,12 @@ export const createDocumentShareLink = async ({
       }
       await prisma.snapshotKeyBox.create({
         data: {
-          ...snapshotDeviceKeyBox,
+          ciphertext: snapshotDeviceKeyBox.ciphertext,
+          nonce: snapshotDeviceKeyBox.nonce,
           snapshotId: latestSnapshot.id,
           creatorDeviceSigningPublicKey: creatorDevice.signingPublicKey,
-          documentShareLinkToken: documentShareLink.token,
+          documentShareLinkDeviceSigningPublicKey:
+            snapshotDeviceKeyBox.deviceSigningPublicKey,
         },
       });
       return documentShareLink;

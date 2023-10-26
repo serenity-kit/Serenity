@@ -10,14 +10,31 @@ export async function getDocumentShareLink({ token }: Params) {
     where: { token },
     include: {
       document: true,
-      snapshotKeyBoxes: { include: { creatorDevice: true } },
     },
   });
-  if (!documentShareLink) {
+
+  if (
+    !documentShareLink ||
+    documentShareLink.document.activeSnapshotId === null
+  ) {
     throw new ForbiddenError("Unauthorized");
   }
+
+  const activeSnapshotKeyBox = await prisma.snapshotKeyBox.findFirst({
+    where: {
+      documentShareLink: { token },
+      snapshotId: documentShareLink.document.activeSnapshotId,
+    },
+    include: { creatorDevice: true },
+  });
+
+  if (!activeSnapshotKeyBox) {
+    throw new ForbiddenError("No active snapshot key box found");
+  }
+
   return {
     ...documentShareLink,
+    activeSnapshotKeyBox,
     workspaceId: documentShareLink.document.workspaceId,
   };
 }

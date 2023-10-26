@@ -424,13 +424,13 @@ export type DocumentShareLinkEdge = {
 
 export type DocumentShareLinkForSharePage = {
   __typename?: 'DocumentShareLinkForSharePage';
+  activeSnapshotKeyBox: SnapshotKeyBox;
   deviceEncryptionPublicKey: Scalars['String'];
   deviceEncryptionPublicKeySignature: Scalars['String'];
   deviceSecretBoxCiphertext: Scalars['String'];
   deviceSecretBoxNonce: Scalars['String'];
   deviceSigningPublicKey: Scalars['String'];
   role: ShareDocumentRole;
-  snapshotKeyBoxs?: Maybe<Array<SnapshotKeyBox>>;
   token: Scalars['String'];
   websocketSessionKey: Scalars['String'];
   workspaceId: Scalars['String'];
@@ -834,6 +834,7 @@ export type Query = {
   documentChain?: Maybe<DocumentChainEventConnection>;
   documentPath?: Maybe<Array<Maybe<Folder>>>;
   documentShareLink?: Maybe<DocumentShareLinkForSharePage>;
+  documentShareLinkSnapshotKeyBox?: Maybe<SnapshotKeyBox>;
   documentShareLinks?: Maybe<DocumentShareLinkConnection>;
   documents?: Maybe<DocumentConnection>;
   fileUrl?: Maybe<File>;
@@ -902,6 +903,12 @@ export type QueryDocumentPathArgs = {
 
 
 export type QueryDocumentShareLinkArgs = {
+  token: Scalars['ID'];
+};
+
+
+export type QueryDocumentShareLinkSnapshotKeyBoxArgs = {
+  snapshotId: Scalars['ID'];
   token: Scalars['ID'];
 };
 
@@ -1671,7 +1678,15 @@ export type DocumentShareLinkQueryVariables = Exact<{
 }>;
 
 
-export type DocumentShareLinkQuery = { __typename?: 'Query', documentShareLink?: { __typename?: 'DocumentShareLinkForSharePage', token: string, websocketSessionKey: string, workspaceId: string, role: ShareDocumentRole, deviceSecretBoxCiphertext: string, deviceSecretBoxNonce: string, snapshotKeyBoxs?: Array<{ __typename?: 'SnapshotKeyBox', id: string, ciphertext: string, nonce: string, creatorDevice: { __typename?: 'CreatorDevice', signingPublicKey: string, encryptionPublicKey: string } }> | null } | null };
+export type DocumentShareLinkQuery = { __typename?: 'Query', documentShareLink?: { __typename?: 'DocumentShareLinkForSharePage', token: string, websocketSessionKey: string, workspaceId: string, role: ShareDocumentRole, deviceSecretBoxCiphertext: string, deviceSecretBoxNonce: string, activeSnapshotKeyBox: { __typename?: 'SnapshotKeyBox', id: string, ciphertext: string, nonce: string, creatorDevice: { __typename?: 'CreatorDevice', signingPublicKey: string, encryptionPublicKey: string } } } | null };
+
+export type DocumentShareLinkSnapshotKeyBoxQueryVariables = Exact<{
+  token: Scalars['ID'];
+  snapshotId: Scalars['ID'];
+}>;
+
+
+export type DocumentShareLinkSnapshotKeyBoxQuery = { __typename?: 'Query', documentShareLinkSnapshotKeyBox?: { __typename?: 'SnapshotKeyBox', id: string, ciphertext: string, nonce: string, creatorDevice: { __typename?: 'CreatorDevice', signingPublicKey: string, encryptionPublicKey: string } } | null };
 
 export type DocumentShareLinksQueryVariables = Exact<{
   documentId: Scalars['ID'];
@@ -2455,7 +2470,7 @@ export const DocumentShareLinkDocument = gql`
     role
     deviceSecretBoxCiphertext
     deviceSecretBoxNonce
-    snapshotKeyBoxs {
+    activeSnapshotKeyBox {
       id
       ciphertext
       nonce
@@ -2470,6 +2485,23 @@ export const DocumentShareLinkDocument = gql`
 
 export function useDocumentShareLinkQuery(options: Omit<Urql.UseQueryArgs<DocumentShareLinkQueryVariables>, 'query'>) {
   return Urql.useQuery<DocumentShareLinkQuery, DocumentShareLinkQueryVariables>({ query: DocumentShareLinkDocument, ...options });
+};
+export const DocumentShareLinkSnapshotKeyBoxDocument = gql`
+    query documentShareLinkSnapshotKeyBox($token: ID!, $snapshotId: ID!) {
+  documentShareLinkSnapshotKeyBox(token: $token, snapshotId: $snapshotId) {
+    id
+    ciphertext
+    nonce
+    creatorDevice {
+      signingPublicKey
+      encryptionPublicKey
+    }
+  }
+}
+    `;
+
+export function useDocumentShareLinkSnapshotKeyBoxQuery(options: Omit<Urql.UseQueryArgs<DocumentShareLinkSnapshotKeyBoxQueryVariables>, 'query'>) {
+  return Urql.useQuery<DocumentShareLinkSnapshotKeyBoxQuery, DocumentShareLinkSnapshotKeyBoxQueryVariables>({ query: DocumentShareLinkSnapshotKeyBoxDocument, ...options });
 };
 export const DocumentShareLinksDocument = gql`
     query documentShareLinks($documentId: ID!, $first: Int! = 50, $after: String) {
@@ -4027,6 +4059,109 @@ export const documentShareLinkQueryService =
         // perform cleanup
         clearInterval(intervalId);
         documentShareLinkQueryServiceSubscribers[variablesString].intervalId = null;
+      }
+    };
+  };
+
+
+
+export const runDocumentShareLinkSnapshotKeyBoxQuery = async (variables: DocumentShareLinkSnapshotKeyBoxQueryVariables, options?: any) => {
+  return await getUrqlClient()
+    .query<DocumentShareLinkSnapshotKeyBoxQuery, DocumentShareLinkSnapshotKeyBoxQueryVariables>(
+      DocumentShareLinkSnapshotKeyBoxDocument,
+      variables,
+      {
+        // better to be safe here and always refetch
+        requestPolicy: "network-only",
+        ...options
+      }
+    )
+    .toPromise();
+};
+
+export type DocumentShareLinkSnapshotKeyBoxQueryResult = Urql.OperationResult<DocumentShareLinkSnapshotKeyBoxQuery, DocumentShareLinkSnapshotKeyBoxQueryVariables>;
+
+export type DocumentShareLinkSnapshotKeyBoxQueryUpdateResultEvent = {
+  type: "DocumentShareLinkSnapshotKeyBoxQuery.UPDATE_RESULT";
+  result: DocumentShareLinkSnapshotKeyBoxQueryResult;
+};
+
+export type DocumentShareLinkSnapshotKeyBoxQueryErrorEvent = {
+  type: "DocumentShareLinkSnapshotKeyBoxQuery.ERROR";
+  result: DocumentShareLinkSnapshotKeyBoxQueryResult;
+};
+
+export type DocumentShareLinkSnapshotKeyBoxQueryServiceEvent = DocumentShareLinkSnapshotKeyBoxQueryUpdateResultEvent | DocumentShareLinkSnapshotKeyBoxQueryErrorEvent;
+
+type DocumentShareLinkSnapshotKeyBoxQueryServiceSubscribersEntry = {
+  variables: DocumentShareLinkSnapshotKeyBoxQueryVariables;
+  callbacks: ((event: DocumentShareLinkSnapshotKeyBoxQueryServiceEvent) => void)[];
+  intervalId: NodeJS.Timer | null;
+};
+
+type DocumentShareLinkSnapshotKeyBoxQueryServiceSubscribers = {
+  [variables: string]: DocumentShareLinkSnapshotKeyBoxQueryServiceSubscribersEntry;
+};
+
+const documentShareLinkSnapshotKeyBoxQueryServiceSubscribers: DocumentShareLinkSnapshotKeyBoxQueryServiceSubscribers = {};
+
+const triggerDocumentShareLinkSnapshotKeyBoxQuery = (variablesString: string, variables: DocumentShareLinkSnapshotKeyBoxQueryVariables) => {
+  getUrqlClient()
+    .query<DocumentShareLinkSnapshotKeyBoxQuery, DocumentShareLinkSnapshotKeyBoxQueryVariables>(DocumentShareLinkSnapshotKeyBoxDocument, variables)
+    .toPromise()
+    .then((result) => {
+      documentShareLinkSnapshotKeyBoxQueryServiceSubscribers[variablesString].callbacks.forEach(
+        (callback) => {
+          callback({
+            type: result.error ? "DocumentShareLinkSnapshotKeyBoxQuery.ERROR" : "DocumentShareLinkSnapshotKeyBoxQuery.UPDATE_RESULT",
+            result: result,
+          });
+        }
+      );
+    });
+};
+
+/**
+ * This service is used to query results every 4 seconds.
+ *
+ * It allows machines to spawn a service that will fetch the query
+ * and send the result to the machine.
+ * It will share the same interval for all machines.
+ * When the last subscription is stopped, the interval will be cleared.
+ * It also considers the variables passed to the service.
+ */
+export const documentShareLinkSnapshotKeyBoxQueryService =
+  (variables: DocumentShareLinkSnapshotKeyBoxQueryVariables, intervalInMs?: number) => (callback, onReceive) => {
+    const variablesString = canonicalize(variables) as string;
+    if (documentShareLinkSnapshotKeyBoxQueryServiceSubscribers[variablesString]) {
+      documentShareLinkSnapshotKeyBoxQueryServiceSubscribers[variablesString].callbacks.push(callback);
+    } else {
+      documentShareLinkSnapshotKeyBoxQueryServiceSubscribers[variablesString] = {
+        variables,
+        callbacks: [callback],
+        intervalId: null,
+      };
+    }
+
+    triggerDocumentShareLinkSnapshotKeyBoxQuery(variablesString, variables);
+    if (!documentShareLinkSnapshotKeyBoxQueryServiceSubscribers[variablesString].intervalId) {
+      documentShareLinkSnapshotKeyBoxQueryServiceSubscribers[variablesString].intervalId = setInterval(
+        () => {
+          triggerDocumentShareLinkSnapshotKeyBoxQuery(variablesString, variables);
+        },
+        intervalInMs || 4000
+      );
+    }
+
+    const intervalId = documentShareLinkSnapshotKeyBoxQueryServiceSubscribers[variablesString].intervalId;
+    return () => {
+      if (
+        documentShareLinkSnapshotKeyBoxQueryServiceSubscribers[variablesString].callbacks.length === 0 &&
+        intervalId
+      ) {
+        // perform cleanup
+        clearInterval(intervalId);
+        documentShareLinkSnapshotKeyBoxQueryServiceSubscribers[variablesString].intervalId = null;
       }
     };
   };

@@ -39,6 +39,7 @@ import * as MainDeviceQueryTypes from "./graphql/queries/device/mainDevice";
 import * as DocumentQueryTypes from "./graphql/queries/document/document";
 import * as DocumentPathQueryTypes from "./graphql/queries/document/documentPath";
 import * as DocumentShareLinkQueryTypes from "./graphql/queries/document/documentShareLink";
+import * as DocumentShareLinkSnapshotKeyBoxQueryTypes from "./graphql/queries/document/documentShareLinkSnapshotKeyBox";
 import * as DocumentShareLinksQueryTypes from "./graphql/queries/document/documentShareLinks";
 import * as DocumentsQueryTypes from "./graphql/queries/document/documents";
 import * as FirstDocumentQueryTypes from "./graphql/queries/document/firstDocument";
@@ -96,6 +97,7 @@ export const schema = makeSchema({
     DocumentShareLinkTypes,
     DocumentShareLinksQueryTypes,
     DocumentShareLinkQueryTypes,
+    DocumentShareLinkSnapshotKeyBoxQueryTypes,
     DocumentChainQueryTypes,
     DocumentChainTypes,
 

@@ -1,5 +1,6 @@
 import * as documentChain from "@serenity-kit/document-chain";
 import {
+  DocumentShareLinkDeviceBox,
   KeyDerivationTrace,
   LocalDevice,
   SerenitySnapshotPublicData,
@@ -40,6 +41,7 @@ import { DocumentState } from "../../types/documentState";
 import { WorkspaceDrawerScreenProps } from "../../types/navigationProps";
 import { createNewSnapshotKey } from "../../utils/createNewSnapshotKey/createNewSnapshotKey";
 import { deriveExistingSnapshotKey } from "../../utils/deriveExistingSnapshotKey/deriveExistingSnapshotKey";
+import { createDocumentShareLinkDeviceBox } from "../../utils/document/createDocumentShareLinkDeviceBox";
 import { useDocumentTitleStore } from "../../utils/document/documentTitleStore";
 import { getDocument } from "../../utils/document/getDocument";
 import { updateDocumentName } from "../../utils/document/updateDocumentName";
@@ -92,13 +94,13 @@ export default function Page({
   const setActiveDocumentId = useDocumentTitleStore(
     (state) => state.setActiveDocumentId
   );
-  const updateDocumentTitle = useDocumentTitleStore(
-    (state) => state.updateDocumentTitle
-  );
   const setSnapshotKey = useEditorStore((state) => state.setSnapshotKey);
   const [isClosedErrorModal, setIsClosedErrorModal] = useState(false);
   const ephemeralUpdateErrorsChangedAt = useRef<Date | null>(null);
   const hasEditorSidebar = useHasEditorSidebar();
+  const updateDocumentTitleInStore = useDocumentTitleStore(
+    (state) => state.updateDocumentTitle
+  );
 
   const { websocketOrigin } = getEnvironmentUrls();
   const { users, workspaceChainData } = useWorkspace();
@@ -161,6 +163,25 @@ export default function Page({
         workspaceKeyBox: workspace.currentWorkspaceKey.workspaceKeyBox!,
       });
 
+      let documentShareLinkDeviceBoxes: DocumentShareLinkDeviceBox[] = [];
+      if (documentChainStateRef.current) {
+        documentShareLinkDeviceBoxes = Object.entries(
+          documentChainStateRef.current.devices
+        ).map(([shareLinkDeviceSigningPublicKey, deviceEntry]) => {
+          const { documentShareLinkDeviceBox } =
+            createDocumentShareLinkDeviceBox({
+              authorDevice: activeDevice,
+              snapshotKey: sodium.from_base64(snapshotKeyData.key),
+              shareLinkDevice: {
+                signingPublicKey: shareLinkDeviceSigningPublicKey,
+                encryptionPublicKey: deviceEntry.encryptionPublicKey,
+                encryptionPublicKeySignature: "IGNORE",
+              },
+            });
+          return documentShareLinkDeviceBox;
+        });
+      }
+
       return {
         id: snapshotId,
         data: Yjs.encodeStateAsUpdateV2(yDocRef.current),
@@ -168,7 +189,10 @@ export default function Page({
         publicData: {
           keyDerivationTrace: snapshotKeyData.keyDerivationTrace,
         },
-        additionalServerData: { documentTitleData },
+        additionalServerData: {
+          documentTitleData,
+          documentShareLinkDeviceBoxes,
+        },
       };
     },
     getSnapshotKey: async (snapshotProofInfo) => {
@@ -424,7 +448,10 @@ export default function Page({
       documentId: docId,
     });
     // this is necessary to propagate document name update to the sidebar and header
-    updateDocumentTitle({ documentId: docId, title });
+    updateDocumentTitleInStore({
+      documentId: docId,
+      title,
+    });
     if (document?.id !== docId) {
       console.error("document ID doesn't match page ID");
       return;

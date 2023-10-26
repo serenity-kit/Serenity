@@ -65,6 +65,12 @@ export type SerenitySnapshot = Snapshot & {
   publicData: Snapshot["publicData"] & SerenitySnapshotPublicData;
 };
 
+export type DocumentShareLinkDeviceBox = {
+  ciphertext: string;
+  nonce: string;
+  deviceSigningPublicKey: string;
+};
+
 export type SerenitySnapshotWithClientData = SnapshotWithClientData & {
   publicData: Snapshot["publicData"] & SerenitySnapshotPublicData;
   additionalServerData: {
@@ -74,6 +80,7 @@ export type SerenitySnapshotWithClientData = SnapshotWithClientData & {
       subkeyId: number;
       workspaceKeyId: string;
     };
+    documentShareLinkDeviceBoxes: DocumentShareLinkDeviceBox[];
   };
 };
 
