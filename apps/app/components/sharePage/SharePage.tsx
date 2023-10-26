@@ -117,9 +117,9 @@ export const SharePage: React.FC<Props> = ({
 
       return snapshotKey;
     },
-    shouldSendSnapshot: ({ snapshotUpdatesCount }) => {
-      // create a new snapshot if the active snapshot has more than 100 updates
-      return snapshotUpdatesCount !== null && snapshotUpdatesCount > 100;
+    shouldSendSnapshot: () => {
+      // share page link users are not supposed to create new snapshots
+      return false;
     },
     isValidClient: async (signingPublicKey: string) => {
       // The client doesn't and shouldn't know about the workspace members
