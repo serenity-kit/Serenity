@@ -4,7 +4,6 @@ import * as documentChain from "@serenity-kit/document-chain";
 import {
   KeyDerivationTrace,
   SerenitySnapshotPublicData,
-  createDocumentTitleKey,
   createSnapshotKey,
   decryptFolderName,
   deriveKeysFromKeyDerivationTrace,
@@ -329,9 +328,6 @@ export default function SidebarFolder(props: Props) {
       signatureKeyPair,
       sodium
     );
-    const documentNameKey = createDocumentTitleKey({
-      snapshotKey: snapshotKey.key,
-    });
     const documentNameData = encryptDocumentTitle({
       title: documentName,
       activeDevice,
@@ -345,7 +341,7 @@ export default function SidebarFolder(props: Props) {
         input: {
           nameCiphertext: documentNameData.ciphertext,
           nameNonce: documentNameData.nonce,
-          subkeyId: documentNameKey.subkeyId,
+          subkeyId: documentNameData.subkeyId,
           workspaceId: props.workspaceId,
           parentFolderId: props.folderId,
           snapshot,
