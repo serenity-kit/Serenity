@@ -21,6 +21,7 @@ module.exports = async function (env, argv) {
           resolveApp("../../packages/user-chain"),
           resolveApp("../../packages/document-chain"),
           resolveApp("../../packages/common"),
+          resolveApp("../../packages/workspace-integrity"),
           "@gorhom/bottom-sheet", // needed due a bug in https://github.com/software-mansion/react-native-reanimated/issues/2994#issuecomment-1216482813
         ],
       },

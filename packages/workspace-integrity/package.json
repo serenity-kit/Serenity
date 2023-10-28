@@ -1,0 +1,28 @@
+{
+  "name": "@serenity-kit/workspace-integrity",
+  "version": "0.0.1",
+  "main": "src/index",
+  "scripts": {
+    "build": "rimraf -rf ./dist && tsc -p tsconfig.build.json",
+    "prepublishOnly": "yarn run build",
+    "test": "jest",
+    "ts:check": "yarn tsc --noEmit",
+    "lint": "eslint --ext .tsx --ext .ts ./"
+  },
+  "dependencies": {
+    "canonicalize": "^2.0.0",
+    "zod": "^3.21.4"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.19.3",
+    "@babel/preset-env": "^7.19.3",
+    "@babel/preset-typescript": "^7.18.6",
+    "@types/jest": "^29.1.1",
+    "jest": "^29.1.1"
+  },
+  "jest": {
+    "setupFilesAfterEnv": [
+      "<rootDir>/test/config/jestTestSetup.ts"
+    ]
+  }
+}
