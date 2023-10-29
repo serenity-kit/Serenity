@@ -20150,6 +20150,11 @@ react-native-popper@^0.3.2:
     "@react-native-aria/focus" "^0.2.5"
     "@react-native-aria/overlays" "^0.3.1"
 
+react-native-quick-sqlite@^8.0.6:
+  version "8.0.6"
+  resolved "https://registry.yarnpkg.com/react-native-quick-sqlite/-/react-native-quick-sqlite-8.0.6.tgz#ac1b662efe5641bc51eb7a8ee8ffac8af29532c4"
+  integrity sha512-XtwXnfZ1a6zRzAHoWFyVJsP3p8etx3/xww1oFKGdiOSj054PdYIeup9A53rtQ6ENyg+aqSKOgmxoN/PetulGOQ==
+
 react-native-reanimated@~2.12.0:
   version "2.12.0"
   resolved "https://registry.yarnpkg.com/react-native-reanimated/-/react-native-reanimated-2.12.0.tgz#5821eecfb1769b1617a67a2d4dec12fdeedb2b6e"
