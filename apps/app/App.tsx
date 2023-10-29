@@ -16,7 +16,6 @@ import { NativeBaseProvider, extendTheme } from "native-base";
 import { OverlayProvider } from "react-native-popper";
 import { RootSiblingParent } from "react-native-root-siblings";
 import { SafeAreaProvider } from "react-native-safe-area-context";
-import initSqlJs from "sql.js/dist/sql-asm";
 import { useAppColorScheme, useDeviceContext } from "twrnc";
 import { Provider as UrqlProvider } from "urql";
 import { theme } from "../../tailwind.config";
@@ -24,6 +23,7 @@ import { ErrorBoundary } from "./components/errorBoundary/ErrorBoundary";
 import { AppContextProvider } from "./context/AppContext";
 import useCachedResources from "./hooks/useCachedResources";
 import Navigation from "./navigation/Navigation";
+import "./store/store";
 import { patchConsoleOutput } from "./utils/patchConsoleOutput/patchConsoleOutput";
 import { patchFileReader } from "./utils/patchFileReader/patchFileReader";
 import { patchGlobalStyles } from "./utils/patchGlobalStyles/patchGlobalStyles";
@@ -31,36 +31,6 @@ import { patchGlobalStyles } from "./utils/patchGlobalStyles/patchGlobalStyles";
 patchConsoleOutput();
 patchGlobalStyles();
 patchFileReader();
-
-const runSql = async () => {
-  const SQL = await initSqlJs({
-    // Required to load the wasm binary asynchronously. Of course, you can host it wherever you want
-    // You can omit locateFile completely when running in node
-    // locateFile: file => `https://sql.js.org/dist/${file}`
-  });
-
-  console.log(SQL);
-  const db = new SQL.Database();
-  // NOTE: You can also use new SQL.Database(data) where
-  // data is an Uint8Array representing an SQLite database file
-
-  // Execute a single SQL string that contains multiple statements
-  let sqlstr =
-    "CREATE TABLE hello (a int, b char); \
-INSERT INTO hello VALUES (0, 'hello'); \
-INSERT INTO hello VALUES (1, 'world');";
-  db.run(sqlstr); // Run the query without returning anything
-
-  // Prepare an sql statement
-  const stmt = db.prepare("SELECT * FROM hello WHERE a=:aval AND b=:bval");
-
-  // Bind values to the parameters and fetch the results of the query
-  const result = stmt.getAsObject({ ":aval": 1, ":bval": "world" });
-  console.log(result); // Will print {a:1, b:'world'}
-  alert(result.b);
-};
-
-runSql();
 
 // import { clearDeviceAndSessionStorage } from "./utils/authentication/clearDeviceAndSessionStorage";
 // clearDeviceAndSessionStorage();
