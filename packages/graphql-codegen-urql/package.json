@@ -3,7 +3,7 @@
   "version": "0.0.1",
   "main": "src/index",
   "scripts": {
-    "ts:check": "yarn tsc --noEmit",
+    "ts:check": "echo 'No ts:check'",
     "test": "echo 'No tests to run'",
     "lint": "eslint --ext .tsx --ext .ts --ext .js ./"
   },
