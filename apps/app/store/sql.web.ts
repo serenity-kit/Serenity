@@ -1,9 +1,17 @@
-import initSqlJs, { Database } from "sql.js/dist/sql-asm";
+import { Database } from "sql.js";
 
 let db: Database;
 
 export const ready = async () => {
-  const SQL = await initSqlJs({});
+  const { default: initSqlJs } = await import("sql.js/dist/sql-wasm.js");
+  const SQL = await initSqlJs({
+    locateFile: (file: string) => {
+      // TODO host this file ourselves
+      // The issue here was Webpack 4 having issues with loading wasm files.
+      // Should be easier to resolve after upgrading to Webpack 5 or Metro.
+      return `https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.8.0/${file}`;
+    },
+  });
   db = new SQL.Database();
 };
 
