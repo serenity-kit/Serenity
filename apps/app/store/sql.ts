@@ -3,7 +3,7 @@ import { QuickSQLiteConnection, open } from "react-native-quick-sqlite";
 let db: QuickSQLiteConnection;
 
 export const ready = () => {
-  db = open({ name: "serenity-test-db.sqlite" });
+  db = open({ name: ":memory:" });
   return Promise.resolve();
 };
 
