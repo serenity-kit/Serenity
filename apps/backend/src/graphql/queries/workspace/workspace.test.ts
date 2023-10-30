@@ -55,7 +55,6 @@ test("user should be able to get a workspace by id", async () => {
   });
   const workspace = result.workspace;
   expect(workspace.id).toBe(otherWorkspace.workspace.id);
-  expect(workspace.name).toBe(workspace2Name);
   expect(typeof workspace.currentWorkspaceKey.id).toBe("string");
   expect(workspace.currentWorkspaceKey.workspaceId).toBe(
     otherWorkspace.workspace.id

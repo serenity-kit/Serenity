@@ -208,10 +208,9 @@ model CreatorDevice {
 
 model Workspace {
   id                 String                 @id
-  idSignature        String
-  name               String // TODO must be encrypted
-  infoCiphertext     String?
-  infoNonce          String?
+  infoCiphertext     String
+  infoNonce          String
+  // TODO not sure how to create the workspaceKey and reference it here at the same time
   infoWorkspaceKeyId String?                @unique
   folders            Folder[]
   documents          Document[]

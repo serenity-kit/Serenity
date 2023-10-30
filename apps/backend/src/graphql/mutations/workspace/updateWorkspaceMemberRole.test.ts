@@ -201,7 +201,6 @@ describe("Input errors", () => {
       updateWorkspaceMemberRole(input: $input) {
         workspace {
           id
-          name
         }
       }
     }

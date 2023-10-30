@@ -189,14 +189,7 @@ export default function AcceptWorkspaceInvitationScreen(
       <VStack alignItems="center" space={4} style={tw`text-center`}>
         <Heading lvl={1}>Hi there!</Heading>
         <Description variant="login">
-          You have been invited to join workspace{" "}
-          <Description variant="login" bold>
-            {
-              workspaceInvitationQueryResult.data?.workspaceInvitation
-                ?.workspaceName
-            }
-          </Description>{" "}
-          by{" "}
+          You have been invited to join a workspace by{" "}
           <Description variant="login" bold>
             {
               workspaceInvitationQueryResult.data?.workspaceInvitation

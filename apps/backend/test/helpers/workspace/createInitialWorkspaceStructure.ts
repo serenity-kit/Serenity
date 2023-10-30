@@ -7,6 +7,7 @@ import {
   createSnapshotKey,
   encryptDocumentTitleByKey,
   encryptFolderName,
+  encryptWorkspaceInfo,
   encryptWorkspaceKeyForDevice,
   folderDerivedKeyContext,
   generateId,
@@ -23,7 +24,24 @@ const query = gql`
     createInitialWorkspaceStructure(input: $input) {
       workspace {
         id
-        name
+        infoCiphertext
+        infoNonce
+        infoWorkspaceKey {
+          id
+          workspaceId
+          generation
+          workspaceKeyBox {
+            id
+            workspaceKeyId
+            deviceSigningPublicKey
+            ciphertext
+            nonce
+            creatorDevice {
+              signingPublicKey
+              encryptionPublicKey
+            }
+          }
+        }
         currentWorkspaceKey {
           id
           workspaceId
@@ -113,8 +131,15 @@ export const createInitialWorkspaceStructure = async ({
       nonce: deviceWorkspaceKeyBox.nonce,
     });
   }
-  const readyWorkspace = {
+
+  const workspaceInfo = encryptWorkspaceInfo({
     name: workspaceName,
+    key: workspaceKey,
+  });
+
+  const readyWorkspace = {
+    infoCiphertext: workspaceInfo.ciphertext,
+    infoNonce: workspaceInfo.nonce,
     workspaceKeyId,
     deviceWorkspaceKeyBoxes,
   };

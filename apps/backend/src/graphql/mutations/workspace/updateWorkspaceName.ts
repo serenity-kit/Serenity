@@ -13,7 +13,9 @@ export const UpdateWorkspaceNameInput = inputObjectType({
   name: "UpdateWorkspaceNameInput",
   definition(t) {
     t.nonNull.string("id");
-    t.string("name");
+    t.nonNull.string("infoCiphertext");
+    t.nonNull.string("infoNonce");
+    t.nonNull.string("infoWorkspaceKeyId");
   },
 });
 
@@ -41,7 +43,9 @@ export const updateWorkspaceNameMutation = mutationField(
       }
       const workspace = await updateWorkspaceName({
         id: args.input.id,
-        name: args.input.name || undefined,
+        infoCiphertext: args.input.infoCiphertext,
+        infoNonce: args.input.infoNonce,
+        infoWorkspaceKeyId: args.input.infoWorkspaceKeyId,
         userId: context.user.id,
       });
       return { workspace };

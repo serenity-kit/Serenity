@@ -6,6 +6,7 @@ import {
   createSnapshotKey,
   encryptDocumentTitle,
   encryptFolderName,
+  encryptWorkspaceInfo,
   folderDerivedKeyContext,
   generateId,
   snapshotDerivedKeyContext,
@@ -163,11 +164,17 @@ export function CreateWorkspaceForm(props: CreateWorkspaceFormProps) {
         },
       });
 
+      const encryptedWorkspaceInfo = encryptWorkspaceInfo({
+        name,
+        key: workspaceKey,
+      });
+
       const createInitialWorkspaceStructureResult =
         await createInitialWorkspaceStructure({
           input: {
             workspace: {
-              name,
+              infoCiphertext: encryptedWorkspaceInfo.ciphertext,
+              infoNonce: encryptedWorkspaceInfo.nonce,
               workspaceKeyId,
               deviceWorkspaceKeyBoxes,
             },

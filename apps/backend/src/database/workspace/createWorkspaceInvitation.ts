@@ -71,10 +71,7 @@ export async function createWorkspaceInvitation({
           },
           workspaceId: true,
           workspace: {
-            select: {
-              id: true,
-              name: true,
-            },
+            select: { id: true },
           },
           role: true,
         },
@@ -119,7 +116,6 @@ export async function createWorkspaceInvitation({
       const workspaceInvitation: WorkspaceInvitation = {
         ...rawWorkspaceInvitation,
         inviterUsername: userToWorkspace.user.username,
-        workspaceName: userToWorkspace.workspace.name,
       };
       return workspaceInvitation;
     },

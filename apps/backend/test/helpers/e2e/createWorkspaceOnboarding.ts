@@ -44,10 +44,7 @@ export const createWorkspaceOnOnboarding = async ({
   expect(userToWorkspace).not.toBe(null);
   const workspaceId = userToWorkspace?.workspaceId;
   const workspace = await prisma.workspace.findFirst({
-    where: {
-      name: workspaceName,
-      id: workspaceId,
-    },
+    where: { id: workspaceId },
     include: {
       workspaceKeys: {
         include: {

@@ -192,8 +192,6 @@ test("successfully creates an update", async () => {
     pubKey: sodium.to_base64(signatureKeyPair.publicKey),
   };
 
-  console.log("PPPPP", lastSnapshotKey);
-
   const updateToSend = createUpdate(
     "UPDATE CONTENT DUMMY",
     publicData,

@@ -4,7 +4,6 @@ import {
   LocalDevice,
 } from "@serenity-tools/common";
 import {
-  WorkspaceKeyBox,
   WorkspaceKeyBoxData,
   WorkspaceKeyDevicePair,
 } from "../../generated/graphql";
@@ -12,25 +11,6 @@ import { getWorkspace } from "../workspace/getWorkspace";
 import { getWorkspaces } from "../workspace/getWorkspaces";
 import { getDevices } from "./getDevices";
 import { getMainDevice } from "./mainDeviceMemoryStore";
-
-type GetWorkspaceKeyBoxByDeviceSigningPublicKeyProps = {
-  workspaceKeyBoxes: WorkspaceKeyBox[];
-  deviceSigningPublicKey: string;
-};
-
-const getWorkspaceKeyBoxByDeviceSigningPublicKey = ({
-  workspaceKeyBoxes,
-  deviceSigningPublicKey,
-}: GetWorkspaceKeyBoxByDeviceSigningPublicKeyProps):
-  | WorkspaceKeyBox
-  | undefined => {
-  for (const workspaceKeyBox of workspaceKeyBoxes) {
-    if (workspaceKeyBox.deviceSigningPublicKey === deviceSigningPublicKey) {
-      return workspaceKeyBox;
-    }
-  }
-  return undefined;
-};
 
 export type Props = {
   activeDevice: LocalDevice;
@@ -71,6 +51,8 @@ export const createNewWorkspaceKeyBoxesForActiveDevice = async ({
         throw new Error("Could not find workspaceKeyBox for main device!");
       }
       const creatorDevice = workspaceKeyBox.creatorDevice;
+      // TODO verify that creator
+      // needs a workspace key chain with a main device!
       const workspaceKeyString = decryptWorkspaceKey({
         ciphertext: workspaceKeyBox.ciphertext,
         nonce: workspaceKeyBox.nonce,

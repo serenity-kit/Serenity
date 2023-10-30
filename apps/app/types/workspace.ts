@@ -17,7 +17,6 @@ export type WorkspaceKey = {
 export type Workspace = {
   id: string;
   name: string;
-  idSignature?: string;
   workspaceKeys?: WorkspaceKey[];
   currentWorkspaceKey?: WorkspaceKey;
 };

@@ -14,7 +14,8 @@ import {
 
 export type WorkspaceParams = {
   id: string;
-  name: string;
+  infoCiphertext: string;
+  infoNonce: string;
   deviceWorkspaceKeyBoxes: DeviceWorkspaceKeyBoxParams[];
   workspaceKeyId: string;
 };
@@ -56,7 +57,8 @@ export async function createInitialWorkspaceStructure({
 }: Params) {
   const createdWorkspace = await createWorkspace({
     id: workspace.id,
-    name: workspace.name,
+    infoCiphertext: workspace.infoCiphertext,
+    infoNonce: workspace.infoNonce,
     userId,
     creatorDeviceSigningPublicKey,
     deviceWorkspaceKeyBoxes: workspace.deviceWorkspaceKeyBoxes,

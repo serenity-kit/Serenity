@@ -11,7 +11,6 @@ export async function getWorkspaceInvitation({
     where: { id: workspaceInvitationId, expiresAt: { gte: new Date() } },
     include: {
       inviterUser: { select: { username: true } },
-      workspace: { select: { name: true } },
     },
   });
   if (!rawWorkspaceInvitation) {
@@ -20,7 +19,6 @@ export async function getWorkspaceInvitation({
   const workspaceInvitation: WorkspaceInvitation = {
     ...rawWorkspaceInvitation,
     inviterUsername: rawWorkspaceInvitation.inviterUser.username,
-    workspaceName: rawWorkspaceInvitation.workspace.name,
   };
   return workspaceInvitation;
 }

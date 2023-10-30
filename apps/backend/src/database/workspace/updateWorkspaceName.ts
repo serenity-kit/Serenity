@@ -5,11 +5,19 @@ import { prisma } from "../prisma";
 
 type Params = {
   id: string;
-  name: string | undefined;
+  infoCiphertext: string;
+  infoNonce: string;
+  infoWorkspaceKeyId: string;
   userId: string;
 };
 
-export async function updateWorkspaceName({ id, name, userId }: Params) {
+export async function updateWorkspaceName({
+  id,
+  infoCiphertext,
+  infoNonce,
+  infoWorkspaceKeyId,
+  userId,
+}: Params) {
   return await prisma.$transaction(
     async (prisma) => {
       const userToWorkspace = await prisma.usersToWorkspaces.findFirst({
@@ -36,25 +44,16 @@ export async function updateWorkspaceName({ id, name, userId }: Params) {
         throw new Error("Invalid workspaceId");
       }
       let updatedWorkspace: any;
-      if (name != undefined) {
-        updatedWorkspace = await prisma.workspace.update({
-          where: {
-            id: workspace.id,
-          },
-          // TODO: update IDs
-          data: {
-            name: name,
-            idSignature: "TODO",
-          },
-        });
-      } else {
-        updatedWorkspace = workspace;
-        updatedWorkspace = await prisma.workspace.findFirst({
-          where: {
-            id: workspace.id,
-          },
-        });
-      }
+      updatedWorkspace = await prisma.workspace.update({
+        where: {
+          id: workspace.id,
+        },
+        data: {
+          infoCiphertext,
+          infoNonce,
+          infoWorkspaceKeyId,
+        },
+      });
       return formatWorkspace(updatedWorkspace);
     },
     {

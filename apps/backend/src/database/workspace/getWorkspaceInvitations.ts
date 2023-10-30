@@ -40,7 +40,6 @@ export async function getWorkspaceInvitations({
     },
     include: {
       inviterUser: { select: { username: true } },
-      workspace: { select: { name: true } },
     },
     orderBy: {
       createdAt: "desc",
@@ -51,7 +50,6 @@ export async function getWorkspaceInvitations({
     const workspaceInvitation: WorkspaceInvitation = {
       ...rawWorkspaceInvitation,
       inviterUsername: rawWorkspaceInvitation.inviterUser.username,
-      workspaceName: rawWorkspaceInvitation.workspace.name,
     };
     workspaceInvitations.push(workspaceInvitation);
   });

@@ -1,3 +1,4 @@
+import { encryptWorkspaceInfo } from "@serenity-tools/common";
 import {
   Button,
   CenterContent,
@@ -54,15 +55,10 @@ export default function WorkspaceSettingsGeneralScreen(
     useState<string>("");
 
   useEffect(() => {
-    if (
-      state.value === "loadWorkspaceSuccess" &&
-      state.context.workspaceQueryResult?.data?.workspace
-    ) {
-      setWorkspaceName(
-        state.context.workspaceQueryResult.data.workspace.name || ""
-      );
+    if (state.value === "loadWorkspaceSuccess") {
+      setWorkspaceName(state.context.workspaceInfo?.name || "");
     }
-  }, [state]);
+  }, [state.context.workspaceInfo?.name, state.value]);
 
   const deleteWorkspace = async () => {
     if (deletingWorkspaceName !== workspaceName) {
@@ -91,15 +87,26 @@ export default function WorkspaceSettingsGeneralScreen(
 
   const updateWorkspaceName = async () => {
     setIsLoadingWorkspaceData(true);
+    if (!state.context.currentWorkspaceKey) {
+      throw new Error("currentWorkspaceKey is missing");
+    }
+
+    const encryptedWorkspaceInfo = encryptWorkspaceInfo({
+      name: workspaceName,
+      key: state.context.currentWorkspaceKey.key,
+    });
+
     const updateWorkspaceResult = await updateWorkspaceNameMutation({
       input: {
         id: workspaceId,
-        name: workspaceName,
+        infoCiphertext: encryptedWorkspaceInfo.ciphertext,
+        infoNonce: encryptedWorkspaceInfo.nonce,
+        infoWorkspaceKeyId: state.context.currentWorkspaceKey.id,
       },
     });
     if (
-      typeof updateWorkspaceResult.data?.updateWorkspaceName?.workspace
-        ?.name === "string"
+      typeof updateWorkspaceResult.data?.updateWorkspaceName?.workspace?.id ===
+      "string"
     ) {
       showToast("Workspace name updated.", "info");
     } else {

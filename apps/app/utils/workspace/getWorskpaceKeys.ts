@@ -31,6 +31,8 @@ export const getWorkspaceKeys = async ({
         `A creator device couldn't be retrieved for workspace ${workspaceId}!`
       );
     }
+    // TODO verify that creator
+    // needs a workspace key chain with a main device!
     const workspaceKeyString = decryptWorkspaceKey({
       ciphertext: workspaceKeyBox.ciphertext,
       nonce: workspaceKeyBox.nonce,

@@ -17,7 +17,8 @@ export type DeviceWorkspaceKeyBoxParams = {
 
 type Params = {
   id: string;
-  name: string;
+  infoCiphertext: string;
+  infoNonce: string;
   userId: string;
   creatorDeviceSigningPublicKey: string;
   deviceWorkspaceKeyBoxes: DeviceWorkspaceKeyBoxParams[];
@@ -27,7 +28,8 @@ type Params = {
 
 export async function createWorkspace({
   id,
-  name,
+  infoCiphertext,
+  infoNonce,
   userId,
   creatorDeviceSigningPublicKey,
   deviceWorkspaceKeyBoxes,
@@ -67,8 +69,8 @@ export async function createWorkspace({
       const rawWorkspace = await prisma.workspace.create({
         data: {
           id,
-          idSignature: "TODO",
-          name,
+          infoCiphertext,
+          infoNonce,
           usersToWorkspaces: {
             create: {
               userId,
@@ -78,7 +80,7 @@ export async function createWorkspace({
           },
           workspaceKeys: {
             create: {
-              id: workspaceKeyId || generateId(),
+              id: workspaceKeyId || generateId(), // TODO this should be done on the client
               generation: 0,
             },
           },
@@ -90,13 +92,16 @@ export async function createWorkspace({
                 where: {
                   deviceSigningPublicKey: creatorDeviceSigningPublicKey,
                 },
-                include: {
-                  creatorDevice: true,
-                },
+                include: { creatorDevice: true },
               },
             },
           },
         },
+      });
+
+      await prisma.workspace.update({
+        where: { id: rawWorkspace.id },
+        data: { infoWorkspaceKeyId: workspaceKeyId },
       });
 
       const workspaceChainState = workspaceChain.resolveState([
@@ -156,8 +161,9 @@ export async function createWorkspace({
       };
       const workspace: Workspace = {
         id: rawWorkspace.id,
-        name: rawWorkspace.name,
-        idSignature: rawWorkspace.idSignature,
+        infoCiphertext: rawWorkspace.infoCiphertext,
+        infoNonce: rawWorkspace.infoNonce,
+        infoWorkspaceKey: rawWorkspace.infoWorkspaceKey,
         currentWorkspaceKey: returningWorkspaceKey,
         workspaceKeys: [returningWorkspaceKey],
       };

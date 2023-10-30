@@ -4,7 +4,24 @@ mutation createInitialWorkspaceStructure(
   createInitialWorkspaceStructure(input: $input) {
     workspace {
       id
-      name
+      infoCiphertext
+      infoNonce
+      infoWorkspaceKey {
+        id
+        workspaceId
+        generation
+        workspaceKeyBox {
+          id
+          workspaceKeyId
+          deviceSigningPublicKey
+          ciphertext
+          nonce
+          creatorDevice {
+            signingPublicKey
+            encryptionPublicKey
+          }
+        }
+      }
       currentWorkspaceKey {
         id
         workspaceId
