@@ -2,7 +2,6 @@ import * as userChain from "@serenity-kit/user-chain";
 import { UserInputError } from "apollo-server-express";
 import { ServerClient } from "postmark";
 import { Prisma } from "../../../prisma/generated/output";
-import { Device } from "../../types/device";
 import { createConfirmationCode } from "../../utils/confirmationCode";
 import { ExpectedGraphqlError } from "../../utils/expectedGraphqlError/expectedGraphqlError";
 import { prisma } from "../prisma";
@@ -15,14 +14,14 @@ if (!process.env.POSTMARK_API_KEY) {
 }
 const postmarkClient = new ServerClient(process.env.POSTMARK_API_KEY);
 
-type DeviceInput = Device & {
+type DeviceInput = {
   ciphertext: string;
   nonce: string;
 };
 
 type Props = {
   registrationRecord: string;
-  mainDevice: DeviceInput;
+  encryptedMainDevice: DeviceInput;
   pendingWorkspaceInvitationId: string | null | undefined;
   pendingWorkspaceInvitationKeySubkeyId: number | null | undefined;
   pendingWorkspaceInvitationKeyCiphertext: string | null | undefined;
@@ -32,7 +31,7 @@ type Props = {
 
 export async function finalizeRegistration({
   registrationRecord,
-  mainDevice,
+  encryptedMainDevice,
   pendingWorkspaceInvitationId,
   pendingWorkspaceInvitationKeySubkeyId,
   pendingWorkspaceInvitationKeyCiphertext,
@@ -44,14 +43,6 @@ export async function finalizeRegistration({
     knownVersion: userChain.version,
   });
   const username = userChainState.currentState.email;
-  if (
-    mainDevice.signingPublicKey !==
-    userChainState.currentState.mainDeviceSigningPublicKey
-  ) {
-    throw new UserInputError(
-      "mainDevice and createChainEvent signing keys don't match"
-    );
-  }
 
   if (pendingWorkspaceInvitationId && !pendingWorkspaceInvitationKeySubkeyId) {
     throw new UserInputError(
@@ -95,12 +86,15 @@ export async function finalizeRegistration({
             username,
             confirmationCode,
             registrationRecord,
-            mainDeviceCiphertext: mainDevice.ciphertext,
-            mainDeviceNonce: mainDevice.nonce,
-            mainDeviceSigningPublicKey: mainDevice.signingPublicKey,
-            mainDeviceEncryptionPublicKey: mainDevice.encryptionPublicKey,
+            mainDeviceCiphertext: encryptedMainDevice.ciphertext,
+            mainDeviceNonce: encryptedMainDevice.nonce,
+            mainDeviceSigningPublicKey:
+              userChainState.currentState.mainDeviceSigningPublicKey,
+            mainDeviceEncryptionPublicKey:
+              userChainState.currentState.mainDeviceEncryptionPublicKey,
             mainDeviceEncryptionPublicKeySignature:
-              mainDevice.encryptionPublicKeySignature,
+              userChainState.currentState
+                .mainDeviceEncryptionPublicKeySignature,
             pendingWorkspaceInvitationId,
             pendingWorkspaceInvitationKeySubkeyId,
             pendingWorkspaceInvitationKeyCiphertext,

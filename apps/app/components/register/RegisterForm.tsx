@@ -104,8 +104,13 @@ export default function RegisterForm(props: Props) {
           registrationResponse:
             startRegistrationResult.data.startRegistration.challengeResponse,
         });
-        const { encryptionPrivateKey, signingPrivateKey, ...mainDevice } =
-          createAndEncryptMainDevice(exportKey);
+        const {
+          encryptionPrivateKey,
+          signingPrivateKey,
+          ciphertext: mainDeviceCiphertext,
+          nonce: mainDeviceNonce,
+          ...mainDevice
+        } = createAndEncryptMainDevice(exportKey);
 
         setMainDevice({
           encryptionPrivateKey: encryptionPrivateKey,
@@ -146,7 +151,10 @@ export default function RegisterForm(props: Props) {
         const finishRegistrationResult = await finishRegistrationMutation({
           input: {
             registrationRecord,
-            mainDevice,
+            encryptedMainDevice: {
+              ciphertext: mainDeviceCiphertext,
+              nonce: mainDeviceNonce,
+            },
             pendingWorkspaceInvitationId: props.pendingWorkspaceInvitationId,
             pendingWorkspaceInvitationKeySubkeyId,
             pendingWorkspaceInvitationKeyCiphertext,

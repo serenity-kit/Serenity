@@ -49,8 +49,13 @@ test("server should register a user", async () => {
   `;
 
   const exportKey = clientRegistrationFinishResult.exportKey;
-  const { signingPrivateKey, encryptionPrivateKey, ...mainDevice } =
-    createAndEncryptMainDevice(sodium.to_base64(exportKey));
+  const {
+    signingPrivateKey,
+    encryptionPrivateKey,
+    ciphertext: mainDeviceCiphertext,
+    nonce: mainDeviceNonce,
+    ...mainDevice
+  } = createAndEncryptMainDevice(sodium.to_base64(exportKey));
 
   const createChainEvent = userChain.createUserChain({
     authorKeyPair: {
@@ -64,7 +69,10 @@ test("server should register a user", async () => {
   const registrationResponse = await graphql.client.request(query, {
     input: {
       registrationRecord: clientRegistrationFinishResult.registrationRecord,
-      mainDevice,
+      encryptedMainDevice: {
+        ciphertext: mainDeviceCiphertext,
+        nonce: mainDeviceNonce,
+      },
       serializedUserChainEvent: JSON.stringify(createChainEvent),
     },
   });
@@ -96,8 +104,13 @@ test("server should register a user with a pending workspace id", async () => {
   `;
 
   const exportKey = clientRegistrationFinishResult.exportKey;
-  const { signingPrivateKey, encryptionPrivateKey, ...mainDevice } =
-    createAndEncryptMainDevice(exportKey);
+  const {
+    signingPrivateKey,
+    encryptionPrivateKey,
+    ciphertext: mainDeviceCiphertext,
+    nonce: mainDeviceNonce,
+    ...mainDevice
+  } = createAndEncryptMainDevice(exportKey);
   const workspaceInvitationKeyData = encryptWorkspaceInvitationPrivateKey({
     exportKey,
     workspaceInvitationSigningPrivateKey: sodium.to_base64(
@@ -117,7 +130,10 @@ test("server should register a user with a pending workspace id", async () => {
   const registrationResponse = await graphql.client.request(query, {
     input: {
       registrationRecord: clientRegistrationFinishResult.registrationRecord,
-      mainDevice,
+      encryptedMainDevice: {
+        ciphertext: mainDeviceCiphertext,
+        nonce: mainDeviceNonce,
+      },
       pendingWorkspaceInvitationId,
       pendingWorkspaceInvitationKeyCiphertext:
         workspaceInvitationKeyData.ciphertext,
@@ -173,8 +189,13 @@ describe("Input errors", () => {
       registrationResponse: result.data.challengeResponse,
     });
     const exportKey = clientRegistrationFinishResult.exportKey;
-    const { signingPrivateKey, encryptionPrivateKey, ...mainDevice } =
-      createAndEncryptMainDevice(sodium.to_base64(exportKey));
+    const {
+      signingPrivateKey,
+      encryptionPrivateKey,
+      ciphertext: mainDeviceCiphertext,
+      nonce: mainDeviceNonce,
+      ...mainDevice
+    } = createAndEncryptMainDevice(sodium.to_base64(exportKey));
 
     const createChainEvent = userChain.createUserChain({
       authorKeyPair: {
@@ -191,7 +212,10 @@ describe("Input errors", () => {
           input: {
             registrationRecord:
               clientRegistrationFinishResult.registrationRecord,
-            mainDevice,
+            encryptedMainDevice: {
+              ciphertext: mainDeviceCiphertext,
+              nonce: mainDeviceNonce,
+            },
             pendingWorkspaceInvitationId,
             pendingWorkspaceInvitationKeyCiphertext: null,
             pendingWorkspaceInvitationKeyPublicNonce: null,
@@ -214,8 +238,13 @@ describe("Input errors", () => {
       registrationResponse: result.data.challengeResponse,
     });
     const exportKey = clientRegistrationFinishResult.exportKey;
-    const { signingPrivateKey, encryptionPrivateKey, ...mainDevice } =
-      createAndEncryptMainDevice(sodium.to_base64(exportKey));
+    const {
+      signingPrivateKey,
+      encryptionPrivateKey,
+      ciphertext: mainDeviceCiphertext,
+      nonce: mainDeviceNonce,
+      ...mainDevice
+    } = createAndEncryptMainDevice(sodium.to_base64(exportKey));
 
     const createChainEvent = userChain.createUserChain({
       authorKeyPair: {
@@ -231,54 +260,17 @@ describe("Input errors", () => {
         await graphql.client.request(query, {
           input: {
             registrationRecord: null,
-            username,
-            mainDevice,
+            encryptedMainDevice: {
+              ciphertext: mainDeviceCiphertext,
+              nonce: mainDeviceNonce,
+            },
             pendingWorkspaceInvitationId,
             serializedUserChainEvent: JSON.stringify(createChainEvent),
           },
         }))()
     ).rejects.toThrowError(/BAD_USER_INPUT/);
   });
-  test("Invalid mainDevice", async () => {
-    const result = await requestRegistrationChallengeResponse(
-      graphql,
-      username,
-      password
-    );
-    const pendingWorkspaceInvitationId = generateId();
-    const clientRegistrationFinishResult = client.finishRegistration({
-      password,
-      clientRegistrationState: result.clientRegistrationState,
-      registrationResponse: result.data.challengeResponse,
-    });
-    const exportKey = clientRegistrationFinishResult.exportKey;
-    const { signingPrivateKey, encryptionPrivateKey, ...mainDevice } =
-      createAndEncryptMainDevice(sodium.to_base64(exportKey));
-
-    const createChainEvent = userChain.createUserChain({
-      authorKeyPair: {
-        privateKey: signingPrivateKey,
-        publicKey: mainDevice.signingPublicKey,
-      },
-      email: username,
-      encryptionPublicKey: mainDevice.encryptionPublicKey,
-    });
-
-    await expect(
-      (async () =>
-        await graphql.client.request(query, {
-          input: {
-            registrationRecord:
-              clientRegistrationFinishResult.registrationRecord,
-            username,
-            mainDevice: null,
-            pendingWorkspaceInvitationId,
-            serializedUserChainEvent: JSON.stringify(createChainEvent),
-          },
-        }))()
-    ).rejects.toThrowError(/BAD_USER_INPUT/);
-  });
-  test("Invalid mainDevice.ciphertext", async () => {
+  test("Invalid encryptedMainDevice", async () => {
     const result = await requestRegistrationChallengeResponse(
       graphql,
       username,
@@ -294,7 +286,8 @@ describe("Input errors", () => {
     const {
       signingPrivateKey,
       encryptionPrivateKey,
-      ciphertext,
+      ciphertext: mainDeviceCiphertext,
+      nonce: mainDeviceNonce,
       ...mainDevice
     } = createAndEncryptMainDevice(sodium.to_base64(exportKey));
 
@@ -313,54 +306,14 @@ describe("Input errors", () => {
           input: {
             registrationRecord:
               clientRegistrationFinishResult.registrationRecord,
-            username,
-            mainDevice,
+            encryptedMainDevice: null,
             pendingWorkspaceInvitationId,
             serializedUserChainEvent: JSON.stringify(createChainEvent),
           },
         }))()
     ).rejects.toThrowError(/BAD_USER_INPUT/);
   });
-  test("Invalid mainDevice.nonce", async () => {
-    const result = await requestRegistrationChallengeResponse(
-      graphql,
-      username,
-      password
-    );
-    const pendingWorkspaceInvitationId = generateId();
-    const clientRegistrationFinishResult = client.finishRegistration({
-      password,
-      clientRegistrationState: result.clientRegistrationState,
-      registrationResponse: result.data.challengeResponse,
-    });
-    const exportKey = clientRegistrationFinishResult.exportKey;
-    const { signingPrivateKey, encryptionPrivateKey, nonce, ...mainDevice } =
-      createAndEncryptMainDevice(sodium.to_base64(exportKey));
-
-    const createChainEvent = userChain.createUserChain({
-      authorKeyPair: {
-        privateKey: signingPrivateKey,
-        publicKey: mainDevice.signingPublicKey,
-      },
-      email: username,
-      encryptionPublicKey: mainDevice.encryptionPublicKey,
-    });
-
-    await expect(
-      (async () =>
-        await graphql.client.request(query, {
-          input: {
-            registrationRecord:
-              clientRegistrationFinishResult.registrationRecord,
-            username,
-            mainDevice,
-            pendingWorkspaceInvitationId,
-            serializedUserChainEvent: JSON.stringify(createChainEvent),
-          },
-        }))()
-    ).rejects.toThrowError(/BAD_USER_INPUT/);
-  });
-  test("Invalid mainDevice.signingPublicKey", async () => {
+  test("Invalid encryptedMainDevice.ciphertext", async () => {
     const result = await requestRegistrationChallengeResponse(
       graphql,
       username,
@@ -376,93 +329,8 @@ describe("Input errors", () => {
     const {
       signingPrivateKey,
       encryptionPrivateKey,
-      signingPublicKey,
-      ...mainDevice
-    } = createAndEncryptMainDevice(sodium.to_base64(exportKey));
-
-    const createChainEvent = userChain.createUserChain({
-      authorKeyPair: {
-        privateKey: signingPrivateKey,
-        publicKey: signingPublicKey,
-      },
-      email: username,
-      encryptionPublicKey: mainDevice.encryptionPublicKey,
-    });
-
-    await expect(
-      (async () =>
-        await graphql.client.request(query, {
-          input: {
-            registrationRecord:
-              clientRegistrationFinishResult.registrationRecord,
-            username,
-            mainDevice,
-            pendingWorkspaceInvitationId,
-            serializedUserChainEvent: JSON.stringify(createChainEvent),
-          },
-        }))()
-    ).rejects.toThrowError(/BAD_USER_INPUT/);
-  });
-  test("Invalid mainDevice.encryptionPublicKey", async () => {
-    const result = await requestRegistrationChallengeResponse(
-      graphql,
-      username,
-      password
-    );
-    const pendingWorkspaceInvitationId = generateId();
-    const clientRegistrationFinishResult = client.finishRegistration({
-      password,
-      clientRegistrationState: result.clientRegistrationState,
-      registrationResponse: result.data.challengeResponse,
-    });
-    const exportKey = clientRegistrationFinishResult.exportKey;
-    const {
-      signingPrivateKey,
-      encryptionPrivateKey,
-      encryptionPublicKey,
-      ...mainDevice
-    } = createAndEncryptMainDevice(sodium.to_base64(exportKey));
-
-    const createChainEvent = userChain.createUserChain({
-      authorKeyPair: {
-        privateKey: signingPrivateKey,
-        publicKey: mainDevice.signingPublicKey,
-      },
-      email: username,
-      encryptionPublicKey,
-    });
-
-    await expect(
-      (async () =>
-        await graphql.client.request(query, {
-          input: {
-            registrationRecord:
-              clientRegistrationFinishResult.registrationRecord,
-            username,
-            mainDevice,
-            pendingWorkspaceInvitationId,
-            serializedUserChainEvent: JSON.stringify(createChainEvent),
-          },
-        }))()
-    ).rejects.toThrowError(/BAD_USER_INPUT/);
-  });
-  test("Invalid mainDevice.encryptionPublicKeySignature", async () => {
-    const result = await requestRegistrationChallengeResponse(
-      graphql,
-      username,
-      password
-    );
-    const pendingWorkspaceInvitationId = generateId();
-    const clientRegistrationFinishResult = client.finishRegistration({
-      password,
-      clientRegistrationState: result.clientRegistrationState,
-      registrationResponse: result.data.challengeResponse,
-    });
-    const exportKey = clientRegistrationFinishResult.exportKey;
-    const {
-      signingPrivateKey,
-      encryptionPrivateKey,
-      encryptionPublicKeySignature,
+      ciphertext: mainDeviceCiphertext,
+      nonce: mainDeviceNonce,
       ...mainDevice
     } = createAndEncryptMainDevice(sodium.to_base64(exportKey));
 
@@ -481,8 +349,56 @@ describe("Input errors", () => {
           input: {
             registrationRecord:
               clientRegistrationFinishResult.registrationRecord,
-            username,
-            mainDevice,
+            encryptedMainDevice: {
+              ciphertext: null,
+              nonce: mainDeviceNonce,
+            },
+            pendingWorkspaceInvitationId,
+            serializedUserChainEvent: JSON.stringify(createChainEvent),
+          },
+        }))()
+    ).rejects.toThrowError(/BAD_USER_INPUT/);
+  });
+  test("Invalid encryptedMainDevice.nonce", async () => {
+    const result = await requestRegistrationChallengeResponse(
+      graphql,
+      username,
+      password
+    );
+    const pendingWorkspaceInvitationId = generateId();
+    const clientRegistrationFinishResult = client.finishRegistration({
+      password,
+      clientRegistrationState: result.clientRegistrationState,
+      registrationResponse: result.data.challengeResponse,
+    });
+    const exportKey = clientRegistrationFinishResult.exportKey;
+    const {
+      signingPrivateKey,
+      encryptionPrivateKey,
+      ciphertext: mainDeviceCiphertext,
+      nonce: mainDeviceNonce,
+      ...mainDevice
+    } = createAndEncryptMainDevice(sodium.to_base64(exportKey));
+
+    const createChainEvent = userChain.createUserChain({
+      authorKeyPair: {
+        privateKey: signingPrivateKey,
+        publicKey: mainDevice.signingPublicKey,
+      },
+      email: username,
+      encryptionPublicKey: mainDevice.encryptionPublicKey,
+    });
+
+    await expect(
+      (async () =>
+        await graphql.client.request(query, {
+          input: {
+            registrationRecord:
+              clientRegistrationFinishResult.registrationRecord,
+            encryptedMainDevice: {
+              ciphertext: mainDeviceCiphertext,
+              nonce: null,
+            },
             pendingWorkspaceInvitationId,
             serializedUserChainEvent: JSON.stringify(createChainEvent),
           },

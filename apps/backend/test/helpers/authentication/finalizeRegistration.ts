@@ -34,8 +34,13 @@ export const finalizeRegistration = async ({
   `;
 
   const exportKey = clientRegistrationFinishResult.exportKey;
-  const { signingPrivateKey, encryptionPrivateKey, ...mainDevice } =
-    createAndEncryptMainDevice(sodium.to_base64(exportKey));
+  const {
+    signingPrivateKey,
+    encryptionPrivateKey,
+    ciphertext: mainDeviceCiphertext,
+    nonce: mainDeviceNonce,
+    ...mainDevice
+  } = createAndEncryptMainDevice(sodium.to_base64(exportKey));
 
   const createChainEvent = userChain.createUserChain({
     authorKeyPair: {
@@ -49,7 +54,10 @@ export const finalizeRegistration = async ({
   const registrationResponse = await graphql.client.request(query, {
     input: {
       registrationRecord: clientRegistrationFinishResult.registrationRecord,
-      mainDevice,
+      encryptedMainDevice: {
+        ciphertext: mainDeviceCiphertext,
+        nonce: mainDeviceNonce,
+      },
       serializedUserChainEvent: JSON.stringify(createChainEvent),
     },
   });

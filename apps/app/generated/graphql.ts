@@ -482,14 +482,11 @@ export type FinishLoginResult = {
 
 export type FinishRegistrationDeviceInput = {
   ciphertext: Scalars['String'];
-  encryptionPublicKey: Scalars['String'];
-  encryptionPublicKeySignature: Scalars['String'];
   nonce: Scalars['String'];
-  signingPublicKey: Scalars['String'];
 };
 
 export type FinishRegistrationInput = {
-  mainDevice: FinishRegistrationDeviceInput;
+  encryptedMainDevice: FinishRegistrationDeviceInput;
   pendingWorkspaceInvitationId?: InputMaybe<Scalars['String']>;
   pendingWorkspaceInvitationKeyCiphertext?: InputMaybe<Scalars['String']>;
   pendingWorkspaceInvitationKeyPublicNonce?: InputMaybe<Scalars['String']>;
