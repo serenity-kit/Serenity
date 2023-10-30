@@ -48,7 +48,8 @@ export const registerUser = async (
   const {
     encryptionPrivateKey,
     signingPrivateKey,
-    ...mainDeviceWithoutPrivateKeys
+    ciphertext: mainDeviceCiphertext,
+    nonce: mainDeviceNonce,
   } = mainDevice;
 
   let pendingWorkspaceInvitationKeyCiphertext: string | null = null;
@@ -81,7 +82,10 @@ export const registerUser = async (
   const registrationResponse = await graphql.client.request(query, {
     input: {
       registrationRecord: clientRegistrationFinishResult.registrationRecord,
-      mainDevice: mainDeviceWithoutPrivateKeys,
+      encryptedMainDevice: {
+        ciphertext: mainDeviceCiphertext,
+        nonce: mainDeviceNonce,
+      },
       pendingWorkspaceInvitationId,
       pendingWorkspaceInvitationKeyCiphertext,
       pendingWorkspaceInvitationKeyPublicNonce,

@@ -42,8 +42,13 @@ export const registerUnverifiedUser = async ({
     }
   `;
   const exportKey = clientRegistrationFinishResult.exportKey;
-  const { signingPrivateKey, encryptionPrivateKey, ...mainDevice } =
-    createAndEncryptMainDevice(exportKey);
+  const {
+    signingPrivateKey,
+    encryptionPrivateKey,
+    ciphertext: mainDeviceCiphertext,
+    nonce: mainDeviceNonce,
+    ...mainDevice
+  } = createAndEncryptMainDevice(exportKey);
 
   let pendingWorkspaceInvitationKeyCiphertext: string | null = null;
   let pendingWorkspaceInvitationKeyPublicNonce: string | null = null;
@@ -75,7 +80,10 @@ export const registerUnverifiedUser = async ({
   const registrationResponse = await graphql.client.request(query, {
     input: {
       registrationRecord: clientRegistrationFinishResult.registrationRecord,
-      mainDevice,
+      encryptedMainDevice: {
+        ciphertext: mainDeviceCiphertext,
+        nonce: mainDeviceNonce,
+      },
       pendingWorkspaceInvitationId,
       pendingWorkspaceInvitationKeyCiphertext,
       pendingWorkspaceInvitationKeyPublicNonce,

@@ -8,14 +8,11 @@ import {
 } from "nexus";
 import { finalizeRegistration } from "../../../database/authentication/finalizeRegistration";
 
-export const FinishRegistrationDeviceInput = inputObjectType({
+export const FinishRegistrationEncryptedDeviceInput = inputObjectType({
   name: "FinishRegistrationDeviceInput",
   definition(t) {
     t.nonNull.string("ciphertext");
     t.nonNull.string("nonce");
-    t.nonNull.string("signingPublicKey");
-    t.nonNull.string("encryptionPublicKey");
-    t.nonNull.string("encryptionPublicKeySignature");
   },
 });
 
@@ -23,7 +20,9 @@ export const FinishRegistrationInput = inputObjectType({
   name: "FinishRegistrationInput",
   definition(t) {
     t.nonNull.string("registrationRecord");
-    t.nonNull.field("mainDevice", { type: FinishRegistrationDeviceInput });
+    t.nonNull.field("encryptedMainDevice", {
+      type: FinishRegistrationEncryptedDeviceInput,
+    });
     t.string("pendingWorkspaceInvitationId");
     t.int("pendingWorkspaceInvitationKeySubkeyId");
     t.string("pendingWorkspaceInvitationKeyCiphertext");
@@ -60,7 +59,7 @@ export const finishRegistrationMutation = mutationField("finishRegistration", {
 
     const unverifiedUser = await finalizeRegistration({
       registrationRecord: args.input.registrationRecord,
-      mainDevice: args.input.mainDevice,
+      encryptedMainDevice: args.input.encryptedMainDevice,
       pendingWorkspaceInvitationId: args.input.pendingWorkspaceInvitationId,
       pendingWorkspaceInvitationKeySubkeyId:
         args.input.pendingWorkspaceInvitationKeySubkeyId,
