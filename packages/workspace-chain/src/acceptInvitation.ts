@@ -1,6 +1,11 @@
 import canonicalize from "canonicalize";
 import sodium from "react-native-libsodium";
 import {
+  workspaceChainAcceptInvitationDomainContext,
+  workspaceChainDomainContext,
+  workspaceChainInvitationDomainContext,
+} from "./constants";
+import {
   AcceptInvitationTransaction,
   AcceptInvitationWorkspaceChainEvent,
   Role,
@@ -53,7 +58,7 @@ export const acceptInvitation = ({
   }
   const invitationDataSignatureVerified = sodium.crypto_sign_verify_detached(
     sodium.from_base64(invitationDataSignature),
-    invitationData,
+    workspaceChainInvitationDomainContext + invitationData,
     sodium.from_base64(invitationSigningPublicKey)
   );
   if (!invitationDataSignatureVerified) {
@@ -76,7 +81,7 @@ export const acceptInvitation = ({
   }
 
   const acceptInvitationSignature = sodium.crypto_sign_detached(
-    acceptInvitationData,
+    workspaceChainAcceptInvitationDomainContext + acceptInvitationData,
     invitationSigningKeyPair.privateKey
   );
 
@@ -104,7 +109,10 @@ export const acceptInvitation = ({
       {
         publicKey: sodium.to_base64(authorKeyPair.publicKey),
         signature: sodium.to_base64(
-          sodium.crypto_sign_detached(message, authorKeyPair.privateKey)
+          sodium.crypto_sign_detached(
+            workspaceChainDomainContext + message,
+            authorKeyPair.privateKey
+          )
         ),
       },
     ],

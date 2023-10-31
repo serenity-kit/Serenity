@@ -3,3 +3,5 @@ export const userDeviceEncryptionPublicKeyDomainContext =
 
 export const userDeviceSigningKeyProofDomainContext =
   "user_device_signing_key_proof";
+
+export const userChainDomainContext = "user_chain";

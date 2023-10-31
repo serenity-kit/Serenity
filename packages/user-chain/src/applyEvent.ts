@@ -1,6 +1,8 @@
-import canonicalize from "canonicalize";
 import sodium from "react-native-libsodium";
-import { userDeviceSigningKeyProofDomainContext } from "./constants";
+import {
+  userChainDomainContext,
+  userDeviceSigningKeyProofDomainContext,
+} from "./constants";
 import { InvalidUserChainError, UnknownVersionUserChainError } from "./errors";
 import { UpdateChainEvent, UserChainEvent, UserChainState } from "./types";
 import { hashEvent, hashTransaction } from "./utils";
@@ -26,7 +28,7 @@ export const applyEvent = ({
   const eventHash = hashEvent(event);
   const isValidSignature = sodium.crypto_sign_verify_detached(
     sodium.from_base64(event.author.signature),
-    transactionHash,
+    userChainDomainContext + transactionHash,
     sodium.from_base64(event.author.publicKey)
   );
   if (!isValidSignature) {
@@ -64,17 +66,9 @@ export const applyEvent = ({
         event.transaction.encryptionPublicKeySignature,
     });
 
-    const deviceSigningContent = canonicalize({
-      userDeviceSigningKeyProofDomainContext,
-      prevEventHash: state.eventHash,
-    });
-    if (!deviceSigningContent) {
-      throw new Error("Failed to canonicalize device signing content");
-    }
-
     const valid = sodium.crypto_sign_verify_detached(
       sodium.from_base64(event.transaction.deviceSigningKeyProof),
-      deviceSigningContent,
+      userDeviceSigningKeyProofDomainContext + state.eventHash,
       sodium.from_base64(event.transaction.signingPublicKey)
     );
     if (!valid) {

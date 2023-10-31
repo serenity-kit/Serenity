@@ -1,8 +1,8 @@
 import { generateId } from "@serenity-tools/common";
-import canonicalize from "canonicalize";
 import sodium from "react-native-libsodium";
 import { KeyPairs, getKeyPairsA, getKeyPairsB } from "../test/testUtils";
 import {
+  userChainDomainContext,
   userDeviceEncryptionPublicKeyDomainContext,
   userDeviceSigningKeyProofDomainContext,
 } from "./constants";
@@ -259,16 +259,8 @@ test("should fail if the knownVersion is smaller than the actual event version",
       sodium.from_base64(signingPrivateKey)
     );
 
-    const deviceSigningContent = canonicalize({
-      userDeviceSigningKeyProofDomainContext,
-      prevEventHash,
-    });
-    if (!deviceSigningContent) {
-      throw new Error("Failed to canonicalize device signing content");
-    }
-
     const deviceSigningKeyProof = sodium.crypto_sign_detached(
-      deviceSigningContent,
+      userDeviceSigningKeyProofDomainContext + prevEventHash,
       sodium.from_base64(signingPrivateKey)
     );
 
@@ -291,7 +283,7 @@ test("should fail if the knownVersion is smaller than the actual event version",
         publicKey: authorKeyPair.publicKey,
         signature: sodium.to_base64(
           sodium.crypto_sign_detached(
-            hash,
+            userChainDomainContext + hash,
             sodium.from_base64(authorKeyPair.privateKey)
           )
         ),
@@ -344,7 +336,7 @@ test("should fail if an old event version is applied after a newer one", async (
         publicKey: authorKeyPair.publicKey,
         signature: sodium.to_base64(
           sodium.crypto_sign_detached(
-            hash,
+            userChainDomainContext + hash,
             sodium.from_base64(authorKeyPair.privateKey)
           )
         ),

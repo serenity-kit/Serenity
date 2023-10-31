@@ -1,6 +1,6 @@
-import canonicalize from "canonicalize";
 import sodium from "react-native-libsodium";
 import {
+  userChainDomainContext,
   userDeviceEncryptionPublicKeyDomainContext,
   userDeviceSigningKeyProofDomainContext,
 } from "./constants";
@@ -36,16 +36,8 @@ export const addDevice = ({
     sodium.from_base64(signingPrivateKey)
   );
 
-  const deviceSigningContent = canonicalize({
-    userDeviceSigningKeyProofDomainContext,
-    prevEventHash,
-  });
-  if (!deviceSigningContent) {
-    throw new Error("Failed to canonicalize device signing content");
-  }
-
   const deviceSigningKeyProof = sodium.crypto_sign_detached(
-    deviceSigningContent,
+    userDeviceSigningKeyProofDomainContext + prevEventHash,
     sodium.from_base64(signingPrivateKey)
   );
 
@@ -69,7 +61,7 @@ export const addDevice = ({
       publicKey: authorKeyPair.publicKey,
       signature: sodium.to_base64(
         sodium.crypto_sign_detached(
-          hash,
+          userChainDomainContext + hash,
           sodium.from_base64(authorKeyPair.privateKey)
         )
       ),

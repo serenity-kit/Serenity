@@ -1,6 +1,10 @@
 import canonicalize from "canonicalize";
 import sodium from "react-native-libsodium";
 import {
+  workspaceChainDomainContext,
+  workspaceChainInvitationDomainContext,
+} from "./constants";
+import {
   AddInvitationTransaction,
   AddInvitationWorkspaceChainEvent,
   Role,
@@ -51,7 +55,7 @@ export const addInvitation = ({
   }
 
   const invitationDataSignature = sodium.crypto_sign_detached(
-    invitationData,
+    workspaceChainInvitationDomainContext + invitationData,
     invitationSigningKeys.privateKey
   );
 
@@ -80,7 +84,10 @@ export const addInvitation = ({
       {
         publicKey: sodium.to_base64(authorKeyPair.publicKey),
         signature: sodium.to_base64(
-          sodium.crypto_sign_detached(message, authorKeyPair.privateKey)
+          sodium.crypto_sign_detached(
+            workspaceChainDomainContext + message,
+            authorKeyPair.privateKey
+          )
         ),
       },
     ],

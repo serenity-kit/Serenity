@@ -1,5 +1,6 @@
 import canonicalize from "canonicalize";
 import sodium from "react-native-libsodium";
+import { workspaceChainDomainContext } from "./constants";
 import {
   Role,
   UpdateMemberTransaction,
@@ -33,7 +34,10 @@ export const updateMember = (
       {
         publicKey: sodium.to_base64(authorKeyPair.publicKey),
         signature: sodium.to_base64(
-          sodium.crypto_sign_detached(message, authorKeyPair.privateKey)
+          sodium.crypto_sign_detached(
+            workspaceChainDomainContext + message,
+            authorKeyPair.privateKey
+          )
         ),
       },
     ],
