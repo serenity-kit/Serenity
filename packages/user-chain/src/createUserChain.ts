@@ -1,6 +1,9 @@
 import { generateId } from "@serenity-tools/common";
 import sodium from "react-native-libsodium";
-import { userDeviceEncryptionPublicKeyDomainContext } from "./constants";
+import {
+  userChainDomainContext,
+  userDeviceEncryptionPublicKeyDomainContext,
+} from "./constants";
 import {
   CreateUserChainEvent,
   CreateUserChainTransaction,
@@ -43,7 +46,7 @@ export const createUserChain = ({
       publicKey: authorKeyPair.publicKey,
       signature: sodium.to_base64(
         sodium.crypto_sign_detached(
-          hash,
+          userChainDomainContext + hash,
           sodium.from_base64(authorKeyPair.privateKey)
         )
       ),

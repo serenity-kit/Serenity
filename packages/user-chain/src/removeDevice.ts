@@ -1,4 +1,5 @@
 import sodium from "react-native-libsodium";
+import { userChainDomainContext } from "./constants";
 import {
   KeyPairBase64,
   RemoveDeviceEvent,
@@ -35,7 +36,7 @@ export const removeDevice = ({
       publicKey: authorKeyPair.publicKey,
       signature: sodium.to_base64(
         sodium.crypto_sign_detached(
-          hash,
+          userChainDomainContext + hash,
           sodium.from_base64(authorKeyPair.privateKey)
         )
       ),

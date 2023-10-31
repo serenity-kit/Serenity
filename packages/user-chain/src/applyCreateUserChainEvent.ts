@@ -1,4 +1,5 @@
 import sodium from "react-native-libsodium";
+import { userChainDomainContext } from "./constants";
 import { InvalidUserChainError, UnknownVersionUserChainError } from "./errors";
 import {
   CreateUserChainEvent,
@@ -23,7 +24,7 @@ export const applyCreateUserChainEvent = ({
   const eventHash = hashEvent(event);
   const isValidSignature = sodium.crypto_sign_verify_detached(
     sodium.from_base64(event.author.signature),
-    transactionHash,
+    userChainDomainContext + transactionHash,
     sodium.from_base64(event.author.publicKey)
   );
   if (!isValidSignature) {

@@ -1,6 +1,7 @@
 import canonicalize from "canonicalize";
 import sodium from "react-native-libsodium";
 import {
+  userChainDomainContext,
   userDeviceEncryptionPublicKeyDomainContext,
   userDeviceSigningKeyProofDomainContext,
 } from "./constants";
@@ -69,7 +70,7 @@ export const addDevice = ({
       publicKey: authorKeyPair.publicKey,
       signature: sodium.to_base64(
         sodium.crypto_sign_detached(
-          hash,
+          userChainDomainContext + hash,
           sodium.from_base64(authorKeyPair.privateKey)
         )
       ),
