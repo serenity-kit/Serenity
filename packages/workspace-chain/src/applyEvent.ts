@@ -1,5 +1,10 @@
 import canonicalize from "canonicalize";
 import sodium from "react-native-libsodium";
+import {
+  workspaceChainAcceptInvitationDomainContext,
+  workspaceChainDomainContext,
+  workspaceChainInvitationDomainContext,
+} from "./constants";
 import { InvalidWorkspaceChainError } from "./errors";
 import {
   Invitation,
@@ -32,7 +37,7 @@ export const applyEvent = (
     if (
       !sodium.crypto_sign_verify_detached(
         sodium.from_base64(author.signature),
-        message,
+        workspaceChainDomainContext + message,
         sodium.from_base64(author.publicKey)
       )
     ) {
@@ -99,7 +104,7 @@ export const applyEvent = (
     if (
       !sodium.crypto_sign_verify_detached(
         sodium.from_base64(event.transaction.acceptInvitationSignature),
-        acceptInvitationData,
+        workspaceChainAcceptInvitationDomainContext + acceptInvitationData,
         sodium.from_base64(event.transaction.invitationSigningPublicKey)
       )
     ) {
@@ -137,7 +142,7 @@ export const applyEvent = (
     if (
       !sodium.crypto_sign_verify_detached(
         sodium.from_base64(event.transaction.invitationDataSignature),
-        invitationData,
+        workspaceChainInvitationDomainContext + invitationData,
         sodium.from_base64(event.transaction.invitationSigningPublicKey)
       )
     ) {

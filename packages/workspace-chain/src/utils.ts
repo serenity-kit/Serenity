@@ -1,5 +1,6 @@
 import canonicalize from "canonicalize";
 import sodium from "react-native-libsodium";
+import { workspaceChainDomainContext } from "./constants";
 import {
   UpdateChainWorkspaceChainEvent,
   WorkspaceChainEvent,
@@ -29,7 +30,7 @@ export const isValidCreateChainEvent = (event: WorkspaceChainEvent) => {
   return event.authors.every((author) => {
     return sodium.crypto_sign_verify_detached(
       sodium.from_base64(author.signature),
-      message,
+      workspaceChainDomainContext + message,
       sodium.from_base64(author.publicKey)
     );
   });

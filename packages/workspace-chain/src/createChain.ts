@@ -1,6 +1,7 @@
 import { generateId } from "@serenity-tools/common";
 import canonicalize from "canonicalize";
 import sodium from "react-native-libsodium";
+import { workspaceChainDomainContext } from "./constants";
 import {
   CreateChainTransaction,
   CreateChainWorkspaceChainEvent,
@@ -31,7 +32,7 @@ export const createChain = (
         publicKey: authorKeyPair.publicKey,
         signature: sodium.to_base64(
           sodium.crypto_sign_detached(
-            message,
+            workspaceChainDomainContext + message,
             sodium.from_base64(authorKeyPair.privateKey)
           )
         ),

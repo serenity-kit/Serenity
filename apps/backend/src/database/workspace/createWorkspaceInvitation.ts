@@ -1,4 +1,5 @@
 import * as workspaceChain from "@serenity-kit/workspace-chain";
+import { workspaceChainInvitationDomainContext } from "@serenity-kit/workspace-chain/src/constants";
 import { ForbiddenError, UserInputError } from "apollo-server-express";
 import canonicalize from "canonicalize";
 import sodium from "react-native-libsodium";
@@ -46,7 +47,7 @@ export async function createWorkspaceInvitation({
   });
   const doesSignatureVerify = sodium.crypto_sign_verify_detached(
     sodium.from_base64(invitationDataSignature),
-    expectedSigningData!,
+    workspaceChainInvitationDomainContext + expectedSigningData!,
     sodium.from_base64(invitationSigningPublicKey)
   );
   if (!doesSignatureVerify) {
