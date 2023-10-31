@@ -1,5 +1,8 @@
 import sodium from "react-native-libsodium";
-import { shareDocumentDeviceEncryptionPublicKeyDomainContext } from "./constants";
+import {
+  documentChainDomainContext,
+  shareDocumentDeviceEncryptionPublicKeyDomainContext,
+} from "./constants";
 import {
   AddShareDocumentDeviceEvent,
   AddShareDocumentDeviceTransaction,
@@ -52,7 +55,7 @@ export const addShareDocumentDevice = ({
       publicKey: authorKeyPair.publicKey,
       signature: sodium.to_base64(
         sodium.crypto_sign_detached(
-          hash,
+          documentChainDomainContext + hash,
           sodium.from_base64(authorKeyPair.privateKey)
         )
       ),

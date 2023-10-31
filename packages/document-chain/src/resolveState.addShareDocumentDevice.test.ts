@@ -8,6 +8,7 @@ import {
   createDocumentChain,
   CreateDocumentChainEvent,
   CreateDocumentChainTransaction,
+  documentChainDomainContext,
   hashEvent,
   hashTransaction,
   InvalidDocumentChainError,
@@ -252,7 +253,7 @@ test("should fail if the knownVersion is smaller than the actual event version",
         publicKey: authorKeyPair.publicKey,
         signature: sodium.to_base64(
           sodium.crypto_sign_detached(
-            hash,
+            documentChainDomainContext + hash,
             sodium.from_base64(authorKeyPair.privateKey)
           )
         ),
@@ -293,7 +294,7 @@ test("should fail if an old event version is applied after a newer one", async (
         publicKey: authorKeyPair.publicKey,
         signature: sodium.to_base64(
           sodium.crypto_sign_detached(
-            hash,
+            documentChainDomainContext + hash,
             sodium.from_base64(authorKeyPair.privateKey)
           )
         ),

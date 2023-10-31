@@ -1,4 +1,5 @@
 import sodium from "react-native-libsodium";
+import { documentChainDomainContext } from "./constants";
 import {
   InvalidDocumentChainError,
   UnknownVersionDocumentChainError,
@@ -31,7 +32,7 @@ export const applyEvent = ({
   const eventHash = hashEvent(event);
   const isValidSignature = sodium.crypto_sign_verify_detached(
     sodium.from_base64(event.author.signature),
-    transactionHash,
+    documentChainDomainContext + transactionHash,
     sodium.from_base64(event.author.publicKey)
   );
   if (!isValidSignature) {
