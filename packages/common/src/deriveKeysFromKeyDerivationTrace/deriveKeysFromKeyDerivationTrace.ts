@@ -18,6 +18,8 @@ export const deriveKeysFromKeyDerivationTrace = ({
   activeDevice,
   workspaceKeyBox,
 }: Params): KeyDerivationTraceWithKeys => {
+  // TODO verify that creator
+  // needs a workspace key chain with a main device!
   const workspaceKey = decryptWorkspaceKey({
     ciphertext: workspaceKeyBox.ciphertext,
     nonce: workspaceKeyBox.nonce,

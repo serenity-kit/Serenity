@@ -2,7 +2,6 @@ mutation updateWorkspaceName($input: UpdateWorkspaceNameInput!) {
   updateWorkspaceName(input: $input) {
     workspace {
       id
-      name
     }
   }
 }

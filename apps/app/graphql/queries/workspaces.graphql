@@ -2,8 +2,9 @@ query workspaces($deviceSigningPublicKey: String!) {
   workspaces(first: 50, deviceSigningPublicKey: $deviceSigningPublicKey) {
     nodes {
       id
-      name
-      currentWorkspaceKey {
+      infoCiphertext
+      infoNonce
+      infoWorkspaceKey {
         id
         workspaceId
         generation
@@ -19,7 +20,7 @@ query workspaces($deviceSigningPublicKey: String!) {
           }
         }
       }
-      workspaceKeys {
+      currentWorkspaceKey {
         id
         workspaceId
         generation

@@ -41,10 +41,8 @@ export type WorkspaceMember = {
 
 export type Workspace = {
   id: string;
-  idSignature: string;
-  name?: string | undefined | null;
-  infoCiphertext?: string | undefined | null;
-  infoNonce?: string | undefined | null;
+  infoCiphertext: string | undefined | null;
+  infoNonce: string | undefined | null;
   infoWorkspaceKeyId?: string | undefined | null;
   infoWorkspaceKey?: WorkspaceKey | undefined | null;
   workspaceKeys?: WorkspaceKey[];
@@ -59,7 +57,6 @@ export type WorkspaceInvitation = {
   inviterUsername: string;
   invitationSigningPublicKey: string;
   invitationDataSignature: string;
-  workspaceName: string | undefined;
   expiresAt: Date;
 };
 

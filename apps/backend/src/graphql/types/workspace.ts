@@ -52,8 +52,6 @@ export const Workspace = objectType({
   name: "Workspace",
   definition(t) {
     t.nonNull.string("id");
-    t.string("name");
-    t.string("idSignature");
     t.string("infoCiphertext");
     t.string("infoNonce");
     t.string("infoWorkspaceKeyId");

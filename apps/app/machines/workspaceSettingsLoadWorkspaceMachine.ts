@@ -1,4 +1,8 @@
-import { LocalDevice } from "@serenity-tools/common";
+import {
+  LocalDevice,
+  decryptWorkspaceInfo,
+  decryptWorkspaceKey,
+} from "@serenity-tools/common";
 import { assign, createMachine } from "xstate";
 import {
   WorkspaceDocument,
@@ -7,8 +11,8 @@ import {
 } from "../generated/graphql";
 import { getUrqlClient } from "../utils/urqlClient/urqlClient";
 import {
-  loadInitialDataMachine,
   MeWithWorkspaceLoadingInfoQueryResult,
+  loadInitialDataMachine,
 } from "./loadInitialData";
 
 export type WorkspaceQueryResult = {
@@ -18,12 +22,21 @@ export type WorkspaceQueryResult = {
   };
 };
 
+type WorkspaceInfo = {
+  name: string;
+};
+
 type Context = {
   workspaceId?: string;
   navigation: any;
   activeDevice: LocalDevice;
   meWithWorkspaceLoadingInfoQueryResult?: MeWithWorkspaceLoadingInfoQueryResult;
   workspaceQueryResult?: WorkspaceQueryResult;
+  workspaceInfo?: WorkspaceInfo;
+  currentWorkspaceKey?: {
+    key: string;
+    id: string;
+  };
 };
 
 const fetchWorkspace = async (context) => {
@@ -44,7 +57,7 @@ const fetchWorkspace = async (context) => {
 };
 
 export const workspaceSettingsLoadWorkspaceMachine =
-  /** @xstate-layout N4IgpgJg5mDOIC5QBsD2BDCB1VAnA1rAA7oDGYAymAC7UCWAdlLAHRqaNQCSDd16yACLp+AYgioGYFowBuqfNPYQefOgOH8AsmQAWjMIlBFUsNZKMgAHogDMABgCMLABwB2ey9sAWRwCYATjd3ADYAGhAAT0RHFxCWAIBWFyC-EJdvYNtsgF8ciOUcAmIyShp6JlZlTlV+IRF0UTBcXDwWImQRADM8AFs2DBVeeg0GnVJ9KUsTM3oLJGsYtz8E+z8UkLcAwM90iOiEbMSWXwCXQL9bEN8Q+288gsGiwhJyKlpOKqe8F9LxSWkcgU0i6NAmzxK5GmpnMDEsNgQSRW3gCISSATutkc132iBSCXcfkcjm8iVufns9hCDxAhR+kLKH0qA0wENeYCaLTaHW6fRYoOo4Pp7Ohszo81ACLO8VsiVsGUSbl8aRCiVxhzczjcyxJIXSbj1yTy+RADFQEDgljpxXZ7wqzBZEBqw1G-FFsPheJWV1JDhCfkVqNs6sciWOqLccsSd0pxO8Lhp1t+b3Kn0dbNK7rmcIWCLJARYDgD-jcVyyARDYYSmyjMacJITJqTDLtaebtoArqRyLB4AsZh7czErsdbAaDajFY5S+EojFridrok-N4qXqI4nvjbSq3me3SgAxdB0ZCQLPinOS4eqwvjtGqzUz9UXBJ+bWJUnJf25Jtb5OM+0+2MGFs09BBkkLJc-QDLYQj9EMXBYSlKSxFFZXcbZjRyIA */
+  /** @xstate-layout N4IgpgJg5mDOIC5QHcD2AnA1rADgQwGMwBlMAFzIEsA7KWAGVTwgHUNt8iBZQgCxrAA6ADZMINKAElqlKnmEARPGTwBiCKmpCaAN1SYho5tNmV5SlTwL8tAbQAMAXUSgcqWKc0uQAD0QAWfwAmQQBOUIA2ewBWCIiADniAdnj-ABoQAE9EAEZo+0FknKSk6P9U-OjQ6IBfGoy0LFxCEnIqWgYxNibOMCsbQzEJEzlFZTUwdHQMQRxhZQAzDABbETERszHLPgEHZyQQNw8qLwO-BByggGYw6uD40Pir0KD4nPiM7IRkwWigqKS9neEWiSRBdQa7GaRFIFAknWY3Q4LX6AjWiKhvXUmm01D0BkEC3I1iR0LAe28R081G85xy9iu-kE-2i0UZjNC9g+WUQb0EVyCQVCOWqQS58WiOQiEJAjWRMLa8MYGJ6KJ2WnRrExLWxGt0+iERLIJO1RFsOX2rnc1NpuQZTJZbP8HK5n0QgoKwRikSCf0BERyVxlcrJsPadGVWtV3HVgxV8rAqkm03Qs3mZCW6FWRpN0fJTkp1pONLOdsZzJBTpd3K+xRuVQiV0BKQSQX8CTq9RA1FQEDg3hDvTDSq6pr6scLx0op1A5wAtDk3Qg59FbuFHrEIu37Fvg2Phx1I6TeqiNUZxLQNuZxpObaWEP4kkvA6F+fkhbE-v5QRK93mDxGo55qecZRgmt7FraCARMK-JXNE8QgqUYKShEz7lIU5SRCUVxvIkCF-gmAEImBZIgZqx4tMQACuBBELA8AHFSkH3nkVwRIIQKtk2ryxIyz5AoI7ZvPSIpvICxSEaGiqHkBCbkeelFEAAYnglDCJAEHTiWs65GyHFcfE1xJLxjbpDyFwpIICT2EkoTwf49lcqEnY1EAA */
   createMachine(
     {
       schema: {
@@ -81,6 +94,7 @@ export const workspaceSettingsLoadWorkspaceMachine =
             onError: [{}],
           },
         },
+
         loadWorkspace: {
           invoke: {
             src: "fetchWorkspace",
@@ -104,9 +118,81 @@ export const workspaceSettingsLoadWorkspaceMachine =
             ],
           },
         },
+
         loadWorkspaceSuccess: {
+          entry: assign({
+            currentWorkspaceKey: (context) => {
+              if (
+                context.workspaceQueryResult?.data?.workspace
+                  ?.currentWorkspaceKey?.workspaceKeyBox
+              ) {
+                const workspaceKeyBox =
+                  context.workspaceQueryResult.data.workspace
+                    .currentWorkspaceKey.workspaceKeyBox;
+                // TODO verify that creator
+                // needs a workspace key chain with a main device!
+                const workspaceKey = decryptWorkspaceKey({
+                  ciphertext: workspaceKeyBox.ciphertext,
+                  nonce: workspaceKeyBox.nonce,
+                  creatorDeviceEncryptionPublicKey:
+                    workspaceKeyBox.creatorDevice.encryptionPublicKey,
+                  receiverDeviceEncryptionPrivateKey:
+                    context.activeDevice.encryptionPrivateKey,
+                });
+                return {
+                  id: context.workspaceQueryResult.data.workspace
+                    .currentWorkspaceKey.id,
+                  key: workspaceKey,
+                };
+              }
+              return undefined;
+            },
+            workspaceInfo: (context) => {
+              let workspaceName = "";
+
+              if (context.workspaceQueryResult?.data?.workspace) {
+                const workspaceData =
+                  context.workspaceQueryResult.data.workspace;
+
+                if (
+                  workspaceData.infoCiphertext &&
+                  workspaceData.infoNonce &&
+                  workspaceData.infoWorkspaceKey?.workspaceKeyBox
+                ) {
+                  // TODO verify that creator
+                  // needs a workspace key chain with a main device!
+                  const workspaceKey = decryptWorkspaceKey({
+                    ciphertext:
+                      workspaceData.infoWorkspaceKey?.workspaceKeyBox
+                        ?.ciphertext,
+                    nonce:
+                      workspaceData.infoWorkspaceKey?.workspaceKeyBox?.nonce,
+                    creatorDeviceEncryptionPublicKey:
+                      workspaceData.infoWorkspaceKey?.workspaceKeyBox
+                        ?.creatorDevice.encryptionPublicKey,
+                    receiverDeviceEncryptionPrivateKey:
+                      context.activeDevice.encryptionPrivateKey,
+                  });
+                  const decryptedWorkspaceInfo = decryptWorkspaceInfo({
+                    ciphertext: workspaceData.infoCiphertext,
+                    nonce: workspaceData.infoNonce,
+                    key: workspaceKey,
+                  });
+                  if (
+                    decryptedWorkspaceInfo &&
+                    typeof decryptedWorkspaceInfo.name === "string"
+                  ) {
+                    workspaceName = decryptedWorkspaceInfo.name as string;
+                  }
+                }
+              }
+
+              return { name: workspaceName };
+            },
+          }),
           type: "final",
         },
+
         loadWorkspaceFailed: {
           type: "final",
         },

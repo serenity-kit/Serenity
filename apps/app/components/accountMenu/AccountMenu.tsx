@@ -1,6 +1,10 @@
 import { useFocusRing } from "@react-native-aria/focus";
 import { useNavigation } from "@react-navigation/native";
 import {
+  decryptWorkspaceInfo,
+  decryptWorkspaceKey,
+} from "@serenity-tools/common";
+import {
   HorizontalDivider,
   Icon,
   IconButton,
@@ -69,6 +73,40 @@ export default function AccountMenu({
     setIsPasswordModalVisible(true);
   };
 
+  let workspaceName = "";
+  if (state.context.workspaceQueryResult?.data?.workspace) {
+    const workspaceData = state.context.workspaceQueryResult.data.workspace;
+
+    if (
+      workspaceData.infoCiphertext &&
+      workspaceData.infoNonce &&
+      workspaceData.infoWorkspaceKey?.workspaceKeyBox &&
+      activeDevice
+    ) {
+      // TODO verify that creator
+      // needs a workspace key chain with a main device!
+      const workspaceKey = decryptWorkspaceKey({
+        ciphertext: workspaceData.infoWorkspaceKey?.workspaceKeyBox?.ciphertext,
+        nonce: workspaceData.infoWorkspaceKey?.workspaceKeyBox?.nonce,
+        creatorDeviceEncryptionPublicKey:
+          workspaceData.infoWorkspaceKey?.workspaceKeyBox?.creatorDevice
+            .encryptionPublicKey,
+        receiverDeviceEncryptionPrivateKey: activeDevice?.encryptionPrivateKey,
+      });
+      const decryptedWorkspaceInfo = decryptWorkspaceInfo({
+        ciphertext: workspaceData.infoCiphertext,
+        nonce: workspaceData.infoNonce,
+        key: workspaceKey,
+      });
+      if (
+        decryptedWorkspaceInfo &&
+        typeof decryptedWorkspaceInfo.name === "string"
+      ) {
+        workspaceName = decryptedWorkspaceInfo.name as string;
+      }
+    }
+  }
+
   return (
     <>
       <Menu
@@ -116,10 +154,7 @@ export default function AccountMenu({
                 numberOfLines={1}
                 ellipsizeMode="tail"
               >
-                {workspaceId
-                  ? state.context.workspaceQueryResult?.data?.workspace?.name ||
-                    " "
-                  : "No workspace"}
+                {workspaceId ? workspaceName : "No workspace"}
               </Text>
               <Icon name="arrow-up-down-s-line" color={"gray-400"} />
             </HStack>
@@ -143,8 +178,44 @@ export default function AccountMenu({
 
         {workspacesQueryResult?.data?.workspaces?.nodes &&
         workspacesQueryResult.data.workspaces.nodes.length >= 1 ? (
-          workspacesQueryResult.data.workspaces.nodes.map((workspace) =>
-            workspace === null || workspace === undefined ? null : (
+          workspacesQueryResult.data.workspaces.nodes.map((workspace) => {
+            if (workspace === null || workspace === undefined) return null;
+
+            let workspaceListName = "";
+            // TODO verify that creator
+            // needs a workspace key chain with a main device!
+            if (
+              workspace.infoCiphertext &&
+              workspace.infoNonce &&
+              workspace.infoWorkspaceKey?.workspaceKeyBox &&
+              activeDevice
+            ) {
+              // TODO verify that creator
+              // needs a workspace key chain with a main device!
+              const workspaceKey = decryptWorkspaceKey({
+                ciphertext:
+                  workspace.infoWorkspaceKey?.workspaceKeyBox?.ciphertext,
+                nonce: workspace.infoWorkspaceKey?.workspaceKeyBox?.nonce,
+                creatorDeviceEncryptionPublicKey:
+                  workspace.infoWorkspaceKey?.workspaceKeyBox?.creatorDevice
+                    .encryptionPublicKey,
+                receiverDeviceEncryptionPrivateKey:
+                  activeDevice?.encryptionPrivateKey,
+              });
+              const decryptedWorkspaceInfo = decryptWorkspaceInfo({
+                ciphertext: workspace.infoCiphertext,
+                nonce: workspace.infoNonce,
+                key: workspaceKey,
+              });
+              if (
+                decryptedWorkspaceInfo &&
+                typeof decryptedWorkspaceInfo.name === "string"
+              ) {
+                workspaceListName = decryptedWorkspaceInfo.name as string;
+              }
+            }
+
+            return (
               <MenuLink
                 key={workspace.id}
                 to={{
@@ -165,10 +236,10 @@ export default function AccountMenu({
                   />
                 }
               >
-                {workspace.name}
+                {workspaceListName}
               </MenuLink>
-            )
-          )
+            );
+          })
         ) : (
           <View style={tw`pl-5 py-3.5`}>
             <Spinner

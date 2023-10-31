@@ -82,7 +82,24 @@ const getWorkspaces = async ({
       ) {
         nodes {
           id
-          name
+          infoCiphertext
+          infoNonce
+          infoWorkspaceKey {
+            id
+            workspaceId
+            generation
+            workspaceKeyBox {
+              id
+              workspaceKeyId
+              deviceSigningPublicKey
+              ciphertext
+              nonce
+              creatorDevice {
+                signingPublicKey
+                encryptionPublicKey
+              }
+            }
+          }
           currentWorkspaceKey {
             id
             workspaceId
@@ -128,12 +145,6 @@ test("user should be able to list workspaces", async () => {
   firstWorkspaceCursor = result.workspaces.edges[0].cursor;
   workspaces.forEach((workspace: Workspace) => {
     expect(typeof workspace.id).toBe("string");
-    expect(typeof workspace.name).toBe("string");
-    if (workspace.id === userData1.workspace.id) {
-      expect(workspace.name).toBe(userData1.workspace.name);
-    } else {
-      expect(workspace.name).toBe(workspace2Name);
-    }
     expect(typeof workspace.currentWorkspaceKey?.id).toBe("string");
     expect(workspace.currentWorkspaceKey?.workspaceId).toBe(workspace.id);
     const workspaceKeyBox = workspace.currentWorkspaceKey?.workspaceKeyBox;
@@ -178,7 +189,6 @@ test("user can query by paginating cursor", async () => {
   expect(workspaces.length).toBe(1);
   const workspace = workspaces[0];
   expect(workspace.id).toBe(otherWorkspace.workspace.id);
-  expect(workspace.name).toBe(workspace2Name);
 });
 
 // NOTE: removing this feature until we update the front-end UI

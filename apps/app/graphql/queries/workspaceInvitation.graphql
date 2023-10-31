@@ -8,7 +8,6 @@ query workspaceInvitation($id: ID!) {
     workspaceId
     inviterUserId
     inviterUsername
-    workspaceName
     role
     expiresAt
     invitationDataSignature

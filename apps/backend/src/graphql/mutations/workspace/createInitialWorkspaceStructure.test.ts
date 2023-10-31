@@ -49,7 +49,6 @@ test("create initial workspace structure", async () => {
     userData1.mainDevice;
   expect(workspace.id).not.toBeNull();
   expect(workspace.id).not.toBeUndefined();
-  expect(workspace.name).toBe(workspaceName);
   expect(workspace.currentWorkspaceKey.id).not.toBeNull();
   expect(folder.id).not.toBeNull();
   expect(folder.id).not.toBeUndefined();
@@ -161,7 +160,6 @@ const query = gql`
     createInitialWorkspaceStructure(input: $input) {
       workspace {
         id
-        name
       }
       folder {
         id
@@ -173,7 +171,7 @@ const query = gql`
   }
 `;
 
-test("Invalid workspace name", async () => {
+test("Invalid workspace infoCiphertext", async () => {
   await expect(
     (async () =>
       await graphql.client.request(
@@ -182,7 +180,7 @@ test("Invalid workspace name", async () => {
           input: {
             workspace: {
               id: generateId(),
-              name: null,
+              infoCiphertext: null,
               deviceWorkspaceKeyBoxes: [],
             },
             folder: {
@@ -198,7 +196,6 @@ test("Invalid workspace name", async () => {
             },
             document: {
               id: generateId(),
-              idSignature: `TODO+${generateId()}`,
               nameCiphertext: "",
               nameNonce: "",
               subkeyId: 123,
@@ -236,7 +233,6 @@ test("Invalid workspace id", async () => {
             },
             document: {
               id: generateId(),
-              idSignature: `TODO+${generateId()}`,
               nameCiphertext: "",
               nameNonce: "",
               subkeyId: 123,
@@ -274,7 +270,6 @@ test("Invalid folder id", async () => {
             },
             document: {
               id: generateId(),
-              idSignature: `TODO+${generateId()}`,
               nameCiphertext: "",
               nameNonce: "",
               subkeyId: 123,
@@ -312,7 +307,6 @@ test("Invalid folder name", async () => {
             },
             document: {
               id: generateId(),
-              idSignature: `TODO+${generateId()}`,
               nameCiphertext: "",
               nameNonce: "",
               subkeyId: 123,
@@ -350,7 +344,6 @@ test("Invalid folder nonce", async () => {
             },
             document: {
               id: generateId(),
-              idSignature: `TODO+${generateId()}`,
               nameCiphertext: "",
               nameNonce: "",
               subkeyId: 123,
@@ -384,7 +377,6 @@ test("Invalid folder trace", async () => {
             },
             document: {
               id: generateId(),
-              idSignature: `TODO+${generateId()}`,
               nameCiphertext: "",
               nameNonce: "",
               subkeyId: 123,
@@ -422,7 +414,6 @@ test("Invalid document id", async () => {
             },
             document: {
               id: null,
-              idSignature: `TODO+${generateId()}`,
               nameCiphertext: "",
               nameNonce: "",
               subkeyId: 123,
@@ -460,7 +451,6 @@ test("Invalid document name", async () => {
             },
             document: {
               id: generateId(),
-              idSignature: `TODO+${generateId()}`,
               nameCiphertext: null,
               nameNonce: "",
               subkeyId: 123,
@@ -498,7 +488,6 @@ test("Invalid document nonce", async () => {
             },
             document: {
               id: generateId(),
-              idSignature: `TODO+${generateId()}`,
               nameCiphertext: "",
               nameNonce: null,
               subkeyId: 123,
@@ -536,7 +525,6 @@ test("Invalid subkeyId", async () => {
             },
             document: {
               id: generateId(),
-              idSignature: `TODO+${generateId()}`,
               nameCiphertext: "",
               nameNonce: "",
               subkeyId: null,
@@ -574,7 +562,6 @@ test("Invalid creator device", async () => {
             },
             document: {
               id: generateId(),
-              idSignature: `TODO+${generateId()}`,
               nameCiphertext: "",
               nameNonce: "",
               subkeyId: 123,
@@ -612,7 +599,6 @@ test("creator device must belong to user", async () => {
             },
             document: {
               id: generateId(),
-              idSignature: `TODO+${generateId()}`,
               nameCiphertext: "",
               nameNonce: "",
               subkeyId: 123,

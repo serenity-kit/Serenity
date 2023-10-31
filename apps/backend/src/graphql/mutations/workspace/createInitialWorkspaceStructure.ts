@@ -26,7 +26,8 @@ export const DeviceWorkspaceKeyBoxInput = inputObjectType({
 export const CreateInitialWorkspaceInput = inputObjectType({
   name: "CreateInitialWorkspaceInput",
   definition(t) {
-    t.nonNull.string("name");
+    t.nonNull.string("infoCiphertext");
+    t.nonNull.string("infoNonce");
     t.nonNull.string("workspaceKeyId");
     t.nonNull.list.nonNull.field("deviceWorkspaceKeyBoxes", {
       type: DeviceWorkspaceKeyBoxInput,

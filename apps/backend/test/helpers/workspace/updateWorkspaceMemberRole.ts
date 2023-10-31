@@ -24,7 +24,6 @@ export const updateWorkspaceMemberRole = async ({
       updateWorkspaceMemberRole(input: $input) {
         workspace {
           id
-          name
         }
       }
     }

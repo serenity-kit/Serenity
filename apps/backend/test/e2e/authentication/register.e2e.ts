@@ -27,30 +27,19 @@ test("Register", async ({ page }) => {
   expect(registrationResult).not.toBeUndefined();
 
   await delayForSeconds(3);
-  const user = await prisma.user.findFirst({
-    where: { username },
-  });
+  const user = await prisma.user.findFirst({ where: { username } });
   expect(user).not.toBe(null);
   const userToWorkspace = await prisma.usersToWorkspaces.findFirst({
-    where: {
-      userId: user?.id,
-    },
+    where: { userId: user?.id },
   });
   expect(userToWorkspace).not.toBe(null);
   const workspaceId = userToWorkspace?.workspaceId;
   const workspace = await prisma.workspace.findFirst({
-    where: {
-      name: workspaceName,
-      id: workspaceId,
-    },
+    where: { id: workspaceId },
   });
   expect(workspace).not.toBe(null);
   // a page will have been created
-  const document = await prisma.document.findFirst({
-    where: {
-      workspaceId,
-    },
-  });
+  const document = await prisma.document.findFirst({ where: { workspaceId } });
   expect(document).not.toBe(null);
   const documentId = document?.id;
   // TODO: get the workspace id and expect URL to match

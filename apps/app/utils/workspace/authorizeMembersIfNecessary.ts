@@ -83,6 +83,8 @@ export const authorizeMembersIfNecessary = async ({
                 if (!workspaceKeyBox) {
                   throw new Error("Missing a workspaceKeyBox");
                 }
+                // TODO verify that creator
+                // needs a workspace key chain with a main device!
                 const key = decryptWorkspaceKey({
                   ciphertext: workspaceKeyBox.ciphertext,
                   nonce: workspaceKeyBox.nonce,

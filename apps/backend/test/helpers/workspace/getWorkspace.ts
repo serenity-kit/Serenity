@@ -18,7 +18,24 @@ export const getWorkspace = async ({
     query workspace($id: ID, $deviceSigningPublicKey: String!) {
       workspace(id: $id, deviceSigningPublicKey: $deviceSigningPublicKey) {
         id
-        name
+        infoCiphertext
+        infoNonce
+        infoWorkspaceKey {
+          id
+          workspaceId
+          generation
+          workspaceKeyBox {
+            id
+            workspaceKeyId
+            deviceSigningPublicKey
+            ciphertext
+            nonce
+            creatorDevice {
+              signingPublicKey
+              encryptionPublicKey
+            }
+          }
+        }
         currentWorkspaceKey {
           id
           workspaceId

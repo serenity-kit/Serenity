@@ -10,6 +10,7 @@ import {
   createSnapshotKey,
   encryptDocumentTitleByKey,
   encryptFolderName,
+  encryptWorkspaceInfo,
   encryptWorkspaceKeyForDevice,
   folderDerivedKeyContext,
   generateId,
@@ -185,11 +186,17 @@ export default async function createUserWithWorkspace({
     publicKey: mainDevice.signingPublicKey,
   });
 
+  const workspaceInfo = await encryptWorkspaceInfo({
+    name: "My Workspace",
+    key: workspaceKey,
+  });
+
   const createWorkspaceResult = await createInitialWorkspaceStructure({
     userId: user.id,
     workspace: {
       id: createWorkspaceChainEvent.transaction.id,
-      name: "My Workspace",
+      infoCiphertext: workspaceInfo.ciphertext,
+      infoNonce: workspaceInfo.nonce,
       workspaceKeyId,
       deviceWorkspaceKeyBoxes: [
         {
@@ -281,5 +288,7 @@ export default async function createUserWithWorkspace({
     document: createWorkspaceResult.document,
     snapshot: createWorkspaceResult.snapshot,
     snapshotKey,
+    workspaceKey,
+    workspaceKeyId,
   };
 }

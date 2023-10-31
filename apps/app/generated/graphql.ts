@@ -208,7 +208,8 @@ export type CreateInitialFolderInput = {
 
 export type CreateInitialWorkspaceInput = {
   deviceWorkspaceKeyBoxes: Array<DeviceWorkspaceKeyBoxInput>;
-  name: Scalars['String'];
+  infoCiphertext: Scalars['String'];
+  infoNonce: Scalars['String'];
   workspaceKeyId: Scalars['String'];
 };
 
@@ -531,12 +532,6 @@ export type FolderEdge = {
   node?: Maybe<Folder>;
 };
 
-export type InfoWorkspaceKeyBoxInput = {
-  ciphertext: Scalars['String'];
-  deviceSigningPublicKey: Scalars['String'];
-  nonce: Scalars['String'];
-};
-
 export type InitiateFileUploadInput = {
   documentId: Scalars['String'];
   workspaceId: Scalars['String'];
@@ -635,7 +630,6 @@ export type Mutation = {
   startRegistration?: Maybe<StartRegistrationResult>;
   updateDocumentName?: Maybe<UpdateDocumentNameResult>;
   updateFolderName?: Maybe<UpdateFolderNameResult>;
-  updateWorkspaceInfo?: Maybe<UpdateWorkspaceInfoResult>;
   updateWorkspaceMemberRole?: Maybe<UpdateWorkspaceMemberRoleResult>;
   updateWorkspaceName?: Maybe<UpdateWorkspaceNameResult>;
   verifyRegistration?: Maybe<VerifyRegistrationResult>;
@@ -779,11 +773,6 @@ export type MutationUpdateDocumentNameArgs = {
 
 export type MutationUpdateFolderNameArgs = {
   input: UpdateFolderNameInput;
-};
-
-
-export type MutationUpdateWorkspaceInfoArgs = {
-  input: UpdateWorkspaceInfoInput;
 };
 
 
@@ -1165,19 +1154,6 @@ export type UpdateFolderNameResult = {
   folder?: Maybe<Folder>;
 };
 
-export type UpdateWorkspaceInfoInput = {
-  creatorDeviceSigningPublicKey: Scalars['String'];
-  infoCiphertext: Scalars['String'];
-  infoNonce: Scalars['String'];
-  infoWorkspaceKeyBoxes: Array<InfoWorkspaceKeyBoxInput>;
-  workspaceId: Scalars['String'];
-};
-
-export type UpdateWorkspaceInfoResult = {
-  __typename?: 'UpdateWorkspaceInfoResult';
-  workspace: Workspace;
-};
-
 export type UpdateWorkspaceMemberRoleInput = {
   serializedWorkspaceChainEvent: Scalars['String'];
   workspaceId: Scalars['String'];
@@ -1190,7 +1166,9 @@ export type UpdateWorkspaceMemberRoleResult = {
 
 export type UpdateWorkspaceNameInput = {
   id: Scalars['String'];
-  name?: InputMaybe<Scalars['String']>;
+  infoCiphertext: Scalars['String'];
+  infoNonce: Scalars['String'];
+  infoWorkspaceKeyId: Scalars['String'];
 };
 
 export type UpdateWorkspaceNameResult = {
@@ -1248,12 +1226,10 @@ export type Workspace = {
   __typename?: 'Workspace';
   currentWorkspaceKey?: Maybe<WorkspaceKey>;
   id: Scalars['String'];
-  idSignature?: Maybe<Scalars['String']>;
   infoCiphertext?: Maybe<Scalars['String']>;
   infoNonce?: Maybe<Scalars['String']>;
   infoWorkspaceKey?: Maybe<WorkspaceKey>;
   infoWorkspaceKeyId?: Maybe<Scalars['String']>;
-  name?: Maybe<Scalars['String']>;
   workspaceKeys?: Maybe<Array<WorkspaceKey>>;
 };
 
@@ -1481,7 +1457,7 @@ export type CreateInitialWorkspaceStructureMutationVariables = Exact<{
 }>;
 
 
-export type CreateInitialWorkspaceStructureMutation = { __typename?: 'Mutation', createInitialWorkspaceStructure?: { __typename?: 'CreateInitialWorkspaceStructureResult', workspace?: { __typename?: 'Workspace', id: string, name?: string | null, currentWorkspaceKey?: { __typename?: 'WorkspaceKey', id: string, workspaceId: string, generation: number, workspaceKeyBox?: { __typename?: 'WorkspaceKeyBox', id: string, workspaceKeyId: string, deviceSigningPublicKey: string, ciphertext: string, creatorDevice: { __typename?: 'CreatorDevice', signingPublicKey: string, encryptionPublicKey: string } } | null } | null } | null, folder?: { __typename?: 'Folder', id: string, nameCiphertext: string, nameNonce: string, parentFolderId?: string | null, rootFolderId?: string | null, workspaceId?: string | null, keyDerivationTrace: { __typename?: 'KeyDerivationTrace', workspaceKeyId: string, trace: Array<{ __typename?: 'KeyDerivationTraceEntry', entryId: string, subkeyId: number, parentId?: string | null, context: string }> } } | null, document?: { __typename?: 'Document', id: string } | null } | null };
+export type CreateInitialWorkspaceStructureMutation = { __typename?: 'Mutation', createInitialWorkspaceStructure?: { __typename?: 'CreateInitialWorkspaceStructureResult', workspace?: { __typename?: 'Workspace', id: string, infoCiphertext?: string | null, infoNonce?: string | null, infoWorkspaceKey?: { __typename?: 'WorkspaceKey', id: string, workspaceId: string, generation: number, workspaceKeyBox?: { __typename?: 'WorkspaceKeyBox', id: string, workspaceKeyId: string, deviceSigningPublicKey: string, ciphertext: string, nonce: string, creatorDevice: { __typename?: 'CreatorDevice', signingPublicKey: string, encryptionPublicKey: string } } | null } | null, currentWorkspaceKey?: { __typename?: 'WorkspaceKey', id: string, workspaceId: string, generation: number, workspaceKeyBox?: { __typename?: 'WorkspaceKeyBox', id: string, workspaceKeyId: string, deviceSigningPublicKey: string, ciphertext: string, creatorDevice: { __typename?: 'CreatorDevice', signingPublicKey: string, encryptionPublicKey: string } } | null } | null } | null, folder?: { __typename?: 'Folder', id: string, nameCiphertext: string, nameNonce: string, parentFolderId?: string | null, rootFolderId?: string | null, workspaceId?: string | null, keyDerivationTrace: { __typename?: 'KeyDerivationTrace', workspaceKeyId: string, trace: Array<{ __typename?: 'KeyDerivationTraceEntry', entryId: string, subkeyId: number, parentId?: string | null, context: string }> } } | null, document?: { __typename?: 'Document', id: string } | null } | null };
 
 export type CreateWorkspaceInvitationMutationVariables = Exact<{
   input: CreateWorkspaceInvitationInput;
@@ -1614,14 +1590,14 @@ export type UpdateWorkspaceMemberRoleMutationVariables = Exact<{
 }>;
 
 
-export type UpdateWorkspaceMemberRoleMutation = { __typename?: 'Mutation', updateWorkspaceMemberRole?: { __typename?: 'UpdateWorkspaceMemberRoleResult', workspace?: { __typename?: 'Workspace', id: string, name?: string | null } | null } | null };
+export type UpdateWorkspaceMemberRoleMutation = { __typename?: 'Mutation', updateWorkspaceMemberRole?: { __typename?: 'UpdateWorkspaceMemberRoleResult', workspace?: { __typename?: 'Workspace', id: string } | null } | null };
 
 export type UpdateWorkspaceNameMutationVariables = Exact<{
   input: UpdateWorkspaceNameInput;
 }>;
 
 
-export type UpdateWorkspaceNameMutation = { __typename?: 'Mutation', updateWorkspaceName?: { __typename?: 'UpdateWorkspaceNameResult', workspace?: { __typename?: 'Workspace', id: string, name?: string | null } | null } | null };
+export type UpdateWorkspaceNameMutation = { __typename?: 'Mutation', updateWorkspaceName?: { __typename?: 'UpdateWorkspaceNameResult', workspace?: { __typename?: 'Workspace', id: string } | null } | null };
 
 export type VerifyRegistrationMutationVariables = Exact<{
   input: VerifyRegistrationInput;
@@ -1806,7 +1782,7 @@ export type WorkspaceQueryVariables = Exact<{
 }>;
 
 
-export type WorkspaceQuery = { __typename?: 'Query', workspace?: { __typename?: 'Workspace', id: string, name?: string | null, currentWorkspaceKey?: { __typename?: 'WorkspaceKey', id: string, workspaceId: string, workspaceKeyBox?: { __typename?: 'WorkspaceKeyBox', id: string, workspaceKeyId: string, deviceSigningPublicKey: string, ciphertext: string, nonce: string, creatorDevice: { __typename?: 'CreatorDevice', signingPublicKey: string, encryptionPublicKey: string } } | null } | null, workspaceKeys?: Array<{ __typename?: 'WorkspaceKey', id: string, workspaceId: string, generation: number, workspaceKeyBox?: { __typename?: 'WorkspaceKeyBox', id: string, workspaceKeyId: string, deviceSigningPublicKey: string, ciphertext: string, nonce: string, creatorDevice: { __typename?: 'CreatorDevice', signingPublicKey: string, encryptionPublicKey: string } } | null }> | null } | null };
+export type WorkspaceQuery = { __typename?: 'Query', workspace?: { __typename?: 'Workspace', id: string, infoCiphertext?: string | null, infoNonce?: string | null, infoWorkspaceKey?: { __typename?: 'WorkspaceKey', id: string, workspaceId: string, generation: number, workspaceKeyBox?: { __typename?: 'WorkspaceKeyBox', id: string, workspaceKeyId: string, deviceSigningPublicKey: string, ciphertext: string, nonce: string, creatorDevice: { __typename?: 'CreatorDevice', signingPublicKey: string, encryptionPublicKey: string } } | null } | null, currentWorkspaceKey?: { __typename?: 'WorkspaceKey', id: string, workspaceId: string, workspaceKeyBox?: { __typename?: 'WorkspaceKeyBox', id: string, workspaceKeyId: string, deviceSigningPublicKey: string, ciphertext: string, nonce: string, creatorDevice: { __typename?: 'CreatorDevice', signingPublicKey: string, encryptionPublicKey: string } } | null } | null, workspaceKeys?: Array<{ __typename?: 'WorkspaceKey', id: string, workspaceId: string, generation: number, workspaceKeyBox?: { __typename?: 'WorkspaceKeyBox', id: string, workspaceKeyId: string, deviceSigningPublicKey: string, ciphertext: string, nonce: string, creatorDevice: { __typename?: 'CreatorDevice', signingPublicKey: string, encryptionPublicKey: string } } | null }> | null } | null };
 
 export type WorkspaceChainQueryVariables = Exact<{
   workspaceId: Scalars['ID'];
@@ -1827,7 +1803,7 @@ export type WorkspaceInvitationQueryVariables = Exact<{
 }>;
 
 
-export type WorkspaceInvitationQuery = { __typename?: 'Query', me?: { __typename?: 'MeResult', id: string, username: string } | null, workspaceInvitation?: { __typename?: 'WorkspaceInvitation', id: string, workspaceId: string, inviterUserId: string, inviterUsername: string, workspaceName?: string | null, role: Role, expiresAt: any, invitationDataSignature: string, invitationSigningPublicKey: string } | null };
+export type WorkspaceInvitationQuery = { __typename?: 'Query', me?: { __typename?: 'MeResult', id: string, username: string } | null, workspaceInvitation?: { __typename?: 'WorkspaceInvitation', id: string, workspaceId: string, inviterUserId: string, inviterUsername: string, role: Role, expiresAt: any, invitationDataSignature: string, invitationSigningPublicKey: string } | null };
 
 export type WorkspaceInvitationsQueryVariables = Exact<{
   workspaceId: Scalars['ID'];
@@ -1856,7 +1832,7 @@ export type WorkspacesQueryVariables = Exact<{
 }>;
 
 
-export type WorkspacesQuery = { __typename?: 'Query', workspaces?: { __typename?: 'WorkspaceConnection', nodes?: Array<{ __typename?: 'Workspace', id: string, name?: string | null, currentWorkspaceKey?: { __typename?: 'WorkspaceKey', id: string, workspaceId: string, generation: number, workspaceKeyBox?: { __typename?: 'WorkspaceKeyBox', id: string, workspaceKeyId: string, deviceSigningPublicKey: string, ciphertext: string, nonce: string, creatorDevice: { __typename?: 'CreatorDevice', signingPublicKey: string, encryptionPublicKey: string } } | null } | null, workspaceKeys?: Array<{ __typename?: 'WorkspaceKey', id: string, workspaceId: string, generation: number, workspaceKeyBox?: { __typename?: 'WorkspaceKeyBox', id: string, workspaceKeyId: string, deviceSigningPublicKey: string, ciphertext: string, nonce: string, creatorDevice: { __typename?: 'CreatorDevice', signingPublicKey: string, encryptionPublicKey: string } } | null }> | null } | null> | null } | null };
+export type WorkspacesQuery = { __typename?: 'Query', workspaces?: { __typename?: 'WorkspaceConnection', nodes?: Array<{ __typename?: 'Workspace', id: string, infoCiphertext?: string | null, infoNonce?: string | null, infoWorkspaceKey?: { __typename?: 'WorkspaceKey', id: string, workspaceId: string, generation: number, workspaceKeyBox?: { __typename?: 'WorkspaceKeyBox', id: string, workspaceKeyId: string, deviceSigningPublicKey: string, ciphertext: string, nonce: string, creatorDevice: { __typename?: 'CreatorDevice', signingPublicKey: string, encryptionPublicKey: string } } | null } | null, currentWorkspaceKey?: { __typename?: 'WorkspaceKey', id: string, workspaceId: string, generation: number, workspaceKeyBox?: { __typename?: 'WorkspaceKeyBox', id: string, workspaceKeyId: string, deviceSigningPublicKey: string, ciphertext: string, nonce: string, creatorDevice: { __typename?: 'CreatorDevice', signingPublicKey: string, encryptionPublicKey: string } } | null } | null } | null> | null } | null };
 
 
 export const AcceptWorkspaceInvitationDocument = gql`
@@ -2008,7 +1984,24 @@ export const CreateInitialWorkspaceStructureDocument = gql`
   createInitialWorkspaceStructure(input: $input) {
     workspace {
       id
-      name
+      infoCiphertext
+      infoNonce
+      infoWorkspaceKey {
+        id
+        workspaceId
+        generation
+        workspaceKeyBox {
+          id
+          workspaceKeyId
+          deviceSigningPublicKey
+          ciphertext
+          nonce
+          creatorDevice {
+            signingPublicKey
+            encryptionPublicKey
+          }
+        }
+      }
       currentWorkspaceKey {
         id
         workspaceId
@@ -2302,7 +2295,6 @@ export const UpdateWorkspaceMemberRoleDocument = gql`
   updateWorkspaceMemberRole(input: $input) {
     workspace {
       id
-      name
     }
   }
 }
@@ -2316,7 +2308,6 @@ export const UpdateWorkspaceNameDocument = gql`
   updateWorkspaceName(input: $input) {
     workspace {
       id
-      name
     }
   }
 }
@@ -2804,7 +2795,24 @@ export const WorkspaceDocument = gql`
     query workspace($id: ID, $deviceSigningPublicKey: String!) {
   workspace(id: $id, deviceSigningPublicKey: $deviceSigningPublicKey) {
     id
-    name
+    infoCiphertext
+    infoNonce
+    infoWorkspaceKey {
+      id
+      workspaceId
+      generation
+      workspaceKeyBox {
+        id
+        workspaceKeyId
+        deviceSigningPublicKey
+        ciphertext
+        nonce
+        creatorDevice {
+          signingPublicKey
+          encryptionPublicKey
+        }
+      }
+    }
     currentWorkspaceKey {
       id
       workspaceId
@@ -2882,7 +2890,6 @@ export const WorkspaceInvitationDocument = gql`
     workspaceId
     inviterUserId
     inviterUsername
-    workspaceName
     role
     expiresAt
     invitationDataSignature
@@ -2968,8 +2975,9 @@ export const WorkspacesDocument = gql`
   workspaces(first: 50, deviceSigningPublicKey: $deviceSigningPublicKey) {
     nodes {
       id
-      name
-      currentWorkspaceKey {
+      infoCiphertext
+      infoNonce
+      infoWorkspaceKey {
         id
         workspaceId
         generation
@@ -2985,7 +2993,7 @@ export const WorkspacesDocument = gql`
           }
         }
       }
-      workspaceKeys {
+      currentWorkspaceKey {
         id
         workspaceId
         generation

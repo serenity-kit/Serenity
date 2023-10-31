@@ -28,24 +28,16 @@ export async function getWorkspace({
       infoWorkspaceKey: {
         include: {
           workspaceKeyBoxes: {
-            where: {
-              deviceSigningPublicKey,
-            },
-            include: {
-              creatorDevice: true,
-            },
+            where: { deviceSigningPublicKey },
+            include: { creatorDevice: true },
           },
         },
       },
       workspaceKeys: {
         include: {
           workspaceKeyBoxes: {
-            where: {
-              deviceSigningPublicKey,
-            },
-            include: {
-              creatorDevice: true,
-            },
+            where: { deviceSigningPublicKey },
+            include: { creatorDevice: true },
           },
         },
         orderBy: {

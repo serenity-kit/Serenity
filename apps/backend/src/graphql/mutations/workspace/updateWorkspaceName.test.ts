@@ -1,4 +1,4 @@
-import { generateId } from "@serenity-tools/common";
+import { decryptWorkspaceInfo, generateId } from "@serenity-tools/common";
 import { gql } from "graphql-request";
 import deleteAllRecords from "../../../../test/helpers/deleteAllRecords";
 import setupGraphql from "../../../../test/helpers/setupGraphql";
@@ -31,28 +31,23 @@ beforeAll(async () => {
   await setup();
 });
 
-test("user won't update the name when not set", async () => {
-  const name = undefined;
-  const result = await updateWorkspaceName({
-    graphql,
-    id: userData1.workspace.id,
-    name,
-    authorizationHeader: userData1.sessionKey,
-  });
-  const workspace = result.updateWorkspaceName.workspace;
-  expect(workspace.name).toBe(userData1.workspace.name);
-});
-
 test("user can change workspace name", async () => {
   const name = "workspace 2";
   const result = await updateWorkspaceName({
     graphql,
     id: userData1.workspace.id,
     name,
+    workspaceKey: userData1.workspaceKey,
+    workspaceKeyId: userData1.workspaceKeyId,
     authorizationHeader: userData1.sessionKey,
   });
   const workspace = result.updateWorkspaceName.workspace;
-  expect(workspace.name).toBe(name);
+  const decryptedWorkspaceInfo = decryptWorkspaceInfo({
+    ciphertext: workspace.infoCiphertext,
+    nonce: workspace.infoNonce,
+    key: userData1.workspaceKey,
+  });
+  expect(decryptedWorkspaceInfo.name).toBe(name);
 });
 
 test("user should not be able to update a workspace they don't own", async () => {
@@ -66,6 +61,8 @@ test("user should not be able to update a workspace they don't own", async () =>
         graphql,
         id,
         name,
+        workspaceKey: userData1.workspaceKey,
+        workspaceKeyId: userData1.workspaceKeyId,
         authorizationHeader,
       }))()
   ).rejects.toThrow("Unauthorized");
@@ -82,6 +79,8 @@ test("user should not be able to update a workspace for a workspace that doesn't
         graphql,
         id,
         name,
+        workspaceKey: userData1.workspaceKey,
+        workspaceKeyId: userData1.workspaceKeyId,
         authorizationHeader,
       }))()
   ).rejects.toThrow("Unauthorized");
@@ -96,6 +95,8 @@ test("Unauthenticated", async () => {
         graphql,
         id,
         name,
+        workspaceKey: userData1.workspaceKey,
+        workspaceKeyId: userData1.workspaceKeyId,
         authorizationHeader: "badauthheader",
       }))()
   ).rejects.toThrowError(/UNAUTHENTICATED/);
@@ -107,25 +108,28 @@ describe("Input errors", () => {
       updateWorkspaceName(input: $input) {
         workspace {
           id
-          name
+          infoCiphertext
+          infoNonce
+          infoWorkspaceKey {
+            id
+            workspaceId
+            generation
+            workspaceKeyBox {
+              id
+              workspaceKeyId
+              deviceSigningPublicKey
+              ciphertext
+              nonce
+              creatorDevice {
+                signingPublicKey
+                encryptionPublicKey
+              }
+            }
+          }
         }
       }
     }
   `;
-  test("Invalid id", async () => {
-    const name = undefined;
-    const authorizationHeaders = {
-      authorization: sessionKey1,
-    };
-    await expect(
-      (async () =>
-        await graphql.client.request(
-          query,
-          { input: { id: null, name } },
-          authorizationHeaders
-        ))()
-    ).rejects.toThrowError(/BAD_USER_INPUT/);
-  });
   test("Invalid input", async () => {
     const authorizationHeaders = {
       authorization: sessionKey1,
