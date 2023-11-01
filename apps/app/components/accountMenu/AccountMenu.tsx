@@ -25,6 +25,7 @@ import { useState } from "react";
 import { Platform } from "react-native";
 import { useAppContext } from "../../context/AppContext";
 import { initiateLogout } from "../../navigation/screens/logoutInProgressScreen/LogoutInProgressScreen";
+import * as workspaceStore from "../../store/workspaceStore";
 import { getMainDevice } from "../../utils/device/mainDeviceMemoryStore";
 import { VerifyPasswordModal } from "../verifyPasswordModal/VerifyPasswordModal";
 import { accountMenuMachine } from "./accountMenuMachine";
@@ -52,6 +53,7 @@ export default function AccountMenu({
   });
   const [isPasswordModalVisible, setIsPasswordModalVisible] = useState(false);
   const workspacesQueryResult = state.context.workspacesQueryResult;
+  const { workspaces } = workspaceStore.useLocalWorkspaces();
 
   const logout = () => {
     initiateLogout();
@@ -128,7 +130,12 @@ export default function AccountMenu({
           crossOffset: 120,
         }}
         isOpen={state.matches("open")}
-        onChange={(isOpen) => send(isOpen ? "OPEN" : "CLOSE")}
+        onChange={(isOpen) => {
+          if (activeDevice && isOpen) {
+            workspaceStore.loadRemoteWorkspaces({ activeDevice });
+          }
+          send(isOpen ? "OPEN" : "CLOSE");
+        }}
         trigger={
           <Pressable
             accessibilityLabel="More options menu"
@@ -176,45 +183,8 @@ export default function AccountMenu({
           {state.context.meQueryResult?.data?.me?.username}
         </MenuLink>
 
-        {workspacesQueryResult?.data?.workspaces?.nodes &&
-        workspacesQueryResult.data.workspaces.nodes.length >= 1 ? (
-          workspacesQueryResult.data.workspaces.nodes.map((workspace) => {
-            if (workspace === null || workspace === undefined) return null;
-
-            let workspaceListName = "";
-            // TODO verify that creator
-            // needs a workspace key chain with a main device!
-            if (
-              workspace.infoCiphertext &&
-              workspace.infoNonce &&
-              workspace.infoWorkspaceKey?.workspaceKeyBox &&
-              activeDevice
-            ) {
-              // TODO verify that creator
-              // needs a workspace key chain with a main device!
-              const workspaceKey = decryptWorkspaceKey({
-                ciphertext:
-                  workspace.infoWorkspaceKey?.workspaceKeyBox?.ciphertext,
-                nonce: workspace.infoWorkspaceKey?.workspaceKeyBox?.nonce,
-                creatorDeviceEncryptionPublicKey:
-                  workspace.infoWorkspaceKey?.workspaceKeyBox?.creatorDevice
-                    .encryptionPublicKey,
-                receiverDeviceEncryptionPrivateKey:
-                  activeDevice?.encryptionPrivateKey,
-              });
-              const decryptedWorkspaceInfo = decryptWorkspaceInfo({
-                ciphertext: workspace.infoCiphertext,
-                nonce: workspace.infoNonce,
-                key: workspaceKey,
-              });
-              if (
-                decryptedWorkspaceInfo &&
-                typeof decryptedWorkspaceInfo.name === "string"
-              ) {
-                workspaceListName = decryptedWorkspaceInfo.name as string;
-              }
-            }
-
+        {workspaces.length >= 1 ? (
+          workspaces.map((workspace) => {
             return (
               <MenuLink
                 key={workspace.id}
@@ -236,7 +206,7 @@ export default function AccountMenu({
                   />
                 }
               >
-                {workspaceListName}
+                {workspace.name}
               </MenuLink>
             );
           })

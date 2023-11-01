@@ -1,4 +1,10 @@
-import { ScrollSafeAreaView, SidebarLink, tw } from "@serenity-tools/ui";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import {
+  Button,
+  ScrollSafeAreaView,
+  SidebarLink,
+  tw,
+} from "@serenity-tools/ui";
 import { useWindowDimensions } from "react-native";
 import { RootStackScreenProps } from "../../../types/navigationProps";
 
@@ -30,6 +36,18 @@ export default function DevDashboardScreen(
       <SidebarLink to={{ screen: "AccountSettings" }} iconName="dashboard-line">
         User settings
       </SidebarLink>
+      <Button
+        onPress={async () => {
+          const sqliteDebugger = await AsyncStorage.getItem("sqlite_debugger");
+          if (sqliteDebugger === "active") {
+            await AsyncStorage.removeItem("sqlite_debugger");
+          } else {
+            await AsyncStorage.setItem("sqlite_debugger", "active");
+          }
+        }}
+      >
+        Toggle Sqlite Debugger (manual refresh needed)
+      </Button>
     </ScrollSafeAreaView>
   );
 }

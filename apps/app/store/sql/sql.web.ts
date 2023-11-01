@@ -3,6 +3,9 @@ import { Database } from "sql.js";
 let db: Database;
 
 export const ready = async () => {
+  if (db) {
+    return Promise.resolve();
+  }
   const { default: initSqlJs } = await import("sql.js/dist/sql-wasm.js");
   const SQL = await initSqlJs({
     locateFile: (file: string) => {
