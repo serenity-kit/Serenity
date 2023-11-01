@@ -5,6 +5,7 @@ import { version } from "./constants";
 
 type Params = {
   documentId: string;
+  documentChainEventHash: string;
   hash: string;
   version: number;
 };
@@ -15,6 +16,7 @@ export const isValidDocumentHash = (params: Params) => {
   }
   const content = canonicalize({
     documentId: params.documentId,
+    documentChainEventHash: params.documentChainEventHash,
     version: params.version,
   });
   if (!content) {

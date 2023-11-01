@@ -5,6 +5,7 @@ import { version } from "./constants";
 
 type Params = {
   documentId: string;
+  documentChainEventHash: string;
 };
 
 export const createDocumentHash = (params: Params) => {
