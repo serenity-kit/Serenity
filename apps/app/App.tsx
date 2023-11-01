@@ -23,7 +23,7 @@ import { ErrorBoundary } from "./components/errorBoundary/ErrorBoundary";
 import { AppContextProvider } from "./context/AppContext";
 import useCachedResources from "./hooks/useCachedResources";
 import Navigation from "./navigation/Navigation";
-import "./store/store";
+import { SqliteDebugger } from "./store/sql/SqliteDebugger";
 import { patchConsoleOutput } from "./utils/patchConsoleOutput/patchConsoleOutput";
 import { patchFileReader } from "./utils/patchFileReader/patchFileReader";
 import { patchGlobalStyles } from "./utils/patchGlobalStyles/patchGlobalStyles";
@@ -167,6 +167,7 @@ export default function App() {
                   <OverlayProvider>
                     <Navigation colorScheme={colorScheme} />
                     <StatusBar />
+                    <SqliteDebugger />
                   </OverlayProvider>
                 </NativeBaseProvider>
               </SafeAreaProvider>

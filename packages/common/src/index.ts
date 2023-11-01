@@ -29,6 +29,7 @@ export * from "./generateId/generateId";
 export * from "./getExpiredTextFromString/getExpiredTextFromString";
 export * from "./hash/hash";
 export * from "./notNull/notNull";
+export * from "./notUndefined/notUndefined";
 export * from "./recreateCommentKey/recreateCommentKey";
 export * from "./recreateDocumentTitleKey/recreateDocumentTitleKey";
 export * from "./recreateSnapshotKey/recreateSnapshotKey";

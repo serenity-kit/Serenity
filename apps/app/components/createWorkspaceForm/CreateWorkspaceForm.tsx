@@ -24,6 +24,7 @@ import { TextInput } from "react-native";
 import sodium from "react-native-libsodium";
 import { useAppContext } from "../../context/AppContext";
 import { useCreateInitialWorkspaceStructureMutation } from "../../generated/graphql";
+import * as workspaceStore from "../../store/workspaceStore";
 import { createWorkspaceKeyBoxesForDevices } from "../../utils/device/createWorkspaceKeyBoxesForDevices";
 import { getMainDevice } from "../../utils/device/mainDeviceMemoryStore";
 import { getAndVerifyUserDevices } from "../../utils/getAndVerifyUserDevices/getAndVerifyUserDevices";
@@ -208,12 +209,15 @@ export function CreateWorkspaceForm(props: CreateWorkspaceFormProps) {
       ) {
         throw new Error("Could not create workspace structure!");
       }
+
       const workspace =
         createInitialWorkspaceStructureResult.data
           .createInitialWorkspaceStructure.workspace;
       const document =
         createInitialWorkspaceStructureResult.data
           .createInitialWorkspaceStructure.document;
+
+      workspaceStore.createWorkspace({ id: workspace.id, name });
 
       navigation.navigate("Workspace", {
         workspaceId: workspace.id,

@@ -3,6 +3,9 @@ import { QuickSQLiteConnection, open } from "react-native-quick-sqlite";
 let db: QuickSQLiteConnection;
 
 export const ready = () => {
+  if (db) {
+    return Promise.resolve();
+  }
   db = open({ name: ":memory:" });
   return Promise.resolve();
 };
