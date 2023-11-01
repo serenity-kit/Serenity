@@ -1,6 +1,6 @@
 import { client, ready as opaqueReady, server } from "@serenity-kit/opaque";
 import * as userChain from "@serenity-kit/user-chain";
-import { LocalDevice, createDevice } from "@serenity-tools/common";
+import { LocalDevice, createDevice, generateId } from "@serenity-tools/common";
 import { addHours } from "../../utils/addHours/addHours";
 import { createSessionAndDevice } from "../authentication/createSessionAndDevice";
 import { prisma } from "../prisma";
@@ -78,6 +78,8 @@ export const createDeviceAndLogin = async ({
     },
     addDeviceEvent,
     deviceType: "web",
+    webDeviceCiphertext: "webDeviceCiphertextMock",
+    webDeviceNonce: `webDeviceNonceMock${generateId()}`, // since it must be unique
   });
   return {
     session,

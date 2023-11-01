@@ -131,6 +131,24 @@ export const login = async ({
     expiresAt = addHours(new Date(), 24);
   }
 
+  let webDeviceKey: string | undefined = undefined;
+  let webDeviceCiphertext: string | undefined = undefined;
+  let webDeviceNonce: string | undefined = undefined;
+
+  if (deviceType === "web" || deviceType === "temporary-web") {
+    webDeviceKey = sodium.to_base64(sodium.crypto_secretbox_keygen());
+    webDeviceNonce = sodium.to_base64(
+      sodium.randombytes_buf(sodium.crypto_secretbox_NONCEBYTES)
+    );
+    webDeviceCiphertext = sodium.to_base64(
+      sodium.crypto_secretbox_easy(
+        JSON.stringify(device),
+        sodium.from_base64(webDeviceNonce),
+        sodium.from_base64(webDeviceKey)
+      )
+    );
+  }
+
   const addDeviceEvent = userChain.addDevice({
     authorKeyPair: {
       privateKey: mainDevice.signingPrivateKey,
@@ -161,6 +179,8 @@ export const login = async ({
         sessionTokenSignature,
         deviceType: getDeviceType(useExtendedLogin),
         serializedUserChainEvent: JSON.stringify(addDeviceEvent),
+        webDeviceCiphertext,
+        webDeviceNonce,
       },
     },
     {
@@ -190,7 +210,14 @@ export const login = async ({
 
   setMainDevice(mainDevice); // so it's locally available
 
-  return { result, urqlClient: authenticatedUrqlClient, mainDevice, device };
+  return {
+    result,
+    urqlClient: authenticatedUrqlClient,
+    mainDevice,
+    device,
+    webDeviceKey,
+    webDeviceAccessToken: addDeviceResult.data.addDevice.webDeviceAccessToken,
+  };
 };
 
 /**

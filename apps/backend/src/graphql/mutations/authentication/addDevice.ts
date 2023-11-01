@@ -22,6 +22,8 @@ export const AddDeviceInput = inputObjectType({
     t.nonNull.string("sessionTokenSignature");
     t.nonNull.string("deviceType");
     t.nonNull.string("serializedUserChainEvent");
+    t.string("webDeviceCiphertext");
+    t.string("webDeviceNonce");
   },
 });
 
@@ -29,6 +31,7 @@ export const AddDeviceResult = objectType({
   name: "AddDeviceResult",
   definition(t) {
     t.field("expiresAt", { type: nonNull("Date") });
+    t.string("webDeviceAccessToken");
   },
 });
 
@@ -100,10 +103,13 @@ export const addDeviceMutation = mutationField("addDevice", {
       },
       addDeviceEvent,
       deviceType: args.input.deviceType,
+      webDeviceCiphertext: args.input.webDeviceCiphertext || undefined,
+      webDeviceNonce: args.input.webDeviceNonce || undefined,
     });
 
     return {
       expiresAt: session.expiresAt,
+      webDeviceAccessToken: session.device.webDeviceAccessToken,
     };
   },
 });

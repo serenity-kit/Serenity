@@ -31,8 +31,8 @@ import {
 import { setDevice } from "../../../utils/device/deviceStore";
 import { getMainDevice } from "../../../utils/device/mainDeviceMemoryStore";
 import {
-  removeWebDevice,
-  setWebDevice,
+  persistWebDeviceAccess,
+  removeWebDeviceAccess,
 } from "../../../utils/device/webDeviceStore";
 import { removeLastUsedWorkspaceId } from "../../../utils/lastUsedWorkspaceAndDocumentStore/lastUsedWorkspaceAndDocumentStore";
 import { acceptWorkspaceInvitation } from "../../../utils/workspace/acceptWorkspaceInvitation";
@@ -128,9 +128,7 @@ export default function RegistrationVerificationScreen(
     try {
       setErrorMessage("");
 
-      // FIXME: allow non-extended login by storing into sessionStorage
-      // for now this is a HACK to support devices and workspaceKeyBoxes
-      // This is specific to the registration
+      // The registration by default registers a device that will be valid for more than 24h.
       const useExtendedLogin = true;
 
       const loginResult = await login({
@@ -141,8 +139,14 @@ export default function RegistrationVerificationScreen(
       });
 
       if (Platform.OS === "web") {
-        await removeWebDevice();
-        await setWebDevice(loginResult.device, useExtendedLogin);
+        await removeWebDeviceAccess();
+        // should always be available in this case
+        if (loginResult.webDeviceAccessToken && loginResult.webDeviceKey) {
+          await persistWebDeviceAccess({
+            accessToken: loginResult.webDeviceAccessToken,
+            key: loginResult.webDeviceKey,
+          });
+        }
         await updateActiveDevice();
       } else if (Platform.OS === "ios") {
         if (useExtendedLogin) {
