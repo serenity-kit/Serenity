@@ -15,7 +15,6 @@ import { OnboardingScreenWrapper } from "../../../components/onboardingScreenWra
 import { useAppContext } from "../../../context/AppContext";
 import {
   runWorkspaceInvitationQuery,
-  useStartLoginMutation,
   useVerifyRegistrationMutation,
 } from "../../../generated/graphql";
 import { RootStackScreenProps } from "../../../types/navigationProps";
@@ -57,7 +56,6 @@ export default function RegistrationVerificationScreen(
     useState<VerificationError>("none");
   const [graphqlError, setGraphqlError] = useState("");
   const { updateAuthentication, updateActiveDevice } = useAppContext();
-  const [, startLoginMutation] = useStartLoginMutation();
 
   const navigateToLoginScreen = async () => {
     await removeLastUsedWorkspaceId();

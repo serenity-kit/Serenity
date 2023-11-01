@@ -411,6 +411,11 @@ const AccountDevicesSettingsScreenWithLoginRedirect =
 const WorkspaceStackNavigatorWithLoginRedirect =
   redirectToLoginIfMissingTheActiveDeviceOrSessionKey(WorkspaceStackNavigator);
 
+const AccountSettingsDrawerScreenWithLoginRedirct =
+  redirectToLoginIfMissingTheActiveDeviceOrSessionKey(
+    AccountSettingsDrawerScreen
+  );
+
 function RootNavigator() {
   const dimensions = useWindowDimensions();
 
@@ -527,7 +532,7 @@ function RootNavigator() {
         {!isPhoneDimensions(dimensions.width) ? (
           <Stack.Screen
             name="AccountSettings"
-            component={AccountSettingsDrawerScreen}
+            component={AccountSettingsDrawerScreenWithLoginRedirct}
           />
         ) : null}
       </Stack.Group>
