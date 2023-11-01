@@ -106,7 +106,7 @@ model User {
   username                                 String                 @unique
   registrationRecord                       String
   // contains the device signingPrivateKey and encryptionPrivateKey
-  // can be decrypted using the key storred in the OPAQUE envelope
+  // can be decrypted using a key derived from the export_key of the OPAQUE flow
   mainDeviceCiphertext                     String
   // nonce to decrypt the mainDeviceCiphertext
   mainDeviceNonce                          String                 @unique
@@ -191,6 +191,10 @@ model Device {
   createdAt                    DateTime        @default(now())
   session                      Session[]
   expiresAt                    DateTime?
+  // the following fields are only relevant for web devices
+  webDeviceCiphertext          String?
+  webDeviceNonce               String?         @unique
+  webDeviceAccessToken         String?         @unique
 }
 
 model CreatorDevice {

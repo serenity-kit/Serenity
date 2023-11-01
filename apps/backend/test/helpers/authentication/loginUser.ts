@@ -1,6 +1,6 @@
 import { client, ready as opaqueReady } from "@serenity-kit/opaque";
 import * as userChain from "@serenity-kit/user-chain";
-import { LocalDevice, createDevice } from "@serenity-tools/common";
+import { LocalDevice, createDevice, generateId } from "@serenity-tools/common";
 import { gql } from "graphql-request";
 import sodium from "react-native-libsodium";
 import { addHours } from "../../../src/utils/addHours/addHours";
@@ -112,6 +112,8 @@ export const loginUser = async ({
       sessionTokenSignature: sodium.to_base64(sessionTokenSignature),
       deviceType: "web",
       serializedUserChainEvent: JSON.stringify(addDeviceEvent),
+      webDeviceCiphertext: "webDeviceCiphertextMock-local",
+      webDeviceNonce: `webDeviceNonceMock-local${generateId()}`, // since it must be unique
     },
   });
 

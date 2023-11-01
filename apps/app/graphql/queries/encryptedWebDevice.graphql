@@ -1,0 +1,6 @@
+query encryptedWebDevice($accessToken: String!) {
+  encryptedWebDevice(accessToken: $accessToken) {
+    ciphertext
+    nonce
+  }
+}

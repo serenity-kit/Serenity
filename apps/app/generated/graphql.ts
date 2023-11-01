@@ -41,11 +41,14 @@ export type AddDeviceInput = {
   loginId: Scalars['String'];
   serializedUserChainEvent: Scalars['String'];
   sessionTokenSignature: Scalars['String'];
+  webDeviceCiphertext?: InputMaybe<Scalars['String']>;
+  webDeviceNonce?: InputMaybe<Scalars['String']>;
 };
 
 export type AddDeviceResult = {
   __typename?: 'AddDeviceResult';
   expiresAt: Scalars['Date'];
+  webDeviceAccessToken?: Maybe<Scalars['String']>;
 };
 
 export type AddMemberWorkspaceKeyInput = {
@@ -458,6 +461,12 @@ export type DocumentSnapshotPublicDataParentSnapshotClocksInput = {
   dummy?: InputMaybe<Scalars['String']>;
 };
 
+export type EncryptedWebDeviceResult = {
+  __typename?: 'EncryptedWebDeviceResult';
+  ciphertext: Scalars['String'];
+  nonce: Scalars['String'];
+};
+
 export type File = {
   __typename?: 'File';
   downloadUrl: Scalars['String'];
@@ -823,6 +832,7 @@ export type Query = {
   documentShareLinkSnapshotKeyBox?: Maybe<SnapshotKeyBox>;
   documentShareLinks?: Maybe<DocumentShareLinkConnection>;
   documents?: Maybe<DocumentConnection>;
+  encryptedWebDevice?: Maybe<EncryptedWebDeviceResult>;
   fileUrl?: Maybe<File>;
   firstDocument?: Maybe<Document>;
   folder?: Maybe<Folder>;
@@ -911,6 +921,11 @@ export type QueryDocumentsArgs = {
   first: Scalars['Int'];
   parentFolderId: Scalars['ID'];
   usingOldKeys?: InputMaybe<Scalars['Boolean']>;
+};
+
+
+export type QueryEncryptedWebDeviceArgs = {
+  accessToken: Scalars['String'];
 };
 
 
@@ -1401,7 +1416,7 @@ export type AddDeviceMutationVariables = Exact<{
 }>;
 
 
-export type AddDeviceMutation = { __typename?: 'Mutation', addDevice?: { __typename?: 'AddDeviceResult', expiresAt: any } | null };
+export type AddDeviceMutation = { __typename?: 'Mutation', addDevice?: { __typename?: 'AddDeviceResult', expiresAt: any, webDeviceAccessToken?: string | null } | null };
 
 export type AttachDeviceToWorkspacesMutationVariables = Exact<{
   input: AttachDeviceToWorkspacesInput;
@@ -1679,6 +1694,13 @@ export type DocumentsQueryVariables = Exact<{
 
 export type DocumentsQuery = { __typename?: 'Query', documents?: { __typename?: 'DocumentConnection', nodes?: Array<{ __typename?: 'Document', id: string, nameCiphertext: string, nameNonce: string, parentFolderId?: string | null, rootFolderId?: string | null, workspaceId: string, subkeyId: number } | null> | null, pageInfo: { __typename?: 'PageInfo', hasNextPage: boolean, hasPreviousPage: boolean, startCursor?: string | null, endCursor?: string | null } } | null };
 
+export type EncryptedWebDeviceQueryVariables = Exact<{
+  accessToken: Scalars['String'];
+}>;
+
+
+export type EncryptedWebDeviceQuery = { __typename?: 'Query', encryptedWebDevice?: { __typename?: 'EncryptedWebDeviceResult', ciphertext: string, nonce: string } | null };
+
 export type FileUrlQueryVariables = Exact<{
   fileId: Scalars['ID'];
   workspaceId: Scalars['ID'];
@@ -1850,6 +1872,7 @@ export const AddDeviceDocument = gql`
     mutation addDevice($input: AddDeviceInput!) {
   addDevice(input: $input) {
     expiresAt
+    webDeviceAccessToken
   }
 }
     `;
@@ -2535,6 +2558,18 @@ export const DocumentsDocument = gql`
 
 export function useDocumentsQuery(options: Omit<Urql.UseQueryArgs<DocumentsQueryVariables>, 'query'>) {
   return Urql.useQuery<DocumentsQuery, DocumentsQueryVariables>({ query: DocumentsDocument, ...options });
+};
+export const EncryptedWebDeviceDocument = gql`
+    query encryptedWebDevice($accessToken: String!) {
+  encryptedWebDevice(accessToken: $accessToken) {
+    ciphertext
+    nonce
+  }
+}
+    `;
+
+export function useEncryptedWebDeviceQuery(options: Omit<Urql.UseQueryArgs<EncryptedWebDeviceQueryVariables>, 'query'>) {
+  return Urql.useQuery<EncryptedWebDeviceQuery, EncryptedWebDeviceQueryVariables>({ query: EncryptedWebDeviceDocument, ...options });
 };
 export const FileUrlDocument = gql`
     query fileUrl($fileId: ID!, $workspaceId: ID!, $documentId: ID!) {
@@ -4373,6 +4408,109 @@ export const documentsQueryService =
         // perform cleanup
         clearInterval(intervalId);
         documentsQueryServiceSubscribers[variablesString].intervalId = null;
+      }
+    };
+  };
+
+
+
+export const runEncryptedWebDeviceQuery = async (variables: EncryptedWebDeviceQueryVariables, options?: any) => {
+  return await getUrqlClient()
+    .query<EncryptedWebDeviceQuery, EncryptedWebDeviceQueryVariables>(
+      EncryptedWebDeviceDocument,
+      variables,
+      {
+        // better to be safe here and always refetch
+        requestPolicy: "network-only",
+        ...options
+      }
+    )
+    .toPromise();
+};
+
+export type EncryptedWebDeviceQueryResult = Urql.OperationResult<EncryptedWebDeviceQuery, EncryptedWebDeviceQueryVariables>;
+
+export type EncryptedWebDeviceQueryUpdateResultEvent = {
+  type: "EncryptedWebDeviceQuery.UPDATE_RESULT";
+  result: EncryptedWebDeviceQueryResult;
+};
+
+export type EncryptedWebDeviceQueryErrorEvent = {
+  type: "EncryptedWebDeviceQuery.ERROR";
+  result: EncryptedWebDeviceQueryResult;
+};
+
+export type EncryptedWebDeviceQueryServiceEvent = EncryptedWebDeviceQueryUpdateResultEvent | EncryptedWebDeviceQueryErrorEvent;
+
+type EncryptedWebDeviceQueryServiceSubscribersEntry = {
+  variables: EncryptedWebDeviceQueryVariables;
+  callbacks: ((event: EncryptedWebDeviceQueryServiceEvent) => void)[];
+  intervalId: NodeJS.Timer | null;
+};
+
+type EncryptedWebDeviceQueryServiceSubscribers = {
+  [variables: string]: EncryptedWebDeviceQueryServiceSubscribersEntry;
+};
+
+const encryptedWebDeviceQueryServiceSubscribers: EncryptedWebDeviceQueryServiceSubscribers = {};
+
+const triggerEncryptedWebDeviceQuery = (variablesString: string, variables: EncryptedWebDeviceQueryVariables) => {
+  getUrqlClient()
+    .query<EncryptedWebDeviceQuery, EncryptedWebDeviceQueryVariables>(EncryptedWebDeviceDocument, variables)
+    .toPromise()
+    .then((result) => {
+      encryptedWebDeviceQueryServiceSubscribers[variablesString].callbacks.forEach(
+        (callback) => {
+          callback({
+            type: result.error ? "EncryptedWebDeviceQuery.ERROR" : "EncryptedWebDeviceQuery.UPDATE_RESULT",
+            result: result,
+          });
+        }
+      );
+    });
+};
+
+/**
+ * This service is used to query results every 4 seconds.
+ *
+ * It allows machines to spawn a service that will fetch the query
+ * and send the result to the machine.
+ * It will share the same interval for all machines.
+ * When the last subscription is stopped, the interval will be cleared.
+ * It also considers the variables passed to the service.
+ */
+export const encryptedWebDeviceQueryService =
+  (variables: EncryptedWebDeviceQueryVariables, intervalInMs?: number) => (callback, onReceive) => {
+    const variablesString = canonicalize(variables) as string;
+    if (encryptedWebDeviceQueryServiceSubscribers[variablesString]) {
+      encryptedWebDeviceQueryServiceSubscribers[variablesString].callbacks.push(callback);
+    } else {
+      encryptedWebDeviceQueryServiceSubscribers[variablesString] = {
+        variables,
+        callbacks: [callback],
+        intervalId: null,
+      };
+    }
+
+    triggerEncryptedWebDeviceQuery(variablesString, variables);
+    if (!encryptedWebDeviceQueryServiceSubscribers[variablesString].intervalId) {
+      encryptedWebDeviceQueryServiceSubscribers[variablesString].intervalId = setInterval(
+        () => {
+          triggerEncryptedWebDeviceQuery(variablesString, variables);
+        },
+        intervalInMs || 4000
+      );
+    }
+
+    const intervalId = encryptedWebDeviceQueryServiceSubscribers[variablesString].intervalId;
+    return () => {
+      if (
+        encryptedWebDeviceQueryServiceSubscribers[variablesString].callbacks.length === 0 &&
+        intervalId
+      ) {
+        // perform cleanup
+        clearInterval(intervalId);
+        encryptedWebDeviceQueryServiceSubscribers[variablesString].intervalId = null;
       }
     };
   };

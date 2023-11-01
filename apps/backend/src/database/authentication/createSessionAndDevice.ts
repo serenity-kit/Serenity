@@ -1,5 +1,5 @@
 import * as userChain from "@serenity-kit/user-chain";
-import { Device } from "@serenity-tools/common";
+import { Device, generateId } from "@serenity-tools/common";
 import { z } from "zod";
 import { Prisma } from "../../../prisma/generated/output";
 import { addDays } from "../../utils/addDays/addDays";
@@ -26,6 +26,8 @@ type Params = {
   device: DeviceWithInfo;
   addDeviceEvent: userChain.AddDeviceEvent;
   deviceType: string;
+  webDeviceCiphertext?: string;
+  webDeviceNonce?: string;
 };
 
 export async function createSessionAndDevice({
@@ -34,6 +36,8 @@ export async function createSessionAndDevice({
   device,
   addDeviceEvent,
   deviceType: rawDeviceType,
+  webDeviceCiphertext,
+  webDeviceNonce,
 }: Params) {
   if (addDeviceEvent.transaction.signingPublicKey !== device.signingPublicKey) {
     throw new Error(
@@ -44,6 +48,11 @@ export async function createSessionAndDevice({
 
   let sessionExpiresAt: Date;
   if (deviceType === "temporary-web" || deviceType === "web") {
+    if (webDeviceCiphertext === undefined || webDeviceNonce === undefined) {
+      throw new Error(
+        "Invalid web device since no encrypted version was provided"
+      );
+    }
     if (addDeviceEvent.transaction.expiresAt === undefined) {
       throw new Error("Invalid device expiration");
     }
@@ -89,6 +98,8 @@ export async function createSessionAndDevice({
         },
       });
 
+      const webDeviceAccessToken = generateId();
+
       return await prisma.session.create({
         data: {
           sessionKey,
@@ -102,8 +113,14 @@ export async function createSessionAndDevice({
               info: device.info,
               user: { connect: { username } },
               expiresAt: addDeviceEvent.transaction.expiresAt,
+              webDeviceCiphertext,
+              webDeviceNonce,
+              webDeviceAccessToken,
             },
           },
+        },
+        include: {
+          device: true,
         },
       });
     },

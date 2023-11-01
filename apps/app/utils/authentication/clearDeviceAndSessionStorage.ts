@@ -1,11 +1,11 @@
 import { Platform } from "react-native";
 import { removeDevice } from "../device/deviceStore";
-import { removeWebDevice } from "../device/webDeviceStore";
+import { removeWebDeviceAccess } from "../device/webDeviceStore";
 import { deleteSessionKey } from "./sessionKeyStore";
 
 export const clearDeviceAndSessionStorage = async () => {
   if (Platform.OS === "web") {
-    await removeWebDevice();
+    await removeWebDeviceAccess();
   } else if (Platform.OS === "ios") {
     await removeDevice();
   }

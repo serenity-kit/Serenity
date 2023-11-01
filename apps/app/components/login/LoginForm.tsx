@@ -14,8 +14,8 @@ import { clearDeviceAndSessionStorage } from "../../utils/authentication/clearDe
 import { login } from "../../utils/authentication/loginHelper";
 import { setDevice } from "../../utils/device/deviceStore";
 import {
-  removeWebDevice,
-  setWebDevice,
+  persistWebDeviceAccess,
+  removeWebDeviceAccess,
 } from "../../utils/device/webDeviceStore";
 import { attachDeviceToWorkspaces } from "../../utils/workspace/attachDeviceToWorkspaces";
 
@@ -75,8 +75,14 @@ export function LoginForm(props: Props) {
       const unsavedDevice = loginResult.device;
       // reset the password in case the user ends up on this screen again
       if (Platform.OS === "web") {
-        await removeWebDevice();
-        await setWebDevice(unsavedDevice, useExtendedLogin);
+        await removeWebDeviceAccess();
+        // should always be available in this case
+        if (loginResult.webDeviceAccessToken && loginResult.webDeviceKey) {
+          await persistWebDeviceAccess({
+            accessToken: loginResult.webDeviceAccessToken,
+            key: loginResult.webDeviceKey,
+          });
+        }
         await updateActiveDevice();
       } else if (Platform.OS === "ios") {
         if (useExtendedLogin) {
