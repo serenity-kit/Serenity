@@ -4,6 +4,9 @@ import * as SplashScreen from "expo-splash-screen";
 import { useCallback, useEffect, useState } from "react";
 import sodium from "react-native-libsodium";
 import { Client } from "urql";
+import * as userChainStore from "../store/userChainStore";
+import * as userStore from "../store/userStore";
+import * as workspaceChainStore from "../store/workspaceChainStore";
 import * as workspaceStore from "../store/workspaceStore";
 import * as SessionKeyStore from "../utils/authentication/sessionKeyStore";
 import { getSessionKey } from "../utils/authentication/sessionKeyStore";
@@ -29,6 +32,9 @@ export default function useCachedResources() {
             "space-mono": require("../assets/fonts/SpaceMono-Regular.ttf"),
           }),
           workspaceStore.initialize(),
+          workspaceChainStore.initialize(),
+          userStore.initialize(),
+          userChainStore.initialize(),
         ]);
         setActiveDevice(result[0]);
         const sessionKey = await getSessionKey();

@@ -10,7 +10,7 @@ import { runWorkspacesQuery } from "../generated/graphql";
 import { showToast } from "../utils/toast/showToast";
 import * as sql from "./sql/sql";
 
-const table = "workspace_v1";
+export const table = "workspace_v1";
 
 export const initialize = async () => {
   await sql.ready();
