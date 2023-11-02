@@ -23,6 +23,7 @@ import {
 } from "../../../generated/graphql";
 import { useAuthenticatedAppContext } from "../../../hooks/useAuthenticatedAppContext";
 import { workspaceSettingsLoadWorkspaceMachine } from "../../../machines/workspaceSettingsLoadWorkspaceMachine";
+import { useLocalLastWorkspaceChainEvent } from "../../../store/workspaceChainStore";
 import { WorkspaceStackScreenProps } from "../../../types/navigationProps";
 import {
   removeLastUsedDocumentId,
@@ -35,7 +36,10 @@ export default function WorkspaceSettingsGeneralScreen(
     children?: React.ReactNode;
   }
 ) {
-  const { workspaceId, workspaceChainData } = useWorkspace();
+  const { workspaceId } = useWorkspace();
+  const lastWorkspaceChainEvent = useLocalLastWorkspaceChainEvent({
+    workspaceId,
+  });
   const { activeDevice } = useAuthenticatedAppContext();
   const [state] = useMachine(workspaceSettingsLoadWorkspaceMachine, {
     context: {
@@ -119,8 +123,8 @@ export default function WorkspaceSettingsGeneralScreen(
   };
 
   let currentUserIsAdmin = false;
-  if (state.value === "loadWorkspaceSuccess" && workspaceChainData) {
-    Object.entries(workspaceChainData.state.members).forEach(
+  if (state.value === "loadWorkspaceSuccess" && lastWorkspaceChainEvent) {
+    Object.entries(lastWorkspaceChainEvent.state.members).forEach(
       ([mainDeviceSigningPublicKey, memberInfo]) => {
         if (
           memberInfo.role === "ADMIN" &&

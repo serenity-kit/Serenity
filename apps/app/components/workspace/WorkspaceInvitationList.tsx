@@ -11,6 +11,7 @@ import {
 } from "@serenity-tools/ui";
 import { isPast, parseJSON } from "date-fns";
 import { useWorkspace } from "../../context/WorkspaceContext";
+import { useLocalLastWorkspaceChainEvent } from "../../store/workspaceChainStore";
 
 type Props = {
   testID?: string;
@@ -20,21 +21,24 @@ type Props = {
 
 export function WorkspaceInvitationList(props: Props) {
   const isDesktopDevice = useIsDesktopDevice();
-  const { workspaceChainData } = useWorkspace();
+  const { workspaceId } = useWorkspace();
+  const lastWorkspaceChainEvent = useLocalLastWorkspaceChainEvent({
+    workspaceId,
+  });
 
   return (
     <View testID={props.testID}>
       <List
         data={
-          workspaceChainData
-            ? Object.entries(workspaceChainData.state.invitations)
+          lastWorkspaceChainEvent
+            ? Object.entries(lastWorkspaceChainEvent.state.invitations)
             : []
         }
         emptyString={"No active invitations"}
         header={<ListHeader data={["Active Links"]} />}
       >
-        {workspaceChainData &&
-          Object.entries(workspaceChainData.state.invitations).map(
+        {lastWorkspaceChainEvent &&
+          Object.entries(lastWorkspaceChainEvent.state.invitations).map(
             ([invitationId, invitationDetails]) => {
               const expired = isPast(parseJSON(invitationDetails.expiresAt));
               return (

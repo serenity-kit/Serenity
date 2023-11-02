@@ -29,6 +29,10 @@ import {
 } from "../../../generated/graphql";
 import { useAuthenticatedAppContext } from "../../../hooks/useAuthenticatedAppContext";
 import { workspaceSettingsLoadWorkspaceMachine } from "../../../machines/workspaceSettingsLoadWorkspaceMachine";
+import {
+  loadRemoteWorkspaceChain,
+  useLocalLastWorkspaceChainEvent,
+} from "../../../store/workspaceChainStore";
 import { WorkspaceStackScreenProps } from "../../../types/navigationProps";
 import { getMainDevice } from "../../../utils/device/mainDeviceMemoryStore";
 import { showToast } from "../../../utils/toast/showToast";
@@ -48,13 +52,10 @@ export default function WorkspaceSettingsMembersScreen(
   props: WorkspaceStackScreenProps<"WorkspaceSettingsMembers">
 ) {
   const isDesktopDevice = useIsDesktopDevice();
-
-  const {
+  const { workspaceId, users } = useWorkspace();
+  const lastWorkspaceChainEvent = useLocalLastWorkspaceChainEvent({
     workspaceId,
-    workspaceChainData,
-    fetchAndApplyNewWorkspaceChainEntries,
-    users,
-  } = useWorkspace();
+  });
   const { activeDevice } = useAuthenticatedAppContext();
   const [state] = useMachine(workspaceSettingsLoadWorkspaceMachine, {
     context: {
@@ -87,13 +88,11 @@ export default function WorkspaceSettingsMembersScreen(
     if (mainDevice === null) {
       throw new Error("mainDevice is null");
     }
-    if (!workspaceChainData) {
+    if (!lastWorkspaceChainEvent) {
       throw new Error("Missing workspace chain data");
     }
     const updateMemberEvent = workspaceChain.updateMember(
-      workspaceChain.hashTransaction(
-        workspaceChainData.lastChainEvent.transaction
-      ),
+      workspaceChain.hashTransaction(lastWorkspaceChainEvent.event.transaction),
       {
         keyType: "ed25519",
         privateKey: sodium.from_base64(mainDevice.signingPrivateKey),
@@ -112,7 +111,7 @@ export default function WorkspaceSettingsMembersScreen(
     if (updateWorkspaceResult.error) {
       showToast("Failed to update the member role.", "error");
     }
-    await fetchAndApplyNewWorkspaceChainEntries();
+    await loadRemoteWorkspaceChain({ workspaceId });
     setMemberRoleInfoToUpdate(undefined);
   };
 
@@ -136,7 +135,7 @@ export default function WorkspaceSettingsMembersScreen(
     if (mainDevice === null) {
       throw new Error("mainDevice is null");
     }
-    if (!workspaceChainData) {
+    if (!lastWorkspaceChainEvent) {
       throw new Error("Missing workspace chain data");
     }
 
@@ -147,9 +146,7 @@ export default function WorkspaceSettingsMembersScreen(
     });
 
     const removeMemberEvent = workspaceChain.removeMember(
-      workspaceChain.hashTransaction(
-        workspaceChainData.lastChainEvent.transaction
-      ),
+      workspaceChain.hashTransaction(lastWorkspaceChainEvent.event.transaction),
       {
         keyType: "ed25519",
         privateKey: sodium.from_base64(mainDevice.signingPrivateKey),
@@ -173,7 +170,7 @@ export default function WorkspaceSettingsMembersScreen(
     if (removeMemberResult.error) {
       showToast("Failed to remove the member.", "error");
     }
-    await fetchAndApplyNewWorkspaceChainEntries();
+    await loadRemoteWorkspaceChain({ workspaceId });
     setMemberToRemove(undefined);
   };
 
@@ -188,8 +185,8 @@ export default function WorkspaceSettingsMembersScreen(
   };
 
   let currentUserIsAdmin = false;
-  if (state.value === "loadWorkspaceSuccess" && workspaceChainData) {
-    Object.entries(workspaceChainData.state.members).forEach(
+  if (state.value === "loadWorkspaceSuccess" && lastWorkspaceChainEvent) {
+    Object.entries(lastWorkspaceChainEvent.state.members).forEach(
       ([mainDeviceSigningPublicKey, memberInfo]) => {
         if (
           memberInfo.role === "ADMIN" &&
@@ -204,8 +201,8 @@ export default function WorkspaceSettingsMembersScreen(
   }
 
   const activeWorkspaceMembers =
-    workspaceChainData?.state.members && users
-      ? Object.entries(workspaceChainData.state.members).map(
+    lastWorkspaceChainEvent?.state.members && users
+      ? Object.entries(lastWorkspaceChainEvent.state.members).map(
           ([mainDeviceSigningPublicKey, member]) => {
             const user = users.find(
               (user) =>

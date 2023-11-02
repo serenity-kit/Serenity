@@ -5,10 +5,12 @@ import {
   generateId,
   notUndefined,
 } from "@serenity-tools/common";
+import canonicalize from "canonicalize";
 import { useSyncExternalStore } from "react";
 import { runWorkspacesQuery } from "../generated/graphql";
 import { showToast } from "../utils/toast/showToast";
 import * as sql from "./sql/sql";
+import { loadRemoteWorkspaceChain } from "./workspaceChainStore";
 
 export const table = "workspace_v1";
 
@@ -45,7 +47,7 @@ export const getWorkspaces = () => {
   const workspaces = sql.execute(`SELECT * FROM ${table}`) as Workspace[];
   if (
     workspaces.length === getWorkspacesCache.length &&
-    JSON.stringify(workspaces) === JSON.stringify(getWorkspacesCache)
+    canonicalize(workspaces) === canonicalize(getWorkspacesCache)
   ) {
     return getWorkspacesCache;
   }
@@ -68,6 +70,16 @@ export const useLocalWorkspaces = () => {
   }, getWorkspaces);
 
   return { workspaces };
+};
+
+export const loadRemoteWorkspaceDetails = async ({
+  workspaceId,
+}: {
+  workspaceId: string;
+}) => {
+  // TODO load the workspaceDetails
+
+  await loadRemoteWorkspaceChain({ workspaceId });
 };
 
 export const loadRemoteWorkspaces = async ({

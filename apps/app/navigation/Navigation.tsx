@@ -7,7 +7,6 @@ import {
   NavigationContainer,
 } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
-import * as workspaceChain from "@serenity-kit/workspace-chain";
 import {
   constructUserFromSerializedUserChain,
   notNull,
@@ -32,13 +31,17 @@ import Sidebar from "../components/sidebar/Sidebar";
 import WorkspaceSettingsSidebar from "../components/workspaceSettingsSidebar/WorkspaceSettingsSidebar";
 import { WorkspaceProvider } from "../context/WorkspaceContext";
 import {
-  useWorkspaceChainQuery,
   useWorkspaceMembersQuery,
   useWorkspaceQuery,
 } from "../generated/graphql";
 import { redirectToLoginIfMissingTheActiveDeviceOrSessionKey } from "../higherOrderComponents/redirectToLoginIfMissingTheActiveDeviceOrSessionKey";
 import { useAuthenticatedAppContext } from "../hooks/useAuthenticatedAppContext";
 import { useInterval } from "../hooks/useInterval";
+import {
+  loadRemoteWorkspaceChain,
+  useLocalLastWorkspaceChainEvent,
+} from "../store/workspaceChainStore";
+import { loadRemoteWorkspaceDetails } from "../store/workspaceStore";
 import {
   RootStackParamList,
   WorkspaceStackParamList,
@@ -244,28 +247,13 @@ function WorkspaceStackNavigator(props) {
     },
   });
 
-  const [workspaceChainQueryResult, reExecuteWorkspaceChainQuery] =
-    useWorkspaceChainQuery({
-      variables: {
-        workspaceId: props.route.params.workspaceId,
-      },
-    });
+  useEffect(() => {
+    loadRemoteWorkspaceDetails({ workspaceId: props.route.params.workspaceId });
+  }, []);
 
-  let workspaceChainState: workspaceChain.WorkspaceChainState | null = null;
-  let lastChainEvent: workspaceChain.WorkspaceChainEvent | null = null;
-  if (workspaceChainQueryResult.data?.workspaceChain?.nodes) {
-    workspaceChainState = workspaceChain.resolveState(
-      workspaceChainQueryResult.data.workspaceChain.nodes
-        .filter(notNull)
-        .map((event) => {
-          const data = workspaceChain.WorkspaceChainEvent.parse(
-            JSON.parse(event.serializedContent)
-          );
-          lastChainEvent = data;
-          return data;
-        })
-    );
-  }
+  const lastWorkspaceChainEvent = useLocalLastWorkspaceChainEvent({
+    workspaceId: props.route.params.workspaceId,
+  });
 
   const [workspaceMembersQueryResult] = useWorkspaceMembersQuery({
     variables: {
@@ -282,20 +270,18 @@ function WorkspaceStackNavigator(props) {
         })
     : null;
 
-  const fetchAndApplyNewWorkspaceChainEntries = async () => {
-    reExecuteWorkspaceChainQuery();
-  };
-
   useInterval(() => {
-    if (activeDevice && workspaceChainState) {
-      authorizeMembersIfNecessary({ activeDevice, workspaceChainState });
+    if (activeDevice && lastWorkspaceChainEvent) {
+      authorizeMembersIfNecessary({
+        activeDevice,
+        workspaceChainState: lastWorkspaceChainEvent.state,
+      });
     }
   }, secondsBetweenNewMemberChecks * 1000);
 
   useInterval(() => {
-    if (workspaceChainState) {
-      // TODO re-execute with a param of the last known event
-      reExecuteWorkspaceChainQuery();
+    if (lastWorkspaceChainEvent) {
+      loadRemoteWorkspaceChain({ workspaceId: props.route.params.workspaceId });
     }
   }, 30 * 1000);
 
@@ -314,14 +300,6 @@ function WorkspaceStackNavigator(props) {
       value={{
         workspaceId: props.route.params.workspaceId,
         workspaceQueryResult,
-        workspaceChainData:
-          workspaceChainState && lastChainEvent
-            ? {
-                state: workspaceChainState,
-                lastChainEvent,
-              }
-            : null,
-        fetchAndApplyNewWorkspaceChainEntries,
         users,
       }}
     >
