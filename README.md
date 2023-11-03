@@ -195,6 +195,8 @@ Update DATABASE_URL in Github secrets with <db_connection_url>/serenity
 ### Wipe the Staging DB @ fly.io
 
 ```sh
+cd apps/backend
+
 flyctl postgres connect --app serenity-dev-db
 # in the psql console run
 SELECT pg_terminate_backend(pg_stat_activity.pid)
@@ -205,22 +207,6 @@ drop database serenity;
 ```
 
 ## Conventions
-
-### Cryptography
-
-#### Keys should be encrypted as Uint8Array
-
-Example:
-
-```ts
-sodium.crypto_box_easy(workspaceKey, nonce, publicKey, privateKey);
-```
-
-In the case above the workspaceKey must be a `Uint8Array`.
-
-#### Signatures should always be encrypted as strings
-
-The reason here is that signatures often include other data as well end it's easier to stay consistent and always use strings. In addition every string must be prefixed with the domain context to make sure signatures can't be misused for other use-cases.
 
 ### Folder/File Naming Convention
 
