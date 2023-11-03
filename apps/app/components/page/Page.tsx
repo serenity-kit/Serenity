@@ -103,7 +103,7 @@ export default function Page({
   );
 
   const { websocketOrigin } = getEnvironmentUrls();
-  const { users, workspaceChainData } = useWorkspace();
+  const { users } = useWorkspace();
 
   const [state, , , yAwareness] = useYjsSync({
     yDoc: yDocRef.current,

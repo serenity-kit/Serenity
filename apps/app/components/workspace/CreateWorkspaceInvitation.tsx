@@ -19,6 +19,10 @@ import {
   runCreateWorkspaceInvitationMutation,
   useDeleteWorkspaceInvitationsMutation,
 } from "../../generated/graphql";
+import {
+  loadRemoteWorkspaceChain,
+  useLocalLastWorkspaceChainEvent,
+} from "../../store/workspaceChainStore";
 import { getMainDevice } from "../../utils/device/mainDeviceMemoryStore";
 import { getEnvironmentUrls } from "../../utils/getEnvironmentUrls/getEnvironmentUrls";
 import { VerifyPasswordModal } from "../verifyPasswordModal/VerifyPasswordModal";
@@ -29,11 +33,10 @@ type Props = {};
 export function CreateWorkspaceInvitation(props: Props) {
   // TODO: propagate graphql error
 
-  const {
+  const { workspaceId } = useWorkspace();
+  const lastWorkspaceChainEvent = useLocalLastWorkspaceChainEvent({
     workspaceId,
-    workspaceChainData,
-    fetchAndApplyNewWorkspaceChainEntries,
-  } = useWorkspace();
+  });
   const [, deleteWorkspaceInvitationsMutation] =
     useDeleteWorkspaceInvitationsMutation();
   const [selectedWorkspaceInvitationId, setSelectedWorkspaceInvitationId] =
@@ -100,7 +103,7 @@ export function CreateWorkspaceInvitation(props: Props) {
     if (!mainDevice) {
       throw new Error("No main device");
     }
-    if (!workspaceChainData) {
+    if (!lastWorkspaceChainEvent) {
       throw new Error("Missing workspace chain data");
     }
     const invitation = workspaceChain.addInvitation({
@@ -113,7 +116,7 @@ export function CreateWorkspaceInvitation(props: Props) {
       expiresAt,
       role: sharingRole,
       prevHash: workspaceChain.hashTransaction(
-        workspaceChainData.lastChainEvent.transaction
+        lastWorkspaceChainEvent.event.transaction
       ),
     });
 
@@ -128,7 +131,7 @@ export function CreateWorkspaceInvitation(props: Props) {
           serializedWorkspaceChainEvent: JSON.stringify(invitation),
         },
       });
-    await fetchAndApplyNewWorkspaceChainEntries();
+    await loadRemoteWorkspaceChain({ workspaceId });
     if (createWorkspaceInvitationResult.data?.createWorkspaceInvitation) {
       setSelectedWorkspaceInvitationId(invitation.transaction.invitationId);
       setSelectedWorkspaceInvitationSigningKeyPairSeed(
@@ -142,12 +145,12 @@ export function CreateWorkspaceInvitation(props: Props) {
     if (!mainDevice) {
       throw new Error("No main device");
     }
-    if (!workspaceChainData) {
+    if (!lastWorkspaceChainEvent) {
       throw new Error("Missing workspace chain data");
     }
     const removeInvitationEvent = workspaceChain.removeInvitations({
       prevHash: workspaceChain.hashTransaction(
-        workspaceChainData.lastChainEvent.transaction
+        lastWorkspaceChainEvent.event.transaction
       ),
       authorKeyPair: {
         keyType: "ed25519",
@@ -163,7 +166,7 @@ export function CreateWorkspaceInvitation(props: Props) {
       },
     });
     setSelectedWorkspaceInvitationId(null);
-    await fetchAndApplyNewWorkspaceChainEntries();
+    await loadRemoteWorkspaceChain({ workspaceId });
   };
 
   const deleteWorkspaceInvitationPreflight = (invitationId) => {

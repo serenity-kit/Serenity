@@ -29,6 +29,7 @@ const exchanges = [
       WorkspaceChainEvent: () => null, // should not be normalized
       DocumentChainEvent: () => null, // should not be normalized
       UserChainEvent: () => null, // should not be normalized
+      EncryptedWebDeviceResult: () => null, // should not be normalized
       // @ts-expect-error the type seems to be wrong,
       DocumentShareLinkForSharePage: (shareLink) => shareLink.token,
       // @ts-expect-error the type seems to be wrong,

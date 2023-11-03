@@ -12,6 +12,7 @@ import {
 import { HStack } from "native-base";
 import { useState } from "react";
 import { useWorkspace } from "../../context/WorkspaceContext";
+import { useLocalLastWorkspaceChainEvent } from "../../store/workspaceChainStore";
 import { useEditorStore } from "../../utils/editorStore/editorStore";
 import PageHeaderRightMenu from "../pageHeaderRightMenu/PageHeaderRightMenu";
 import { PageShareModalContent } from "../pageShareModalContent/PageShareModalContent";
@@ -26,14 +27,17 @@ export const PageHeaderRight: React.FC<Props> = ({
   hasShareButton,
 }) => {
   const hasEditorSidebar = useHasEditorSidebar();
-  const { workspaceChainData, users } = useWorkspace();
+  const { workspaceId, users } = useWorkspace();
+  const lastWorkspaceChainEvent = useLocalLastWorkspaceChainEvent({
+    workspaceId,
+  });
   const [isActiveShareModal, setIsActiveShareModal] = useState(false);
   const isInEditingMode = useEditorStore((state) => state.isInEditingMode);
   const triggerBlur = useEditorStore((state) => state.triggerBlur);
 
   const activeWorkspaceMembers =
-    workspaceChainData?.state.members && users
-      ? Object.entries(workspaceChainData.state.members).map(
+    lastWorkspaceChainEvent?.state.members && users
+      ? Object.entries(lastWorkspaceChainEvent.state.members).map(
           ([mainDeviceSigningPublicKey, member]) => {
             const user = users.find(
               (user) =>

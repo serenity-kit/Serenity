@@ -1,4 +1,3 @@
-import * as workspaceChain from "@serenity-kit/workspace-chain";
 import { VerifiedUserFromUserChain } from "@serenity-tools/common";
 import React, { useContext } from "react";
 import { UseQueryState } from "urql";
@@ -13,11 +12,6 @@ type WorkspaceContext = {
       deviceSigningPublicKey: string;
     }>
   >;
-  workspaceChainData: {
-    state: workspaceChain.WorkspaceChainState;
-    lastChainEvent: workspaceChain.WorkspaceChainEvent;
-  } | null;
-  fetchAndApplyNewWorkspaceChainEntries: () => Promise<void>;
   users: VerifiedUserFromUserChain[] | null;
 };
 
@@ -29,8 +23,6 @@ const workspaceContext = React.createContext<WorkspaceContext>({
     data: undefined,
     error: undefined,
   },
-  workspaceChainData: null,
-  fetchAndApplyNewWorkspaceChainEntries: () => Promise.resolve(),
   users: null,
 });
 
