@@ -9,7 +9,7 @@ import setupGraphql, {
 import createUserWithWorkspace from "../../../database/testHelpers/createUserWithWorkspace";
 
 const graphql = setupGraphql();
-const password = "password";
+const password = "password22room5K42";
 let userData: any = undefined;
 let fileUploadData: any = undefined;
 

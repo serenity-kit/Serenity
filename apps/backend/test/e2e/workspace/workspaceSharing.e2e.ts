@@ -15,7 +15,7 @@ test.describe("Workspace Sharing", () => {
   test("admin sharing link", async ({ page }) => {
     const role = Role.ADMIN;
     const username = `${generateId()}@example.com`;
-    const password = "password";
+    const password = "password22room5K42";
     const { workspace, document } = await createUserWithWorkspace({
       username,
       password,
@@ -39,7 +39,7 @@ test.describe("Workspace Sharing", () => {
   test("editor sharing link", async ({ page }) => {
     const role = Role.EDITOR;
     const username = `${generateId()}@example.com`;
-    const password = "password";
+    const password = "password22room5K42";
     const { workspace, document } = await createUserWithWorkspace({
       username,
       password,
@@ -63,7 +63,7 @@ test.describe("Workspace Sharing", () => {
   test("commenter sharing link", async ({ page }) => {
     const role = Role.COMMENTER;
     const username = `${generateId()}@example.com`;
-    const password = "password";
+    const password = "password22room5K42";
     const { workspace, document } = await createUserWithWorkspace({
       username,
       password,
@@ -87,7 +87,7 @@ test.describe("Workspace Sharing", () => {
   test("viewer sharing link", async ({ page }) => {
     const role = Role.VIEWER;
     const username = `${generateId()}@example.com`;
-    const password = "password";
+    const password = "password22room5K42";
     const { workspace, document } = await createUserWithWorkspace({
       username,
       password,
@@ -110,7 +110,7 @@ test.describe("Workspace Sharing", () => {
 
   test("User 1 can create a sharing link", async ({ page }) => {
     const username = `${generateId()}@example.com`;
-    const password = "password";
+    const password = "password22room5K42";
     const { workspace, document } = await createUserWithWorkspace({
       username,
       password,
@@ -132,7 +132,7 @@ test.describe("Workspace Sharing", () => {
 
   test("Existing other user can accept workspace", async ({ page }) => {
     const username = `${generateId()}@example.com`;
-    const password = "password";
+    const password = "password22room5K42";
     const { workspace, document } = await createUserWithWorkspace({
       username,
       password,
@@ -164,7 +164,7 @@ test.describe("Workspace Sharing", () => {
 
   test("Unauthenticated other user can accept workspace", async ({ page }) => {
     const username = `${generateId()}@example.com`;
-    const password = "password";
+    const password = "password22room5K42";
     await createUserWithWorkspace({
       username,
       password,
@@ -184,7 +184,7 @@ test.describe("Workspace Sharing", () => {
 
   test("Unregistered other user can accept workspace", async ({ page }) => {
     const username = `${generateId()}@example.com`;
-    const password = "password";
+    const password = "password22room5K42";
     const workspaceName = "my workspace";
     await page.goto(workspaceInvitationUrl);
     await delayForSeconds(2);

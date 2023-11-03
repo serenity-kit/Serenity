@@ -32,7 +32,7 @@ test("Register multiple users", async ({ page }) => {
   const registrationResult1 = await register({
     page,
     username: `${generateId()}@example.com`,
-    password: "password",
+    password: "password22room5K42",
     workspaceName: generateId(),
   });
   await expectResults({
@@ -44,7 +44,7 @@ test("Register multiple users", async ({ page }) => {
   const registrationResult2 = await register({
     page,
     username: `${generateId()}@example.com`,
-    password: "password",
+    password: "password22room5K42",
     workspaceName: generateId(),
   });
   await expectResults({
@@ -56,7 +56,7 @@ test("Register multiple users", async ({ page }) => {
 });
 
 test("Multi reg, multi remember login", async ({ page }) => {
-  const password = "password";
+  const password = "password22room5K42";
   const stayLoggedIn = true;
   const registrationResult1 = await createUserWithWorkspace({
     username: `${generateId()}@example.com`,
@@ -93,7 +93,7 @@ test("Multi reg, multi remember login", async ({ page }) => {
 });
 
 test("Multi reg, multi forget login", async ({ page }) => {
-  const password = "password";
+  const password = "password22room5K42";
   const stayLoggedIn = false;
   const registrationResult1 = await register({
     page,
@@ -134,7 +134,7 @@ test("Multi reg, multi forget login", async ({ page }) => {
 });
 
 test("Multi reg, multi mixed login", async ({ page }) => {
-  const password = "password";
+  const password = "password22room5K42";
   const registrationResult1 = await register({
     page,
     username: `${generateId()}@example.com`,

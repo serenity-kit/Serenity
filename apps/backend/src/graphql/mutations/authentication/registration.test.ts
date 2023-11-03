@@ -14,7 +14,7 @@ import { prisma } from "../../../database/prisma";
 
 const graphql = setupGraphql();
 const username = `${generateId()}@example.com`;
-const password = "password";
+const password = "password22room5K42";
 let result: any = null;
 
 beforeAll(async () => {

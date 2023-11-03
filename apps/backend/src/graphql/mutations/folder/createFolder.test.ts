@@ -17,7 +17,7 @@ import createUserWithWorkspace from "../../../database/testHelpers/createUserWit
 const graphql = setupGraphql();
 let userData1: any = undefined;
 const username = "user1";
-const password = "password";
+const password = "password22room5K42";
 let workspaceKey: string = "";
 let addedWorkspace: any = null;
 let sessionKey = "";

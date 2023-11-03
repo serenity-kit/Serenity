@@ -102,7 +102,7 @@ test("verify registration 5 times resets code", async () => {
 
 test("server should verify a user", async () => {
   const username = `${generateId()}@example.com`;
-  const password = "password";
+  const password = "password22room5K42";
   const pendingWorkspaceInvitationId = undefined;
   const registrationResponse = await registerUnverifiedUser({
     graphql,
@@ -130,7 +130,7 @@ test("server should verify a user", async () => {
 
 test("server should verify a user with a pending workspace id", async () => {
   const username = `${generateId()}@example.com`;
-  const password = "password";
+  const password = "password22room5K42";
   const pendingWorkspaceInvitationId = generateId();
   const registrationResponse = await registerUnverifiedUser({
     graphql,

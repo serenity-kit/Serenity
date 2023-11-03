@@ -15,7 +15,7 @@ let sessionKey = "";
 let documentId1 = "";
 let comment1: any = undefined;
 let comment2: any = undefined;
-const password = "password";
+const password = "password22room5K42";
 
 const setup = async () => {
   userData1 = await createUserWithWorkspace({
