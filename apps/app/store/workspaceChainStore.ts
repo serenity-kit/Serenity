@@ -2,6 +2,7 @@ import * as workspaceChain from "@serenity-kit/workspace-chain";
 import { generateId, notNull } from "@serenity-tools/common";
 import canonicalize from "canonicalize";
 import { useSyncExternalStore } from "react";
+import sodium from "react-native-libsodium";
 import { runWorkspaceChainQuery } from "../generated/graphql";
 import { showToast } from "../utils/toast/showToast";
 import * as sql from "./sql/sql";
@@ -72,16 +73,17 @@ export const createWorkspaceChainEvent = ({
   workspaceId,
   event,
   state,
+  position,
   triggerRerender,
 }: {
   workspaceId: string;
   event: workspaceChain.WorkspaceChainEvent;
   state: workspaceChain.WorkspaceChainState;
+  position: number;
   triggerRerender?: boolean;
 }) => {
-  const lastEvent = getLastWorkspaceChainEvent({ workspaceId });
   sql.execute(`INSERT INTO ${table} VALUES (?, ?, ?, ?);`, [
-    lastEvent ? lastEvent.position + 1 : 0,
+    position,
     JSON.stringify(event),
     JSON.stringify(state),
     workspaceId,
@@ -115,15 +117,20 @@ export const loadRemoteWorkspaceChain = async ({
 }: {
   workspaceId: string;
 }) => {
-  // TODO only fetch the necessary workspace chain events (get the last one and pass it to the query)
-  sql.execute(`DELETE FROM ${table};`);
+  const lastEvent = getLastWorkspaceChainEvent({ workspaceId });
 
   const workspaceChainQueryResult = await runWorkspaceChainQuery({
     workspaceId,
+    after: lastEvent
+      ? sodium.to_base64(
+          lastEvent.position.toString(),
+          sodium.base64_variants.ORIGINAL
+        )
+      : undefined,
   });
 
   if (workspaceChainQueryResult.error) {
-    showToast("Failed to load the workspace data.", "error");
+    showToast("Failed to load the workspace.", "error");
   }
 
   if (
@@ -133,17 +140,27 @@ export const loadRemoteWorkspaceChain = async ({
     // refactor the following part to be available in the chain API
     const chain =
       workspaceChainQueryResult.data.workspaceChain.nodes.filter(notNull);
-    const [firstRawEvent, ...otherRawEvents] = chain;
-    const firstEvent = workspaceChain.CreateChainWorkspaceChainEvent.parse(
-      JSON.parse(firstRawEvent.serializedContent)
-    );
-    let state = workspaceChain.applyCreateChainEvent(firstEvent);
-    createWorkspaceChainEvent({
-      event: firstEvent,
-      workspaceId,
-      state,
-      triggerRerender: false,
-    });
+
+    let otherRawEvents = chain;
+    let state: workspaceChain.WorkspaceChainState;
+
+    if (lastEvent) {
+      state = lastEvent.state;
+    } else {
+      const [firstRawEvent, ...rest] = chain;
+      otherRawEvents = rest;
+      const firstEvent = workspaceChain.CreateChainWorkspaceChainEvent.parse(
+        JSON.parse(firstRawEvent.serializedContent)
+      );
+      state = workspaceChain.applyCreateChainEvent(firstEvent);
+      createWorkspaceChainEvent({
+        event: firstEvent,
+        workspaceId,
+        state,
+        triggerRerender: false,
+        position: firstRawEvent.position,
+      });
+    }
 
     otherRawEvents.map((rawEvent) => {
       const event = workspaceChain.UpdateChainWorkspaceChainEvent.parse(
@@ -155,6 +172,7 @@ export const loadRemoteWorkspaceChain = async ({
         workspaceId,
         state,
         triggerRerender: false,
+        position: rawEvent.position,
       });
     });
     triggerGetLastWorkspaceChain();

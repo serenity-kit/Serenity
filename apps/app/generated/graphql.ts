@@ -1808,6 +1808,7 @@ export type WorkspaceQuery = { __typename?: 'Query', workspace?: { __typename?: 
 
 export type WorkspaceChainQueryVariables = Exact<{
   workspaceId: Scalars['ID'];
+  after?: InputMaybe<Scalars['String']>;
 }>;
 
 
@@ -2887,8 +2888,8 @@ export function useWorkspaceQuery(options: Omit<Urql.UseQueryArgs<WorkspaceQuery
   return Urql.useQuery<WorkspaceQuery, WorkspaceQueryVariables>({ query: WorkspaceDocument, ...options });
 };
 export const WorkspaceChainDocument = gql`
-    query workspaceChain($workspaceId: ID!) {
-  workspaceChain(workspaceId: $workspaceId, first: 5000) {
+    query workspaceChain($workspaceId: ID!, $after: String) {
+  workspaceChain(workspaceId: $workspaceId, first: 5000, after: $after) {
     nodes {
       serializedContent
       position
