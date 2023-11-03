@@ -42,19 +42,12 @@ export async function acceptWorkspaceInvitation({
       const { lastWorkspaceChainEvent, workspaceChainState } =
         await getLastWorkspaceChainEventWithState({ prisma, workspaceId });
 
-      console.log("LAST WorkspaceChainEvent", lastWorkspaceChainEvent);
-      console.log("NEW WorkspaceChainEvent", workspaceChainEvent);
-
       const newState = workspaceChain.applyEvent(
         workspaceChainState,
         workspaceChainEvent
       );
 
       const allEvents = await prisma.workspaceChainEvent.findMany();
-      console.log("ALL EVENTS", allEvents);
-
-      console.log("NEW STATE", newState);
-      console.log("NEW STATE.lastEventHash", newState.lastEventHash);
       await prisma.workspaceChainEvent.create({
         data: {
           content: workspaceChainEvent,

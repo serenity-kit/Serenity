@@ -67,8 +67,6 @@ export default function RegisterForm(props: Props) {
     "none" | "accept-tos" | "email" | "password"
   >("none");
 
-  console.log(passwordStrengthEvaluation);
-
   // we want to reset the form when the user navigates away from the screen
   // to avoid having the form filled and potentially allowing someone else to
   // steal the login data with brief access to the client
