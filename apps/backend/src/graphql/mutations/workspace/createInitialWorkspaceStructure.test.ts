@@ -28,7 +28,7 @@ beforeAll(async () => {
 
 test("create initial workspace structure", async () => {
   const authorizationHeader = userData1.sessionKey;
-  const workspaceName = "My Worskpace";
+  const workspaceName = "My Workspace";
   const result = await createInitialWorkspaceStructure({
     graphql,
     workspaceName,
@@ -78,6 +78,8 @@ test("create initial workspace structure", async () => {
     nonce: workspaceKeyBox.nonce,
     creatorDeviceEncryptionPublicKey: userData1.mainDevice.encryptionPublicKey,
     receiverDeviceEncryptionPrivateKey: userData1.encryptionPrivateKey,
+    workspaceId: workspace.id,
+    workspaceKeyId: workspace.currentWorkspaceKey.id,
   });
   expect(typeof workspaceKey).toBe("string");
   const decryptedFolderName = decryptFolderName({
@@ -103,6 +105,8 @@ test("create initial workspace structure", async () => {
       signingPrivateKey: userData1.signingPrivateKey,
     },
     workspaceKeyBox: workspace.currentWorkspaceKey.workspaceKeyBox,
+    workspaceId: workspace.id,
+    workspaceKeyId: workspace.currentWorkspaceKey.id,
   });
   const snapshotKey =
     snapshotKeyTrace.trace[snapshotKeyTrace.trace.length - 1].key;

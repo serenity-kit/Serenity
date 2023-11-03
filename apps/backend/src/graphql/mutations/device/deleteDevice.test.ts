@@ -53,6 +53,8 @@ test("delete and keep devices mismatch", async () => {
     receiverDeviceEncryptionPublicKey: userData1.device.encryptionPublicKey,
     creatorDeviceEncryptionPrivateKey: userData1.encryptionPrivateKey,
     workspaceKey,
+    workspaceId: userData1.workspace.id,
+    workspaceKeyId: userData1.workspace.currentWorkspaceKey.id,
   });
   const newDeviceWorkspaceKeyBoxes: WorkspaceWithWorkspaceDevicesParing[] = [
     {
@@ -101,11 +103,15 @@ test("delete a device", async () => {
     receiverDeviceEncryptionPublicKey: userData1.device.encryptionPublicKey,
     creatorDeviceEncryptionPrivateKey: userData1.encryptionPrivateKey,
     workspaceKey,
+    workspaceId: userData1.workspace.id,
+    workspaceKeyId: userData1.workspace.currentWorkspaceKey.id,
   });
   const workspaceKeyBox2 = encryptWorkspaceKeyForDevice({
     receiverDeviceEncryptionPublicKey: userData1.webDevice.encryptionPublicKey,
     creatorDeviceEncryptionPrivateKey: userData1.encryptionPrivateKey,
     workspaceKey,
+    workspaceId: userData1.workspace.id,
+    workspaceKeyId: userData1.workspace.currentWorkspaceKey.id,
   });
   const newDeviceWorkspaceKeyBoxes: WorkspaceWithWorkspaceDevicesParing[] = [
     {
@@ -180,6 +186,8 @@ test("delete login device clears session", async () => {
     receiverDeviceEncryptionPublicKey: userData1.device.encryptionPublicKey,
     creatorDeviceEncryptionPrivateKey: userData1.encryptionPrivateKey,
     workspaceKey,
+    workspaceId: userData1.workspace.id,
+    workspaceKeyId: userData1.workspace.currentWorkspaceKey.id,
   });
   const newDeviceWorkspaceKeyBoxes: WorkspaceWithWorkspaceDevicesParing[] = [
     {

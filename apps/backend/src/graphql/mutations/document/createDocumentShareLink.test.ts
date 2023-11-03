@@ -42,6 +42,8 @@ test("create admin share link fails", async () => {
     keyDerivationTrace: userData1.folder.keyDerivationTrace,
     activeDevice: userData1.webDevice,
     workspaceKeyBox: user1Workspace.currentWorkspaceKey.workspaceKeyBox,
+    workspaceId: userData1.workspace.id,
+    workspaceKeyId: user1Workspace.currentWorkspaceKey.id,
   });
   const snapshotKeyData = createSnapshotKey({
     folderKey: folderKeyTrace.trace[folderKeyTrace.trace.length - 1].key,
@@ -66,6 +68,8 @@ test("create editor share link", async () => {
     keyDerivationTrace: userData1.folder.keyDerivationTrace,
     activeDevice: userData1.webDevice,
     workspaceKeyBox: user1Workspace.currentWorkspaceKey.workspaceKeyBox,
+    workspaceId: userData1.workspace.id,
+    workspaceKeyId: user1Workspace.currentWorkspaceKey.id,
   });
   const snapshotKeyData = createSnapshotKey({
     folderKey: folderKeyTrace.trace[folderKeyTrace.trace.length - 1].key,
@@ -89,6 +93,8 @@ test("create commenter share link", async () => {
     keyDerivationTrace: userData1.folder.keyDerivationTrace,
     activeDevice: userData1.webDevice,
     workspaceKeyBox: user1Workspace.currentWorkspaceKey.workspaceKeyBox,
+    workspaceId: userData1.workspace.id,
+    workspaceKeyId: user1Workspace.currentWorkspaceKey.id,
   });
   const snapshotKeyData = createSnapshotKey({
     folderKey: folderKeyTrace.trace[folderKeyTrace.trace.length - 1].key,
@@ -112,6 +118,8 @@ test("create viewer share link", async () => {
     keyDerivationTrace: userData1.folder.keyDerivationTrace,
     activeDevice: userData1.webDevice,
     workspaceKeyBox: user1Workspace.currentWorkspaceKey.workspaceKeyBox,
+    workspaceId: userData1.workspace.id,
+    workspaceKeyId: user1Workspace.currentWorkspaceKey.id,
   });
   const snapshotKeyData = createSnapshotKey({
     folderKey: folderKeyTrace.trace[folderKeyTrace.trace.length - 1].key,
@@ -140,6 +148,8 @@ test("Invalid ownership", async () => {
     keyDerivationTrace: userData1.folder.keyDerivationTrace,
     activeDevice: userData1.webDevice,
     workspaceKeyBox: user1Workspace.currentWorkspaceKey.workspaceKeyBox,
+    workspaceId: userData1.workspace.id,
+    workspaceKeyId: user1Workspace.currentWorkspaceKey.id,
   });
   const snapshotKeyData = createSnapshotKey({
     folderKey: folderKeyTrace.trace[folderKeyTrace.trace.length - 1].key,
@@ -239,6 +249,8 @@ describe("Input errors", () => {
       keyDerivationTrace: userData1.folder.keyDerivationTrace,
       activeDevice: userData1.webDevice,
       workspaceKeyBox: user1Workspace.currentWorkspaceKey.workspaceKeyBox,
+      workspaceId: userData1.workspace.id,
+      workspaceKeyId: user1Workspace.currentWorkspaceKey.id,
     });
     const snapshotKeyData = createSnapshotKey({
       folderKey: folderKeyTrace.trace[folderKeyTrace.trace.length - 1].key,

@@ -124,6 +124,8 @@ export const createInitialWorkspaceStructure = async ({
       receiverDeviceEncryptionPublicKey: device.encryptionPublicKey,
       creatorDeviceEncryptionPrivateKey: creatorDevice.encryptionPrivateKey,
       workspaceKey,
+      workspaceId: event.transaction.id,
+      workspaceKeyId,
     });
     deviceWorkspaceKeyBoxes.push({
       deviceSigningPublicKey: device.signingPublicKey,

@@ -64,7 +64,7 @@ test("initial condition", async () => {
 test("add device", async () => {
   const loginResult = await createDeviceAndLogin({
     username: userData1.user.username,
-    password: "password",
+    password,
     envelope: userData1.envelope,
     mainDevice: userData1.mainDevice,
   });
@@ -72,6 +72,8 @@ test("add device", async () => {
   const { nonce, ciphertext } = createAndEncryptWorkspaceKeyForDevice({
     receiverDeviceEncryptionPublicKey: user1Device2.encryptionPublicKey,
     creatorDeviceEncryptionPrivateKey: userData1.encryptionPrivateKey,
+    workspaceKeyId: userData1.workspace.currentWorkspaceKey.id,
+    workspaceId: userData1.workspace.id,
   });
   await attachDeviceToWorkspaces({
     graphql,
@@ -128,7 +130,7 @@ test("delete device", async () => {
 
   const loginResult = await createDeviceAndLogin({
     username: userData1.user.username,
-    password: "password",
+    password,
     envelope: userData1.envelope,
     mainDevice: userData1.mainDevice,
   });
@@ -138,16 +140,22 @@ test("delete device", async () => {
     receiverDeviceEncryptionPublicKey: userData1.device.encryptionPublicKey,
     creatorDeviceEncryptionPrivateKey: userData1.encryptionPrivateKey,
     workspaceKey,
+    workspaceId: userData1.workspace.id,
+    workspaceKeyId: userData1.workspace.currentWorkspaceKey.id,
   });
   const workspaceKeyBox2 = encryptWorkspaceKeyForDevice({
     receiverDeviceEncryptionPublicKey: userData1.webDevice.encryptionPublicKey,
     creatorDeviceEncryptionPrivateKey: userData1.encryptionPrivateKey,
     workspaceKey,
+    workspaceId: userData1.workspace.id,
+    workspaceKeyId: userData1.workspace.currentWorkspaceKey.id,
   });
   const workspaceKeyBox3 = encryptWorkspaceKeyForDevice({
     receiverDeviceEncryptionPublicKey: user1Device2.encryptionPublicKey,
     creatorDeviceEncryptionPrivateKey: userData1.encryptionPrivateKey,
     workspaceKey,
+    workspaceId: userData1.workspace.id,
+    workspaceKeyId: userData1.workspace.currentWorkspaceKey.id,
   });
   const newDeviceWorkspaceKeyBoxes: WorkspaceWithWorkspaceDevicesParing[] = [
     {

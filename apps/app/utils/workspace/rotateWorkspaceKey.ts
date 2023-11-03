@@ -58,6 +58,8 @@ export const rotateWorkspaceKey = async ({
         receiverDeviceEncryptionPublicKey: device.encryptionPublicKey,
         creatorDeviceEncryptionPrivateKey: activeDevice.encryptionPrivateKey,
         workspaceKey: workspaceKey.workspaceKey,
+        workspaceId,
+        workspaceKeyId: workspaceKey.id,
       });
       deviceWorkspaceKeyBoxes.push({
         ciphertext,

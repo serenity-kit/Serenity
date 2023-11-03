@@ -11,12 +11,16 @@ type Params = {
     nonce: string;
     creatorDevice: Device;
   };
+  workspaceId: string;
+  workspaceKeyId: string;
 };
 
 export const deriveKeysFromKeyDerivationTrace = ({
   keyDerivationTrace,
   activeDevice,
   workspaceKeyBox,
+  workspaceId,
+  workspaceKeyId,
 }: Params): KeyDerivationTraceWithKeys => {
   // TODO verify that creator
   // needs a workspace key chain with a main device!
@@ -26,6 +30,8 @@ export const deriveKeysFromKeyDerivationTrace = ({
     creatorDeviceEncryptionPublicKey:
       workspaceKeyBox.creatorDevice.encryptionPublicKey,
     receiverDeviceEncryptionPrivateKey: activeDevice.encryptionPrivateKey!,
+    workspaceId,
+    workspaceKeyId,
   });
 
   const keyDerivationTraceWithKeys: KeyDerivationTraceWithKeys = {

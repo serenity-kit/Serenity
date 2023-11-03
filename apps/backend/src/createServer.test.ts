@@ -47,6 +47,8 @@ const setup = async () => {
     nonce: workspaceKeyBox?.nonce!,
     creatorDeviceEncryptionPublicKey: result.device.encryptionPublicKey,
     receiverDeviceEncryptionPrivateKey: result.encryptionPrivateKey,
+    workspaceId,
+    workspaceKeyId: addedWorkspace.currentWorkspaceKey?.id!,
   });
   addedFolder = result.folder;
   const folderKeyResult = kdfDeriveFromKey({

@@ -17,6 +17,8 @@ type Params = {
     nonce: string;
     creatorDevice: Device;
   };
+  workspaceId: string;
+  workspaceKeyId: string;
 };
 
 export const decryptDocumentTitle = ({
@@ -27,6 +29,8 @@ export const decryptDocumentTitle = ({
   ciphertext,
   nonce,
   publicData,
+  workspaceId,
+  workspaceKeyId,
 }: Params) => {
   const snapshotFolderKeyData = deriveKeysFromKeyDerivationTrace({
     keyDerivationTrace: snapshot.keyDerivationTrace,
@@ -38,6 +42,8 @@ export const decryptDocumentTitle = ({
       encryptionPublicKeySignature: activeDevice.encryptionPublicKeySignature!,
     },
     workspaceKeyBox: workspaceKeyBox,
+    workspaceId,
+    workspaceKeyId,
   });
   const snapshotKeyData =
     snapshotFolderKeyData.trace[snapshotFolderKeyData.trace.length - 1];

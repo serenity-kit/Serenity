@@ -159,6 +159,8 @@ export default function SidebarFolder(props: Props) {
           encryptionPublicKeySignature:
             activeDevice.encryptionPublicKeySignature!,
         },
+        workspaceId: workspace.id,
+        workspaceKeyId: props.keyDerivationTrace.workspaceKeyId,
       });
       // since the decryptFolderName method takes a parent key
       // and the last item of the key chain is the current folder key,
@@ -205,6 +207,8 @@ export default function SidebarFolder(props: Props) {
           activeDevice.encryptionPublicKeySignature!,
       },
       workspaceKeyBox: workspace.currentWorkspaceKey.workspaceKeyBox!,
+      workspaceId: workspace.id,
+      workspaceKeyId: workspace.currentWorkspaceKey.id,
     });
     const parentChainItem =
       parentFolderKeyChainData.trace[parentFolderKeyChainData.trace.length - 1];
@@ -288,6 +292,8 @@ export default function SidebarFolder(props: Props) {
         encryptionPublicKeySignature:
           activeDevice.encryptionPublicKeySignature!,
       },
+      workspaceId: workspace.id,
+      workspaceKeyId: workspace.currentWorkspaceKey.id,
     });
     const folderKey = folderKeyTrace.trace[folderKeyTrace.trace.length - 1].key;
     const snapshotKey = createSnapshotKey({ folderKey });
@@ -335,6 +341,8 @@ export default function SidebarFolder(props: Props) {
         keyDerivationTrace: snapshot.publicData.keyDerivationTrace,
       },
       workspaceKeyBox: workspace.currentWorkspaceKey.workspaceKeyBox!,
+      workspaceId: workspace.id,
+      workspaceKeyId: workspace.currentWorkspaceKey.id,
     });
     const result = await runCreateDocumentMutation(
       {
@@ -428,6 +436,8 @@ export default function SidebarFolder(props: Props) {
           activeDevice.encryptionPublicKeySignature!,
       },
       workspaceKeyBox: workspace.currentWorkspaceKey!.workspaceKeyBox!,
+      workspaceId: workspace.id,
+      workspaceKeyId: workspace.currentWorkspaceKey!.id,
     });
     // ignore the last chain item as it's the key for the old folder name
     let parentKey = workspaceKey;

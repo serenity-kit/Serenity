@@ -44,6 +44,8 @@ const setup = async () => {
     nonce: workspaceKeyBox.nonce,
     creatorDeviceEncryptionPublicKey: userData1.device.encryptionPublicKey,
     receiverDeviceEncryptionPrivateKey: userData1.encryptionPrivateKey,
+    workspaceId: userData1.workspace.id,
+    workspaceKeyId: addedWorkspace.currentWorkspaceKey.id,
   });
   const folderKeyResult = kdfDeriveFromKey({
     key: workspaceKey,
@@ -69,6 +71,8 @@ const setup = async () => {
     keyDerivationTrace: addedDocumentSnapshot.keyDerivationTrace,
     activeDevice: userData1.mainDevice,
     workspaceKeyBox: userData1.workspace.currentWorkspaceKey.workspaceKeyBox,
+    workspaceId: userData1.workspace.id,
+    workspaceKeyId: userData1.workspace.currentWorkspaceKey.id,
   });
   snapshotKey = snapshotKeyTrace.trace[snapshotKeyTrace.trace.length - 1].key;
 };

@@ -33,7 +33,7 @@ export const removeMemberAndRotateWorkspaceKey = async ({
       if (userId === userToRevoke.id) {
         throw new UserInputError("Cannot remove yourself from a workspace");
       }
-      const verifiedUserWorskpace = await prisma.usersToWorkspaces.findFirst({
+      const verifiedUserWorkspace = await prisma.usersToWorkspaces.findFirst({
         where: {
           userId,
           workspaceId,
@@ -42,7 +42,7 @@ export const removeMemberAndRotateWorkspaceKey = async ({
         },
         select: { workspaceId: true },
       });
-      if (!verifiedUserWorskpace) {
+      if (!verifiedUserWorkspace) {
         throw new ForbiddenError("Unauthorized");
       }
       // verify user owns creatorsignigpublickey

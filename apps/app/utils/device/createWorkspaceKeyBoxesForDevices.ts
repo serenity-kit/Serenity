@@ -16,10 +16,14 @@ export type DeviceWorkspaceKeyBoxParams = {
 export type Props = {
   devices: VerifiedDevice[];
   activeDevice: LocalDevice;
+  workspaceKeyId: string;
+  workspaceId: string;
 };
 export const createWorkspaceKeyBoxesForDevices = ({
   devices,
   activeDevice,
+  workspaceId,
+  workspaceKeyId,
 }: Props) => {
   const deviceWorkspaceKeyBoxes: DeviceWorkspaceKeyBoxInput[] = [];
   const allDevices = devices;
@@ -38,6 +42,8 @@ export const createWorkspaceKeyBoxesForDevices = ({
       receiverDeviceEncryptionPublicKey: receiverDevice.encryptionPublicKey,
       creatorDeviceEncryptionPrivateKey: activeDevice.encryptionPrivateKey,
       workspaceKey: sodium.to_base64(workspaceKey),
+      workspaceId,
+      workspaceKeyId,
     });
     deviceWorkspaceKeyBoxes.push({
       ciphertext,

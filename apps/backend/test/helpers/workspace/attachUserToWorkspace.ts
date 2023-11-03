@@ -75,11 +75,15 @@ export const attachUserToWorkspace = async ({
     creatorDeviceEncryptionPublicKey:
       currentWorkspaceKey.workspaceKeyBox.creatorDevice.encryptionPublicKey,
     receiverDeviceEncryptionPrivateKey: hostWebDevice.encryptionPrivateKey,
+    workspaceId: workspace.id,
+    workspaceKeyId: currentWorkspaceKey.id,
   });
   const guestUserWorkspaceKeyBoxMain = encryptWorkspaceKeyForDevice({
     receiverDeviceEncryptionPublicKey: guestMainDevice.encryptionPublicKey,
     creatorDeviceEncryptionPrivateKey: hostWebDevice.encryptionPrivateKey,
     workspaceKey,
+    workspaceId: workspace.id,
+    workspaceKeyId: currentWorkspaceKey.id,
   });
 
   const workspaceKeys = [
@@ -100,6 +104,8 @@ export const attachUserToWorkspace = async ({
       receiverDeviceEncryptionPublicKey: guestWebDevice.encryptionPublicKey,
       creatorDeviceEncryptionPrivateKey: hostWebDevice.encryptionPrivateKey,
       workspaceKey,
+      workspaceId: workspace.id,
+      workspaceKeyId: currentWorkspaceKey.id,
     });
     workspaceKeys[0].workspaceKeyBoxes.push({
       ciphertext: guestUserWorkspaceKeyBoxWeb.ciphertext,

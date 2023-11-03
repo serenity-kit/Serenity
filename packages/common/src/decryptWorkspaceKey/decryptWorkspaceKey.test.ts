@@ -1,4 +1,6 @@
 import sodium from "react-native-libsodium";
+import { createDevice } from "../createDevice/createDevice";
+import { encryptWorkspaceKeyForDevice } from "../encryptWorkspaceKeyForDevice/encryptWorkspaceKeyForDevice";
 import { decryptWorkspaceKey } from "./decryptWorkspaceKey";
 
 beforeAll(async () => {
@@ -6,20 +8,28 @@ beforeAll(async () => {
 });
 
 test("decrypt workspace key", () => {
-  const nonce = "tWowcePQUts7U35mCW7TUvR-8p_9KQMA";
-  const ciphertext =
-    "59Ua5K1dkXqOGZVpmlR1sYW6hUW5ZtWfCFANglSmF1hURfnTxOi1MlVXAWuDAmTM";
-  const creatorDeviceEncryptionPublicKey =
-    "sizOegqS2xWZWeSX5yHAgwnjq3hwsuuQqu0KseZCagA";
-  const receiverDeviceEncryptionPrivateKey =
-    "4gC2Vfd7GxU70ktlAbyArUMi_cHJwY01gOk4cJ9VhhI";
-  const workspaceKey = decryptWorkspaceKey({
+  const workspaceId = "Xap-RWCrBdK8WjQDeYLV0jnt9k_ez1ol";
+  const workspaceKeyId = "GeyIuvSBeokOi0GX-ZKyw-kwFvgJNbee";
+  const workspaceKey = "toD7aqDdLUbdz6QimFN8xQrwHX0joueeCdjPEoPvWYc";
+
+  const creatorDevice = createDevice("user");
+  const receiverDevice = createDevice("user");
+
+  const { ciphertext, nonce } = encryptWorkspaceKeyForDevice({
+    creatorDeviceEncryptionPrivateKey: creatorDevice.encryptionPrivateKey,
+    receiverDeviceEncryptionPublicKey: receiverDevice.encryptionPublicKey,
+    workspaceId,
+    workspaceKeyId,
+    workspaceKey,
+  });
+
+  const decryptedWorkspaceKey = decryptWorkspaceKey({
     ciphertext,
     nonce,
-    creatorDeviceEncryptionPublicKey,
-    receiverDeviceEncryptionPrivateKey,
+    creatorDeviceEncryptionPublicKey: creatorDevice.encryptionPublicKey,
+    receiverDeviceEncryptionPrivateKey: receiverDevice.encryptionPrivateKey,
+    workspaceId,
+    workspaceKeyId,
   });
-  expect(typeof workspaceKey).toBe("string");
-  expect(workspaceKey.length).toBe(43);
-  expect(workspaceKey).toBe("toD7aqDdLUbdz6QimFN8xQrwHX0joueeCdjPEoPvWYc");
+  expect(decryptedWorkspaceKey).toBe(workspaceKey);
 });

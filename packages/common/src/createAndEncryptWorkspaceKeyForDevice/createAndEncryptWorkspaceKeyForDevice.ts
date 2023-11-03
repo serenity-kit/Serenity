@@ -1,24 +1,30 @@
 import sodium from "react-native-libsodium";
+import { encryptWorkspaceKeyForDevice } from "../encryptWorkspaceKeyForDevice/encryptWorkspaceKeyForDevice";
 
 type Props = {
   receiverDeviceEncryptionPublicKey: string;
   creatorDeviceEncryptionPrivateKey: string;
+  workspaceKeyId: string;
+  workspaceId: string;
 };
 export const createAndEncryptWorkspaceKeyForDevice = ({
   receiverDeviceEncryptionPublicKey,
   creatorDeviceEncryptionPrivateKey,
+  workspaceId,
+  workspaceKeyId,
 }: Props) => {
-  const workspaceKey = sodium.crypto_kdf_keygen();
-  const nonce = sodium.randombytes_buf(sodium.crypto_box_NONCEBYTES);
-  const ciphertext = sodium.crypto_box_easy(
+  const workspaceKey = sodium.to_base64(sodium.crypto_kdf_keygen());
+
+  const { ciphertext, nonce } = encryptWorkspaceKeyForDevice({
+    creatorDeviceEncryptionPrivateKey,
+    receiverDeviceEncryptionPublicKey,
+    workspaceId,
+    workspaceKeyId,
+    workspaceKey,
+  });
+  return {
     workspaceKey,
     nonce,
-    sodium.from_base64(receiverDeviceEncryptionPublicKey),
-    sodium.from_base64(creatorDeviceEncryptionPrivateKey)
-  );
-  return {
-    workspaceKey: sodium.to_base64(workspaceKey),
-    nonce: sodium.to_base64(nonce),
-    ciphertext: sodium.to_base64(ciphertext),
+    ciphertext,
   };
 };
