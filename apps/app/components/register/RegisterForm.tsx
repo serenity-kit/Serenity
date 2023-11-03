@@ -28,6 +28,7 @@ import {
 } from "../../generated/graphql";
 import { setRegistrationInfo } from "../../utils/authentication/registrationMemoryStore";
 import { setMainDevice } from "../../utils/device/mainDeviceMemoryStore";
+import { getOpaqueServerPublicKey } from "../../utils/getOpaqueServerPublicKey/getOpaqueServerPublicKey";
 
 // setup zxcvbn
 const options = {
@@ -119,13 +120,17 @@ export default function RegisterForm(props: Props) {
         },
       });
       if (startRegistrationResult.data?.startRegistration) {
-        const { exportKey, registrationRecord } = client.finishRegistration({
-          password,
-          clientRegistrationState:
-            clientRegistrationStartResult.clientRegistrationState,
-          registrationResponse:
-            startRegistrationResult.data.startRegistration.challengeResponse,
-        });
+        const { exportKey, registrationRecord, serverStaticPublicKey } =
+          client.finishRegistration({
+            password,
+            clientRegistrationState:
+              clientRegistrationStartResult.clientRegistrationState,
+            registrationResponse:
+              startRegistrationResult.data.startRegistration.challengeResponse,
+          });
+        if (serverStaticPublicKey !== getOpaqueServerPublicKey()) {
+          throw new Error("Failed to register. Please contact our support.");
+        }
         const {
           encryptionPrivateKey,
           signingPrivateKey,
