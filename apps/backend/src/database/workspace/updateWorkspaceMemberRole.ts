@@ -1,7 +1,7 @@
 import * as workspaceChain from "@serenity-kit/workspace-chain";
 import { ForbiddenError } from "apollo-server-express";
 import { Prisma, Role } from "../../../prisma/generated/output";
-import { formatWorkspace, Workspace } from "../../types/workspace";
+import { Workspace, formatWorkspace } from "../../types/workspace";
 import { prisma } from "../prisma";
 import { getLastWorkspaceChainEventWithState } from "../workspaceChain/getLastWorkspaceChainEventWithState";
 

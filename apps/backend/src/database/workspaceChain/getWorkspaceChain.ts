@@ -1,13 +1,9 @@
 import { ForbiddenError } from "apollo-server-express";
 import { prisma } from "../prisma";
 
-type Cursor = {
-  id?: string;
-};
-
 type Params = {
   userId: string;
-  cursor?: Cursor;
+  afterPosition?: number;
   skip?: number;
   take: number;
   workspaceId: string;
@@ -15,10 +11,10 @@ type Params = {
 export async function getWorkspaceChain({
   userId,
   workspaceId,
-}: // cursor,
-// skip,
-// take,
-Params) {
+  // take,
+  afterPosition,
+  skip,
+}: Params) {
   const userToWorkspace = await prisma.usersToWorkspaces.findFirst({
     where: { userId, workspaceId },
   });
@@ -27,11 +23,11 @@ Params) {
   }
 
   const workspaceChain = await prisma.workspaceChainEvent.findMany({
-    where: {
-      workspaceId,
-    },
-    // cursor,
-    // skip,
+    where: { workspaceId },
+    cursor: afterPosition
+      ? { workspaceId_position: { workspaceId, position: afterPosition } }
+      : undefined,
+    skip,
     // take,
     orderBy: {
       position: "asc",

@@ -22,17 +22,17 @@ export const workspaceChainQuery = queryField((t) => {
         throw new AuthenticationError("Not authenticated");
       }
       const userId = context.user.id;
-      const cursor = args.after ? { id: args.after } : undefined;
+      const afterPosition = args.after ? parseInt(args.after, 10) : undefined;
       // prisma will include the cursor if skip: 1 is not set
       // https://www.prisma.io/docs/concepts/components/prisma-client/pagination#do-i-always-have-to-skip-1
-      const skip = cursor ? 1 : undefined;
+      const skip = typeof afterPosition === "number" ? 1 : undefined;
       // include one extra project to set hasNextPage value
       const take: any = args.first ? args.first + 1 : undefined;
 
       const workspaceChain = await getWorkspaceChain({
         userId,
         workspaceId: args.workspaceId,
-        cursor,
+        afterPosition,
         skip,
         take,
       });

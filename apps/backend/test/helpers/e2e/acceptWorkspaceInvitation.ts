@@ -39,6 +39,7 @@ export const acceptWorkspaceInvitation = async ({
   const urlAsExpected = pageUrl.startsWith(
     `http://localhost:19006/workspace/${sharedWorkspaceId}/page`
   );
+
   expect(urlAsExpected).toBe(true);
   // now wait for decryption
   await delayForSeconds(5);
