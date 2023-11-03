@@ -19,6 +19,7 @@ import {
   useStartLoginMutation,
 } from "../../generated/graphql";
 import { setMainDevice } from "../../utils/device/mainDeviceMemoryStore";
+import { getOpaqueServerPublicKey } from "../../utils/getOpaqueServerPublicKey/getOpaqueServerPublicKey";
 
 export type Props = {
   isVisible: boolean;
@@ -88,6 +89,14 @@ export function VerifyPasswordModal(props: Props) {
       });
       if (finishLoginResponse === null) {
         throw new Error("Could not finish the login process");
+      }
+
+      if (
+        finishLoginResponse.serverStaticPublicKey !== getOpaqueServerPublicKey()
+      ) {
+        throw new Error(
+          "Failed to verify the password. Please contact our support."
+        );
       }
 
       const mainDeviceResult = await runMainDeviceQuery({});

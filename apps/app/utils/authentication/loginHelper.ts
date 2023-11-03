@@ -13,6 +13,7 @@ import {
   runStartLoginMutation,
 } from "../../generated/graphql";
 import { setMainDevice } from "../device/mainDeviceMemoryStore";
+import { getOpaqueServerPublicKey } from "../getOpaqueServerPublicKey/getOpaqueServerPublicKey";
 import { removeLastUsedDocumentIdAndWorkspaceId } from "../lastUsedWorkspaceAndDocumentStore/lastUsedWorkspaceAndDocumentStore";
 import { createDeviceWithInfo } from "./createDeviceWithInfo";
 import {
@@ -85,6 +86,10 @@ export const login = async ({
   });
   if (!result) {
     throw new Error("Failed to finish login");
+  }
+
+  if (result.serverStaticPublicKey !== getOpaqueServerPublicKey()) {
+    throw new Error("Failed to login. Please contact our support.");
   }
 
   const finishLoginResult = await runFinishLoginMutation({
