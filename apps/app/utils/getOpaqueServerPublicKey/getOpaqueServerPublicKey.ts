@@ -9,7 +9,7 @@ export const getOpaqueServerPublicKey = () => {
     return "-DO080qIlXaaF3rMNlCfu7DJ3yFdeYUkV328WjK2eU0";
   }
   if (env === "staging") {
-    return "UtLfNRuDs2yLQF7bY1P2DYTO_B6F7M5igAnyOhG0sUA";
+    return "5MdfeeNFDqw1pHECGKb27eFAB5cQArrKm7piwFDw0x8";
   }
   if (env === "production") {
     return "fESSqCVcW_9ldqfXuToGRGMXLazg8EeiBm-GXROu53I";
