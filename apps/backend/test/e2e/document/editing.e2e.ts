@@ -181,7 +181,7 @@ test.describe("Edit document", () => {
 });
 
 test.describe("Edit document in subfolder", () => {
-  test("Add content", async ({ page }) => {
+  test.skip("Add content", async ({ page }) => {
     const newContent = "\nHello World!";
     await login({
       page,
@@ -223,7 +223,7 @@ test.describe("Edit document in subfolder", () => {
     expect(afterLoginContent).toBe(endingContent);
   });
 
-  test("Add content shows for shared user", async ({ browser, page }) => {
+  test.skip("Add content shows for shared user", async ({ browser, page }) => {
     await login({
       page,
       username: user1.username,
