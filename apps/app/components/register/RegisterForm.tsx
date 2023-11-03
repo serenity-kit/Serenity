@@ -11,7 +11,12 @@ import {
   Input,
   LinkExternal,
   Text,
+  View,
+  tw,
 } from "@serenity-tools/ui";
+import { zxcvbn, zxcvbnOptions } from "@zxcvbn-ts/core";
+import * as zxcvbnCommonPackage from "@zxcvbn-ts/language-common";
+import * as zxcvbnEnPackage from "@zxcvbn-ts/language-en";
 import { useEffect, useState } from "react";
 import { useWindowDimensions } from "react-native";
 import { client } from "react-native-opaque";
@@ -23,6 +28,17 @@ import {
 } from "../../generated/graphql";
 import { setRegistrationInfo } from "../../utils/authentication/registrationMemoryStore";
 import { setMainDevice } from "../../utils/device/mainDeviceMemoryStore";
+
+// setup zxcvbn
+const options = {
+  translations: zxcvbnEnPackage.translations,
+  graphs: zxcvbnCommonPackage.adjacencyGraphs,
+  dictionary: {
+    ...zxcvbnCommonPackage.dictionary,
+    ...zxcvbnEnPackage.dictionary,
+  },
+};
+zxcvbnOptions.setOptions(options);
 
 type Props = {
   pendingWorkspaceInvitationId?: string;
@@ -39,11 +55,18 @@ export default function RegisterForm(props: Props) {
   const { updateAuthentication } = useAppContext();
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const [passwordStrengthEvaluation, setPasswordStrengthEvaluation] = useState(
+    zxcvbn(password)
+  );
   const [isRegistering, setIsRegistering] = useState(false);
   const [hasAcceptedTerms, setHasAcceptedTerms] = useState(false);
   const [, finishRegistrationMutation] = useFinishRegistrationMutation();
   const [, startRegistrationMutation] = useStartRegistrationMutation();
-  const [errorMessage, setErrorMessage] = useState("");
+  const [errorMessage, setErrorMessage] = useState<
+    "none" | "accept-tos" | "email" | "password"
+  >("none");
+
+  console.log(passwordStrengthEvaluation);
 
   // we want to reset the form when the user navigates away from the screen
   // to avoid having the form filled and potentially allowing someone else to
@@ -52,7 +75,8 @@ export default function RegisterForm(props: Props) {
     if (!props.isFocused) {
       setUsername("");
       setPassword("");
-      setErrorMessage("");
+      setPasswordStrengthEvaluation(zxcvbn(""));
+      setErrorMessage("none");
       setIsRegistering(false);
       setHasAcceptedTerms(false);
     }
@@ -60,24 +84,22 @@ export default function RegisterForm(props: Props) {
 
   const onRegisterPress = async () => {
     if (!hasAcceptedTerms) {
-      setErrorMessage("Please accept the terms of service.");
+      setErrorMessage("accept-tos");
       return;
     }
-    setErrorMessage("");
+    setErrorMessage("none");
     setIsRegistering(true);
 
     // verify the username is a valid email address using the zod module
     try {
       z.string().email().parse(username);
     } catch (error) {
-      setErrorMessage("Invalid email address");
+      setErrorMessage("email");
       setIsRegistering(false);
       return;
     }
-    try {
-      z.string().min(6).parse(password);
-    } catch (error) {
-      setErrorMessage("Password must be at least 6 characters");
+    if (passwordStrengthEvaluation.score < 4) {
+      setErrorMessage("password");
       setIsRegistering(false);
       return;
     }
@@ -178,6 +200,7 @@ export default function RegisterForm(props: Props) {
           });
           // reset since the user might end up on this screen again
           setPassword("");
+          setPasswordStrengthEvaluation(zxcvbn(""));
           setUsername("");
         } else if (finishRegistrationResult.error) {
           if (
@@ -205,6 +228,16 @@ export default function RegisterForm(props: Props) {
     }
   };
 
+  let errorContent = "";
+  if (errorMessage === "accept-tos") {
+    errorContent = "Please accept the terms of service.";
+  } else if (errorMessage === "email") {
+    errorContent = "Please enter a valid email address.";
+  } else if (errorMessage === "password") {
+    errorContent =
+      "Password is too weak. Please make sure to use a strong password.";
+  }
+
   return (
     <FormWrapper>
       <Input
@@ -224,6 +257,7 @@ export default function RegisterForm(props: Props) {
         value={password}
         onChangeText={(password: string) => {
           setPassword(password);
+          setPasswordStrengthEvaluation(zxcvbn(password));
         }}
         placeholder="Enter your password …"
       />
@@ -257,12 +291,30 @@ export default function RegisterForm(props: Props) {
         </Text>
       </Checkbox>
 
-      {errorMessage ? (
+      {errorMessage !== "none" && errorMessage !== "password" ? (
         <InfoMessage variant="error" icon>
-          {errorMessage}
+          {errorContent}
         </InfoMessage>
       ) : null}
-
+      {errorMessage === "password" && passwordStrengthEvaluation.score < 4 ? (
+        <InfoMessage variant="error" icon>
+          <View>{errorContent}</View>
+          {passwordStrengthEvaluation.feedback.suggestions.length > 0 ? (
+            <>
+              <View style={tw`mt-4 mb-2`}>
+                <Text variant="xxs">Suggestions</Text>
+              </View>
+              {passwordStrengthEvaluation.feedback.suggestions.map(
+                (suggestion) => (
+                  <View>
+                    <Text variant="xs">{suggestion}</Text>
+                  </View>
+                )
+              )}
+            </>
+          ) : null}
+        </InfoMessage>
+      ) : null}
       <Button onPress={onRegisterPress} isLoading={isRegistering}>
         Register
       </Button>
