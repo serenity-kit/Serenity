@@ -45,7 +45,7 @@ test.describe("Share links", () => {
     const page2 = await context2.newPage();
     await page2.goto(sharingUrl);
 
-    await delayForSeconds(1);
+    await delayForSeconds(3);
 
     const pageContent = page.locator("div[class='ProseMirror']");
     const startingContentPage1 = await pageContent.innerHTML();
@@ -71,7 +71,7 @@ test.describe("Share links", () => {
     const page2 = await context2.newPage();
     await page2.goto(sharingUrl);
 
-    await delayForSeconds(1);
+    await delayForSeconds(3);
 
     const pageContent = page.locator("div[class='ProseMirror']");
     const startingContentPage1 = await pageContent.innerHTML();
@@ -116,7 +116,7 @@ test.describe("Share links", () => {
     const page2 = await context2.newPage();
     await page2.goto(sharingUrl);
 
-    await delayForSeconds(1);
+    await delayForSeconds(3);
 
     const pageContent = page.locator("div[class='ProseMirror']");
     const startingContentPage1 = await pageContent.innerHTML();
