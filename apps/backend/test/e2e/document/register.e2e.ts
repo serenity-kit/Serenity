@@ -8,7 +8,7 @@ import { register } from "../../helpers/e2e/register";
 import { renameDocument } from "../../helpers/e2e/renameDocument";
 
 let username: string;
-const password = "password";
+const password = "password22room5K42";
 const workspaceName = "a workspace";
 
 test.beforeAll(async () => {

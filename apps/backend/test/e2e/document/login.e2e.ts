@@ -9,7 +9,7 @@ import { login } from "../../helpers/e2e/login";
 import { renameDocument } from "../../helpers/e2e/renameDocument";
 
 let username: string;
-const password = "password";
+const password = "password22room5K42";
 let createdWorkspace: any = null;
 let firstFolder: any = null;
 

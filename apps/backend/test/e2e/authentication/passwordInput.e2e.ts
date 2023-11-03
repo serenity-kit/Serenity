@@ -7,7 +7,7 @@ import { reloadPage } from "../../helpers/e2e/reloadPage";
 
 test("Bad login then good login", async ({ page }) => {
   const username = `${generateId()}@example.com`;
-  const password = "password";
+  const password = "password22room5K42";
   const { user, workspace, document } = await createUserWithWorkspace({
     username,
     password,

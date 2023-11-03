@@ -7,7 +7,7 @@ const graphql = setupGraphql();
 const username = "7dfb4dd9-88be-414c-8a40-b5c030003d89@example.com";
 const username2 = "08844f05-ef88-4ac0-acf8-1e5163c2dcdb@example.com";
 const pendingWorkspaceInvitation2 = "08844f05-ef88-4ac0-acf8-1e5163c2dcdb";
-const password = "password";
+const password = "password22room5K42";
 
 beforeAll(async () => {
   await deleteAllRecords();

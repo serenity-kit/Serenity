@@ -16,7 +16,7 @@ import { WorkspaceWithWorkspaceDevicesParing } from "../../../types/workspaceDev
 
 const graphql = setupGraphql();
 const username = `${generateId()}@example.com`;
-const password = "password";
+const password = "password22room5K42";
 
 let userData1: any = undefined;
 let user1Device2: any = undefined;

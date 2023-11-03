@@ -14,7 +14,7 @@ import { getWorkspace } from "../../../../test/helpers/workspace/getWorkspace";
 import createUserWithWorkspace from "../../../database/testHelpers/createUserWithWorkspace";
 
 const graphql = setupGraphql();
-const password = "password";
+const password = "password22room5K42";
 let userData1: any = null;
 let user1Workspace: any = null;
 

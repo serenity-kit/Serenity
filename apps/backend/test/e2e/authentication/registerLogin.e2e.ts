@@ -31,7 +31,7 @@ const expectResults = async ({
 
 test("Register and remember login", async ({ page }) => {
   const username = `${generateId()}@example.com`;
-  const password = "password";
+  const password = "password22room5K42";
   const workspaceName = "my workspace";
   const stayLoggedIn = true;
   const registrationResult = await register({
@@ -55,7 +55,7 @@ test("Register and remember login", async ({ page }) => {
 
 test("Register and don't remember login", async ({ page }) => {
   const username = `${generateId()}@example.com`;
-  const password = "password";
+  const password = "password22room5K42";
   const workspaceName = "my workspace";
   const stayLoggedIn = false;
   const registrationResult = await register({
@@ -79,7 +79,7 @@ test("Register and don't remember login", async ({ page }) => {
 
 test("Register, logout, remember login", async ({ page }) => {
   const username = `${generateId()}@example.com`;
-  const password = "password";
+  const password = "password22room5K42";
   const workspaceName = "my workspace";
   const stayLoggedIn = false;
   const registrationResult = await register({
@@ -106,7 +106,7 @@ test("Register, logout, remember login", async ({ page }) => {
 
 test("Register, logout, don't remember login", async ({ page }) => {
   const username = `${generateId()}@example.com`;
-  const password = "password";
+  const password = "password22room5K42";
   const workspaceName = "my workspace";
   const stayLoggedIn = false;
   const registrationResult = await register({

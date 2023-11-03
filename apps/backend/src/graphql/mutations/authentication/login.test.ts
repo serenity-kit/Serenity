@@ -12,7 +12,7 @@ import setupGraphql from "../../../../test/helpers/setupGraphql";
 
 const graphql = setupGraphql();
 const username = `${generateId()}@example.com`;
-const password = "password";
+const password = "password22room5K42";
 
 beforeAll(async () => {
   await opaqueReady;

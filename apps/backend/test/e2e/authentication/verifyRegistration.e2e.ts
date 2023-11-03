@@ -9,7 +9,7 @@ import { verifyRegistration } from "../../helpers/e2e/verifyRegistration";
 
 test("Register Properly", async ({ page }) => {
   const username = `${generateId()}@example.com`;
-  const password = "password";
+  const password = "password22room5K42";
   // Go to registration url
   await page.goto("http://localhost:19006/register");
   await delayForSeconds(2);
@@ -24,7 +24,7 @@ test("Register Properly", async ({ page }) => {
 
 test("One wrong code", async ({ page }) => {
   const username = `${generateId()}@example.com`;
-  const password = "password";
+  const password = "password22room5K42";
   await page.goto("http://localhost:19006/register");
   await delayForSeconds(2);
   const { confirmationCode } = await fillRegisterForm({
@@ -45,7 +45,7 @@ test("One wrong code", async ({ page }) => {
 
 test("max wrong codes", async ({ page }) => {
   const username = `${generateId()}@example.com`;
-  const password = "password";
+  const password = "password22room5K42";
   await page.goto("http://localhost:19006/register");
   await delayForSeconds(2);
 

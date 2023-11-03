@@ -11,7 +11,7 @@ test.beforeAll(async () => {
 
 test("Register", async ({ page }) => {
   const username = `${generateId()}@example.com`;
-  const password = "password";
+  const password = "password22room5K42";
   const workspaceName = "my workspace";
 
   // Go to registration url

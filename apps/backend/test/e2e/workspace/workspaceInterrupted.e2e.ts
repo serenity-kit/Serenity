@@ -35,7 +35,7 @@ const expectResults = async ({
 
 test("Register and reload before onboarding", async ({ page }) => {
   const username = `${generateId()}@example.com`;
-  const password = "password";
+  const password = "password22room5K42";
   const workspaceName = "my workspace";
   await page.goto("http://localhost:19006/register");
   await delayForSeconds(2);
@@ -68,7 +68,7 @@ test("Register and reload before onboarding", async ({ page }) => {
 
 test("Register and re-login before onboarding", async ({ page }) => {
   const username = `${generateId()}@example.com`;
-  const password = "password";
+  const password = "password22room5K42";
   const workspaceName = "my workspace";
   await page.goto("http://localhost:19006/register");
   await delayForSeconds(2);

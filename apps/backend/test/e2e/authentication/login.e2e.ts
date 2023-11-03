@@ -6,7 +6,7 @@ import { e2eRegisterUser } from "../../helpers/e2e/e2eRegisterUser";
 
 test("Login without remembering web keys", async ({ page }) => {
   const username = `${generateId()}@example.com`;
-  const password = "password";
+  const password = "password22room5K42";
   const { workspace, document } = await createUserWithWorkspace({
     username,
     password,
@@ -21,7 +21,7 @@ test("Login without remembering web keys", async ({ page }) => {
 
 test("Login and remember web keys", async ({ page }) => {
   const username = `${generateId()}@example.com`;
-  const password = "password";
+  const password = "password22room5K42";
   const { workspace, document } = await createUserWithWorkspace({
     username,
     password,
@@ -36,7 +36,7 @@ test("Login and remember web keys", async ({ page }) => {
 
 test("Register then Login", async ({ page }) => {
   const username = `${generateId()}@example.com`;
-  const password = "password";
+  const password = "password22room5K42";
   await page.goto("http://localhost:19006/register");
   const { workspace, document } = await e2eRegisterUser({
     page,

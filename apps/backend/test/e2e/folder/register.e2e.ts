@@ -7,7 +7,7 @@ import { deleteFolder } from "../../helpers/e2e/deleteFolder";
 import { register } from "../../helpers/e2e/register";
 import { renameFolder } from "../../helpers/e2e/renameFolder";
 
-const password = "password";
+const password = "password22room5K42";
 const workspaceName = "a workspace";
 
 test.beforeAll(async () => {

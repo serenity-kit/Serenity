@@ -17,7 +17,7 @@ let sessionKey = "";
 let documentId1 = "";
 let snapshotId1 = "";
 let snapshotKey1 = "";
-const password = "password";
+const password = "password22room5K42";
 
 const setup = async () => {
   userData1 = await createUserWithWorkspace({

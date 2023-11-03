@@ -1,12 +1,12 @@
 import { gql } from "graphql-request";
-import setupGraphql from "../../../test/helpers/setupGraphql";
-import deleteAllRecords from "../../../test/helpers/deleteAllRecords";
 import { registerUser } from "../../../test/helpers/authentication/registerUser";
+import deleteAllRecords from "../../../test/helpers/deleteAllRecords";
+import setupGraphql from "../../../test/helpers/setupGraphql";
 
 const graphql = setupGraphql();
 const username = "7dfb4dd9-88be-414c-8a40-b5c030003d89@example.com";
 const username2 = "08844f05-ef88-4ac0-acf8-1e5163c2dcdb@example.com";
-const password = "password";
+const password = "password22room5K42";
 let sessionKey = "";
 
 const setup = async () => {

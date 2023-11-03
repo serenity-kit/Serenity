@@ -14,7 +14,7 @@ let userData1: any = undefined;
 let sessionKey = "";
 let documentId = "";
 let deviceSigningPublicKey = "";
-const password = "password";
+const password = "password22room5K42";
 
 const setup = async () => {
   userData1 = await createUserWithWorkspace({

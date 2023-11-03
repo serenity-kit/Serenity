@@ -15,7 +15,7 @@ let sessionKey = "";
 let documentId1 = "";
 let snapshotId1 = "";
 let snapshotKey1 = "";
-const password = "password";
+const password = "password22room5K42";
 
 beforeAll(async () => {
   await deleteAllRecords();

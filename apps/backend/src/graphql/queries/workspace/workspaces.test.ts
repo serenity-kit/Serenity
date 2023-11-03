@@ -12,7 +12,7 @@ let userData1: any = undefined;
 let otherWorkspace: any = undefined;
 let sessionKey = "";
 const username = "user@example.com";
-const password = "password";
+const password = "password22room5K42";
 let device: any;
 let webDevice: any;
 

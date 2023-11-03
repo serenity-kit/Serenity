@@ -8,7 +8,7 @@ const graphql = setupGraphql();
 let userData1: any = undefined;
 let otherWorkspace: any = undefined;
 const username = "7dfb4dd9-88be-414c-8a40-b5c030003d89@example.com";
-const password = "password";
+const password = "password22room5K42";
 let sessionKey = "";
 let device: any = null;
 let webDevice: any;

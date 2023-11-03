@@ -11,7 +11,7 @@ let userData1: any = undefined;
 let userData2: any = undefined;
 let childFolder: any = undefined;
 let grandChildFolder: any = undefined;
-const password = "password";
+const password = "password22room5K42";
 let workspaceKey = "";
 
 const setup = async () => {
