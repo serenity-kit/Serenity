@@ -1,15 +1,21 @@
 import {
   LocalDevice,
+  SerenitySnapshotPublicData,
   createSnapshotKey,
   decryptWorkspaceKey,
   folderDerivedKeyContext,
   snapshotDerivedKeyContext,
 } from "@serenity-tools/common";
 import { kdfDeriveFromKey } from "@serenity-tools/common/src/kdfDeriveFromKey/kdfDeriveFromKey";
-import { createSnapshot, createUpdate } from "@serenity-tools/secsync";
+import {
+  SnapshotPublicData,
+  createSnapshot,
+  createUpdate,
+} from "@serenity-tools/secsync";
 import sodium, { KeyPair } from "react-native-libsodium";
 import deleteAllRecords from "../test/helpers/deleteAllRecords";
 import { createDocument } from "../test/helpers/document/createDocument";
+import { getLastDocumentChainEventByDocumentId } from "../test/helpers/documentChain/getLastDocumentChainEventByDocumentId";
 import setupGraphql from "../test/helpers/setupGraphql";
 import {
   createSocketClient,
@@ -166,13 +172,15 @@ test("successfully creates a snapshot", async () => {
     privateKey: sodium.from_base64(webDevice!.signingPrivateKey),
     keyType: "ed25519",
   };
-  const publicData = {
+  const { state } = await getLastDocumentChainEventByDocumentId({ documentId });
+  const publicData: SnapshotPublicData & SerenitySnapshotPublicData = {
     snapshotId: id,
     docId: documentId,
     pubKey: sodium.to_base64(signatureKeyPair.publicKey),
     keyDerivationTrace,
     parentSnapshotId: initialSnapshot.id,
     parentSnapshotUpdateClocks: {},
+    documentChainEventHash: state.eventHash,
   };
   const snapshot = createSnapshot(
     "CONTENT DUMMY",

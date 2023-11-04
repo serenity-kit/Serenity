@@ -270,6 +270,10 @@ export default function SidebarFolder(props: Props) {
         publicKey: activeDevice.signingPublicKey,
       },
     });
+    const documentChainState = documentChain.resolveState({
+      events: [createDocumentChainEvent],
+      knownVersion: documentChain.version,
+    });
     const documentId = createDocumentChainEvent.transaction.id;
     const snapshotId = generateId();
     const documentName = "Untitled";
@@ -317,6 +321,7 @@ export default function SidebarFolder(props: Props) {
       docId: documentId,
       pubKey: sodium.to_base64(signatureKeyPair.publicKey),
       keyDerivationTrace: snapshotKeyDerivationTrace,
+      documentChainEventHash: documentChainState.currentState.eventHash,
       parentSnapshotId: "",
       parentSnapshotUpdateClocks: {},
     };

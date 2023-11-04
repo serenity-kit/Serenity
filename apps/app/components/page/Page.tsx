@@ -149,6 +149,11 @@ export default function Page({
         throw new Error("Workspace or workspaceKeys not found");
       }
 
+      if (!documentChainStateRef.current) {
+        console.error("documentChainStateRef.current not found");
+        throw new Error("documentChainStateRef.current not found");
+      }
+
       const documentTitle = decryptDocumentTitleBasedOnSnapshotKey({
         snapshotKey: sodium.to_base64(snapshotKeyRef.current!.key),
         ciphertext: document.nameCiphertext,
@@ -194,6 +199,7 @@ export default function Page({
         key: sodium.from_base64(snapshotKeyData.key),
         publicData: {
           keyDerivationTrace: snapshotKeyData.keyDerivationTrace,
+          documentChainEventHash: documentChainStateRef.current.eventHash,
         },
         additionalServerData: {
           documentTitleData,

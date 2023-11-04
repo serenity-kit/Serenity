@@ -18,6 +18,7 @@ import sodium, { KeyPair } from "react-native-libsodium";
 import { Device } from "../prisma/generated/output";
 import deleteAllRecords from "../test/helpers/deleteAllRecords";
 import { createDocument } from "../test/helpers/document/createDocument";
+import { getLastDocumentChainEventByDocumentId } from "../test/helpers/documentChain/getLastDocumentChainEventByDocumentId";
 import setupGraphql from "../test/helpers/setupGraphql";
 import {
   createSocketClient,
@@ -125,11 +126,13 @@ test("successfully creates a snapshot", async () => {
     privateKey: sodium.from_base64(webDevice!.signingPrivateKey),
     keyType: "ed25519",
   };
+  const { state } = await getLastDocumentChainEventByDocumentId({ documentId });
   const publicData: SnapshotPublicData & SerenitySnapshotPublicData = {
     snapshotId: id,
     docId: documentId,
     pubKey: sodium.to_base64(signatureKeyPair.publicKey),
     keyDerivationTrace,
+    documentChainEventHash: state.eventHash,
     parentSnapshotId: initialSnapshot.id,
     parentSnapshotUpdateClocks: {},
   };
@@ -293,11 +296,14 @@ test("successfully creates a snapshot", async () => {
     privateKey: sodium.from_base64(webDevice!.signingPrivateKey),
     keyType: "ed25519",
   };
+
+  const { state } = await getLastDocumentChainEventByDocumentId({ documentId });
   const publicData: SnapshotPublicData & SerenitySnapshotPublicData = {
     snapshotId: id,
     docId: documentId,
     pubKey: sodium.to_base64(signatureKeyPair.publicKey),
     keyDerivationTrace,
+    documentChainEventHash: state.eventHash,
     parentSnapshotId: firstSnapshot.publicData.snapshotId,
     parentSnapshotUpdateClocks: {
       [webDevice!.signingPublicKey]: 0,

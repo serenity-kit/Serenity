@@ -166,9 +166,14 @@ export default async function createUserWithWorkspace({
       publicKey: mainDevice.signingPublicKey,
     },
   });
+  const documentChainState = documentChain.resolveState({
+    events: [createDocumentChainEvent],
+    knownVersion: documentChain.version,
+  });
   const snapshot = createIntroductionDocumentSnapshot({
     documentId: createDocumentChainEvent.transaction.id,
     snapshotEncryptionKey: sodium.from_base64(snapshotKey.key),
+    documentChainEventHash: documentChainState.currentState.eventHash,
     keyDerivationTrace: {
       workspaceKeyId,
       trace: [

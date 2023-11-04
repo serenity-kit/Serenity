@@ -55,6 +55,7 @@ export type KeyDerivationTrace = z.infer<typeof KeyDerivationTrace>;
 
 export const SerenitySnapshotPublicData = z.object({
   keyDerivationTrace: KeyDerivationTrace,
+  documentChainEventHash: z.string(),
 });
 
 export type SerenitySnapshotPublicData = z.infer<
