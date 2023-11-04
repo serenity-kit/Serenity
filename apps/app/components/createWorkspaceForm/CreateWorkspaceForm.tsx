@@ -126,10 +126,16 @@ export function CreateWorkspaceForm(props: CreateWorkspaceFormProps) {
           publicKey: activeDevice.signingPublicKey,
         },
       });
+      const documentChainState = documentChain.resolveState({
+        events: [createDocumentChainEvent],
+        knownVersion: documentChain.version,
+      });
+
       const snapshotId = generateId();
       const snapshot = createIntroductionDocumentSnapshot({
         documentId: createDocumentChainEvent.transaction.id,
         snapshotEncryptionKey: sodium.from_base64(snapshotKey.key),
+        documentChainEventHash: documentChainState.currentState.eventHash,
         keyDerivationTrace: {
           workspaceKeyId,
           trace: [

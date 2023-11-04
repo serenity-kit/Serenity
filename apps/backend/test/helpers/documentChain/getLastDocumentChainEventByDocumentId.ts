@@ -24,5 +24,6 @@ export const getLastDocumentChainEventByDocumentId = async ({
 
   return {
     lastChainEvent,
+    state: lastChainEntryFromDb.state as documentChain.DocumentChainState,
   };
 };

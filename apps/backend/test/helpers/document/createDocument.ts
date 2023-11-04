@@ -111,6 +111,12 @@ export const createDocument = async ({
       publicKey: activeDevice.signingPublicKey,
     },
   });
+
+  const documentChainState = documentChain.resolveState({
+    events: [createDocumentChainEvent],
+    knownVersion: documentChain.version,
+  });
+
   const id = createDocumentChainEvent.transaction.id;
 
   if (!workspace) {
@@ -184,6 +190,7 @@ export const createDocument = async ({
     docId: id,
     pubKey: sodium.to_base64(signatureKeyPair.publicKey),
     keyDerivationTrace: snapshotKeyDerivationTrace,
+    documentChainEventHash: documentChainState.currentState.eventHash,
     parentSnapshotId: "",
     parentSnapshotUpdateClocks: {},
   };

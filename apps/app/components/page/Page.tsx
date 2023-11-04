@@ -102,6 +102,10 @@ export default function Page({
   const updateDocumentTitleInStore = useDocumentTitleStore(
     (state) => state.updateDocumentTitle
   );
+  let latestResolvedDocumentChainRef =
+    useRef<documentChain.ResolvedDocumentChain>();
+  let activeSnapshotDocumentChainStateRef =
+    useRef<documentChain.DocumentChainState>();
 
   const { websocketOrigin } = getEnvironmentUrls();
   const { users } = useWorkspace();
@@ -149,6 +153,13 @@ export default function Page({
         throw new Error("Workspace or workspaceKeys not found");
       }
 
+      if (!latestResolvedDocumentChainRef.current?.currentState) {
+        console.error(
+          "latestResolvedDocumentChainRef.current.current not found"
+        );
+        throw new Error("latestDocumentChainStateRef.current not found");
+      }
+
       const documentTitle = decryptDocumentTitleBasedOnSnapshotKey({
         snapshotKey: sodium.to_base64(snapshotKeyRef.current!.key),
         ciphertext: document.nameCiphertext,
@@ -168,25 +179,23 @@ export default function Page({
       });
 
       let documentShareLinkDeviceBoxes: DocumentShareLinkDeviceBox[] = [];
-      if (documentChainStateRef.current) {
-        documentShareLinkDeviceBoxes = Object.entries(
-          documentChainStateRef.current.devices
-        ).map(([shareLinkDeviceSigningPublicKey, deviceEntry]) => {
-          const { documentShareLinkDeviceBox } =
-            encryptSnapshotKeyForShareLinkDevice({
-              documentId: docId,
-              snapshotId: id,
-              authorDevice: activeDevice,
-              snapshotKey: sodium.from_base64(snapshotKeyData.key),
-              shareLinkDevice: {
-                signingPublicKey: shareLinkDeviceSigningPublicKey,
-                encryptionPublicKey: deviceEntry.encryptionPublicKey,
-                encryptionPublicKeySignature: "IGNORE",
-              },
-            });
-          return documentShareLinkDeviceBox;
-        });
-      }
+      documentShareLinkDeviceBoxes = Object.entries(
+        latestResolvedDocumentChainRef.current.currentState.devices
+      ).map(([shareLinkDeviceSigningPublicKey, deviceEntry]) => {
+        const { documentShareLinkDeviceBox } =
+          encryptSnapshotKeyForShareLinkDevice({
+            documentId: docId,
+            snapshotId: id,
+            authorDevice: activeDevice,
+            snapshotKey: sodium.from_base64(snapshotKeyData.key),
+            shareLinkDevice: {
+              signingPublicKey: shareLinkDeviceSigningPublicKey,
+              encryptionPublicKey: deviceEntry.encryptionPublicKey,
+              encryptionPublicKeySignature: "IGNORE",
+            },
+          });
+        return documentShareLinkDeviceBox;
+      });
 
       return {
         id: snapshotId,
@@ -194,6 +203,8 @@ export default function Page({
         key: sodium.from_base64(snapshotKeyData.key),
         publicData: {
           keyDerivationTrace: snapshotKeyData.keyDerivationTrace,
+          documentChainEventHash:
+            latestResolvedDocumentChainRef.current.currentState.eventHash,
         },
         additionalServerData: {
           documentTitleData,
@@ -206,6 +217,21 @@ export default function Page({
         throw new Error(
           "SnapshotProofInfo not provided when trying to derive a new key"
         );
+      }
+      if (!latestResolvedDocumentChainRef.current) {
+        console.error("latestResolvedDocumentChainRef.current not found");
+        throw new Error("latestDocumentChainStateRef.current not found");
+      }
+
+      activeSnapshotDocumentChainStateRef.current =
+        latestResolvedDocumentChainRef.current.statePerEvent[
+          snapshotProofInfo.additionalPublicData.documentChainEventHash
+        ];
+
+      // TODO refetch newest chain items and try again before returning an error
+      if (!activeSnapshotDocumentChainStateRef.current) {
+        console.error("activeSnapshotDocumentChainStateRef.current not set");
+        throw new Error("activeSnapshotDocumentChainStateRef.current not set");
       }
 
       const snapshotKeyData = await deriveExistingSnapshotKey(
@@ -291,8 +317,6 @@ export default function Page({
   });
 
   const yAwarenessRef = useRef<Awareness>(yAwareness);
-  let documentChainStateRef = useRef<documentChain.DocumentChainState>();
-  let lastDocumentChainEventRef = useRef<documentChain.DocumentChainEvent>();
 
   useEffect(() => {
     setTimeout(() => {
@@ -322,19 +346,17 @@ export default function Page({
         document = fetchedDocument as Document;
 
         if (documentChainQueryResult.data?.documentChain?.nodes) {
-          const userChainResult = documentChain.resolveState({
+          const documentChainResult = documentChain.resolveState({
             events: documentChainQueryResult.data.documentChain.nodes
               .filter(notNull)
               .map((event) => {
-                const data = documentChain.DocumentChainEvent.parse(
+                return documentChain.DocumentChainEvent.parse(
                   JSON.parse(event.serializedContent)
                 );
-                lastDocumentChainEventRef.current = data;
-                return data;
               }),
             knownVersion: documentChain.version,
           });
-          documentChainStateRef.current = userChainResult.currentState;
+          latestResolvedDocumentChainRef.current = documentChainResult;
         }
       } catch (err) {
         // TODO
@@ -450,7 +472,6 @@ export default function Page({
   }, [documentState, setDocumentState]);
 
   const updateTitle = async (title: string) => {
-    // TODO GET
     const document = await getDocument({
       documentId: docId,
     });
