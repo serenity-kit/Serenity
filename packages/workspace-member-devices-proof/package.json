@@ -1,5 +1,5 @@
 {
-  "name": "@serenity-kit/workspace-integrity",
+  "name": "@serenity-kit/workspace-member-devices-proof",
   "version": "0.0.1",
   "main": "src/index",
   "scripts": {
