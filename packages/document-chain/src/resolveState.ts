@@ -8,12 +8,15 @@ type Params = {
   knownVersion: number;
 };
 
-type ReturnType = {
+export type ResolvedDocumentChain = {
   currentState: DocumentChainState;
   statePerEvent: { [eventHash: string]: DocumentChainState };
 };
 
-export const resolveState = ({ events, knownVersion }: Params): ReturnType => {
+export const resolveState = ({
+  events,
+  knownVersion,
+}: Params): ResolvedDocumentChain => {
   if (events.length === 0) {
     throw new InvalidDocumentChainError("No events");
   }

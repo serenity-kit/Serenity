@@ -69,6 +69,12 @@ export const SharePage: React.FC<Props> = ({
   const ephemeralUpdateErrorsChangedAt = useRef<Date | null>(null);
   const hasEditorSidebar = useHasEditorSidebar();
 
+  // TODO resolve the document chain once we allow document share links to edit the document
+  let latestResolvedDocumentChainRef =
+    useRef<documentChain.ResolvedDocumentChain>();
+  let activeSnapshotDocumentChainStateRef =
+    useRef<documentChain.DocumentChainState>();
+
   const { websocketOrigin } = getEnvironmentUrls();
 
   const [state, , , yAwareness] = useYjsSync({
@@ -140,8 +146,6 @@ export const SharePage: React.FC<Props> = ({
   });
 
   const yAwarenessRef = useRef<Awareness>(yAwareness);
-  let documentChainStateRef = useRef<documentChain.DocumentChainState>();
-  let lastDocumentChainEventRef = useRef<documentChain.DocumentChainEvent>();
 
   useEffect(() => {
     setTimeout(() => {
