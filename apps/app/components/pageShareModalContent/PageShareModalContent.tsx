@@ -59,6 +59,7 @@ export function PageShareModalContent() {
   const [sharingRole, setSharingRole] = useState<ShareDocumentRole>("VIEWER");
   const documentState = useEditorStore((state) => state.documentState);
   const snapshotKey = useEditorStore((state) => state.snapshotKey);
+  const snapshotId = useEditorStore((state) => state.snapshotId);
   const [
     isPasswordModalVisibleForCreateShareLink,
     setIsPasswordModalVisibleForCreateShareLink,
@@ -129,9 +130,13 @@ export function PageShareModalContent() {
     if (snapshotKey === null) {
       throw new Error("snapshotKey not available");
     }
+    if (snapshotId === null) {
+      throw new Error("snapshotId not available");
+    }
 
     try {
       const shareLinkData = await createDocumentShareLink({
+        snapshotId,
         documentId: pageId,
         sharingRole,
         mainDevice,

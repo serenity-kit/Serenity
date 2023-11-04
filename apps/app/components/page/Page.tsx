@@ -6,6 +6,7 @@ import {
   SerenitySnapshotPublicData,
   constructUserFromSerializedUserChain,
   encryptDocumentTitle,
+  encryptSnapshotKeyForShareLinkDevice,
   generateId,
   notNull,
 } from "@serenity-tools/common";
@@ -41,7 +42,6 @@ import { DocumentState } from "../../types/documentState";
 import { WorkspaceDrawerScreenProps } from "../../types/navigationProps";
 import { createNewSnapshotKey } from "../../utils/createNewSnapshotKey/createNewSnapshotKey";
 import { deriveExistingSnapshotKey } from "../../utils/deriveExistingSnapshotKey/deriveExistingSnapshotKey";
-import { createDocumentShareLinkDeviceBox } from "../../utils/document/createDocumentShareLinkDeviceBox";
 import { useDocumentTitleStore } from "../../utils/document/documentTitleStore";
 import { getDocument } from "../../utils/document/getDocument";
 import { updateDocumentName } from "../../utils/document/updateDocumentName";
@@ -95,6 +95,7 @@ export default function Page({
     (state) => state.setActiveDocumentId
   );
   const setSnapshotKey = useEditorStore((state) => state.setSnapshotKey);
+  const setSnapshotId = useEditorStore((state) => state.setSnapshotId);
   const [isClosedErrorModal, setIsClosedErrorModal] = useState(false);
   const ephemeralUpdateErrorsChangedAt = useRef<Date | null>(null);
   const hasEditorSidebar = useHasEditorSidebar();
@@ -117,10 +118,11 @@ export default function Page({
         snapshotInFlightKeyRef.current = null;
         if (snapshotKeyRef.current) {
           setSnapshotKey(snapshotKeyRef.current.key);
+          setSnapshotId(knownSnapshotInfo.snapshotId);
         }
       }
     },
-    getNewSnapshotData: async () => {
+    getNewSnapshotData: async ({ id }) => {
       const documentResult = await runDocumentQuery({ id: docId });
       const document = documentResult.data?.document;
       if (!document) {
@@ -171,7 +173,9 @@ export default function Page({
           documentChainStateRef.current.devices
         ).map(([shareLinkDeviceSigningPublicKey, deviceEntry]) => {
           const { documentShareLinkDeviceBox } =
-            createDocumentShareLinkDeviceBox({
+            encryptSnapshotKeyForShareLinkDevice({
+              documentId: docId,
+              snapshotId: id,
               authorDevice: activeDevice,
               snapshotKey: sodium.from_base64(snapshotKeyData.key),
               shareLinkDevice: {
@@ -218,6 +222,7 @@ export default function Page({
       };
       if (snapshotKeyRef.current) {
         setSnapshotKey(snapshotKeyRef.current.key);
+        setSnapshotId(snapshotProofInfo.snapshotId);
       }
       setActiveSnapshotAndCommentKeys(
         {

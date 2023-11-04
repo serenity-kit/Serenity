@@ -160,20 +160,13 @@ function ActualSharePageScreen(
     send("start");
   });
 
-  if (
-    state.value !== "done" &&
-    state.value !== "decryptDeviceFail" &&
-    state.value !== "decryptSnapsotKeyFailed"
-  ) {
+  if (state.value !== "done" && state.value !== "decryptDeviceFail") {
     return (
       <CenterContent>
         <Spinner fadeIn />
       </CenterContent>
     );
-  } else if (
-    state.value === "decryptDeviceFail" ||
-    state.value === "decryptSnapsotKeyFailed"
-  ) {
+  } else if (state.value === "decryptDeviceFail") {
     return (
       <CenterContent>
         <InfoMessage variant="error" testID="document-share-error">
@@ -184,7 +177,6 @@ function ActualSharePageScreen(
       </CenterContent>
     );
   } else if (
-    state.context.snapshotKey &&
     state.context.device &&
     state.context.documentShareLinkQueryResult?.data?.documentShareLink
   ) {

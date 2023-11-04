@@ -1,23 +1,23 @@
 import { idLength } from "@serenity-tools/secsync";
 import { extractPrefixFromUint8Array } from "@serenity-tools/secsync/src/utils/extractPrefixFromUint8Array";
 import sodium from "react-native-libsodium";
-import { workspaceKeyEncryptionDomainContextAndVersion } from "../encryptWorkspaceKeyForDevice/encryptWorkspaceKeyForDevice";
+import { snapshotKeyEncryptionDomainContextAndVersion } from "../encryptSnapshotKeyForShareLinkDevice/encryptSnapshotKeyForShareLinkDevice";
 
 type Props = {
   ciphertext: string;
   nonce: string;
   creatorDeviceEncryptionPublicKey: string;
   receiverDeviceEncryptionPrivateKey: string;
-  workspaceId: string;
-  workspaceKeyId: string;
+  documentId: string;
+  snapshotId: string;
 };
-export const decryptWorkspaceKey = ({
+export const decryptSnapshotKey = ({
   ciphertext,
   nonce,
   creatorDeviceEncryptionPublicKey,
   receiverDeviceEncryptionPrivateKey,
-  workspaceKeyId,
-  workspaceId,
+  documentId,
+  snapshotId,
 }: Props) => {
   const value = sodium.crypto_box_open_easy(
     sodium.from_base64(ciphertext),
@@ -29,30 +29,28 @@ export const decryptWorkspaceKey = ({
     extractPrefixFromUint8Array(value, 1);
   if (
     extractedDomainContext[0] !==
-    workspaceKeyEncryptionDomainContextAndVersion[0]
+    snapshotKeyEncryptionDomainContextAndVersion[0]
   ) {
-    throw new Error("Invalid workspace key decryption domain context");
+    throw new Error("Invalid snapshot key decryption domain context");
   }
 
   const { value: valueWithoutVersion, prefix: extractedVersion } =
     extractPrefixFromUint8Array(valueWithoutDomainContext, 1);
-  if (
-    extractedVersion[0] !== workspaceKeyEncryptionDomainContextAndVersion[1]
-  ) {
-    throw new Error("Invalid workspace key decryption version");
+  if (extractedVersion[0] !== snapshotKeyEncryptionDomainContextAndVersion[1]) {
+    throw new Error("Invalid snapshot key decryption version");
   }
 
-  const { value: valueWithoutWorkspaceId, prefix: extractedWorkspaceId } =
+  const { value: valueWithoutDocumentId, prefix: extractedDocumentId } =
     extractPrefixFromUint8Array(valueWithoutVersion, idLength);
-  if (sodium.to_base64(extractedWorkspaceId) !== workspaceId) {
-    throw new Error("Invalid workspace key decryption workspaceId");
+  if (sodium.to_base64(extractedDocumentId) !== documentId) {
+    throw new Error("Invalid workspace key decryption documentId");
   }
 
-  const { value: workspaceKey, prefix: extractedWorkspaceKeyId } =
-    extractPrefixFromUint8Array(valueWithoutWorkspaceId, idLength);
-  if (sodium.to_base64(extractedWorkspaceKeyId) !== workspaceKeyId) {
-    throw new Error("Invalid workspace key decryption workspaceKeyId");
+  const { value: snapshotKey, prefix: extractedSnapshotId } =
+    extractPrefixFromUint8Array(valueWithoutDocumentId, idLength);
+  if (sodium.to_base64(extractedSnapshotId) !== snapshotId) {
+    throw new Error("Invalid workspace key decryption snapshotId");
   }
 
-  return sodium.to_base64(workspaceKey);
+  return sodium.to_base64(snapshotKey);
 };

@@ -19,7 +19,6 @@ type Context = {
   shareLinkDeviceKey?: string;
   navigation: any;
   device?: LocalDevice;
-  snapshotKey?: string;
   documentShareLinkQueryResult?: DocumentShareLinkQueryResult;
 };
 
@@ -84,7 +83,7 @@ export const sharePageScreenMachine =
             id: "decryptVirtualDevice",
             onDone: [
               {
-                target: "deviceDecrypt",
+                target: "done",
                 actions: assign({
                   device: (context, event) => {
                     return event.data;
@@ -100,34 +99,10 @@ export const sharePageScreenMachine =
           },
         },
         noAccess: {},
-        deviceDecrypt: {
-          invoke: {
-            src: "decryptSnapshotKey",
-            id: "decryptSnapshotKey",
-            onDone: [
-              {
-                target: "done",
-                actions: assign({
-                  snapshotKey: (context, event) => {
-                    return event.data;
-                  },
-                }),
-              },
-            ],
-            onError: [
-              {
-                target: "decryptSnapsotKeyFailed",
-              },
-            ],
-          },
-        },
         decryptDeviceFail: {
           type: "final",
         },
         done: {
-          type: "final",
-        },
-        decryptSnapsotKeyFailed: {
           type: "final",
         },
       },
@@ -151,28 +126,6 @@ export const sharePageScreenMachine =
           );
           const device = JSON.parse(sodium.to_string(base64DeviceData));
           return device;
-        },
-        decryptSnapshotKey: async (context, event) => {
-          if (
-            context.device &&
-            context.documentShareLinkQueryResult?.data?.documentShareLink
-              ?.activeSnapshotKeyBox
-          ) {
-            const snapshotKeyBox =
-              context.documentShareLinkQueryResult.data.documentShareLink
-                .activeSnapshotKeyBox;
-
-            const snapshotKey = sodium.crypto_box_open_easy(
-              sodium.from_base64(snapshotKeyBox.ciphertext),
-              sodium.from_base64(snapshotKeyBox.nonce),
-              sodium.from_base64(
-                snapshotKeyBox.creatorDevice.encryptionPublicKey
-              ),
-              sodium.from_base64(context.device?.encryptionPrivateKey)
-            );
-            return sodium.to_base64(snapshotKey);
-          }
-          throw new Error("Snapshot could not be decrypted");
         },
       },
       guards: {

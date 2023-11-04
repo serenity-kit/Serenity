@@ -3,7 +3,9 @@ import sodium from "react-native-libsodium";
 
 // first 0 indicating workspace key domain context
 // second 0 indicating the workspace key encryption version
-export const domainContextAndVersion = new Uint8Array([0, 0]);
+export const workspaceKeyEncryptionDomainContextAndVersion = new Uint8Array([
+  0, 0,
+]);
 
 type Props = {
   receiverDeviceEncryptionPublicKey: string;
@@ -33,7 +35,10 @@ export const encryptWorkspaceKeyForDevice = ({
     sodium.from_base64(workspaceKeyId)
   );
   content = prefixWithUint8Array(content, sodium.from_base64(workspaceId));
-  content = prefixWithUint8Array(content, domainContextAndVersion);
+  content = prefixWithUint8Array(
+    content,
+    workspaceKeyEncryptionDomainContextAndVersion
+  );
 
   const ciphertext = sodium.crypto_box_easy(
     content,
