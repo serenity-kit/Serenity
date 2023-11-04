@@ -221,6 +221,7 @@ export type CreateInitialWorkspaceStructureInput = {
   document: CreateInitialDocumentInput;
   folder: CreateInitialFolderInput;
   serializedWorkspaceChainEvent: Scalars['String'];
+  serializedWorkspaceMemberDevicesProof: Scalars['String'];
   workspace: CreateInitialWorkspaceInput;
 };
 

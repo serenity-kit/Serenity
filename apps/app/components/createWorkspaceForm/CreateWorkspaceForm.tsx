@@ -1,6 +1,7 @@
 import { useNavigation } from "@react-navigation/native";
 import * as documentChain from "@serenity-kit/document-chain";
 import * as workspaceChain from "@serenity-kit/workspace-chain";
+import * as workspaceMemberDevicesProofUtil from "@serenity-kit/workspace-member-devices-proof";
 import {
   createIntroductionDocumentSnapshot,
   createSnapshotKey,
@@ -76,12 +77,14 @@ export function CreateWorkspaceForm(props: CreateWorkspaceFormProps) {
         privateKey: mainDevice.signingPrivateKey,
         publicKey: mainDevice.signingPublicKey,
       });
+      const workspaceChainState = await workspaceChain.resolveState([event]);
       const workspaceKeyId = generateId();
       const folderId = generateId();
       const folderName = "Getting started";
       const documentName = "Introduction";
 
-      const { nonExpiredDevices } = await getAndVerifyUserDevices();
+      const { nonExpiredDevices, userId, userChainState } =
+        await getAndVerifyUserDevices();
 
       // build workspace key boxes for workspace
       const { deviceWorkspaceKeyBoxes, workspaceKey } =
@@ -180,6 +183,20 @@ export function CreateWorkspaceForm(props: CreateWorkspaceFormProps) {
         key: workspaceKey,
       });
 
+      const workspaceMemberDevicesProof =
+        workspaceMemberDevicesProofUtil.createWorkspaceMemberDevicesProof({
+          authorKeyPair: {
+            privateKey: sodium.from_base64(mainDevice.signingPrivateKey),
+            publicKey: sodium.from_base64(mainDevice.signingPublicKey),
+            keyType: "ed25519",
+          },
+          workspaceMemberDevicesProofData: {
+            clock: 0,
+            userChainHashes: { [userId]: userChainState.eventHash },
+            workspaceChainHash: workspaceChainState.lastEventHash,
+          },
+        });
+
       const createInitialWorkspaceStructureResult =
         await createInitialWorkspaceStructure({
           input: {
@@ -189,6 +206,9 @@ export function CreateWorkspaceForm(props: CreateWorkspaceFormProps) {
               workspaceKeyId,
               deviceWorkspaceKeyBoxes,
             },
+            serializedWorkspaceMemberDevicesProof: JSON.stringify(
+              workspaceMemberDevicesProof
+            ),
             serializedWorkspaceChainEvent: JSON.stringify(event),
             folder: {
               id: folderId,

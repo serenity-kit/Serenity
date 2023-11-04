@@ -1,5 +1,6 @@
 import * as documentChain from "@serenity-kit/document-chain";
 import * as workspaceChain from "@serenity-kit/workspace-chain";
+import * as workspaceMemberDevicesProofUtil from "@serenity-kit/workspace-member-devices-proof";
 import {
   LocalDevice,
   createDocumentTitleKey,
@@ -16,6 +17,7 @@ import {
 import { gql } from "graphql-request";
 import sodium from "react-native-libsodium";
 import { DeviceWorkspaceKeyBoxParams } from "../../../src/database/workspace/createWorkspace";
+import { getAndConstructUserFromUserChainTestHelper } from "../userChain/getAndConstructUserFromUserChainTestHelper";
 
 const query = gql`
   mutation createInitialWorkspaceStructure(
@@ -110,6 +112,7 @@ export const createInitialWorkspaceStructure = async ({
     privateKey: mainDevice.signingPrivateKey,
     publicKey: mainDevice.signingPublicKey,
   });
+  const workspaceChainState = await workspaceChain.resolveState([event]);
 
   const workspaceKeyId = generateId();
   const folderId = generateId();
@@ -244,6 +247,26 @@ export const createInitialWorkspaceStructure = async ({
     serializedDocumentChainEvent: JSON.stringify(createDocumentChainEvent),
   };
 
+  const userChainUser = await getAndConstructUserFromUserChainTestHelper({
+    mainDeviceSigningPublicKey: mainDevice.signingPublicKey,
+  });
+
+  const workspaceMemberDevicesProof =
+    workspaceMemberDevicesProofUtil.createWorkspaceMemberDevicesProof({
+      authorKeyPair: {
+        privateKey: sodium.from_base64(mainDevice.signingPrivateKey),
+        publicKey: sodium.from_base64(mainDevice.signingPublicKey),
+        keyType: "ed25519",
+      },
+      workspaceMemberDevicesProofData: {
+        clock: 0,
+        userChainHashes: {
+          [userChainUser.userId]: userChainUser.userChainState.eventHash,
+        },
+        workspaceChainHash: workspaceChainState.lastEventHash,
+      },
+    });
+
   // create the initial workspace structure
   const authorizationHeaders = {
     authorization: authorizationHeader,
@@ -254,6 +277,9 @@ export const createInitialWorkspaceStructure = async ({
       input: {
         workspace: readyWorkspace,
         serializedWorkspaceChainEvent: JSON.stringify(event),
+        serializedWorkspaceMemberDevicesProof: JSON.stringify(
+          workspaceMemberDevicesProof
+        ),
         folder: readyFolder,
         document: readyDocument,
         creatorDeviceSigningPublicKey: creatorDevice.signingPublicKey,

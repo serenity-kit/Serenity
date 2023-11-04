@@ -2,6 +2,7 @@ import * as documentChain from "@serenity-kit/document-chain";
 import { client, ready as opaqueReady, server } from "@serenity-kit/opaque";
 import * as userChain from "@serenity-kit/user-chain";
 import * as workspaceChain from "@serenity-kit/workspace-chain";
+import * as workspaceMemberDevicesProofUtil from "@serenity-kit/workspace-member-devices-proof";
 import {
   createAndEncryptMainDevice,
   createAndEncryptWorkspaceKeyForDevice,
@@ -60,29 +61,29 @@ export default async function createUserWithWorkspace({
 
   const mainDevice = createAndEncryptMainDevice(exportKey);
 
+  const device = await prisma.device.create({
+    data: {
+      signingPublicKey: mainDevice.signingPublicKey,
+      encryptionPublicKey: mainDevice.encryptionPublicKey,
+      encryptionPublicKeySignature: mainDevice.encryptionPublicKeySignature,
+    },
+  });
+
+  const createChainEvent = userChain.createUserChain({
+    authorKeyPair: {
+      privateKey: mainDevice.signingPrivateKey,
+      publicKey: mainDevice.signingPublicKey,
+    },
+    email: username,
+    encryptionPublicKey: mainDevice.encryptionPublicKey,
+  });
+  const userChainState = userChain.resolveState({
+    events: [createChainEvent],
+    knownVersion: userChain.version,
+  });
+
   const result = await prisma.$transaction(
     async (prisma) => {
-      const device = await prisma.device.create({
-        data: {
-          signingPublicKey: mainDevice.signingPublicKey,
-          encryptionPublicKey: mainDevice.encryptionPublicKey,
-          encryptionPublicKeySignature: mainDevice.encryptionPublicKeySignature,
-        },
-      });
-
-      const createChainEvent = userChain.createUserChain({
-        authorKeyPair: {
-          privateKey: mainDevice.signingPrivateKey,
-          publicKey: mainDevice.signingPublicKey,
-        },
-        email: username,
-        encryptionPublicKey: mainDevice.encryptionPublicKey,
-      });
-      const userChainState = userChain.resolveState({
-        events: [createChainEvent],
-        knownVersion: userChain.version,
-      });
-
       const user = await prisma.user.create({
         data: {
           id: userChainState.currentState.id,
@@ -107,7 +108,6 @@ export default async function createUserWithWorkspace({
       });
       return {
         user,
-        device,
         encryptionPrivateKey: mainDevice.encryptionPrivateKey,
         signingPrivateKey: mainDevice.signingPrivateKey,
       };
@@ -121,12 +121,15 @@ export default async function createUserWithWorkspace({
   const workspaceKeyId = generateId();
   const documentName = "Introduction";
   const user = result.user;
-  const device = result.device;
 
   const createWorkspaceChainEvent = workspaceChain.createChain({
     privateKey: mainDevice.signingPrivateKey,
     publicKey: mainDevice.signingPublicKey,
   });
+
+  const workspaceChainState = workspaceChain.resolveState([
+    createWorkspaceChainEvent,
+  ]);
 
   const { nonce, ciphertext, workspaceKey } =
     createAndEncryptWorkspaceKeyForDevice({
@@ -199,6 +202,23 @@ export default async function createUserWithWorkspace({
     key: workspaceKey,
   });
 
+  const workspaceMemberDevicesProof =
+    workspaceMemberDevicesProofUtil.createWorkspaceMemberDevicesProof({
+      authorKeyPair: {
+        privateKey: sodium.from_base64(mainDevice.signingPrivateKey),
+        publicKey: sodium.from_base64(mainDevice.signingPublicKey),
+        keyType: "ed25519",
+      },
+      workspaceMemberDevicesProofData: {
+        clock: 0,
+        userChainHashes: {
+          [userChainState.currentState.id]:
+            userChainState.currentState.eventHash,
+        },
+        workspaceChainHash: workspaceChainState.lastEventHash,
+      },
+    });
+
   const createWorkspaceResult = await createInitialWorkspaceStructure({
     userId: user.id,
     workspace: {
@@ -214,6 +234,7 @@ export default async function createUserWithWorkspace({
         },
       ],
     },
+    workspaceMemberDevicesProof,
     workspaceChainEvent: createWorkspaceChainEvent,
     folder: {
       id: folderId,
@@ -240,6 +261,7 @@ export default async function createUserWithWorkspace({
       snapshot,
     },
     creatorDeviceSigningPublicKey: device.signingPublicKey,
+    userMainDeviceSigningPublicKey: mainDevice.signingPublicKey,
     documentChainEvent: createDocumentChainEvent,
   });
 

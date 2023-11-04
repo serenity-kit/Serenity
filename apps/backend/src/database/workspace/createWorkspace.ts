@@ -1,4 +1,5 @@
 import * as workspaceChain from "@serenity-kit/workspace-chain";
+import * as workspaceMemberDevicesProofUtil from "@serenity-kit/workspace-member-devices-proof";
 import { equalArrayContent, generateId } from "@serenity-tools/common";
 import { Prisma } from "../../../prisma/generated/output";
 import {
@@ -8,6 +9,7 @@ import {
 } from "../../types/workspace";
 import { getOrCreateCreatorDevice } from "../../utils/device/getOrCreateCreatorDevice";
 import { prisma } from "../prisma";
+import { getLastUserChainEventWithState } from "../userChain/getLastUserChainEventWithState";
 
 export type DeviceWorkspaceKeyBoxParams = {
   deviceSigningPublicKey: string;
@@ -21,9 +23,11 @@ type Params = {
   infoNonce: string;
   userId: string;
   creatorDeviceSigningPublicKey: string;
+  userMainDeviceSigningPublicKey: string;
   deviceWorkspaceKeyBoxes: DeviceWorkspaceKeyBoxParams[];
   workspaceKeyId?: string | undefined;
   workspaceChainEvent: workspaceChain.CreateChainWorkspaceChainEvent;
+  workspaceMemberDevicesProof: workspaceMemberDevicesProofUtil.WorkspaceMemberDevicesProof;
 };
 
 export async function createWorkspace({
@@ -32,9 +36,11 @@ export async function createWorkspace({
   infoNonce,
   userId,
   creatorDeviceSigningPublicKey,
+  userMainDeviceSigningPublicKey,
   deviceWorkspaceKeyBoxes,
   workspaceKeyId,
   workspaceChainEvent,
+  workspaceMemberDevicesProof,
 }: Params): Promise<Workspace> {
   return await prisma.$transaction(
     async (prisma) => {
@@ -66,6 +72,34 @@ export async function createWorkspace({
         );
       }
 
+      const userChainEvent = await getLastUserChainEventWithState({
+        prisma,
+        userId,
+      });
+
+      const workspaceChainState = workspaceChain.resolveState([
+        workspaceChainEvent,
+      ]);
+
+      const workspaceMemberDevicesProofData: workspaceMemberDevicesProofUtil.WorkspaceMemberDevicesProofData =
+        {
+          clock: 0,
+          workspaceChainHash: workspaceChainState.lastEventHash,
+          userChainHashes: {
+            [userId]: userChainEvent.userChainState.eventHash,
+          },
+        };
+
+      if (
+        !workspaceMemberDevicesProofUtil.isValidWorkspaceMemberDevicesProof({
+          workspaceMemberDevicesProof,
+          authorPublicKey: userMainDeviceSigningPublicKey,
+          workspaceMemberDevicesProofData,
+        })
+      ) {
+        throw new Error("Invalid workspaceMemberDevicesProof");
+      }
+
       const rawWorkspace = await prisma.workspace.create({
         data: {
           id,
@@ -82,6 +116,14 @@ export async function createWorkspace({
             create: {
               id: workspaceKeyId || generateId(), // TODO this should be done on the client
               generation: 0,
+            },
+          },
+          workspaceMemberDevicesProofs: {
+            create: {
+              clock: 0,
+              data: workspaceMemberDevicesProofData,
+              proof: workspaceMemberDevicesProof,
+              hash: workspaceMemberDevicesProof.hash,
             },
           },
         },
@@ -103,10 +145,6 @@ export async function createWorkspace({
         where: { id: rawWorkspace.id },
         data: { infoWorkspaceKeyId: workspaceKeyId },
       });
-
-      const workspaceChainState = workspaceChain.resolveState([
-        workspaceChainEvent,
-      ]);
 
       await prisma.workspaceChainEvent.create({
         data: {
