@@ -3,6 +3,7 @@ import {
   LocalDevice,
   SerenitySnapshotPublicData,
   ShareDocumentRole,
+  decryptSnapshotKey,
 } from "@serenity-tools/common";
 import { useYjsSync } from "@serenity-tools/secsync";
 import {
@@ -63,6 +64,7 @@ export const SharePage: React.FC<Props> = ({
   const setSyncState = useEditorStore((state) => state.setSyncState);
   const setDocumentState = useEditorStore((state) => state.setDocumentState);
   const setSnapshotKey = useEditorStore((state) => state.setSnapshotKey);
+  const setSnapshotId = useEditorStore((state) => state.setSnapshotId);
   const [isClosedErrorModal, setIsClosedErrorModal] = useState(false);
   const ephemeralUpdateErrorsChangedAt = useRef<Date | null>(null);
   const hasEditorSidebar = useHasEditorSidebar();
@@ -99,23 +101,28 @@ export const SharePage: React.FC<Props> = ({
         throw new Error("Snapshot key box not found");
       }
 
-      const snapshotKey = sodium.crypto_box_open_easy(
-        sodium.from_base64(snapshotKeyBox.ciphertext),
-        sodium.from_base64(snapshotKeyBox.nonce),
-        sodium.from_base64(snapshotKeyBox.creatorDevice.encryptionPublicKey),
-        sodium.from_base64(shareLinkDevice.encryptionPrivateKey)
-      );
+      const snapshotKey = decryptSnapshotKey({
+        ciphertext: snapshotKeyBox.ciphertext,
+        nonce: snapshotKeyBox.nonce,
+        documentId: docId,
+        snapshotId: snapshotProofInfo.snapshotId,
+        creatorDeviceEncryptionPublicKey:
+          snapshotKeyBox.creatorDevice.encryptionPublicKey,
+        receiverDeviceEncryptionPrivateKey:
+          shareLinkDevice.encryptionPrivateKey,
+      });
 
-      setSnapshotKey(snapshotKey);
+      setSnapshotId(snapshotProofInfo.snapshotId);
+      setSnapshotKey(sodium.from_base64(snapshotKey));
       setActiveSnapshotAndCommentKeys(
         {
           id: snapshotProofInfo.snapshotId,
-          key: sodium.to_base64(snapshotKey),
+          key: snapshotKey,
         },
         {}
       );
 
-      return snapshotKey;
+      return sodium.from_base64(snapshotKey);
     },
     shouldSendSnapshot: () => {
       // share page link users are not supposed to create new snapshots

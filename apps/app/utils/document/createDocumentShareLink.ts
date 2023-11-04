@@ -1,13 +1,13 @@
 import * as documentChain from "@serenity-kit/document-chain";
 import {
   createDevice,
+  encryptSnapshotKeyForShareLinkDevice,
   LocalDevice,
   ShareDocumentRole,
 } from "@serenity-tools/common";
 import sodium from "react-native-libsodium";
 import { runCreateDocumentShareLinkMutation } from "../../generated/graphql";
 import { getEnvironmentUrls } from "../getEnvironmentUrls/getEnvironmentUrls";
-import { createDocumentShareLinkDeviceBox } from "./createDocumentShareLinkDeviceBox";
 
 export const getDocumentShareLinkUrl = (
   documentId: string,
@@ -20,6 +20,7 @@ export const getDocumentShareLinkUrl = (
 
 export type Props = {
   documentId: string;
+  snapshotId: string;
   snapshotKey: Uint8Array;
   sharingRole: ShareDocumentRole;
   mainDevice: LocalDevice;
@@ -28,6 +29,7 @@ export type Props = {
 export const createDocumentShareLink = async ({
   documentId,
   snapshotKey,
+  snapshotId,
   sharingRole,
   mainDevice,
   prevDocumentChainEvent,
@@ -60,10 +62,12 @@ export const createDocumentShareLink = async ({
     expiresAt: undefined,
   });
 
-  const { documentShareLinkDeviceBox } = createDocumentShareLinkDeviceBox({
+  const { documentShareLinkDeviceBox } = encryptSnapshotKeyForShareLinkDevice({
     shareLinkDevice,
     snapshotKey,
     authorDevice: mainDevice,
+    documentId,
+    snapshotId,
   });
 
   const response = await runCreateDocumentShareLinkMutation(

@@ -24,6 +24,8 @@ interface EditorState {
   removeAllSubscribers: () => void;
   snapshotKey: Uint8Array | null;
   setSnapshotKey: (snapshotKey: Uint8Array) => void;
+  snapshotId: string | null;
+  setSnapshotId: (snapshotid: string) => void;
 }
 
 export const useEditorStore = create<EditorState>((set, get) => ({
@@ -39,8 +41,12 @@ export const useEditorStore = create<EditorState>((set, get) => ({
     get().subscriptions.forEach((callback) => callback());
   },
   snapshotKey: null,
+  snapshotId: null,
   setSnapshotKey: (snapshotKey) => {
     set(() => ({ snapshotKey }));
+  },
+  setSnapshotId: (snapshotId) => {
+    set(() => ({ snapshotId }));
   },
   removeAllSubscribers: () => {
     set((state) => ({
