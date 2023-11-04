@@ -58,11 +58,15 @@ export const createNewWorkspaceKeyBoxesForActiveDevice = async ({
         nonce: workspaceKeyBox.nonce,
         receiverDeviceEncryptionPrivateKey: mainDevice?.encryptionPrivateKey!,
         creatorDeviceEncryptionPublicKey: creatorDevice?.encryptionPublicKey!,
+        workspaceId: workspace.id,
+        workspaceKeyId: workspaceKey.id,
       });
       const { nonce, ciphertext } = encryptWorkspaceKeyForDevice({
         workspaceKey: workspaceKeyString,
         receiverDeviceEncryptionPublicKey: activeDevice.encryptionPublicKey,
         creatorDeviceEncryptionPrivateKey: mainDevice.encryptionPrivateKey!,
+        workspaceId: workspace.id,
+        workspaceKeyId: workspaceKey.id,
       });
       workspaceKeyDevicePairs.push({
         workspaceKeyId: workspaceKey.id,

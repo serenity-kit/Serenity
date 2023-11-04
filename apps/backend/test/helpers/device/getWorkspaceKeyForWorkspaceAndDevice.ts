@@ -18,6 +18,8 @@ export const getWorkspaceKeyForWorkspaceAndDevice = ({
     nonce: workspaceKeyData?.nonce!,
     creatorDeviceEncryptionPublicKey: device.encryptionPublicKey,
     receiverDeviceEncryptionPrivateKey: deviceEncryptionPrivateKey,
+    workspaceId: workspace.id,
+    workspaceKeyId: workspace.currentWorkspaceKey?.id!,
   });
   return workspaceKey;
 };

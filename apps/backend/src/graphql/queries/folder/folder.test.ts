@@ -33,6 +33,8 @@ beforeAll(async () => {
     nonce: workspaceKeyBox?.nonce!,
     creatorDeviceEncryptionPublicKey: result.device.encryptionPublicKey,
     receiverDeviceEncryptionPrivateKey: result.encryptionPrivateKey,
+    workspaceId: result.workspace.id,
+    workspaceKeyId: result.workspace.currentWorkspaceKey!.id,
   });
   addedFolder = result.folder;
   const folderKeyResult = kdfDeriveFromKey({

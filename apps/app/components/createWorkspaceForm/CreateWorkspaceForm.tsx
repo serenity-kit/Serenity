@@ -88,6 +88,8 @@ export function CreateWorkspaceForm(props: CreateWorkspaceFormProps) {
         createWorkspaceKeyBoxesForDevices({
           devices: nonExpiredDevices,
           activeDevice,
+          workspaceId: event.transaction.id,
+          workspaceKeyId,
         });
       if (!workspaceKey) {
         throw new Error("Could not retrieve workspaceKey!");
@@ -163,6 +165,8 @@ export function CreateWorkspaceForm(props: CreateWorkspaceFormProps) {
           ...workspaceKeyBox!,
           creatorDevice: activeDevice,
         },
+        workspaceId: event.transaction.id,
+        workspaceKeyId,
       });
 
       const encryptedWorkspaceInfo = encryptWorkspaceInfo({

@@ -17,7 +17,7 @@ export const getWorkspaceKeys = async ({
   if (!workspaceKeys) {
     throw new Error("No workspaceKeys found for workspace");
   }
-  const decryptedWorskpaceKeys: { [workspaceKeyId: string]: string } = {};
+  const decryptedWorkspaceKeys: { [workspaceKeyId: string]: string } = {};
   for (let workspaceKey of workspaceKeys) {
     const workspaceKeyBox = workspaceKey.workspaceKeyBox;
     if (!workspaceKeyBox) {
@@ -38,11 +38,13 @@ export const getWorkspaceKeys = async ({
       nonce: workspaceKeyBox.nonce,
       creatorDeviceEncryptionPublicKey: creatorDevice.encryptionPublicKey,
       receiverDeviceEncryptionPrivateKey: activeDevice.encryptionPrivateKey!,
+      workspaceId: workspace.id,
+      workspaceKeyId: workspaceKey.id,
     });
-    decryptedWorskpaceKeys[workspaceKey.id] = workspaceKeyString;
+    decryptedWorkspaceKeys[workspaceKey.id] = workspaceKeyString;
   }
-  if (Object.keys(decryptedWorskpaceKeys).length === 0) {
+  if (Object.keys(decryptedWorkspaceKeys).length === 0) {
     throw new Error("No workspaceKeys found for workspace");
   }
-  return decryptedWorskpaceKeys;
+  return decryptedWorkspaceKeys;
 };

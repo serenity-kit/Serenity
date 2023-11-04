@@ -15,10 +15,12 @@ test("encrypt workspacekey for device, generate nonce", () => {
     receiverDeviceEncryptionPublicKey,
     creatorDeviceEncryptionPrivateKey,
     workspaceKey,
+    workspaceId: "Xap-RWCrBdK8WjQDeYLV0jnt9k_ez1ol",
+    workspaceKeyId: "GeyIuvSBeokOi0GX-ZKyw-kwFvgJNbee",
   });
   expect(typeof ciphertext).toBe("string");
   expect(typeof nonce).toBe("string");
-  expect(ciphertext.length).toBe(64);
+  expect(ciphertext.length).toBe(131);
   expect(nonce.length).toBe(32);
 });
 
@@ -34,10 +36,12 @@ test("encrypt workspacekey for device, existing nonce", () => {
     creatorDeviceEncryptionPrivateKey,
     workspaceKey,
     nonce,
+    workspaceId: "Xap-RWCrBdK8WjQDeYLV0jnt9k_ez1ol",
+    workspaceKeyId: "GeyIuvSBeokOi0GX-ZKyw-kwFvgJNbee",
   });
   expect(typeof ciphertext).toBe("string");
-  expect(ciphertext.length).toBe(64);
+  expect(ciphertext.length).toBe(131);
   expect(ciphertext).toBe(
-    "R4OVvMsR4GajXjQqm9alb6txehHUFqOCBmA1legQ8ozjWd6OI7Xg3coPVttqSutS"
+    "1NBYnOOSBCjKUfcrhz76yBiJgXyeUcPsnybpNMC0w8nvmQ6tkwyTSBnT3umjLRObWZpWY3LrHM63MJ1OvLHlQhskaPJAn9fmVD6P0d68tUjRkhTCs8b63bXe-CO5aB_5vQY"
   );
 });

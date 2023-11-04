@@ -161,6 +161,8 @@ export default function Page({
           keyDerivationTrace: snapshotKeyData.keyDerivationTrace,
         },
         workspaceKeyBox: workspace.currentWorkspaceKey.workspaceKeyBox!,
+        workspaceId,
+        workspaceKeyId: workspace.currentWorkspaceKey.id,
       });
 
       let documentShareLinkDeviceBoxes: DocumentShareLinkDeviceBox[] = [];

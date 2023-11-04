@@ -153,6 +153,8 @@ export const createDocument = async ({
     keyDerivationTrace: folder.keyDerivationTrace as KeyDerivationTrace,
     activeDevice,
     workspaceKeyBox,
+    workspaceId,
+    workspaceKeyId: workspace.workspaceKeys[0].id,
   });
   const folderKey = folderKeyTrace.trace[folderKeyTrace.trace.length - 1].key;
   const snapshotKey = createSnapshotKey({

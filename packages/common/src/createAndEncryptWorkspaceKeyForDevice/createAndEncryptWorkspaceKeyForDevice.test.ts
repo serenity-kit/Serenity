@@ -13,6 +13,8 @@ test("encrypt workspace key for device", () => {
   const result = createAndEncryptWorkspaceKeyForDevice({
     receiverDeviceEncryptionPublicKey,
     creatorDeviceEncryptionPrivateKey,
+    workspaceId: "Xap-RWCrBdK8WjQDeYLV0jnt9k_ez1ol",
+    workspaceKeyId: "GeyIuvSBeokOi0GX-ZKyw-kwFvgJNbee",
   });
   const { workspaceKey, nonce, ciphertext } = result;
   expect(typeof workspaceKey).toBe("string");
@@ -20,5 +22,5 @@ test("encrypt workspace key for device", () => {
   expect(typeof ciphertext).toBe("string");
   expect(workspaceKey.length).toBe(43);
   expect(nonce.length).toBe(32);
-  expect(ciphertext.length).toBe(64);
+  expect(ciphertext.length).toBe(131);
 });

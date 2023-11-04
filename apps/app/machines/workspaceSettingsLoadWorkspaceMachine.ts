@@ -124,7 +124,8 @@ export const workspaceSettingsLoadWorkspaceMachine =
             currentWorkspaceKey: (context) => {
               if (
                 context.workspaceQueryResult?.data?.workspace
-                  ?.currentWorkspaceKey?.workspaceKeyBox
+                  ?.currentWorkspaceKey?.workspaceKeyBox &&
+                context.workspaceId
               ) {
                 const workspaceKeyBox =
                   context.workspaceQueryResult.data.workspace
@@ -138,6 +139,10 @@ export const workspaceSettingsLoadWorkspaceMachine =
                     workspaceKeyBox.creatorDevice.encryptionPublicKey,
                   receiverDeviceEncryptionPrivateKey:
                     context.activeDevice.encryptionPrivateKey,
+                  workspaceId: context.workspaceId,
+                  workspaceKeyId:
+                    context.workspaceQueryResult.data.workspace
+                      .currentWorkspaceKey.id,
                 });
                 return {
                   id: context.workspaceQueryResult.data.workspace
@@ -150,7 +155,10 @@ export const workspaceSettingsLoadWorkspaceMachine =
             workspaceInfo: (context) => {
               let workspaceName = "";
 
-              if (context.workspaceQueryResult?.data?.workspace) {
+              if (
+                context.workspaceQueryResult?.data?.workspace &&
+                context.workspaceId
+              ) {
                 const workspaceData =
                   context.workspaceQueryResult.data.workspace;
 
@@ -172,6 +180,8 @@ export const workspaceSettingsLoadWorkspaceMachine =
                         ?.creatorDevice.encryptionPublicKey,
                     receiverDeviceEncryptionPrivateKey:
                       context.activeDevice.encryptionPrivateKey,
+                    workspaceKeyId: workspaceData.infoWorkspaceKey?.id,
+                    workspaceId: context.workspaceId,
                   });
                   const decryptedWorkspaceInfo = decryptWorkspaceInfo({
                     ciphertext: workspaceData.infoCiphertext,

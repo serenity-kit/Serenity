@@ -58,6 +58,8 @@ test("user cannot remove self", async () => {
     receiverDeviceEncryptionPublicKey: newDevice.encryptionPublicKey,
     creatorDeviceEncryptionPrivateKey: userData1.deviceEncryptionPrivateKey,
     workspaceKey,
+    workspaceId: userData1.workspace.id,
+    workspaceKeyId: userData1.workspace.currentWorkspaceKey.id,
   });
   const deviceWorkspaceKeyBoxes: WorkspaceDeviceParing[] = [
     {
@@ -128,6 +130,8 @@ test("user cannot revoke own main device", async () => {
     receiverDeviceEncryptionPublicKey: newDevice.encryptionPublicKey,
     creatorDeviceEncryptionPrivateKey: userData1.deviceEncryptionPrivateKey,
     workspaceKey,
+    workspaceId: userData1.workspace.id,
+    workspaceKeyId: userData1.workspace.currentWorkspaceKey.id,
   });
   const deviceWorkspaceKeyBoxes: WorkspaceDeviceParing[] = [
     {
@@ -191,17 +195,23 @@ test("user can remove another user", async () => {
     receiverDeviceEncryptionPublicKey: userData1.webDevice.signingPublicKey,
     creatorDeviceEncryptionPrivateKey: userData1.webDevice.encryptionPrivateKey,
     workspaceKey,
+    workspaceId: userData1.workspace.id,
+    workspaceKeyId: userData1.workspace.currentWorkspaceKey.id,
   });
   const user2MainDeviceKeyBox = encryptWorkspaceKeyForDevice({
     receiverDeviceEncryptionPublicKey: userData1.mainDevice.signingPublicKey,
     creatorDeviceEncryptionPrivateKey:
       userData1.mainDevice.encryptionPrivateKey,
     workspaceKey,
+    workspaceId: userData1.workspace.id,
+    workspaceKeyId: userData1.workspace.currentWorkspaceKey.id,
   });
   const user1WebDeviceDeviceKeyBox = encryptWorkspaceKeyForDevice({
     receiverDeviceEncryptionPublicKey: userData1.webDevice.signingPublicKey,
     creatorDeviceEncryptionPrivateKey: userData1.webDevice.encryptionPrivateKey,
     workspaceKey,
+    workspaceId: userData1.workspace.id,
+    workspaceKeyId: userData1.workspace.currentWorkspaceKey.id,
   });
   const approvedDeviceKeyBoxes = [
     {
@@ -240,12 +250,16 @@ test("user can remove another user", async () => {
     creatorDeviceEncryptionPrivateKey:
       userData1.mainDevice.encryptionPrivateKey,
     workspaceKey,
+    workspaceId: userData1.workspace.id,
+    workspaceKeyId: userData1.workspace.currentWorkspaceKey.id,
   });
   const user1WebDeviceGen1 = encryptWorkspaceKeyForDevice({
     receiverDeviceEncryptionPublicKey: userData1.webDevice.signingPublicKey,
     creatorDeviceEncryptionPrivateKey:
       userData1.mainDevice.encryptionPrivateKey,
     workspaceKey,
+    workspaceId: userData1.workspace.id,
+    workspaceKeyId: userData1.workspace.currentWorkspaceKey.id,
   });
   const workspaceUsersBefore = await prisma.usersToWorkspaces.findMany({
     where: { workspaceId: userData1.workspace.id },
@@ -378,6 +392,8 @@ test("user can remove another user", async () => {
     keyDerivationTrace: firstFolder.keyDerivationTrace,
     activeDevice: userData1.webDevice,
     workspaceKeyBox: oldWorkspaceKeyBox,
+    workspaceId: userData1.workspace.id,
+    workspaceKeyId: workspace.workspaceKeys[1].id,
   });
   let parentKey = workspaceKey;
   if (folderKeyTrace.trace.length > 1) {
@@ -421,6 +437,8 @@ test("user can rotate key for multiple devices", async () => {
     receiverDeviceEncryptionPublicKey: userData1.device.signingPublicKey,
     creatorDeviceEncryptionPrivateKey: userData1.deviceEncryptionPrivateKey,
     workspaceKey,
+    workspaceId: userData1.workspace.id,
+    workspaceKeyId: userData1.workspace.currentWorkspaceKey.id,
   });
   const user2DeviceKeyBoxes = [
     {
@@ -458,11 +476,15 @@ test("user can rotate key for multiple devices", async () => {
     receiverDeviceEncryptionPublicKey: userData1.device.signingPublicKey,
     creatorDeviceEncryptionPrivateKey: userData1.deviceEncryptionPrivateKey,
     workspaceKey,
+    workspaceId: userData1.workspace.id,
+    workspaceKeyId: userData1.workspace.currentWorkspaceKey.id,
   });
   const keyData2 = encryptWorkspaceKeyForDevice({
     receiverDeviceEncryptionPublicKey: userData1.webDevice.signingPublicKey,
     creatorDeviceEncryptionPrivateKey: userData1.deviceEncryptionPrivateKey,
     workspaceKey,
+    workspaceId: userData1.workspace.id,
+    workspaceKeyId: userData1.workspace.currentWorkspaceKey.id,
   });
   const loginResult = await createDeviceAndLogin({
     username: userData1.user.username,
@@ -475,6 +497,8 @@ test("user can rotate key for multiple devices", async () => {
     receiverDeviceEncryptionPublicKey: newDevice.signingPublicKey,
     creatorDeviceEncryptionPrivateKey: userData1.deviceEncryptionPrivateKey,
     workspaceKey,
+    workspaceId: userData1.workspace.id,
+    workspaceKeyId: userData1.workspace.currentWorkspaceKey.id,
   });
   const deviceWorkspaceKeyBoxes: WorkspaceDeviceParing[] = [
     {

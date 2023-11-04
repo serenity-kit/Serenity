@@ -73,6 +73,8 @@ const setup = async () => {
       userAndWorkspaceData.device.encryptionPublicKey,
     receiverDeviceEncryptionPrivateKey:
       userAndWorkspaceData.encryptionPrivateKey,
+    workspaceId,
+    workspaceKeyId: userAndWorkspaceData.workspace.currentWorkspaceKey.id,
   });
   addedFolder = userAndWorkspaceData.folder;
   const folderKeyResult = kdfDeriveFromKey({
@@ -215,11 +217,15 @@ test("delete a device", async () => {
     receiverDeviceEncryptionPublicKey: device!.encryptionPublicKey,
     creatorDeviceEncryptionPrivateKey: encryptionPrivateKey,
     workspaceKey,
+    workspaceId,
+    workspaceKeyId: userAndWorkspaceData.workspace.currentWorkspaceKey.id,
   });
   const workspaceKeyBox2 = encryptWorkspaceKeyForDevice({
     receiverDeviceEncryptionPublicKey: webDevice!.encryptionPublicKey,
     creatorDeviceEncryptionPrivateKey: encryptionPrivateKey,
     workspaceKey,
+    workspaceId,
+    workspaceKeyId: userAndWorkspaceData.workspace.currentWorkspaceKey.id,
   });
   const newDeviceWorkspaceKeyBoxes: WorkspaceWithWorkspaceDevicesParing[] = [
     {
@@ -374,6 +380,8 @@ test("successfully creates a snapshot", async () => {
     creatorDeviceEncryptionPublicKey:
       workspaceKeyBox.creatorDevice.encryptionPublicKey,
     receiverDeviceEncryptionPrivateKey: encryptionPrivateKey,
+    workspaceId,
+    workspaceKeyId: userAndWorkspaceData.workspace.currentWorkspaceKey.id,
   });
   const folderKeyResult = kdfDeriveFromKey({
     key: workspaceKey,

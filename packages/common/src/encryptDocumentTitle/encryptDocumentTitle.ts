@@ -20,6 +20,8 @@ type Params = {
   workspaceKeyBox: WorkspaceKeyBox;
   title: string;
   publicData?: any;
+  workspaceId: string;
+  workspaceKeyId: string;
 };
 
 type EncryptDocumentTitleByKeyParams = {
@@ -44,7 +46,13 @@ export const encryptDocumentTitleByKey = (
 };
 
 export const encryptDocumentTitle = (params: Params) => {
-  const { activeDevice, workspaceKeyBox } = params;
+  const {
+    activeDevice,
+    workspaceKeyBox,
+
+    workspaceId,
+    workspaceKeyId,
+  } = params;
   const snapshotFolderKeyData = deriveKeysFromKeyDerivationTrace({
     keyDerivationTrace: params.snapshot.keyDerivationTrace,
     activeDevice: {
@@ -55,6 +63,8 @@ export const encryptDocumentTitle = (params: Params) => {
       encryptionPublicKeySignature: activeDevice.encryptionPublicKeySignature!,
     },
     workspaceKeyBox,
+    workspaceId,
+    workspaceKeyId,
   });
   const snapshotKeyData =
     snapshotFolderKeyData.trace[snapshotFolderKeyData.trace.length - 1];

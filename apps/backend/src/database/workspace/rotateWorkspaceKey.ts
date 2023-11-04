@@ -92,7 +92,7 @@ export const rotateWorkspaceKey = async ({
   const createdWorkspaceKeyBoxes = await prisma.workspaceKeyBox.findMany({
     where: { workspaceKeyId: newWorkspaceKey.id },
   });
-  const returnedWorskpaceKey: WorkspaceKey = newWorkspaceKey;
-  returnedWorskpaceKey.workspaceKeyBoxes = createdWorkspaceKeyBoxes;
-  return returnedWorskpaceKey;
+  const returnedWorkspaceKey: WorkspaceKey = newWorkspaceKey;
+  returnedWorkspaceKey.workspaceKeyBoxes = createdWorkspaceKeyBoxes;
+  return returnedWorkspaceKey;
 };

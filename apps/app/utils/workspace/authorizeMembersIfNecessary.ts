@@ -92,6 +92,8 @@ export const authorizeMembersIfNecessary = async ({
                     workspaceKeyBox.creatorDevice?.encryptionPublicKey!,
                   receiverDeviceEncryptionPrivateKey:
                     activeDevice.encryptionPrivateKey!,
+                  workspaceId,
+                  workspaceKeyId: id,
                 });
                 return {
                   workspaceKeyId: id,
@@ -110,6 +112,8 @@ export const authorizeMembersIfNecessary = async ({
                     creatorDeviceEncryptionPrivateKey:
                       activeDevice.encryptionPrivateKey,
                     workspaceKey: key,
+                    workspaceId,
+                    workspaceKeyId,
                   });
                   return {
                     receiverDeviceSigningPublicKey:

@@ -112,6 +112,8 @@ export default function SidebarPage(props: Props) {
             keyDerivationTrace: snapshot.keyDerivationTrace,
           },
           workspaceKeyBox: documentWorkspaceKey.workspaceKeyBox!,
+          workspaceId: props.workspaceId,
+          workspaceKeyId: documentWorkspaceKey.id,
         });
         updateDocumentTitleInStore({
           documentId: props.documentId,

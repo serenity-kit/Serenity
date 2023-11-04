@@ -122,10 +122,18 @@ export default async function createUserWithWorkspace({
   const documentName = "Introduction";
   const user = result.user;
   const device = result.device;
+
+  const createWorkspaceChainEvent = workspaceChain.createChain({
+    privateKey: mainDevice.signingPrivateKey,
+    publicKey: mainDevice.signingPublicKey,
+  });
+
   const { nonce, ciphertext, workspaceKey } =
     createAndEncryptWorkspaceKeyForDevice({
       receiverDeviceEncryptionPublicKey: mainDevice.encryptionPublicKey,
       creatorDeviceEncryptionPrivateKey: mainDevice.encryptionPrivateKey,
+      workspaceKeyId,
+      workspaceId: createWorkspaceChainEvent.transaction.id,
     });
   const folderName = "Getting Started";
   const folderIdSignature = sodium.to_base64(
@@ -179,11 +187,6 @@ export default async function createUserWithWorkspace({
       ],
     },
     device: mainDevice,
-  });
-
-  const createWorkspaceChainEvent = workspaceChain.createChain({
-    privateKey: mainDevice.signingPrivateKey,
-    publicKey: mainDevice.signingPublicKey,
   });
 
   const workspaceInfo = await encryptWorkspaceInfo({
@@ -246,6 +249,8 @@ export default async function createUserWithWorkspace({
     receiverDeviceEncryptionPublicKey: webDevice.encryptionPublicKey,
     creatorDeviceEncryptionPrivateKey: mainDevice.encryptionPrivateKey,
     workspaceKey,
+    workspaceKeyId,
+    workspaceId: createWorkspaceChainEvent.transaction.id,
   });
 
   await attachDeviceToWorkspaces({

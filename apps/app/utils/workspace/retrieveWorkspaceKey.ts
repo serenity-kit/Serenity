@@ -43,6 +43,8 @@ export const retrieveWorkspaceKey = async ({
     nonce: workspaceKeyBox.nonce,
     creatorDeviceEncryptionPublicKey: creatorDevice.encryptionPublicKey,
     receiverDeviceEncryptionPrivateKey: activeDevice.encryptionPrivateKey!,
+    workspaceId: workspace.id,
+    workspaceKeyId: workspaceKeyId,
   });
   return {
     id: workspace?.currentWorkspaceKey?.id,

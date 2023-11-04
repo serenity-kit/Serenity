@@ -29,11 +29,15 @@ const setup = async () => {
     nonce: workspaceKeyBox?.nonce!,
     creatorDeviceEncryptionPublicKey: userData1.device.encryptionPublicKey,
     receiverDeviceEncryptionPrivateKey: userData1.encryptionPrivateKey,
+    workspaceId: userData1.workspace.id,
+    workspaceKeyId: userData1.workspace.currentWorkspaceKey.id,
   });
   const snapshotKeyTrace = deriveKeysFromKeyDerivationTrace({
     keyDerivationTrace: userData1.snapshot.publicData.keyDerivationTrace,
     activeDevice: userData1.mainDevice,
     workspaceKeyBox: userData1.workspace.currentWorkspaceKey.workspaceKeyBox,
+    workspaceId: userData1.workspace.id,
+    workspaceKeyId: userData1.workspace.currentWorkspaceKey.id,
   });
   snapshotKey = snapshotKeyTrace.trace[snapshotKeyTrace.trace.length - 1].key;
   sessionKey = userData1.sessionKey;
@@ -88,6 +92,8 @@ test("user should be retrieve a document", async () => {
     keyDerivationTrace: snapshot.keyDerivationTrace,
     activeDevice: userData1.mainDevice,
     workspaceKeyBox: userData1.workspace.currentWorkspaceKey.workspaceKeyBox,
+    workspaceId: userData1.workspace.id,
+    workspaceKeyId: userData1.workspace.currentWorkspaceKey.id,
   });
   const snapshotKey =
     snapshotKeyTrace.trace[snapshotKeyTrace.trace.length - 1].key;

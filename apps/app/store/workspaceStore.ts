@@ -131,6 +131,8 @@ export const loadRemoteWorkspaces = async ({
               .encryptionPublicKey,
           receiverDeviceEncryptionPrivateKey:
             activeDevice?.encryptionPrivateKey,
+          workspaceId: workspace.id,
+          workspaceKeyId: workspace.infoWorkspaceKey?.id,
         });
         const decryptedWorkspaceInfo = decryptWorkspaceInfo({
           ciphertext: workspace.infoCiphertext,

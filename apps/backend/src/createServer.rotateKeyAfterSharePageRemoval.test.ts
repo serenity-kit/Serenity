@@ -62,6 +62,9 @@ const setup = async () => {
     nonce: workspaceKeyBox?.nonce!,
     creatorDeviceEncryptionPublicKey: result.device.encryptionPublicKey,
     receiverDeviceEncryptionPrivateKey: result.encryptionPrivateKey,
+    workspaceId,
+    // @ts-expect-error
+    workspaceKeyId: result.workspace.currentWorkspaceKey?.id,
   });
   addedFolder = result.folder;
   const folderKeyResult = kdfDeriveFromKey({
@@ -256,6 +259,8 @@ test("successfully creates a snapshot", async () => {
     creatorDeviceEncryptionPublicKey:
       workspaceKeyBox.creatorDevice.encryptionPublicKey,
     receiverDeviceEncryptionPrivateKey: encryptionPrivateKey,
+    workspaceId: workspaceResult.workspace.id,
+    workspaceKeyId: workspaceResult.workspace.currentWorkspaceKey.id,
   });
   const folderKeyResult = kdfDeriveFromKey({
     key: workspaceKey,

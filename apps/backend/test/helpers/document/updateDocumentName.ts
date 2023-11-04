@@ -144,6 +144,8 @@ export const updateDocumentName = async ({
     keyDerivationTrace: snapshot.keyDerivationTrace,
     activeDevice,
     workspaceKeyBox,
+    workspaceId: workspace.id,
+    workspaceKeyId,
   });
   const snapshotKey =
     snapshotKeyTrace.trace[snapshotKeyTrace.trace.length - 1].key;

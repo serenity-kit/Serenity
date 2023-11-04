@@ -94,6 +94,8 @@ export default function AccountMenu({
           workspaceData.infoWorkspaceKey?.workspaceKeyBox?.creatorDevice
             .encryptionPublicKey,
         receiverDeviceEncryptionPrivateKey: activeDevice?.encryptionPrivateKey,
+        workspaceId: workspaceData.id,
+        workspaceKeyId: workspaceData.infoWorkspaceKey?.id,
       });
       const decryptedWorkspaceInfo = decryptWorkspaceInfo({
         ciphertext: workspaceData.infoCiphertext,

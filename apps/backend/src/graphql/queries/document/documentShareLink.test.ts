@@ -31,6 +31,8 @@ const setup = async () => {
     keyDerivationTrace: userData.folder.keyDerivationTrace,
     activeDevice: userData.webDevice,
     workspaceKeyBox: user1Workspace.currentWorkspaceKey.workspaceKeyBox,
+    workspaceId: userData.workspace.id,
+    workspaceKeyId: user1Workspace.currentWorkspaceKey.id,
   });
   const snapshotKeyData = createSnapshotKey({
     folderKey: folderKeyTrace.trace[folderKeyTrace.trace.length - 1].key,
