@@ -19,6 +19,7 @@ export const initialize = async () => {
       "content"	TEXT NOT NULL,
       "state"	TEXT NOT NULL,
       "workspaceId"	TEXT NOT NULL,
+      "hash"	TEXT NOT NULL,
       PRIMARY KEY("position","workspaceId")
       FOREIGN KEY("workspaceId") REFERENCES "${workspaceStore.table}" ON DELETE CASCADE
     );`
@@ -69,17 +70,17 @@ export const getLastWorkspaceChainEvent = ({
   return getLastWorkspaceChainEventCache[workspaceId];
 };
 
-export const getWorkspaceChainEventByEventHash = ({
+export const getWorkspaceChainEventByHash = ({
   workspaceId,
-  eventHash,
+  hash,
 }: {
   workspaceId: string;
-  eventHash: string;
+  hash: string;
 }) => {
   // TODO create helper to get one
   const workspaceChainEventResult = sql.execute(
-    `SELECT * FROM ${table} WHERE workspaceId = ? AND eventHash  = ? LIMIT 1`,
-    [workspaceId, eventHash]
+    `SELECT * FROM ${table} WHERE workspaceId = ? AND hash  = ? LIMIT 1`,
+    [workspaceId, hash]
   ) as any;
   const workspaceChainEvent =
     workspaceChainEventResult.length > 0
@@ -105,11 +106,12 @@ export const createWorkspaceChainEvent = ({
   position: number;
   triggerRerender?: boolean;
 }) => {
-  sql.execute(`INSERT INTO ${table} VALUES (?, ?, ?, ?);`, [
+  sql.execute(`INSERT INTO ${table} VALUES (?, ?, ?, ?, ?);`, [
     position,
     JSON.stringify(event),
     JSON.stringify(state),
     workspaceId,
+    workspaceChain.hashTransaction(event.transaction),
   ]);
   if (triggerRerender !== false) {
     triggerGetLastWorkspaceChain();

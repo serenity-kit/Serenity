@@ -18,6 +18,7 @@ export const workspaceChainQuery = queryField((t) => {
           "Requested too many workspace chain events. First value exceeds 5000."
         );
       }
+
       if (!context.user) {
         throw new AuthenticationError("Not authenticated");
       }

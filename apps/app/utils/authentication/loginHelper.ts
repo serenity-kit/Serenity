@@ -13,6 +13,10 @@ import {
   runMeQuery,
   runStartLoginMutation,
 } from "../../generated/graphql";
+import {
+  getWorkspaceChainEventByHash,
+  loadRemoteWorkspaceChain,
+} from "../../store/workspaceChainStore";
 import { setMainDevice } from "../device/mainDeviceMemoryStore";
 import { getOpaqueServerPublicKey } from "../getOpaqueServerPublicKey/getOpaqueServerPublicKey";
 import { removeLastUsedDocumentIdAndWorkspaceId } from "../lastUsedWorkspaceAndDocumentStore/lastUsedWorkspaceAndDocumentStore";
@@ -179,11 +183,6 @@ export const login = async ({
     )
   );
 
-  console.log(
-    "finishLoginResult.data.finishLogin",
-    finishLoginResult.data.finishLogin.workspaceMemberDevicesProofs
-  );
-
   const newWorkspaceMemberDevicesProofs: {
     workspaceId: string;
     serializedWorkspaceMemberDevicesProof: string;
@@ -194,14 +193,22 @@ export const login = async ({
       workspaceMemberDevicesProofUtil.WorkspaceMemberDevicesProofData.parse(
         JSON.parse(entry.serializedData)
       );
-    // const currentWorkspaceChainResult = await loadRemoteWorkspaceChain({
-    //   workspaceId: entry.workspaceId,
-    //   sessionKey: result.sessionKey,
-    // });
-    // console.log(currentWorkspaceChainResult);
 
-    // TODO verify the workspace chain event exists in the loaded chain
-    // getWorkspaceChainEventByEventHash
+    // load latest workspace chain entries and check if the workspace chain event is included
+    // to verify that the server is providing this or a newer workspace chain
+    await loadRemoteWorkspaceChain({
+      workspaceId: entry.workspaceId,
+      sessionKey: result.sessionKey,
+    });
+    const workspaceChainEvent = getWorkspaceChainEventByHash({
+      hash: data.workspaceChainHash,
+      workspaceId: entry.workspaceId,
+    });
+    if (!workspaceChainEvent) {
+      throw new Error(
+        "Workspace chain event not found in the current workspace chain"
+      );
+    }
 
     const isValid =
       workspaceMemberDevicesProofUtil.isValidWorkspaceMemberDevicesProof({
