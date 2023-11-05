@@ -209,5 +209,6 @@ export const loadRemoteWorkspaceChain = async ({
     });
     triggerGetLastWorkspaceChain();
   }
+
   return getLastWorkspaceChainEvent({ workspaceId });
 };

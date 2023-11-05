@@ -196,7 +196,7 @@ export const login = async ({
 
     // load latest workspace chain entries and check if the workspace chain event is included
     // to verify that the server is providing this or a newer workspace chain
-    await loadRemoteWorkspaceChain({
+    const { state } = await loadRemoteWorkspaceChain({
       workspaceId: entry.workspaceId,
       sessionKey: result.sessionKey,
     });
@@ -233,7 +233,7 @@ export const login = async ({
             ...data.userChainHashes,
             [newUserChainState.id]: newUserChainState.eventHash,
           },
-          workspaceChainHash: data.workspaceChainHash,
+          workspaceChainHash: state.lastEventHash,
         },
       });
     newWorkspaceMemberDevicesProofs.push({

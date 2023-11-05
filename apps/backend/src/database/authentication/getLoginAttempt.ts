@@ -5,9 +5,11 @@ type Params = {
 };
 
 export async function getLoginAttempt({ loginAttemptId }: Params) {
-  return await prisma.loginAttempt.findUniqueOrThrow({
+  return await prisma.loginAttempt.findFirstOrThrow({
     where: {
       id: loginAttemptId,
+      // only valid for 30 seconds
+      createdAt: { lt: new Date(Date.now() + 1000 * 30) },
     },
   });
 }
