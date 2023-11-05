@@ -69,6 +69,29 @@ export const getLastWorkspaceChainEvent = ({
   return getLastWorkspaceChainEventCache[workspaceId];
 };
 
+export const getWorkspaceChainEventByEventHash = ({
+  workspaceId,
+  eventHash,
+}: {
+  workspaceId: string;
+  eventHash: string;
+}) => {
+  // TODO create helper to get one
+  const workspaceChainEventResult = sql.execute(
+    `SELECT * FROM ${table} WHERE workspaceId = ? AND eventHash  = ? LIMIT 1`,
+    [workspaceId, eventHash]
+  ) as any;
+  const workspaceChainEvent =
+    workspaceChainEventResult.length > 0
+      ? {
+          position: workspaceChainEventResult[0].position,
+          event: JSON.parse(workspaceChainEventResult[0].content),
+          state: JSON.parse(workspaceChainEventResult[0].state),
+        }
+      : undefined;
+  return workspaceChainEvent;
+};
+
 export const createWorkspaceChainEvent = ({
   workspaceId,
   event,
@@ -114,20 +137,27 @@ export const useLocalLastWorkspaceChainEvent = ({
 
 export const loadRemoteWorkspaceChain = async ({
   workspaceId,
+  sessionKey,
 }: {
   workspaceId: string;
+  sessionKey?: string;
 }) => {
   const lastEvent = getLastWorkspaceChainEvent({ workspaceId });
 
-  const workspaceChainQueryResult = await runWorkspaceChainQuery({
-    workspaceId,
-    after: lastEvent
-      ? sodium.to_base64(
-          lastEvent.position.toString(),
-          sodium.base64_variants.ORIGINAL
-        )
-      : undefined,
-  });
+  const workspaceChainQueryResult = await runWorkspaceChainQuery(
+    {
+      workspaceId,
+      after: lastEvent
+        ? sodium.to_base64(
+            lastEvent.position.toString(),
+            sodium.base64_variants.ORIGINAL
+          )
+        : undefined,
+    },
+    sessionKey
+      ? { fetchOptions: { headers: { Authorization: sessionKey } } }
+      : undefined
+  );
 
   if (workspaceChainQueryResult.error) {
     showToast("Failed to load the workspace.", "error");

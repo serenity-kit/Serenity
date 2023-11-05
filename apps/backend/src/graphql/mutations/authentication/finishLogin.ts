@@ -10,7 +10,9 @@ import { addSessionKeyToLoginAttempt } from "../../../database/authentication/ad
 import { getLoginAttempt } from "../../../database/authentication/getLoginAttempt";
 import { getUserByUsername } from "../../../database/user/getUserByUsername";
 import { getUserChainByUsername } from "../../../database/userChain/getUserChainByUsername";
+import { getWorkspaceMemberDevicesProofs } from "../../../database/workspace/getWorkspaceMemberDevicesProofs";
 import { UserChainEvent } from "../../types/userChain";
+import { WorkspaceMemberDevicesProof } from "../../types/workspaceMemberDevicesProof";
 
 export const FinishLoginInput = inputObjectType({
   name: "FinishLoginInput",
@@ -36,6 +38,9 @@ export const FinishLoginResult = objectType({
     });
     t.nonNull.field("mainDevice", {
       type: FinishLoginMainDevice,
+    });
+    t.nonNull.list.nonNull.field("workspaceMemberDevicesProofs", {
+      type: WorkspaceMemberDevicesProof,
     });
   },
 });
@@ -72,6 +77,10 @@ export const finishLoginMutation = mutationField("finishLogin", {
       username: loginAttempt.username,
     });
     const user = await getUserByUsername({ username: loginAttempt.username });
+    const workspaceMemberDevicesProofs = await getWorkspaceMemberDevicesProofs({
+      userId: user.id,
+      take: 100,
+    });
 
     return {
       userChain,
@@ -79,6 +88,7 @@ export const finishLoginMutation = mutationField("finishLogin", {
         ciphertext: user.mainDeviceCiphertext,
         nonce: user.mainDeviceNonce,
       },
+      workspaceMemberDevicesProofs,
     };
   },
 });

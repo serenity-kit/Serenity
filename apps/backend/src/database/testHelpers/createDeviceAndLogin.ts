@@ -1,11 +1,15 @@
 import { client, ready as opaqueReady, server } from "@serenity-kit/opaque";
 import * as userChain from "@serenity-kit/user-chain";
+import * as workspaceMemberDevicesProofUtil from "@serenity-kit/workspace-member-devices-proof";
 import { LocalDevice, createDevice, generateId } from "@serenity-tools/common";
+import sodium from "libsodium-wrappers";
+import { getLastWorkspaceChainEvent } from "../../../test/helpers/workspace/getLastWorkspaceChainEvent";
 import { addHours } from "../../utils/addHours/addHours";
 import { createSessionAndDevice } from "../authentication/createSessionAndDevice";
 import { prisma } from "../prisma";
 import { getUserByUsername } from "../user/getUserByUsername";
 import { getLastUserChainEventWithState } from "../userChain/getLastUserChainEventWithState";
+import { getWorkspaceMemberDevicesProofs } from "../workspace/getWorkspaceMemberDevicesProofs";
 
 type Params = {
   username: string;
@@ -45,10 +49,11 @@ export const createDeviceAndLogin = async ({
   const webDevice = createDevice("user");
 
   const user = await getUserByUsername({ username });
-  const { lastUserChainEvent } = await getLastUserChainEventWithState({
-    prisma,
-    userId: user.id,
-  });
+  const { lastUserChainEvent, userChainState } =
+    await getLastUserChainEventWithState({
+      prisma,
+      userId: user.id,
+    });
 
   const expiresAt = addHours(new Date(), 1);
   const addDeviceEvent = userChain.addDevice({
@@ -62,6 +67,48 @@ export const createDeviceAndLogin = async ({
     prevEvent: lastUserChainEvent.content,
     expiresAt,
   });
+  const newUserChainState = userChain.applyEvent({
+    state: userChainState,
+    event: addDeviceEvent,
+    knownVersion: userChain.version,
+  });
+
+  const existingWorkspaceMemberDevicesProofs =
+    await getWorkspaceMemberDevicesProofs({
+      userId: user.id,
+      take: 100,
+    });
+
+  const workspaceMemberDevicesProofEntries = await Promise.all(
+    existingWorkspaceMemberDevicesProofs.map(async (existingEntry) => {
+      const { workspaceChainState } = await getLastWorkspaceChainEvent({
+        workspaceId: existingEntry.workspaceId,
+      });
+
+      const workspaceMemberDevicesProofData: workspaceMemberDevicesProofUtil.WorkspaceMemberDevicesProofData =
+        {
+          clock: existingEntry.proof.clock + 1,
+          userChainHashes: {
+            ...existingEntry.data.userChainHashes,
+            [user.id]: newUserChainState.eventHash,
+          },
+          workspaceChainHash: workspaceChainState.lastEventHash,
+        };
+      const newProof =
+        workspaceMemberDevicesProofUtil.createWorkspaceMemberDevicesProof({
+          authorKeyPair: {
+            privateKey: sodium.from_base64(mainDevice.signingPrivateKey),
+            publicKey: sodium.from_base64(mainDevice.signingPublicKey),
+            keyType: "ed25519",
+          },
+          workspaceMemberDevicesProofData,
+        });
+      return {
+        workspaceId: existingEntry.workspaceId,
+        workspaceMemberDevicesProof: newProof,
+      };
+    })
+  );
 
   const session = await createSessionAndDevice({
     username,
@@ -80,6 +127,7 @@ export const createDeviceAndLogin = async ({
     deviceType: "web",
     webDeviceCiphertext: "webDeviceCiphertextMock",
     webDeviceNonce: `webDeviceNonceMock${generateId()}`, // since it must be unique
+    workspaceMemberDevicesProofEntries,
   });
   return {
     session,

@@ -59,6 +59,7 @@ import * as UnauthorizedMemberTypes from "./graphql/queries/workspace/unauthoriz
 import * as WorkspaceQueryTypes from "./graphql/queries/workspace/workspace";
 import * as WorkspaceInvitationTypes from "./graphql/queries/workspace/workspaceInvitation";
 import * as WorkspaceInvitationsTypes from "./graphql/queries/workspace/workspaceInvitations";
+import * as WorkspaceMemberDevicesProofsQueryTypes from "./graphql/queries/workspace/workspaceMemberDevicesProofs";
 import * as WorkspaceMembersQueryTypes from "./graphql/queries/workspace/workspaceMembers";
 import * as WorkspaceMembersByMainDeviceSigningPublicKeyQueryTypes from "./graphql/queries/workspace/workspaceMembersByMainDeviceSigningPublicKey";
 import * as WorkspacesQueryTypes from "./graphql/queries/workspace/workspaces";
@@ -72,6 +73,7 @@ import * as UserTypes from "./graphql/types/user";
 import * as UserChainTypes from "./graphql/types/userChain";
 import * as WorkspaceTypes from "./graphql/types/workspace";
 import * as WorkspaceChainTypes from "./graphql/types/workspaceChain";
+import * as WorkspaceMemberDevicesProofTypes from "./graphql/types/workspaceMemberDevicesProof";
 
 export const schema = makeSchema({
   plugins: [
@@ -158,6 +160,9 @@ export const schema = makeSchema({
     WorkspaceChainTypes,
     WorkspaceChainQueryTypes,
     WorkspaceChainByInvitationIdQueryTypes,
+
+    WorkspaceMemberDevicesProofTypes,
+    WorkspaceMemberDevicesProofsQueryTypes,
 
     UserTypes,
     UserChainTypes,

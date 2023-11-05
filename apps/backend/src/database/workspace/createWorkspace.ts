@@ -97,7 +97,9 @@ export async function createWorkspace({
           workspaceMemberDevicesProofData,
         })
       ) {
-        throw new Error("Invalid workspaceMemberDevicesProof");
+        throw new Error(
+          "Invalid workspaceMemberDevicesProof in createWorkspace"
+        );
       }
 
       const rawWorkspace = await prisma.workspace.create({

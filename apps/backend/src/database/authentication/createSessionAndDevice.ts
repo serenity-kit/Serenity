@@ -1,4 +1,5 @@
 import * as userChain from "@serenity-kit/user-chain";
+import * as workspaceMemberDevicesProofUtil from "@serenity-kit/workspace-member-devices-proof";
 import { Device, generateId } from "@serenity-tools/common";
 import { z } from "zod";
 import { Prisma } from "../../../prisma/generated/output";
@@ -7,6 +8,7 @@ import { addHours } from "../../utils/addHours/addHours";
 import { addYears } from "../../utils/addYears/addYears";
 import { prisma } from "../prisma";
 import { getLastUserChainEventWithState } from "../userChain/getLastUserChainEventWithState";
+import { updateWorkspaceMemberDevicesProof } from "../workspace/updateWorkspaceMemberDevicesProof";
 
 export const DeviceType = z.union([
   z.literal("temporary-web"),
@@ -28,6 +30,10 @@ type Params = {
   deviceType: string;
   webDeviceCiphertext?: string;
   webDeviceNonce?: string;
+  workspaceMemberDevicesProofEntries: {
+    workspaceId: string;
+    workspaceMemberDevicesProof: workspaceMemberDevicesProofUtil.WorkspaceMemberDevicesProof;
+  }[];
 };
 
 export async function createSessionAndDevice({
@@ -38,6 +44,7 @@ export async function createSessionAndDevice({
   deviceType: rawDeviceType,
   webDeviceCiphertext,
   webDeviceNonce,
+  workspaceMemberDevicesProofEntries,
 }: Params) {
   if (addDeviceEvent.transaction.signingPublicKey !== device.signingPublicKey) {
     throw new Error(
@@ -97,6 +104,17 @@ export async function createSessionAndDevice({
           position: lastUserChainEvent.position + 1,
         },
       });
+
+      for (const entry of workspaceMemberDevicesProofEntries) {
+        await updateWorkspaceMemberDevicesProof({
+          authorPublicKey: userChainState.mainDeviceSigningPublicKey,
+          userId,
+          prisma,
+          workspaceId: entry.workspaceId,
+          userChainEventHash: newUserChainState.eventHash,
+          workspaceMemberDevicesProof: entry.workspaceMemberDevicesProof,
+        });
+      }
 
       const webDeviceAccessToken = generateId();
 

@@ -1,4 +1,5 @@
 import * as userChain from "@serenity-kit/user-chain";
+import * as workspaceMemberDevicesProofUtil from "@serenity-kit/workspace-member-devices-proof";
 import { ForbiddenError, UserInputError } from "apollo-server-express";
 import {
   arg,
@@ -11,6 +12,14 @@ import sodium from "react-native-libsodium";
 import { createSessionAndDevice } from "../../../database/authentication/createSessionAndDevice";
 import { getLoginAttempt } from "../../../database/authentication/getLoginAttempt";
 
+export const WorkspaceMemberDevicesProofInput = inputObjectType({
+  name: "WorkspaceMemberDevicesProofInput",
+  definition(t) {
+    t.nonNull.string("workspaceId");
+    t.nonNull.string("serializedWorkspaceMemberDevicesProof");
+  },
+});
+
 export const AddDeviceInput = inputObjectType({
   name: "AddDeviceInput",
   definition(t) {
@@ -22,6 +31,9 @@ export const AddDeviceInput = inputObjectType({
     t.nonNull.string("sessionTokenSignature");
     t.nonNull.string("deviceType");
     t.nonNull.string("serializedUserChainEvent");
+    t.nonNull.list.nonNull.field("workspaceMemberDevicesProofs", {
+      type: WorkspaceMemberDevicesProofInput,
+    });
     t.string("webDeviceCiphertext");
     t.string("webDeviceNonce");
   },
@@ -91,6 +103,17 @@ export const addDeviceMutation = mutationField("addDevice", {
       JSON.parse(args.input.serializedUserChainEvent)
     );
 
+    const workspaceMemberDevicesProofEntries =
+      args.input.workspaceMemberDevicesProofs.map((entry) => {
+        return {
+          workspaceId: entry.workspaceId,
+          workspaceMemberDevicesProof:
+            workspaceMemberDevicesProofUtil.WorkspaceMemberDevicesProof.parse(
+              JSON.parse(entry.serializedWorkspaceMemberDevicesProof)
+            ),
+        };
+      });
+
     const session = await createSessionAndDevice({
       username: loginAttempt.username,
       sessionKey: sessionKey,
@@ -105,6 +128,7 @@ export const addDeviceMutation = mutationField("addDevice", {
       deviceType: args.input.deviceType,
       webDeviceCiphertext: args.input.webDeviceCiphertext || undefined,
       webDeviceNonce: args.input.webDeviceNonce || undefined,
+      workspaceMemberDevicesProofEntries,
     });
 
     return {
