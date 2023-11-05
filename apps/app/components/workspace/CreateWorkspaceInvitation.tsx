@@ -1,4 +1,5 @@
 import * as workspaceChain from "@serenity-kit/workspace-chain";
+import * as workspaceMemberDevicesProofUtil from "@serenity-kit/workspace-member-devices-proof";
 import {
   Button,
   Description,
@@ -17,6 +18,7 @@ import { useWorkspace } from "../../context/WorkspaceContext";
 import {
   Role,
   runCreateWorkspaceInvitationMutation,
+  runWorkspaceMemberDevicesProofQuery,
   useDeleteWorkspaceInvitationsMutation,
 } from "../../generated/graphql";
 import {
@@ -124,11 +126,52 @@ export function CreateWorkspaceInvitation(props: Props) {
       throw new Error("Expected invitation transaction");
     }
 
+    const workspaceMemberDevicesProofQueryResult =
+      await runWorkspaceMemberDevicesProofQuery({
+        workspaceId,
+      });
+
+    if (
+      !workspaceMemberDevicesProofQueryResult.data?.workspaceMemberDevicesProof
+    ) {
+      throw new Error("Missing workspaceMemberDevicesProof");
+    }
+
+    const tmpResult =
+      workspaceMemberDevicesProofQueryResult.data?.workspaceMemberDevicesProof;
+    const existingWorkspaceMemberDevicesProofData =
+      workspaceMemberDevicesProofUtil.WorkspaceMemberDevicesProofData.parse(
+        JSON.parse(tmpResult.serializedData)
+      );
+
+    // TODO verify the result using isValidWorkspaceMemberDevicesProof
+    // TODO verify the result using workspaceChainHash
+    // TODO verify your own user chain entry
+
+    const workspaceMemberDevicesProof =
+      workspaceMemberDevicesProofUtil.createWorkspaceMemberDevicesProof({
+        authorKeyPair: {
+          privateKey: sodium.from_base64(mainDevice.signingPrivateKey),
+          publicKey: sodium.from_base64(mainDevice.signingPublicKey),
+          keyType: "ed25519",
+        },
+        workspaceMemberDevicesProofData: {
+          ...existingWorkspaceMemberDevicesProofData,
+          clock: existingWorkspaceMemberDevicesProofData.clock + 1,
+          workspaceChainHash: workspaceChain.hashTransaction(
+            invitation.transaction
+          ),
+        },
+      });
+
     const createWorkspaceInvitationResult =
       await runCreateWorkspaceInvitationMutation({
         input: {
           workspaceId,
           serializedWorkspaceChainEvent: JSON.stringify(invitation),
+          serializedWorkspaceMemberDevicesProof: JSON.stringify(
+            workspaceMemberDevicesProof
+          ),
         },
       });
     await loadRemoteWorkspaceChain({ workspaceId });

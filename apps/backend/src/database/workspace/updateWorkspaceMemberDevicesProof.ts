@@ -2,12 +2,12 @@ import { PrismaClient } from "@prisma/client";
 import * as workspaceMemberDevicesProofUtil from "@serenity-kit/workspace-member-devices-proof";
 import { ForbiddenError } from "apollo-server-express";
 import { getLastWorkspaceChainEventWithState } from "../workspaceChain/getLastWorkspaceChainEventWithState";
-import { getWorkspaceMemberDevicesProof } from "./getWorkspaceMemberDevicesProof";
+import { getWorkspaceMemberDevicesProofByWorkspaceId } from "./getWorkspaceMemberDevicesProofByWorkspaceId";
 
 type Params = {
   workspaceId: string;
   userId: string;
-  userChainEventHash: string;
+  userChainEventHash?: string;
   prisma: PrismaClient;
   workspaceMemberDevicesProof: workspaceMemberDevicesProofUtil.WorkspaceMemberDevicesProof;
   authorPublicKey: string;
@@ -40,7 +40,7 @@ export async function updateWorkspaceMemberDevicesProof({
   });
 
   const existingWorkspaceMemberDevicesProof =
-    await getWorkspaceMemberDevicesProof({
+    await getWorkspaceMemberDevicesProofByWorkspaceId({
       prisma,
       workspaceId,
     });
@@ -49,10 +49,12 @@ export async function updateWorkspaceMemberDevicesProof({
     {
       clock: existingWorkspaceMemberDevicesProof.proof.clock + 1,
       workspaceChainHash: workspaceChainState.lastEventHash,
-      userChainHashes: {
-        ...existingWorkspaceMemberDevicesProof.data.userChainHashes,
-        [userId]: userChainEventHash,
-      },
+      userChainHashes: userChainEventHash
+        ? {
+            ...existingWorkspaceMemberDevicesProof.data.userChainHashes,
+            [userId]: userChainEventHash,
+          }
+        : existingWorkspaceMemberDevicesProof.data.userChainHashes,
     };
 
   if (

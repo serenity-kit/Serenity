@@ -1,0 +1,11 @@
+query workspaceMemberDevicesProof($workspaceId: ID!) {
+  workspaceMemberDevicesProof(workspaceId: $workspaceId) {
+    proof {
+      hash
+      hashSignature
+      clock
+      version
+    }
+    serializedData
+  }
+}

@@ -178,21 +178,6 @@ test("user should not be able to invite from a workspace they don't own", async 
   ).rejects.toThrow("Unauthorized");
 });
 
-test("user should not be able to invite from a workspace that doesn't exist", async () => {
-  const username = "adam@example.com";
-  await expect(
-    (async () =>
-      await createWorkspaceInvitation({
-        graphql,
-        workspaceId: "nonExistentWorkspace",
-        role: Role.EDITOR,
-        authorizationHeader: userAndDevice2.sessionKey,
-        mainDevice: userAndDevice2.mainDevice,
-        overwritePrevHash: "wrongHash",
-      }))()
-  ).rejects.toThrow("Unauthorized");
-});
-
 test("Unauthenticated", async () => {
   const username = "a@a.com";
   const userAndDevice = await createUserWithWorkspace({

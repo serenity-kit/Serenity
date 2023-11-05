@@ -1,25 +1,14 @@
+import { PrismaClient } from "@prisma/client";
 import * as workspaceMemberDevicesProofUtil from "@serenity-kit/workspace-member-devices-proof";
-import { ForbiddenError } from "apollo-server-express";
-import { prisma } from "../prisma";
 
 type Params = {
   workspaceId: string;
-  userId: string;
+  prisma: PrismaClient;
 };
-export async function getWorkspaceMemberDevicesProof({
+export async function getWorkspaceMemberDevicesProofByWorkspaceId({
   workspaceId,
-  userId,
+  prisma,
 }: Params) {
-  const userWorkspace = await prisma.usersToWorkspaces.findFirst({
-    where: {
-      userId,
-      workspaceId,
-    },
-    select: { workspace: true },
-  });
-  if (!userWorkspace) {
-    throw new ForbiddenError("Unauthorized");
-  }
   const workspaceMemberDevicesProof =
     await prisma.workspaceMemberDevicesProof.findFirstOrThrow({
       where: {
