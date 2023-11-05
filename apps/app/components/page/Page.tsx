@@ -61,6 +61,7 @@ type Props = WorkspaceDrawerScreenProps<"Page"> & {
   signatureKeyPair: KeyPair;
   workspaceId: string;
   reloadPage: () => void;
+  latestResolvedDocumentChain: documentChain.ResolvedDocumentChain;
 };
 
 export default function Page({
@@ -69,6 +70,7 @@ export default function Page({
   signatureKeyPair,
   workspaceId,
   reloadPage,
+  latestResolvedDocumentChain,
 }: Props) {
   const { pageId: docId, setActiveSnapshotAndCommentKeys } = usePage();
   const isNew = route.params?.isNew ?? false;
@@ -102,8 +104,6 @@ export default function Page({
   const updateDocumentTitleInStore = useDocumentTitleStore(
     (state) => state.updateDocumentTitle
   );
-  let latestResolvedDocumentChainRef =
-    useRef<documentChain.ResolvedDocumentChain>();
   let activeSnapshotDocumentChainStateRef =
     useRef<documentChain.DocumentChainState>();
 
@@ -153,13 +153,6 @@ export default function Page({
         throw new Error("Workspace or workspaceKeys not found");
       }
 
-      if (!latestResolvedDocumentChainRef.current?.currentState) {
-        console.error(
-          "latestResolvedDocumentChainRef.current.current not found"
-        );
-        throw new Error("latestDocumentChainStateRef.current not found");
-      }
-
       const documentTitle = decryptDocumentTitleBasedOnSnapshotKey({
         snapshotKey: sodium.to_base64(snapshotKeyRef.current!.key),
         ciphertext: document.nameCiphertext,
@@ -180,7 +173,7 @@ export default function Page({
 
       let documentShareLinkDeviceBoxes: DocumentShareLinkDeviceBox[] = [];
       documentShareLinkDeviceBoxes = Object.entries(
-        latestResolvedDocumentChainRef.current.currentState.devices
+        latestResolvedDocumentChain.currentState.devices
       ).map(([shareLinkDeviceSigningPublicKey, deviceEntry]) => {
         const { documentShareLinkDeviceBox } =
           encryptSnapshotKeyForShareLinkDevice({
@@ -204,7 +197,7 @@ export default function Page({
         publicData: {
           keyDerivationTrace: snapshotKeyData.keyDerivationTrace,
           documentChainEventHash:
-            latestResolvedDocumentChainRef.current.currentState.eventHash,
+            latestResolvedDocumentChain.currentState.eventHash,
         },
         additionalServerData: {
           documentTitleData,
@@ -218,13 +211,13 @@ export default function Page({
           "SnapshotProofInfo not provided when trying to derive a new key"
         );
       }
-      if (!latestResolvedDocumentChainRef.current) {
-        console.error("latestResolvedDocumentChainRef.current not found");
+      if (!latestResolvedDocumentChain) {
+        console.error("latestResolvedDocumentChain not found");
         throw new Error("latestDocumentChainStateRef.current not found");
       }
 
       activeSnapshotDocumentChainStateRef.current =
-        latestResolvedDocumentChainRef.current.statePerEvent[
+        latestResolvedDocumentChain.statePerEvent[
           snapshotProofInfo.additionalPublicData.documentChainEventHash
         ];
 
@@ -356,7 +349,7 @@ export default function Page({
               }),
             knownVersion: documentChain.version,
           });
-          latestResolvedDocumentChainRef.current = documentChainResult;
+          latestResolvedDocumentChain = documentChainResult;
         }
       } catch (err) {
         // TODO

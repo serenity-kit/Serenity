@@ -11,7 +11,8 @@ import { useWorkspace } from "../../../context/WorkspaceContext";
 import { useAuthenticatedAppContext } from "../../../hooks/useAuthenticatedAppContext";
 import { WorkspaceDrawerScreenProps } from "../../../types/navigationProps";
 
-import { LocalDevice } from "@serenity-tools/common";
+import * as documentChain from "@serenity-kit/document-chain";
+import { LocalDevice, notNull } from "@serenity-tools/common";
 import { tw, useIsPermanentLeftSidebar } from "@serenity-tools/ui";
 import { useActor, useInterpret, useMachine } from "@xstate/react";
 import { Drawer } from "react-native-drawer-layout";
@@ -23,6 +24,7 @@ import { PageNoAccessError } from "../../../components/page/PageNoAccessError";
 import { PageHeaderRight } from "../../../components/pageHeaderRight/PageHeaderRight";
 import { commentsDrawerWidth } from "../../../constants";
 import { PageProvider } from "../../../context/PageContext";
+import { runDocumentChainQuery } from "../../../generated/graphql";
 import { commentsMachine } from "../../../machines/commentsMachine";
 import {
   getDocumentPath,
@@ -45,6 +47,9 @@ const ActualPageScreen = (
   const getFolderKey = useFolderKeyStore((state) => state.getFolderKey);
   const folderStore = useOpenFolderStore();
   const documentPathStore = useDocumentPathStore();
+  let [latestResolvedDocumentChain, setLatestResolvedDocumentChain] = useState<
+    documentChain.ResolvedDocumentChain | undefined
+  >(undefined);
 
   const [state] = useMachine(loadPageMachine, {
     context: {
@@ -112,6 +117,28 @@ const ActualPageScreen = (
     }
   }, [pageId, workspaceId, props.navigation, state]);
 
+  useEffect(() => {
+    const fetchDocumentChain = async () => {
+      const documentChainQueryResult = await runDocumentChainQuery({
+        documentId: pageId,
+      });
+      if (documentChainQueryResult.data?.documentChain?.nodes) {
+        const documentChainResult = documentChain.resolveState({
+          events: documentChainQueryResult.data.documentChain.nodes
+            .filter(notNull)
+            .map((event) => {
+              return documentChain.DocumentChainEvent.parse(
+                JSON.parse(event.serializedContent)
+              );
+            }),
+          knownVersion: documentChain.version,
+        });
+        setLatestResolvedDocumentChain(documentChainResult);
+      }
+    };
+    fetchDocumentChain();
+  });
+
   const signatureKeyPair: KeyPair = useMemo(() => {
     return {
       publicKey: sodium.from_base64(activeDevice.signingPublicKey),
@@ -122,7 +149,7 @@ const ActualPageScreen = (
 
   if (state.matches("hasNoAccess")) {
     return <PageNoAccessError />;
-  } else if (state.matches("loadDocument")) {
+  } else if (state.matches("loadDocument") && latestResolvedDocumentChain) {
     return (
       <PageProvider
         value={{
@@ -172,6 +199,7 @@ const ActualPageScreen = (
             key={pageId}
             signatureKeyPair={signatureKeyPair}
             workspaceId={workspaceId}
+            latestResolvedDocumentChain={latestResolvedDocumentChain}
           />
         </Drawer>
       </PageProvider>
