@@ -1072,6 +1072,7 @@ export type RemoveMemberAndRotateWorkspaceKeyInput = {
   creatorDeviceSigningPublicKey: Scalars['String'];
   deviceWorkspaceKeyBoxes: Array<WorkspaceDeviceInput>;
   serializedWorkspaceChainEvent: Scalars['String'];
+  serializedWorkspaceMemberDevicesProof: Scalars['String'];
   workspaceId: Scalars['String'];
 };
 
