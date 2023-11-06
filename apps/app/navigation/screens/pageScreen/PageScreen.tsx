@@ -137,7 +137,7 @@ const ActualPageScreen = (
       }
     };
     fetchDocumentChain();
-  });
+  }, []);
 
   const signatureKeyPair: KeyPair = useMemo(() => {
     return {

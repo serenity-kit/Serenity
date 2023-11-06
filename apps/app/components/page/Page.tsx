@@ -33,7 +33,6 @@ import { usePage } from "../../context/PageContext";
 import { useWorkspace } from "../../context/WorkspaceContext";
 import {
   Document,
-  runDocumentChainQuery,
   runDocumentQuery,
   runWorkspaceMembersQuery,
 } from "../../generated/graphql";
@@ -329,28 +328,10 @@ export default function Page({
 
       let document: Document | undefined = undefined;
       try {
-        // TODO optimize be either parallelizing or merging documentChain and document query into one
-        const documentChainQueryResult = await runDocumentChainQuery({
-          documentId: docId,
-        });
         const fetchedDocument = await getDocument({
           documentId: docId,
         });
         document = fetchedDocument as Document;
-
-        if (documentChainQueryResult.data?.documentChain?.nodes) {
-          const documentChainResult = documentChain.resolveState({
-            events: documentChainQueryResult.data.documentChain.nodes
-              .filter(notNull)
-              .map((event) => {
-                return documentChain.DocumentChainEvent.parse(
-                  JSON.parse(event.serializedContent)
-                );
-              }),
-            knownVersion: documentChain.version,
-          });
-          latestResolvedDocumentChain = documentChainResult;
-        }
       } catch (err) {
         // TODO
         console.error(err);
