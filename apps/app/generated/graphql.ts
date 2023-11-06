@@ -588,6 +588,7 @@ export type KeyDerivationTraceInput = {
 
 export type LogoutInput = {
   serializedUserChainEvent: Scalars['String'];
+  workspaceMemberDevicesProofs: Array<WorkspaceMemberDevicesProofInput>;
 };
 
 export type LogoutResult = {

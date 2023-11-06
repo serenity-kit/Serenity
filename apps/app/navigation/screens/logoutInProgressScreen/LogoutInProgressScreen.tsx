@@ -1,13 +1,20 @@
 import { useFocusEffect } from "@react-navigation/native";
 import * as userChain from "@serenity-kit/user-chain";
-import { notNull } from "@serenity-tools/common";
+import * as workspaceMemberDevicesProofUtil from "@serenity-kit/workspace-member-devices-proof";
+import { notNull, notUndefined } from "@serenity-tools/common";
 import { CenterContent, Text } from "@serenity-tools/ui";
 import { useWindowDimensions } from "react-native";
+import sodium from "react-native-libsodium";
 import { useAppContext } from "../../../context/AppContext";
 import {
   runLogoutMutation,
   runUserChainQuery,
+  runWorkspaceMemberDevicesProofsQuery,
 } from "../../../generated/graphql";
+import {
+  getWorkspaceChainEventByHash,
+  loadRemoteWorkspaceChain,
+} from "../../../store/workspaceChainStore";
 import { RootStackScreenProps } from "../../../types/navigationProps";
 import { clearDeviceAndSessionStorage } from "../../../utils/authentication/clearDeviceAndSessionStorage";
 import { getMainDevice } from "../../../utils/device/mainDeviceMemoryStore";
@@ -47,9 +54,10 @@ export default function LogoutInProgress({
         }
 
         const userChainQueryResult = await runUserChainQuery({});
+        let userChainState: userChain.UserChainState | null = null;
         let lastChainEvent: userChain.UserChainEvent | null = null;
         if (userChainQueryResult.data?.userChain?.nodes) {
-          userChain.resolveState({
+          userChainState = userChain.resolveState({
             events: userChainQueryResult.data.userChain.nodes
               .filter(notNull)
               .map((event) => {
@@ -60,11 +68,21 @@ export default function LogoutInProgress({
                 return data;
               }),
             knownVersion: userChain.version,
-          });
+          }).currentState;
         }
 
-        if (!lastChainEvent) {
-          throw new Error("lastChainEvent not available");
+        if (!lastChainEvent || !userChainState) {
+          throw new Error("lastChainEvent or userChainState not available");
+        }
+
+        const workspaceMemberDevicesProofsQueryResult =
+          await runWorkspaceMemberDevicesProofsQuery({});
+
+        if (
+          !workspaceMemberDevicesProofsQueryResult.data
+            ?.workspaceMemberDevicesProofs?.nodes
+        ) {
+          throw new Error("Failed to fetch workspaceMemberDevicesProofs");
         }
 
         const event = userChain.removeDevice({
@@ -75,9 +93,78 @@ export default function LogoutInProgress({
           signingPublicKey: activeDevice.signingPublicKey,
           prevEvent: lastChainEvent,
         });
+        const newUserChainState = userChain.applyEvent({
+          state: userChainState,
+          event,
+          knownVersion: userChain.version,
+        });
+
+        const newWorkspaceMemberDevicesProofs: {
+          workspaceId: string;
+          serializedWorkspaceMemberDevicesProof: string;
+        }[] = [];
+        for (const entry of workspaceMemberDevicesProofsQueryResult.data.workspaceMemberDevicesProofs.nodes
+          .filter(notNull)
+          .filter(notUndefined)) {
+          const data =
+            workspaceMemberDevicesProofUtil.WorkspaceMemberDevicesProofData.parse(
+              JSON.parse(entry.serializedData)
+            );
+
+          // load latest workspace chain entries and check if the workspace chain event is included
+          // to verify that the server is providing this or a newer workspace chain
+          const { state } = await loadRemoteWorkspaceChain({
+            workspaceId: entry.workspaceId,
+          });
+          const workspaceChainEvent = getWorkspaceChainEventByHash({
+            hash: data.workspaceChainHash,
+            workspaceId: entry.workspaceId,
+          });
+          if (!workspaceChainEvent) {
+            throw new Error(
+              "Workspace chain event not found in the current workspace chain"
+            );
+          }
+
+          const isValid =
+            workspaceMemberDevicesProofUtil.isValidWorkspaceMemberDevicesProof({
+              authorPublicKey: entry.authorMainDeviceSigningPublicKey,
+              workspaceMemberDevicesProof: entry.proof,
+              workspaceMemberDevicesProofData: data,
+            });
+          if (!isValid) {
+            throw new Error("Invalid workspace member devices proof");
+          }
+
+          const newProof =
+            workspaceMemberDevicesProofUtil.createWorkspaceMemberDevicesProof({
+              authorKeyPair: {
+                privateKey: sodium.from_base64(mainDevice.signingPrivateKey),
+                publicKey: sodium.from_base64(mainDevice.signingPublicKey),
+                keyType: "ed25519",
+              },
+              workspaceMemberDevicesProofData: {
+                clock: data.clock + 1,
+                userChainHashes: {
+                  ...data.userChainHashes,
+                  [newUserChainState.id]: newUserChainState.eventHash,
+                },
+                workspaceChainHash: state.lastEventHash,
+              },
+            });
+          newWorkspaceMemberDevicesProofs.push({
+            workspaceId: entry.workspaceId,
+            serializedWorkspaceMemberDevicesProof: JSON.stringify(newProof),
+          });
+        }
 
         const logoutResult = await runLogoutMutation(
-          { input: { serializedUserChainEvent: JSON.stringify(event) } },
+          {
+            input: {
+              serializedUserChainEvent: JSON.stringify(event),
+              workspaceMemberDevicesProofs: newWorkspaceMemberDevicesProofs,
+            },
+          },
           {}
         );
         remoteCleanupSuccessful = logoutResult.data?.logout?.success || false;
