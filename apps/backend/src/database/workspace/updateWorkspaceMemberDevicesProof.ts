@@ -7,7 +7,9 @@ import { getWorkspaceMemberDevicesProofByWorkspaceId } from "./getWorkspaceMembe
 type Params = {
   workspaceId: string;
   userId: string;
+  /* userChainEventHash to be updated for the provided userId  */
   userChainEventHash?: string;
+  userIdToRemove?: string;
   prisma: PrismaClient;
   workspaceMemberDevicesProof: workspaceMemberDevicesProofUtil.WorkspaceMemberDevicesProof;
   authorPublicKey: string;
@@ -17,6 +19,7 @@ export async function updateWorkspaceMemberDevicesProof({
   userId,
   workspaceId,
   userChainEventHash,
+  userIdToRemove,
   workspaceMemberDevicesProof,
   authorPublicKey,
   prisma,
@@ -45,16 +48,23 @@ export async function updateWorkspaceMemberDevicesProof({
       workspaceId,
     });
 
+  let userChainHashes =
+    existingWorkspaceMemberDevicesProof.data.userChainHashes;
+  if (userChainEventHash) {
+    userChainHashes = {
+      ...existingWorkspaceMemberDevicesProof.data.userChainHashes,
+      [userId]: userChainEventHash,
+    };
+  }
+  if (userIdToRemove) {
+    delete userChainHashes[userIdToRemove];
+  }
+
   const workspaceMemberDevicesProofData: workspaceMemberDevicesProofUtil.WorkspaceMemberDevicesProofData =
     {
       clock: existingWorkspaceMemberDevicesProof.proof.clock + 1,
       workspaceChainHash: workspaceChainState.lastEventHash,
-      userChainHashes: userChainEventHash
-        ? {
-            ...existingWorkspaceMemberDevicesProof.data.userChainHashes,
-            [userId]: userChainEventHash,
-          }
-        : existingWorkspaceMemberDevicesProof.data.userChainHashes,
+      userChainHashes,
     };
 
   if (

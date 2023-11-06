@@ -1,10 +1,12 @@
 import * as workspaceChain from "@serenity-kit/workspace-chain";
+import * as workspaceMemberDevicesProofUtil from "@serenity-kit/workspace-member-devices-proof";
 import { ForbiddenError, UserInputError } from "apollo-server-express";
 import { Prisma, Role } from "../../../prisma/generated/output";
 import { WorkspaceDeviceParing } from "../../types/workspaceDevice";
 import { prisma } from "../prisma";
 import { getLastWorkspaceChainEventWithState } from "../workspaceChain/getLastWorkspaceChainEventWithState";
 import { rotateWorkspaceKey } from "./rotateWorkspaceKey";
+import { updateWorkspaceMemberDevicesProof } from "./updateWorkspaceMemberDevicesProof";
 
 export type Props = {
   newDeviceWorkspaceKeyBoxes: WorkspaceDeviceParing[];
@@ -12,6 +14,8 @@ export type Props = {
   workspaceId: string;
   userId: string;
   workspaceChainEvent: workspaceChain.RemoveMemberWorkspaceChainEvent;
+  workspaceMemberDevicesProof: workspaceMemberDevicesProofUtil.WorkspaceMemberDevicesProof;
+  mainDeviceSigningPublicKey: string;
 };
 
 export const removeMemberAndRotateWorkspaceKey = async ({
@@ -20,6 +24,8 @@ export const removeMemberAndRotateWorkspaceKey = async ({
   creatorDeviceSigningPublicKey,
   newDeviceWorkspaceKeyBoxes,
   workspaceChainEvent,
+  workspaceMemberDevicesProof,
+  mainDeviceSigningPublicKey,
 }) => {
   return await prisma.$transaction(
     async (prisma) => {
@@ -67,6 +73,15 @@ export const removeMemberAndRotateWorkspaceKey = async ({
           workspaceId,
           position: lastWorkspaceChainEvent.position + 1,
         },
+      });
+
+      await updateWorkspaceMemberDevicesProof({
+        authorPublicKey: mainDeviceSigningPublicKey,
+        userId,
+        userIdToRemove: userToRevoke.id,
+        prisma,
+        workspaceId,
+        workspaceMemberDevicesProof,
       });
 
       // add only devices which will belong to this workspace

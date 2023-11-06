@@ -1,4 +1,5 @@
 import * as workspaceChain from "@serenity-kit/workspace-chain";
+import * as workspaceMemberDevicesProofUtil from "@serenity-kit/workspace-member-devices-proof";
 import { AuthenticationError } from "apollo-server-express";
 import {
   arg,
@@ -20,6 +21,7 @@ export const RemoveMemberAndRotateWorkspaceKeyInput = inputObjectType({
     t.nonNull.list.nonNull.field("deviceWorkspaceKeyBoxes", {
       type: WorkspaceDeviceInput,
     });
+    t.nonNull.string("serializedWorkspaceMemberDevicesProof");
   },
 });
 
@@ -61,12 +63,19 @@ export const removeMemberAndRotateWorkspaceKeyMutation = mutationField(
         context.user.mainDeviceSigningPublicKey
       );
 
+      const workspaceMemberDevicesProof =
+        workspaceMemberDevicesProofUtil.WorkspaceMemberDevicesProof.parse(
+          JSON.parse(args.input.serializedWorkspaceMemberDevicesProof)
+        );
+
       const workspaceKey = await removeMemberAndRotateWorkspaceKey({
         userId: context.user.id,
         workspaceId: args.input.workspaceId,
         creatorDeviceSigningPublicKey: args.input.creatorDeviceSigningPublicKey,
         newDeviceWorkspaceKeyBoxes: args.input.deviceWorkspaceKeyBoxes,
         workspaceChainEvent,
+        workspaceMemberDevicesProof,
+        mainDeviceSigningPublicKey: context.user.mainDeviceSigningPublicKey,
       });
       return { workspaceKey };
     },

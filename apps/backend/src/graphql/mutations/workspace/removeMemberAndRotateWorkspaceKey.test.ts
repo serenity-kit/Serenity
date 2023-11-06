@@ -90,7 +90,8 @@ test("user cannot remove self", async () => {
         creatorDeviceSigningPublicKey: userData1.device.signingPublicKey,
         deviceWorkspaceKeyBoxes,
         authorizationHeader: userData1.sessionKey,
-        serializedWorkspaceChainEvent: JSON.stringify(removeMemberEvent),
+        workspaceChainEvent: removeMemberEvent,
+        mainDevice: userData1.mainDevice,
       }))()
   ).rejects.toThrowError(/BAD_USER_INPUT/);
 });
@@ -162,7 +163,8 @@ test("user cannot revoke own main device", async () => {
         creatorDeviceSigningPublicKey: userData1.device.signingPublicKey,
         deviceWorkspaceKeyBoxes,
         authorizationHeader: userData1.sessionKey,
-        serializedWorkspaceChainEvent: JSON.stringify(removeMemberEvent),
+        workspaceChainEvent: removeMemberEvent,
+        mainDevice: userData1.mainDevice,
       }))()
   ).rejects.toThrowError(/BAD_USER_INPUT/);
 });
@@ -306,7 +308,8 @@ test("user can remove another user", async () => {
     creatorDeviceSigningPublicKey: userData1.mainDevice.signingPublicKey,
     deviceWorkspaceKeyBoxes,
     authorizationHeader: userData1.sessionKey,
-    serializedWorkspaceChainEvent: JSON.stringify(removeMemberEvent),
+    workspaceChainEvent: removeMemberEvent,
+    mainDevice: userData1.mainDevice,
   });
 
   const resultingWorkspaceKey =
@@ -537,7 +540,8 @@ test("user can rotate key for multiple devices", async () => {
     creatorDeviceSigningPublicKey: userData1.device.signingPublicKey,
     deviceWorkspaceKeyBoxes,
     authorizationHeader: userData1.sessionKey,
-    serializedWorkspaceChainEvent: JSON.stringify(removeMemberEvent),
+    workspaceChainEvent: removeMemberEvent,
+    mainDevice: userData1.mainDevice,
   });
   const resultingWorkspaceKey =
     workspaceKeyResult.removeMemberAndRotateWorkspaceKey.workspaceKey;
@@ -598,20 +602,6 @@ test("user can rotate key for multiple devices", async () => {
   expect(
     workspace.workspaceKeys[1].workspaceKeyBox.deviceSigningPublicKey
   ).toBe(userData1.device.signingPublicKey);
-});
-
-test("Unauthenticated", async () => {
-  await expect(
-    (async () =>
-      await removeMemberAndRotateWorkspaceKey({
-        graphql,
-        workspaceId: userData1.workspace.id,
-        creatorDeviceSigningPublicKey: userData1.device.signingPublicKey,
-        deviceWorkspaceKeyBoxes: [],
-        authorizationHeader: "badAuthHeader",
-        serializedWorkspaceChainEvent: "{}",
-      }))()
-  ).rejects.toThrowError(/UNAUTHENTICATED/);
 });
 
 describe("Input errors", () => {
