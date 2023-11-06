@@ -1,3 +1,5 @@
+import * as userChain from "@serenity-kit/user-chain";
+import { notNull } from "@serenity-tools/common";
 import {
   Box,
   Button,
@@ -19,7 +21,10 @@ import { OnboardingScreenWrapper } from "../../../components/onboardingScreenWra
 import RegisterForm from "../../../components/register/RegisterForm";
 import { VerifyPasswordModal } from "../../../components/verifyPasswordModal/VerifyPasswordModal";
 import { useAppContext } from "../../../context/AppContext";
-import { useWorkspaceInvitationQuery } from "../../../generated/graphql";
+import {
+  runUserChainQuery,
+  useWorkspaceInvitationQuery,
+} from "../../../generated/graphql";
 import { RootStackScreenProps } from "../../../types/navigationProps";
 import { getMainDevice } from "../../../utils/device/mainDeviceMemoryStore";
 import { acceptWorkspaceInvitation } from "../../../utils/workspace/acceptWorkspaceInvitation";
@@ -76,6 +81,27 @@ export default function AcceptWorkspaceInvitationScreen(
 
     try {
       setIsSubmitting(true);
+
+      let userChainState: userChain.UserChainState | undefined = undefined;
+      const userChainQueryResult = await runUserChainQuery({});
+      if (userChainQueryResult.data?.userChain?.nodes) {
+        userChainState = userChain.resolveState({
+          events: userChainQueryResult.data.userChain.nodes
+            .filter(notNull)
+            .map((event) => {
+              const data = userChain.UserChainEvent.parse(
+                JSON.parse(event.serializedContent)
+              );
+              return data;
+            }),
+          knownVersion: userChain.version,
+        }).currentState;
+      }
+
+      if (!userChainState) {
+        throw new Error("userChainState not available");
+      }
+
       const workspaceId = await acceptWorkspaceInvitation({
         invitationId: workspaceInvitationId,
         mainDevice,
@@ -91,6 +117,8 @@ export default function AcceptWorkspaceInvitationScreen(
         invitationSigningPublicKey:
           workspaceInvitationQueryResult.data.workspaceInvitation
             .invitationSigningPublicKey,
+        currentUserId: userChainState.id,
+        currentUserChainHash: userChainState.eventHash,
       });
       props.navigation.navigate("Workspace", {
         workspaceId: workspaceId,

@@ -1,5 +1,8 @@
-query workspaceMemberDevicesProof($workspaceId: ID!) {
-  workspaceMemberDevicesProof(workspaceId: $workspaceId) {
+query workspaceMemberDevicesProof($workspaceId: ID!, $invitationId: ID) {
+  workspaceMemberDevicesProof(
+    workspaceId: $workspaceId
+    invitationId: $invitationId
+  ) {
     proof {
       hash
       hashSignature
@@ -7,5 +10,6 @@ query workspaceMemberDevicesProof($workspaceId: ID!) {
       version
     }
     serializedData
+    authorMainDeviceSigningPublicKey
   }
 }

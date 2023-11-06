@@ -17,6 +17,7 @@ mutation finishLogin($input: FinishLoginInput!) {
       }
       serializedData
       workspaceId
+      authorMainDeviceSigningPublicKey
     }
   }
 }

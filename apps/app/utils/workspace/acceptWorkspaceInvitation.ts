@@ -1,10 +1,12 @@
 import * as workspaceChain from "@serenity-kit/workspace-chain";
+import * as workspaceMemberDevicesProofUtil from "@serenity-kit/workspace-member-devices-proof";
 import { LocalDevice, notNull } from "@serenity-tools/common";
 import sodium from "react-native-libsodium";
 import {
   Role as RoleEnum,
   runAcceptWorkspaceInvitationMutation,
   runWorkspaceChainByInvitationIdQuery,
+  runWorkspaceMemberDevicesProofQuery,
 } from "../../generated/graphql";
 
 type Role = `${RoleEnum}`;
@@ -18,6 +20,8 @@ export type Props = {
   role: Role;
   invitationDataSignature: string;
   invitationSigningPublicKey: string;
+  currentUserId: string;
+  currentUserChainHash: string;
 };
 
 export const acceptWorkspaceInvitation = async ({
@@ -29,6 +33,8 @@ export const acceptWorkspaceInvitation = async ({
   invitationDataSignature,
   invitationSigningPublicKey,
   role,
+  currentUserId,
+  currentUserChainHash,
 }: Props): Promise<string> => {
   const workspaceChainByInvitationIdResult =
     await runWorkspaceChainByInvitationIdQuery({ invitationId });
@@ -73,10 +79,56 @@ export const acceptWorkspaceInvitation = async ({
     },
   });
 
+  const workspaceMemberDevicesProofQueryResult =
+    await runWorkspaceMemberDevicesProofQuery({
+      workspaceId,
+      invitationId,
+    });
+
+  if (
+    !workspaceMemberDevicesProofQueryResult.data?.workspaceMemberDevicesProof
+  ) {
+    throw new Error("Missing workspaceMemberDevicesProof");
+  }
+
+  const tmpResult =
+    workspaceMemberDevicesProofQueryResult.data?.workspaceMemberDevicesProof;
+  const existingWorkspaceMemberDevicesProofData =
+    workspaceMemberDevicesProofUtil.WorkspaceMemberDevicesProofData.parse(
+      JSON.parse(tmpResult.serializedData)
+    );
+
+  // TODO verify the result using isValidWorkspaceMemberDevicesProof
+  // TODO verify the result using workspaceChainHash
+  // TODO verify your own user chain entry
+
+  const workspaceMemberDevicesProof =
+    workspaceMemberDevicesProofUtil.createWorkspaceMemberDevicesProof({
+      authorKeyPair: {
+        privateKey: sodium.from_base64(mainDevice.signingPrivateKey),
+        publicKey: sodium.from_base64(mainDevice.signingPublicKey),
+        keyType: "ed25519",
+      },
+      workspaceMemberDevicesProofData: {
+        ...existingWorkspaceMemberDevicesProofData,
+        userChainHashes: {
+          ...existingWorkspaceMemberDevicesProofData.userChainHashes,
+          [currentUserId]: currentUserChainHash,
+        },
+        clock: existingWorkspaceMemberDevicesProofData.clock + 1,
+        workspaceChainHash: workspaceChain.hashTransaction(
+          acceptInvitationEvent.transaction
+        ),
+      },
+    });
+
   const result = await runAcceptWorkspaceInvitationMutation(
     {
       input: {
         serializedWorkspaceChainEvent: JSON.stringify(acceptInvitationEvent),
+        serializedWorkspaceMemberDevicesProof: JSON.stringify(
+          workspaceMemberDevicesProof
+        ),
       },
     },
     { requestPolicy: "network-only" }

@@ -20,6 +20,7 @@ export type Scalars = {
 
 export type AcceptWorkspaceInvitationInput = {
   serializedWorkspaceChainEvent: Scalars['String'];
+  serializedWorkspaceMemberDevicesProof: Scalars['String'];
 };
 
 export type AcceptWorkspaceInvitationResult = {
@@ -275,6 +276,7 @@ export type DeleteDeviceInput = {
   creatorSigningPublicKey: Scalars['String'];
   newDeviceWorkspaceKeyBoxes: Array<WorkspaceWithWorkspaceDevicesParingInput>;
   serializedUserChainEvent: Scalars['String'];
+  workspaceMemberDevicesProofs: Array<WorkspaceMemberDevicesProofInput>;
 };
 
 export type DeleteDeviceResult = {
@@ -586,6 +588,7 @@ export type KeyDerivationTraceInput = {
 
 export type LogoutInput = {
   serializedUserChainEvent: Scalars['String'];
+  workspaceMemberDevicesProofs: Array<WorkspaceMemberDevicesProofInput>;
 };
 
 export type LogoutResult = {
@@ -1030,6 +1033,7 @@ export type QueryWorkspaceKeyByDocumentIdArgs = {
 
 
 export type QueryWorkspaceMemberDevicesProofArgs = {
+  invitationId?: InputMaybe<Scalars['ID']>;
   workspaceId: Scalars['ID'];
 };
 
@@ -1409,6 +1413,7 @@ export type WorkspaceMemberConnection = {
 
 export type WorkspaceMemberDevicesProof = {
   __typename?: 'WorkspaceMemberDevicesProof';
+  authorMainDeviceSigningPublicKey: Scalars['String'];
   proof: WorkspaceMemberDevicesProofContent;
   serializedData: Scalars['String'];
   workspaceId: Scalars['String'];
@@ -1594,7 +1599,7 @@ export type FinishLoginMutationVariables = Exact<{
 }>;
 
 
-export type FinishLoginMutation = { __typename?: 'Mutation', finishLogin?: { __typename?: 'FinishLoginResult', userChain: Array<{ __typename?: 'UserChainEvent', position: number, serializedContent: string }>, mainDevice: { __typename?: 'FinishLoginMainDevice', ciphertext: string, nonce: string }, workspaceMemberDevicesProofs: Array<{ __typename?: 'WorkspaceMemberDevicesProof', serializedData: string, workspaceId: string, proof: { __typename?: 'WorkspaceMemberDevicesProofContent', hash: string, hashSignature: string, clock: number, version: number } }> } | null };
+export type FinishLoginMutation = { __typename?: 'Mutation', finishLogin?: { __typename?: 'FinishLoginResult', userChain: Array<{ __typename?: 'UserChainEvent', position: number, serializedContent: string }>, mainDevice: { __typename?: 'FinishLoginMainDevice', ciphertext: string, nonce: string }, workspaceMemberDevicesProofs: Array<{ __typename?: 'WorkspaceMemberDevicesProof', serializedData: string, workspaceId: string, authorMainDeviceSigningPublicKey: string, proof: { __typename?: 'WorkspaceMemberDevicesProofContent', hash: string, hashSignature: string, clock: number, version: number } }> } | null };
 
 export type FinishRegistrationMutationVariables = Exact<{
   input: FinishRegistrationInput;
@@ -1896,15 +1901,16 @@ export type WorkspaceInvitationsQuery = { __typename?: 'Query', workspaceInvitat
 
 export type WorkspaceMemberDevicesProofQueryVariables = Exact<{
   workspaceId: Scalars['ID'];
+  invitationId?: InputMaybe<Scalars['ID']>;
 }>;
 
 
-export type WorkspaceMemberDevicesProofQuery = { __typename?: 'Query', workspaceMemberDevicesProof?: { __typename?: 'WorkspaceMemberDevicesProof', serializedData: string, proof: { __typename?: 'WorkspaceMemberDevicesProofContent', hash: string, hashSignature: string, clock: number, version: number } } | null };
+export type WorkspaceMemberDevicesProofQuery = { __typename?: 'Query', workspaceMemberDevicesProof?: { __typename?: 'WorkspaceMemberDevicesProof', serializedData: string, authorMainDeviceSigningPublicKey: string, proof: { __typename?: 'WorkspaceMemberDevicesProofContent', hash: string, hashSignature: string, clock: number, version: number } } | null };
 
 export type WorkspaceMemberDevicesProofsQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type WorkspaceMemberDevicesProofsQuery = { __typename?: 'Query', workspaceMemberDevicesProofs?: { __typename?: 'WorkspaceMemberDevicesProofConnection', nodes?: Array<{ __typename?: 'WorkspaceMemberDevicesProof', serializedData: string, workspaceId: string, proof: { __typename?: 'WorkspaceMemberDevicesProofContent', hash: string, hashSignature: string, clock: number, version: number } } | null> | null } | null };
+export type WorkspaceMemberDevicesProofsQuery = { __typename?: 'Query', workspaceMemberDevicesProofs?: { __typename?: 'WorkspaceMemberDevicesProofConnection', nodes?: Array<{ __typename?: 'WorkspaceMemberDevicesProof', serializedData: string, workspaceId: string, authorMainDeviceSigningPublicKey: string, proof: { __typename?: 'WorkspaceMemberDevicesProofContent', hash: string, hashSignature: string, clock: number, version: number } } | null> | null } | null };
 
 export type WorkspaceMembersQueryVariables = Exact<{
   workspaceId: Scalars['ID'];
@@ -2252,6 +2258,7 @@ export const FinishLoginDocument = gql`
       }
       serializedData
       workspaceId
+      authorMainDeviceSigningPublicKey
     }
   }
 }
@@ -3041,8 +3048,11 @@ export function useWorkspaceInvitationsQuery(options: Omit<Urql.UseQueryArgs<Wor
   return Urql.useQuery<WorkspaceInvitationsQuery, WorkspaceInvitationsQueryVariables>({ query: WorkspaceInvitationsDocument, ...options });
 };
 export const WorkspaceMemberDevicesProofDocument = gql`
-    query workspaceMemberDevicesProof($workspaceId: ID!) {
-  workspaceMemberDevicesProof(workspaceId: $workspaceId) {
+    query workspaceMemberDevicesProof($workspaceId: ID!, $invitationId: ID) {
+  workspaceMemberDevicesProof(
+    workspaceId: $workspaceId
+    invitationId: $invitationId
+  ) {
     proof {
       hash
       hashSignature
@@ -3050,6 +3060,7 @@ export const WorkspaceMemberDevicesProofDocument = gql`
       version
     }
     serializedData
+    authorMainDeviceSigningPublicKey
   }
 }
     `;
@@ -3069,6 +3080,7 @@ export const WorkspaceMemberDevicesProofsDocument = gql`
       }
       serializedData
       workspaceId
+      authorMainDeviceSigningPublicKey
     }
   }
 }

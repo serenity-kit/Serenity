@@ -9,6 +9,7 @@ query workspaceMemberDevicesProofs {
       }
       serializedData
       workspaceId
+      authorMainDeviceSigningPublicKey
     }
   }
 }

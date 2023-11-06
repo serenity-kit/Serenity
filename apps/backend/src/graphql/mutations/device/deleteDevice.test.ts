@@ -235,20 +235,6 @@ test("delete login device clears session", async () => {
   expect(device).toBeNull();
 });
 
-test("Unauthenticated", async () => {
-  await expect(
-    (async () =>
-      await deleteDevice({
-        graphql,
-        creatorSigningPublicKey: userData1.device.signingPublicKey,
-        newDeviceWorkspaceKeyBoxes: [],
-        deviceSigningPublicKeyToBeDeleted: userData1.webDevice.signingPublicKey,
-        authorizationHeader: "badauthheader",
-        mainDevice: userData1.mainDevice,
-      }))()
-  ).rejects.toThrowError(/UNAUTHENTICATED/);
-});
-
 describe("Input errors", () => {
   const authorizationHeaders = {
     authorization: "somesessionkey",

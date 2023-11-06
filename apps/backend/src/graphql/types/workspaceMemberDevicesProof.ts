@@ -1,4 +1,4 @@
-import { objectType } from "nexus";
+import { inputObjectType, objectType } from "nexus";
 
 export const WorkspaceMemberDevicesProofContent = objectType({
   name: "WorkspaceMemberDevicesProofContent",
@@ -16,5 +16,14 @@ export const WorkspaceMemberDevicesProof = objectType({
     t.nonNull.string("serializedData");
     t.nonNull.field("proof", { type: WorkspaceMemberDevicesProofContent });
     t.nonNull.string("workspaceId");
+    t.nonNull.string("authorMainDeviceSigningPublicKey");
+  },
+});
+
+export const WorkspaceMemberDevicesProofInput = inputObjectType({
+  name: "WorkspaceMemberDevicesProofInput",
+  definition(t) {
+    t.nonNull.string("workspaceId");
+    t.nonNull.string("serializedWorkspaceMemberDevicesProof");
   },
 });

@@ -1,4 +1,6 @@
 import * as userChain from "@serenity-kit/user-chain";
+import * as workspaceMemberDevicesProofUtil from "@serenity-kit/workspace-member-devices-proof";
+import { equalStringArrays } from "@serenity-tools/common";
 import { UserInputError } from "apollo-server-express";
 import { Prisma, WorkspaceKey } from "../../../prisma/generated/output";
 import {
@@ -8,12 +10,17 @@ import {
 import { prisma } from "../prisma";
 import { getLastUserChainEventWithState } from "../userChain/getLastUserChainEventWithState";
 import { rotateWorkspaceKey } from "../workspace/rotateWorkspaceKey";
+import { updateWorkspaceMemberDevicesProof } from "../workspace/updateWorkspaceMemberDevicesProof";
 
 type Params = {
   userId: string;
   newDeviceWorkspaceKeyBoxes: WorkspaceWithWorkspaceDevicesParing[];
   creatorDeviceSigningPublicKey: string;
   removeDeviceEvent: userChain.RemoveDeviceEvent;
+  workspaceMemberDevicesProofEntries: {
+    workspaceId: string;
+    workspaceMemberDevicesProof: workspaceMemberDevicesProofUtil.WorkspaceMemberDevicesProof;
+  }[];
 };
 
 export async function deleteDevice({
@@ -21,6 +28,7 @@ export async function deleteDevice({
   creatorDeviceSigningPublicKey,
   newDeviceWorkspaceKeyBoxes,
   removeDeviceEvent,
+  workspaceMemberDevicesProofEntries,
 }: Params): Promise<WorkspaceKey[]> {
   const deviceSigningPublicKeyToBeDeleted =
     removeDeviceEvent.transaction.signingPublicKey;
@@ -208,6 +216,37 @@ export async function deleteDevice({
         });
         updatedWorkspaceKeys.push(updatedWorkspaceKey);
       }
+
+      const userWorkspacesIncludingUnauthorized =
+        await prisma.usersToWorkspaces.findMany({
+          where: { userId },
+          select: { workspaceId: true },
+        });
+
+      const workspaceIds = userWorkspacesIncludingUnauthorized.map(
+        (entry) => entry.workspaceId
+      );
+
+      if (
+        !equalStringArrays(
+          workspaceMemberDevicesProofEntries.map((entry) => entry.workspaceId),
+          workspaceIds
+        )
+      ) {
+        throw new Error("Invalid workspaceMemberDevicesProofEntries");
+      }
+
+      for (const entry of workspaceMemberDevicesProofEntries) {
+        await updateWorkspaceMemberDevicesProof({
+          authorPublicKey: userChainState.mainDeviceSigningPublicKey,
+          userId,
+          prisma,
+          workspaceId: entry.workspaceId,
+          userChainEventHash: newUserChainState.eventHash,
+          workspaceMemberDevicesProof: entry.workspaceMemberDevicesProof,
+        });
+      }
+
       // delete unmatched devices
       await prisma.device.deleteMany({
         where: {

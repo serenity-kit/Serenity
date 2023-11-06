@@ -1,5 +1,10 @@
 import * as userChain from "@serenity-kit/user-chain";
-import { getExpiredTextFromString, notNull } from "@serenity-tools/common";
+import * as workspaceMemberDevicesProofUtil from "@serenity-kit/workspace-member-devices-proof";
+import {
+  getExpiredTextFromString,
+  notNull,
+  notUndefined,
+} from "@serenity-tools/common";
 import {
   Description,
   Heading,
@@ -18,14 +23,20 @@ import { useMachine } from "@xstate/react";
 import { format } from "date-fns";
 import { useState } from "react";
 import { useWindowDimensions } from "react-native";
+import sodium from "react-native-libsodium";
 import { VerifyPasswordModal } from "../../../components/verifyPasswordModal/VerifyPasswordModal";
 import {
+  runWorkspaceMemberDevicesProofsQuery,
   useDeleteDeviceMutation,
   useDevicesQuery,
   useUserChainQuery,
 } from "../../../generated/graphql";
 import { useAuthenticatedAppContext } from "../../../hooks/useAuthenticatedAppContext";
 import { loadMeAndVerifyMachine } from "../../../machines/loadMeAndVerifyMachine";
+import {
+  getWorkspaceChainEventByHash,
+  loadRemoteWorkspaceChain,
+} from "../../../store/workspaceChainStore";
 import { RootStackScreenProps } from "../../../types/navigationProps";
 import { WorkspaceWithWorkspaceDevicesParing } from "../../../types/workspaceDevice";
 import { getMainDevice } from "../../../utils/device/mainDeviceMemoryStore";
@@ -55,7 +66,6 @@ export default function AccountDevicesSettingsScreen(
     },
   });
   const [, deleteDeviceMutation] = useDeleteDeviceMutation();
-
   const [userChainQueryResult, reExecuteUserChainQuery] = useUserChainQuery({});
 
   let userChainState: userChain.UserChainState | null = null;
@@ -94,16 +104,31 @@ export default function AccountDevicesSettingsScreen(
     if (!lastChainEvent) {
       throw new Error("lastChainEvent not available");
     }
+    if (!userChainState) {
+      throw new Error("userChainState not available");
+    }
     const newDeviceWorkspaceKeyBoxes: WorkspaceWithWorkspaceDevicesParing[] =
       [];
     const workspaces = await getWorkspaces({
       deviceSigningPublicKey: activeDevice.signingPublicKey,
     });
+
+    const workspaceMemberDevicesProofsQueryResult =
+      await runWorkspaceMemberDevicesProofsQuery({});
+
+    if (
+      !workspaceMemberDevicesProofsQueryResult.data
+        ?.workspaceMemberDevicesProofs?.nodes
+    ) {
+      throw new Error("Failed to fetch workspaceMemberDevicesProofs");
+    }
+
     if (!workspaces) {
       console.error("no workspaces found for user");
       setSigningPublicKeyToBeDeleted(undefined);
       return;
     }
+
     for (let workspace of workspaces) {
       const workspaceId = workspace.id;
 
@@ -127,12 +152,77 @@ export default function AccountDevicesSettingsScreen(
       signingPublicKey: deviceSigningPublicKey,
       prevEvent: lastChainEvent,
     });
+    const newUserChainState = userChain.applyEvent({
+      state: userChainState,
+      event,
+      knownVersion: userChain.version,
+    });
+
+    const newWorkspaceMemberDevicesProofs: {
+      workspaceId: string;
+      serializedWorkspaceMemberDevicesProof: string;
+    }[] = [];
+    for (const entry of workspaceMemberDevicesProofsQueryResult.data.workspaceMemberDevicesProofs.nodes
+      .filter(notNull)
+      .filter(notUndefined)) {
+      const data =
+        workspaceMemberDevicesProofUtil.WorkspaceMemberDevicesProofData.parse(
+          JSON.parse(entry.serializedData)
+        );
+
+      // load latest workspace chain entries and check if the workspace chain event is included
+      // to verify that the server is providing this or a newer workspace chain
+      const { state } = await loadRemoteWorkspaceChain({
+        workspaceId: entry.workspaceId,
+      });
+      const workspaceChainEvent = getWorkspaceChainEventByHash({
+        hash: data.workspaceChainHash,
+        workspaceId: entry.workspaceId,
+      });
+      if (!workspaceChainEvent) {
+        throw new Error(
+          "Workspace chain event not found in the current workspace chain"
+        );
+      }
+
+      const isValid =
+        workspaceMemberDevicesProofUtil.isValidWorkspaceMemberDevicesProof({
+          authorPublicKey: entry.authorMainDeviceSigningPublicKey,
+          workspaceMemberDevicesProof: entry.proof,
+          workspaceMemberDevicesProofData: data,
+        });
+      if (!isValid) {
+        throw new Error("Invalid workspace member devices proof");
+      }
+
+      const newProof =
+        workspaceMemberDevicesProofUtil.createWorkspaceMemberDevicesProof({
+          authorKeyPair: {
+            privateKey: sodium.from_base64(mainDevice.signingPrivateKey),
+            publicKey: sodium.from_base64(mainDevice.signingPublicKey),
+            keyType: "ed25519",
+          },
+          workspaceMemberDevicesProofData: {
+            clock: data.clock + 1,
+            userChainHashes: {
+              ...data.userChainHashes,
+              [newUserChainState.id]: newUserChainState.eventHash,
+            },
+            workspaceChainHash: state.lastEventHash,
+          },
+        });
+      newWorkspaceMemberDevicesProofs.push({
+        workspaceId: entry.workspaceId,
+        serializedWorkspaceMemberDevicesProof: JSON.stringify(newProof),
+      });
+    }
 
     const deleteDeviceResult = await deleteDeviceMutation({
       input: {
         creatorSigningPublicKey: activeDevice.signingPublicKey,
         newDeviceWorkspaceKeyBoxes,
         serializedUserChainEvent: JSON.stringify(event),
+        workspaceMemberDevicesProofs: newWorkspaceMemberDevicesProofs,
       },
     });
     if (deleteDeviceResult.data?.deleteDevice) {

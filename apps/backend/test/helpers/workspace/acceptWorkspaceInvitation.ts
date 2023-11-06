@@ -1,8 +1,11 @@
 import * as workspaceChain from "@serenity-kit/workspace-chain";
+import * as workspaceMemberDevicesProofUtil from "@serenity-kit/workspace-member-devices-proof";
 import { LocalDevice } from "@serenity-tools/common";
 import { gql } from "graphql-request";
 import sodium from "react-native-libsodium";
 import { prisma } from "../../../src/database/prisma";
+import { getWorkspaceMemberDevicesProofByWorkspaceId } from "../../../src/database/workspace/getWorkspaceMemberDevicesProofByWorkspaceId";
+import { getAndConstructUserFromUserChainTestHelper } from "../userChain/getAndConstructUserFromUserChainTestHelper";
 import { getLastWorkspaceChainEvent } from "./getLastWorkspaceChainEvent";
 
 type Params = {
@@ -61,11 +64,43 @@ export const acceptWorkspaceInvitation = async ({
     },
   });
 
+  const existingEntry = await getWorkspaceMemberDevicesProofByWorkspaceId({
+    prisma,
+    workspaceId: workspaceInvitation.workspaceId,
+  });
+
+  const userChainUser = await getAndConstructUserFromUserChainTestHelper({
+    mainDeviceSigningPublicKey: inviteeMainDevice.signingPublicKey,
+  });
+
+  const workspaceMemberDevicesProofData: workspaceMemberDevicesProofUtil.WorkspaceMemberDevicesProofData =
+    {
+      clock: existingEntry.proof.clock + 1,
+      userChainHashes: {
+        ...existingEntry.data.userChainHashes,
+        [userChainUser.userId]: userChainUser.userChainState.eventHash,
+      },
+      workspaceChainHash: workspaceChain.hashTransaction(
+        acceptInvitationEvent.transaction
+      ),
+    };
+
+  const newProof =
+    workspaceMemberDevicesProofUtil.createWorkspaceMemberDevicesProof({
+      authorKeyPair: {
+        privateKey: sodium.from_base64(inviteeMainDevice.signingPrivateKey),
+        publicKey: sodium.from_base64(inviteeMainDevice.signingPublicKey),
+        keyType: "ed25519",
+      },
+      workspaceMemberDevicesProofData,
+    });
+
   const result = await graphql.client.request(
     query,
     {
       input: {
         serializedWorkspaceChainEvent: JSON.stringify(acceptInvitationEvent),
+        serializedWorkspaceMemberDevicesProof: JSON.stringify(newProof),
       },
     },
     authorizationHeaders

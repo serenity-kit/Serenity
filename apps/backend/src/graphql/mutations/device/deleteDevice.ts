@@ -1,4 +1,5 @@
 import * as userChain from "@serenity-kit/user-chain";
+import * as workspaceMemberDevicesProofUtil from "@serenity-kit/workspace-member-devices-proof";
 import { AuthenticationError } from "apollo-server-express";
 import {
   arg,
@@ -9,6 +10,7 @@ import {
 } from "nexus";
 import { deleteDevice } from "../../../database/device/deleteDevice";
 import { WorkspaceWithWorkspaceDevicesParingInput } from "../../types/workspaceDevice";
+import { WorkspaceMemberDevicesProofInput } from "../../types/workspaceMemberDevicesProof";
 
 export const DeleteDeviceResult = objectType({
   name: "DeleteDeviceResult",
@@ -25,6 +27,9 @@ export const DeleteDeviceInput = inputObjectType({
       type: WorkspaceWithWorkspaceDevicesParingInput,
     });
     t.nonNull.string("serializedUserChainEvent");
+    t.nonNull.list.nonNull.field("workspaceMemberDevicesProofs", {
+      type: WorkspaceMemberDevicesProofInput,
+    });
   },
 });
 
@@ -49,11 +54,23 @@ export const deleteDeviceMutation = mutationField("deleteDevice", {
       JSON.parse(args.input.serializedUserChainEvent)
     );
 
+    const workspaceMemberDevicesProofEntries =
+      args.input.workspaceMemberDevicesProofs.map((entry) => {
+        return {
+          workspaceId: entry.workspaceId,
+          workspaceMemberDevicesProof:
+            workspaceMemberDevicesProofUtil.WorkspaceMemberDevicesProof.parse(
+              JSON.parse(entry.serializedWorkspaceMemberDevicesProof)
+            ),
+        };
+      });
+
     await deleteDevice({
       userId: context.user.id,
       creatorDeviceSigningPublicKey: args.input.creatorSigningPublicKey,
       newDeviceWorkspaceKeyBoxes: args.input.newDeviceWorkspaceKeyBoxes,
       removeDeviceEvent,
+      workspaceMemberDevicesProofEntries,
     });
     return {
       status: "success",
