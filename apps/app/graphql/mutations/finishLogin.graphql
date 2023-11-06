@@ -8,5 +8,15 @@ mutation finishLogin($input: FinishLoginInput!) {
       ciphertext
       nonce
     }
+    workspaceMemberDevicesProofs {
+      proof {
+        hash
+        hashSignature
+        clock
+        version
+      }
+      serializedData
+      workspaceId
+    }
   }
 }

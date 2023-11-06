@@ -51,6 +51,12 @@ export const isValidWorkspaceMemberDevicesProof = ({
     );
 
     if (regeneratedHash !== workspaceMemberDevicesProof.hash) {
+      console.log("PPP", workspaceMemberDevicesProofDataString);
+      console.log(
+        "wrong hash",
+        regeneratedHash,
+        workspaceMemberDevicesProof.hash
+      );
       return false;
     }
 

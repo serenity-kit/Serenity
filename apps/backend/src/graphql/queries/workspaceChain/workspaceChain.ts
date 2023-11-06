@@ -1,5 +1,6 @@
 import { AuthenticationError, UserInputError } from "apollo-server-express";
 import { idArg, nonNull, queryField } from "nexus";
+import { getLoginAttemptAndUserBySessionKey } from "../../../database/authentication/getLoginAttemptAndUserBySessionKey";
 import { getWorkspaceChain } from "../../../database/workspaceChain/getWorkspaceChain";
 import { WorkspaceChainEvent } from "../../types/workspaceChain";
 
@@ -18,10 +19,23 @@ export const workspaceChainQuery = queryField((t) => {
           "Requested too many workspace chain events. First value exceeds 5000."
         );
       }
-      if (!context.user) {
+
+      let userId = "";
+      if (context.user) {
+        userId = context.user.id;
+      } else if (context.authorizationHeader) {
+        const sessionKey = context.authorizationHeader;
+        try {
+          const { user } = await getLoginAttemptAndUserBySessionKey({
+            sessionKey,
+          });
+          userId = user.id;
+        } catch (e) {
+          throw new AuthenticationError("Not authenticated");
+        }
+      } else {
         throw new AuthenticationError("Not authenticated");
       }
-      const userId = context.user.id;
       const afterPosition = args.after ? parseInt(args.after, 10) : undefined;
       // prisma will include the cursor if skip: 1 is not set
       // https://www.prisma.io/docs/concepts/components/prisma-client/pagination#do-i-always-have-to-skip-1

@@ -40,7 +40,7 @@ test("user should be able to delete a workspace invitation they created", async 
   const { lastChainEntry } = await getLastWorkspaceChainEvent({
     workspaceId: userAndDevice1.workspace.id,
   });
-  const removeInvitationsEvent = workspaceChain.removeInvitations({
+  const removeInvitationEvent = workspaceChain.removeInvitations({
     prevHash: workspaceChain.hashTransaction(lastChainEntry.transaction),
     authorKeyPair: {
       keyType: "ed25519",
@@ -54,57 +54,10 @@ test("user should be able to delete a workspace invitation they created", async 
 
   const deleteWorkspaceInvitationResult = await deleteWorkspaceInvitations({
     graphql,
-    serializedWorkspaceChainEvent: JSON.stringify(removeInvitationsEvent),
-    authorizationHeader: userAndDevice1.sessionKey,
-  });
-  expect(deleteWorkspaceInvitationResult.deleteWorkspaceInvitations)
-    .toMatchInlineSnapshot(`
-    {
-      "status": "success",
-    }
-  `);
-});
-
-test("user should be able to delete a workspace invitation they didn't create", async () => {
-  // add user2 as an admin for workspace 1
-  const workspaceInvitationResult = await createWorkspaceInvitation({
-    graphql,
-    role: "ADMIN",
-    workspaceId: userAndDevice1.workspace.id,
+    workspaceChainEvent: removeInvitationEvent,
     authorizationHeader: userAndDevice1.sessionKey,
     mainDevice: userAndDevice1.mainDevice,
-  });
-  const invitationId =
-    workspaceInvitationResult.createWorkspaceInvitation.workspaceInvitation.id;
-
-  await acceptWorkspaceInvitation({
-    graphql,
-    invitationId,
-    inviteeMainDevice: userAndDevice2.mainDevice,
-    invitationSigningKeyPairSeed:
-      workspaceInvitationResult.invitationSigningKeyPairSeed,
-    authorizationHeader: userAndDevice2.sessionKey,
-  });
-
-  const { lastChainEntry } = await getLastWorkspaceChainEvent({
     workspaceId: userAndDevice1.workspace.id,
-  });
-  const removeInvitationsEvent = workspaceChain.removeInvitations({
-    prevHash: workspaceChain.hashTransaction(lastChainEntry.transaction),
-    authorKeyPair: {
-      keyType: "ed25519",
-      privateKey: sodium.from_base64(
-        userAndDevice2.mainDevice.signingPrivateKey
-      ),
-      publicKey: sodium.from_base64(userAndDevice2.mainDevice.signingPublicKey),
-    },
-    invitationIds: [invitationId],
-  });
-
-  const deleteWorkspaceInvitationResult = await deleteWorkspaceInvitations({
-    graphql,
-    serializedWorkspaceChainEvent: JSON.stringify(removeInvitationsEvent),
-    authorizationHeader: userAndDevice2.sessionKey,
   });
   expect(deleteWorkspaceInvitationResult.deleteWorkspaceInvitations)
     .toMatchInlineSnapshot(`
@@ -137,7 +90,7 @@ test("user should not be able to delete a workspace invitation if they aren't ad
   const { lastChainEntry } = await getLastWorkspaceChainEvent({
     workspaceId: userAndDevice1.workspace.id,
   });
-  const removeInvitationsEvent = workspaceChain.removeInvitations({
+  const removeInvitationEvent = workspaceChain.removeInvitations({
     prevHash: workspaceChain.hashTransaction(lastChainEntry.transaction),
     authorKeyPair: {
       keyType: "ed25519",
@@ -153,8 +106,10 @@ test("user should not be able to delete a workspace invitation if they aren't ad
     (async () =>
       await deleteWorkspaceInvitations({
         graphql,
-        serializedWorkspaceChainEvent: JSON.stringify(removeInvitationsEvent),
+        workspaceChainEvent: removeInvitationEvent,
         authorizationHeader: userAndDevice2.sessionKey,
+        mainDevice: userAndDevice1.mainDevice,
+        workspaceId: userAndDevice1.workspace.id,
       }))()
   ).rejects.toThrowError();
 });
@@ -174,7 +129,7 @@ test("Unauthenticated", async () => {
   const { lastChainEntry } = await getLastWorkspaceChainEvent({
     workspaceId: userAndDevice1.workspace.id,
   });
-  const removeInvitationsEvent = workspaceChain.removeInvitations({
+  const removeInvitationEvent = workspaceChain.removeInvitations({
     prevHash: workspaceChain.hashTransaction(lastChainEntry.transaction),
     authorKeyPair: {
       keyType: "ed25519",
@@ -190,8 +145,10 @@ test("Unauthenticated", async () => {
     (async () =>
       await deleteWorkspaceInvitations({
         graphql,
-        serializedWorkspaceChainEvent: JSON.stringify(removeInvitationsEvent),
+        workspaceChainEvent: removeInvitationEvent,
         authorizationHeader: "badauthheader",
+        mainDevice: userAndDevice1.mainDevice,
+        workspaceId: userAndDevice1.workspace.id,
       }))()
   ).rejects.toThrowError(/UNAUTHENTICATED/);
 });

@@ -1,4 +1,5 @@
 import * as userChain from "@serenity-kit/user-chain";
+import * as workspaceMemberDevicesProofUtil from "@serenity-kit/workspace-member-devices-proof";
 import { decryptMainDevice } from "@serenity-tools/common";
 import { addDays, addHours } from "date-fns";
 import { Platform } from "react-native";
@@ -12,6 +13,10 @@ import {
   runMeQuery,
   runStartLoginMutation,
 } from "../../generated/graphql";
+import {
+  getWorkspaceChainEventByHash,
+  loadRemoteWorkspaceChain,
+} from "../../store/workspaceChainStore";
 import { setMainDevice } from "../device/mainDeviceMemoryStore";
 import { getOpaqueServerPublicKey } from "../getOpaqueServerPublicKey/getOpaqueServerPublicKey";
 import { removeLastUsedDocumentIdAndWorkspaceId } from "../lastUsedWorkspaceAndDocumentStore/lastUsedWorkspaceAndDocumentStore";
@@ -165,6 +170,11 @@ export const login = async ({
     prevEvent: lastUserChainEvent,
     expiresAt,
   });
+  const newUserChainState = userChain.applyEvent({
+    state: userChainState.currentState,
+    event: addDeviceEvent,
+    knownVersion: userChain.version,
+  });
 
   const sessionTokenSignature = sodium.to_base64(
     sodium.crypto_sign_detached(
@@ -172,6 +182,65 @@ export const login = async ({
       sodium.from_base64(device.signingPrivateKey)
     )
   );
+
+  const newWorkspaceMemberDevicesProofs: {
+    workspaceId: string;
+    serializedWorkspaceMemberDevicesProof: string;
+  }[] = [];
+  for (const entry of finishLoginResult.data.finishLogin
+    .workspaceMemberDevicesProofs) {
+    const data =
+      workspaceMemberDevicesProofUtil.WorkspaceMemberDevicesProofData.parse(
+        JSON.parse(entry.serializedData)
+      );
+
+    // load latest workspace chain entries and check if the workspace chain event is included
+    // to verify that the server is providing this or a newer workspace chain
+    const { state } = await loadRemoteWorkspaceChain({
+      workspaceId: entry.workspaceId,
+      sessionKey: result.sessionKey,
+    });
+    const workspaceChainEvent = getWorkspaceChainEventByHash({
+      hash: data.workspaceChainHash,
+      workspaceId: entry.workspaceId,
+    });
+    if (!workspaceChainEvent) {
+      throw new Error(
+        "Workspace chain event not found in the current workspace chain"
+      );
+    }
+
+    const isValid =
+      workspaceMemberDevicesProofUtil.isValidWorkspaceMemberDevicesProof({
+        authorPublicKey: mainDevice.signingPublicKey,
+        workspaceMemberDevicesProof: entry.proof,
+        workspaceMemberDevicesProofData: data,
+      });
+    if (!isValid) {
+      throw new Error("Invalid workspace member devices proof");
+    }
+
+    const newProof =
+      workspaceMemberDevicesProofUtil.createWorkspaceMemberDevicesProof({
+        authorKeyPair: {
+          privateKey: sodium.from_base64(mainDevice.signingPrivateKey),
+          publicKey: sodium.from_base64(mainDevice.signingPublicKey),
+          keyType: "ed25519",
+        },
+        workspaceMemberDevicesProofData: {
+          clock: data.clock + 1,
+          userChainHashes: {
+            ...data.userChainHashes,
+            [newUserChainState.id]: newUserChainState.eventHash,
+          },
+          workspaceChainHash: state.lastEventHash,
+        },
+      });
+    newWorkspaceMemberDevicesProofs.push({
+      workspaceId: entry.workspaceId,
+      serializedWorkspaceMemberDevicesProof: JSON.stringify(newProof),
+    });
+  }
 
   const addDeviceResult = await runAddDeviceMutation(
     {
@@ -184,6 +253,7 @@ export const login = async ({
         sessionTokenSignature,
         deviceType: getDeviceType(useExtendedLogin),
         serializedUserChainEvent: JSON.stringify(addDeviceEvent),
+        workspaceMemberDevicesProofs: newWorkspaceMemberDevicesProofs,
         webDeviceCiphertext,
         webDeviceNonce,
       },

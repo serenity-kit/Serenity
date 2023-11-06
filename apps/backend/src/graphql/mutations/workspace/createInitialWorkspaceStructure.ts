@@ -1,5 +1,6 @@
 import * as documentChain from "@serenity-kit/document-chain";
 import * as workspaceChain from "@serenity-kit/workspace-chain";
+import * as workspaceMemberDevicesProofUtil from "@serenity-kit/workspace-member-devices-proof";
 import { AuthenticationError } from "apollo-server-express";
 import {
   arg,
@@ -67,6 +68,7 @@ export const CreateInitialWorkspaceStructureInput = inputObjectType({
     t.nonNull.field("folder", { type: CreateInitialFolderInput });
     t.nonNull.field("document", { type: CreateInitialDocumentInput });
     t.nonNull.string("creatorDeviceSigningPublicKey");
+    t.nonNull.string("serializedWorkspaceMemberDevicesProof");
   },
 });
 
@@ -108,14 +110,10 @@ export const createInitialWorkspaceStructureMutation = mutationField(
         context.user.mainDeviceSigningPublicKey
       );
 
-      const workspaceState = workspaceChain.resolveState([workspaceChainEvent]);
-      if (
-        !workspaceState.members.hasOwnProperty(
-          context.user.mainDeviceSigningPublicKey
-        )
-      ) {
-        throw new Error("Invalid workspace chain state");
-      }
+      const workspaceMemberDevicesProof =
+        workspaceMemberDevicesProofUtil.WorkspaceMemberDevicesProof.parse(
+          JSON.parse(args.input.serializedWorkspaceMemberDevicesProof)
+        );
 
       const documentChainEvent = documentChain.CreateDocumentChainEvent.parse(
         JSON.parse(args.input.document.serializedDocumentChainEvent)
@@ -123,12 +121,17 @@ export const createInitialWorkspaceStructureMutation = mutationField(
 
       const workspaceStructure = await createInitialWorkspaceStructure({
         userId: context.user.id,
-        workspace: { ...args.input.workspace, id: workspaceState.id },
+        workspace: {
+          ...args.input.workspace,
+          id: workspaceChainEvent.transaction.id,
+        },
         workspaceChainEvent,
         folder: args.input.folder,
         document: args.input.document,
+        userMainDeviceSigningPublicKey: context.user.mainDeviceSigningPublicKey,
         creatorDeviceSigningPublicKey: args.input.creatorDeviceSigningPublicKey,
         documentChainEvent,
+        workspaceMemberDevicesProof,
       });
       return workspaceStructure;
     },

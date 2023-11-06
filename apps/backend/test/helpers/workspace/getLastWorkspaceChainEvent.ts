@@ -21,5 +21,7 @@ export const getLastWorkspaceChainEvent = async ({ workspaceId }: Props) => {
 
   return {
     lastChainEntry,
+    workspaceChainState:
+      lastChainEntryFromDb.state as workspaceChain.WorkspaceChainState,
   };
 };

@@ -1,4 +1,5 @@
 import * as workspaceChain from "@serenity-kit/workspace-chain";
+import * as workspaceMemberDevicesProofUtil from "@serenity-kit/workspace-member-devices-proof";
 import { AuthenticationError } from "apollo-server-express";
 import {
   arg,
@@ -13,6 +14,7 @@ export const DeleteWorkspaceInvitationsInput = inputObjectType({
   name: "DeleteWorkspaceInvitationsInput",
   definition(t) {
     t.nonNull.string("serializedWorkspaceChainEvent");
+    t.nonNull.string("serializedWorkspaceMemberDevicesProof");
   },
 });
 
@@ -49,7 +51,17 @@ export const deleteWorkspaceInvitationsMutation = mutationField(
         context.user.mainDeviceSigningPublicKey
       );
 
-      await deleteWorkspaceInvitations({ workspaceChainEvent });
+      const workspaceMemberDevicesProof =
+        workspaceMemberDevicesProofUtil.WorkspaceMemberDevicesProof.parse(
+          JSON.parse(args.input.serializedWorkspaceMemberDevicesProof)
+        );
+
+      await deleteWorkspaceInvitations({
+        workspaceChainEvent,
+        userId: context.user.id,
+        workspaceMemberDevicesProof,
+        mainDeviceSigningPublicKey: context.user.mainDeviceSigningPublicKey,
+      });
       return { status: "success" };
     },
   }

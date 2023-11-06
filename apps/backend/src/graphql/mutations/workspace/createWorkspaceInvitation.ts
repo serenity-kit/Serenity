@@ -1,4 +1,5 @@
 import * as workspaceChain from "@serenity-kit/workspace-chain";
+import * as workspaceMemberDevicesProofUtil from "@serenity-kit/workspace-member-devices-proof";
 import { AuthenticationError } from "apollo-server-express";
 import {
   arg,
@@ -16,6 +17,7 @@ export const CreateWorkspaceInvitationInput = inputObjectType({
   definition(t) {
     t.nonNull.string("workspaceId");
     t.nonNull.string("serializedWorkspaceChainEvent");
+    t.nonNull.string("serializedWorkspaceMemberDevicesProof");
   },
 });
 
@@ -52,10 +54,17 @@ export const createWorkspaceInvitationMutation = mutationField(
         context.user.mainDeviceSigningPublicKey
       );
 
+      const workspaceMemberDevicesProof =
+        workspaceMemberDevicesProofUtil.WorkspaceMemberDevicesProof.parse(
+          JSON.parse(args.input.serializedWorkspaceMemberDevicesProof)
+        );
+
       const workspaceInvitation = await createWorkspaceInvitation({
+        mainDeviceSigningPublicKey: context.user.mainDeviceSigningPublicKey,
         workspaceId: args.input.workspaceId,
         inviterUserId: context.user.id,
         workspaceChainEvent,
+        workspaceMemberDevicesProof,
       });
       return {
         workspaceInvitation: formatWorkspaceInvitation(workspaceInvitation),

@@ -16,9 +16,10 @@ export type VerifiedUserFromUserChain = {
   userId: string;
   email: string;
   mainDeviceSigningPublicKey: string;
-  lastChainEvent: string;
+  lastChainEvent: userChain.UserChainEvent;
   nonExpiredDevices: VerifiedDevice[];
   expiredDevices: VerifiedDevice[];
+  userChainState: userChain.UserChainState;
 };
 
 export const constructUserFromSerializedUserChain = ({
@@ -29,7 +30,7 @@ export const constructUserFromSerializedUserChain = ({
   }
 
   let userChainState: userChain.UserChainState;
-  let lastChainEvent: userChain.UserChainEvent;
+  let lastChainEvent: userChain.UserChainEvent = {} as userChain.UserChainEvent;
 
   const userChainResult = userChain.resolveState({
     events: serializedUserChain.filter(notNull).map((event) => {
@@ -77,10 +78,10 @@ export const constructUserFromSerializedUserChain = ({
     userId: userChainState.id,
     email: userChainState.email,
     mainDeviceSigningPublicKey: userChainState.mainDeviceSigningPublicKey,
-    // @ts-expect-error there always must be lastChainEvent
     lastChainEvent,
     nonExpiredDevices,
     expiredDevices,
+    userChainState,
   };
   return workspaceMember;
 };

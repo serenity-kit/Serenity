@@ -211,19 +211,20 @@ model CreatorDevice {
 }
 
 model Workspace {
-  id                 String                 @id
-  infoCiphertext     String
-  infoNonce          String
+  id                           String                        @id
+  infoCiphertext               String
+  infoNonce                    String
   // TODO not sure how to create the workspaceKey and reference it here at the same time
-  infoWorkspaceKeyId String?                @unique
-  folders            Folder[]
-  documents          Document[]
-  usersToWorkspaces  UsersToWorkspaces[]
-  invitations        WorkspaceInvitations[]
-  workspaceKeys      WorkspaceKey[]         @relation(name: "workspace")
-  infoWorkspaceKey   WorkspaceKey?          @relation(name: "infoWorkspaceKey", fields: [infoWorkspaceKeyId], references: [id])
-  createdAt          DateTime               @default(now())
-  chain              WorkspaceChainEvent[]
+  infoWorkspaceKeyId           String?                       @unique
+  folders                      Folder[]
+  documents                    Document[]
+  usersToWorkspaces            UsersToWorkspaces[]
+  invitations                  WorkspaceInvitations[]
+  workspaceKeys                WorkspaceKey[]                @relation(name: "workspace")
+  infoWorkspaceKey             WorkspaceKey?                 @relation(name: "infoWorkspaceKey", fields: [infoWorkspaceKeyId], references: [id])
+  createdAt                    DateTime                      @default(now())
+  chain                        WorkspaceChainEvent[]
+  workspaceMemberDevicesProofs WorkspaceMemberDevicesProof[]
 
   @@index([createdAt(sort: Desc)])
 }
@@ -238,6 +239,18 @@ model WorkspaceChainEvent {
 
   @@id([workspaceId, position])
   @@index([workspaceId, position(sort: Asc)])
+}
+
+model WorkspaceMemberDevicesProof {
+  hash        String    @unique
+  proof       Json
+  data        Json
+  clock       Int
+  workspace   Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  workspaceId String
+
+  @@id([workspaceId, clock])
+  @@index([workspaceId, clock(sort: Asc)])
 }
 
 enum Role {

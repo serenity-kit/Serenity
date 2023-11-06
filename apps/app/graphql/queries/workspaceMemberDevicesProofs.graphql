@@ -1,0 +1,14 @@
+query workspaceMemberDevicesProofs {
+  workspaceMemberDevicesProofs(first: 50) {
+    nodes {
+      proof {
+        hash
+        hashSignature
+        clock
+        version
+      }
+      serializedData
+      workspaceId
+    }
+  }
+}

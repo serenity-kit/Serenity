@@ -19,6 +19,7 @@ export const createWorkspaceMemberDevicesProof = ({
   const workspaceDataString = canonicalize(
     workspaceMemberDevicesProofDataWithVersion
   );
+
   if (!workspaceDataString)
     throw new Error("Failed to canonicalize the workspaceParams");
   const hash = sodium.to_base64(

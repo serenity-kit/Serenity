@@ -1,5 +1,6 @@
 import * as workspaceChain from "@serenity-kit/workspace-chain";
 import { workspaceChainInvitationDomainContext } from "@serenity-kit/workspace-chain/src/constants";
+import * as workspaceMemberDevicesProofUtil from "@serenity-kit/workspace-member-devices-proof";
 import { ForbiddenError, UserInputError } from "apollo-server-express";
 import canonicalize from "canonicalize";
 import sodium from "react-native-libsodium";
@@ -7,17 +8,22 @@ import { Prisma, Role } from "../../../prisma/generated/output";
 import { WorkspaceInvitation } from "../../types/workspace";
 import { prisma } from "../prisma";
 import { getLastWorkspaceChainEventWithState } from "../workspaceChain/getLastWorkspaceChainEventWithState";
+import { updateWorkspaceMemberDevicesProof } from "./updateWorkspaceMemberDevicesProof";
 
 type Params = {
   workspaceId: string;
   inviterUserId: string;
   workspaceChainEvent: workspaceChain.AddInvitationWorkspaceChainEvent;
+  workspaceMemberDevicesProof: workspaceMemberDevicesProofUtil.WorkspaceMemberDevicesProof;
+  mainDeviceSigningPublicKey: string;
 };
 
 export async function createWorkspaceInvitation({
   workspaceId,
   workspaceChainEvent,
   inviterUserId,
+  workspaceMemberDevicesProof,
+  mainDeviceSigningPublicKey,
 }: Params) {
   if (workspaceId !== workspaceChainEvent.transaction.workspaceId) {
     throw new UserInputError("The workspace ID does not match");
@@ -100,6 +106,14 @@ export async function createWorkspaceInvitation({
           workspaceId,
           position: lastWorkspaceChainEvent.position + 1,
         },
+      });
+
+      await updateWorkspaceMemberDevicesProof({
+        authorPublicKey: mainDeviceSigningPublicKey,
+        userId: inviterUserId,
+        prisma,
+        workspaceId,
+        workspaceMemberDevicesProof,
       });
 
       const rawWorkspaceInvitation = await prisma.workspaceInvitations.create({

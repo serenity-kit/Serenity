@@ -43,6 +43,7 @@ export type AddDeviceInput = {
   sessionTokenSignature: Scalars['String'];
   webDeviceCiphertext?: InputMaybe<Scalars['String']>;
   webDeviceNonce?: InputMaybe<Scalars['String']>;
+  workspaceMemberDevicesProofs: Array<WorkspaceMemberDevicesProofInput>;
 };
 
 export type AddDeviceResult = {
@@ -221,6 +222,7 @@ export type CreateInitialWorkspaceStructureInput = {
   document: CreateInitialDocumentInput;
   folder: CreateInitialFolderInput;
   serializedWorkspaceChainEvent: Scalars['String'];
+  serializedWorkspaceMemberDevicesProof: Scalars['String'];
   workspace: CreateInitialWorkspaceInput;
 };
 
@@ -233,6 +235,7 @@ export type CreateInitialWorkspaceStructureResult = {
 
 export type CreateWorkspaceInvitationInput = {
   serializedWorkspaceChainEvent: Scalars['String'];
+  serializedWorkspaceMemberDevicesProof: Scalars['String'];
   workspaceId: Scalars['String'];
 };
 
@@ -301,6 +304,7 @@ export type DeleteFoldersResult = {
 
 export type DeleteWorkspaceInvitationsInput = {
   serializedWorkspaceChainEvent: Scalars['String'];
+  serializedWorkspaceMemberDevicesProof: Scalars['String'];
 };
 
 export type DeleteWorkspaceInvitationsResult = {
@@ -489,6 +493,7 @@ export type FinishLoginResult = {
   __typename?: 'FinishLoginResult';
   mainDevice: FinishLoginMainDevice;
   userChain: Array<UserChainEvent>;
+  workspaceMemberDevicesProofs: Array<WorkspaceMemberDevicesProof>;
 };
 
 export type FinishRegistrationDeviceInput = {
@@ -853,6 +858,8 @@ export type Query = {
   workspaceInvitation?: Maybe<WorkspaceInvitation>;
   workspaceInvitations?: Maybe<WorkspaceInvitationConnection>;
   workspaceKeyByDocumentId?: Maybe<WorkspaceKeyByDocumentIdResult>;
+  workspaceMemberDevicesProof?: Maybe<WorkspaceMemberDevicesProof>;
+  workspaceMemberDevicesProofs?: Maybe<WorkspaceMemberDevicesProofConnection>;
   workspaceMembers?: Maybe<WorkspaceMemberConnection>;
   workspaceMembersByMainDeviceSigningPublicKey?: Maybe<WorkspaceMembersByMainDeviceSigningPublicKeyResult>;
   workspaces?: Maybe<WorkspaceConnection>;
@@ -1019,6 +1026,17 @@ export type QueryWorkspaceInvitationsArgs = {
 export type QueryWorkspaceKeyByDocumentIdArgs = {
   deviceSigningPublicKey: Scalars['String'];
   documentId: Scalars['ID'];
+};
+
+
+export type QueryWorkspaceMemberDevicesProofArgs = {
+  workspaceId: Scalars['ID'];
+};
+
+
+export type QueryWorkspaceMemberDevicesProofsArgs = {
+  after?: InputMaybe<Scalars['String']>;
+  first: Scalars['Int'];
 };
 
 
@@ -1387,6 +1405,44 @@ export type WorkspaceMemberConnection = {
   pageInfo: PageInfo;
 };
 
+export type WorkspaceMemberDevicesProof = {
+  __typename?: 'WorkspaceMemberDevicesProof';
+  proof: WorkspaceMemberDevicesProofContent;
+  serializedData: Scalars['String'];
+  workspaceId: Scalars['String'];
+};
+
+export type WorkspaceMemberDevicesProofConnection = {
+  __typename?: 'WorkspaceMemberDevicesProofConnection';
+  /** https://facebook.github.io/relay/graphql/connections.htm#sec-Edge-Types */
+  edges?: Maybe<Array<Maybe<WorkspaceMemberDevicesProofEdge>>>;
+  /** Flattened list of WorkspaceMemberDevicesProof type */
+  nodes?: Maybe<Array<Maybe<WorkspaceMemberDevicesProof>>>;
+  /** https://facebook.github.io/relay/graphql/connections.htm#sec-undefined.PageInfo */
+  pageInfo: PageInfo;
+};
+
+export type WorkspaceMemberDevicesProofContent = {
+  __typename?: 'WorkspaceMemberDevicesProofContent';
+  clock: Scalars['Int'];
+  hash: Scalars['String'];
+  hashSignature: Scalars['String'];
+  version: Scalars['Int'];
+};
+
+export type WorkspaceMemberDevicesProofEdge = {
+  __typename?: 'WorkspaceMemberDevicesProofEdge';
+  /** https://facebook.github.io/relay/graphql/connections.htm#sec-Cursor */
+  cursor: Scalars['String'];
+  /** https://facebook.github.io/relay/graphql/connections.htm#sec-Node */
+  node?: Maybe<WorkspaceMemberDevicesProof>;
+};
+
+export type WorkspaceMemberDevicesProofInput = {
+  serializedWorkspaceMemberDevicesProof: Scalars['String'];
+  workspaceId: Scalars['String'];
+};
+
 export type WorkspaceMemberEdge = {
   __typename?: 'WorkspaceMemberEdge';
   /** https://facebook.github.io/relay/graphql/connections.htm#sec-Cursor */
@@ -1536,7 +1592,7 @@ export type FinishLoginMutationVariables = Exact<{
 }>;
 
 
-export type FinishLoginMutation = { __typename?: 'Mutation', finishLogin?: { __typename?: 'FinishLoginResult', userChain: Array<{ __typename?: 'UserChainEvent', position: number, serializedContent: string }>, mainDevice: { __typename?: 'FinishLoginMainDevice', ciphertext: string, nonce: string } } | null };
+export type FinishLoginMutation = { __typename?: 'Mutation', finishLogin?: { __typename?: 'FinishLoginResult', userChain: Array<{ __typename?: 'UserChainEvent', position: number, serializedContent: string }>, mainDevice: { __typename?: 'FinishLoginMainDevice', ciphertext: string, nonce: string }, workspaceMemberDevicesProofs: Array<{ __typename?: 'WorkspaceMemberDevicesProof', serializedData: string, workspaceId: string, proof: { __typename?: 'WorkspaceMemberDevicesProofContent', hash: string, hashSignature: string, clock: number, version: number } }> } | null };
 
 export type FinishRegistrationMutationVariables = Exact<{
   input: FinishRegistrationInput;
@@ -1835,6 +1891,18 @@ export type WorkspaceInvitationsQueryVariables = Exact<{
 
 
 export type WorkspaceInvitationsQuery = { __typename?: 'Query', workspaceInvitations?: { __typename?: 'WorkspaceInvitationConnection', nodes?: Array<{ __typename?: 'WorkspaceInvitation', id: string, workspaceId: string, inviterUserId: string, inviterUsername: string, role: Role, expiresAt: any } | null> | null, pageInfo: { __typename?: 'PageInfo', hasNextPage: boolean, endCursor?: string | null } } | null };
+
+export type WorkspaceMemberDevicesProofQueryVariables = Exact<{
+  workspaceId: Scalars['ID'];
+}>;
+
+
+export type WorkspaceMemberDevicesProofQuery = { __typename?: 'Query', workspaceMemberDevicesProof?: { __typename?: 'WorkspaceMemberDevicesProof', serializedData: string, proof: { __typename?: 'WorkspaceMemberDevicesProofContent', hash: string, hashSignature: string, clock: number, version: number } } | null };
+
+export type WorkspaceMemberDevicesProofsQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type WorkspaceMemberDevicesProofsQuery = { __typename?: 'Query', workspaceMemberDevicesProofs?: { __typename?: 'WorkspaceMemberDevicesProofConnection', nodes?: Array<{ __typename?: 'WorkspaceMemberDevicesProof', serializedData: string, workspaceId: string, proof: { __typename?: 'WorkspaceMemberDevicesProofContent', hash: string, hashSignature: string, clock: number, version: number } } | null> | null } | null };
 
 export type WorkspaceMembersQueryVariables = Exact<{
   workspaceId: Scalars['ID'];
@@ -2172,6 +2240,16 @@ export const FinishLoginDocument = gql`
     mainDevice {
       ciphertext
       nonce
+    }
+    workspaceMemberDevicesProofs {
+      proof {
+        hash
+        hashSignature
+        clock
+        version
+      }
+      serializedData
+      workspaceId
     }
   }
 }
@@ -2959,6 +3037,43 @@ export const WorkspaceInvitationsDocument = gql`
 
 export function useWorkspaceInvitationsQuery(options: Omit<Urql.UseQueryArgs<WorkspaceInvitationsQueryVariables>, 'query'>) {
   return Urql.useQuery<WorkspaceInvitationsQuery, WorkspaceInvitationsQueryVariables>({ query: WorkspaceInvitationsDocument, ...options });
+};
+export const WorkspaceMemberDevicesProofDocument = gql`
+    query workspaceMemberDevicesProof($workspaceId: ID!) {
+  workspaceMemberDevicesProof(workspaceId: $workspaceId) {
+    proof {
+      hash
+      hashSignature
+      clock
+      version
+    }
+    serializedData
+  }
+}
+    `;
+
+export function useWorkspaceMemberDevicesProofQuery(options: Omit<Urql.UseQueryArgs<WorkspaceMemberDevicesProofQueryVariables>, 'query'>) {
+  return Urql.useQuery<WorkspaceMemberDevicesProofQuery, WorkspaceMemberDevicesProofQueryVariables>({ query: WorkspaceMemberDevicesProofDocument, ...options });
+};
+export const WorkspaceMemberDevicesProofsDocument = gql`
+    query workspaceMemberDevicesProofs {
+  workspaceMemberDevicesProofs(first: 50) {
+    nodes {
+      proof {
+        hash
+        hashSignature
+        clock
+        version
+      }
+      serializedData
+      workspaceId
+    }
+  }
+}
+    `;
+
+export function useWorkspaceMemberDevicesProofsQuery(options?: Omit<Urql.UseQueryArgs<WorkspaceMemberDevicesProofsQueryVariables>, 'query'>) {
+  return Urql.useQuery<WorkspaceMemberDevicesProofsQuery, WorkspaceMemberDevicesProofsQueryVariables>({ query: WorkspaceMemberDevicesProofsDocument, ...options });
 };
 export const WorkspaceMembersDocument = gql`
     query workspaceMembers($workspaceId: ID!) {
@@ -6470,6 +6585,212 @@ export const workspaceInvitationsQueryService =
         // perform cleanup
         clearInterval(intervalId);
         workspaceInvitationsQueryServiceSubscribers[variablesString].intervalId = null;
+      }
+    };
+  };
+
+
+
+export const runWorkspaceMemberDevicesProofQuery = async (variables: WorkspaceMemberDevicesProofQueryVariables, options?: any) => {
+  return await getUrqlClient()
+    .query<WorkspaceMemberDevicesProofQuery, WorkspaceMemberDevicesProofQueryVariables>(
+      WorkspaceMemberDevicesProofDocument,
+      variables,
+      {
+        // better to be safe here and always refetch
+        requestPolicy: "network-only",
+        ...options
+      }
+    )
+    .toPromise();
+};
+
+export type WorkspaceMemberDevicesProofQueryResult = Urql.OperationResult<WorkspaceMemberDevicesProofQuery, WorkspaceMemberDevicesProofQueryVariables>;
+
+export type WorkspaceMemberDevicesProofQueryUpdateResultEvent = {
+  type: "WorkspaceMemberDevicesProofQuery.UPDATE_RESULT";
+  result: WorkspaceMemberDevicesProofQueryResult;
+};
+
+export type WorkspaceMemberDevicesProofQueryErrorEvent = {
+  type: "WorkspaceMemberDevicesProofQuery.ERROR";
+  result: WorkspaceMemberDevicesProofQueryResult;
+};
+
+export type WorkspaceMemberDevicesProofQueryServiceEvent = WorkspaceMemberDevicesProofQueryUpdateResultEvent | WorkspaceMemberDevicesProofQueryErrorEvent;
+
+type WorkspaceMemberDevicesProofQueryServiceSubscribersEntry = {
+  variables: WorkspaceMemberDevicesProofQueryVariables;
+  callbacks: ((event: WorkspaceMemberDevicesProofQueryServiceEvent) => void)[];
+  intervalId: NodeJS.Timer | null;
+};
+
+type WorkspaceMemberDevicesProofQueryServiceSubscribers = {
+  [variables: string]: WorkspaceMemberDevicesProofQueryServiceSubscribersEntry;
+};
+
+const workspaceMemberDevicesProofQueryServiceSubscribers: WorkspaceMemberDevicesProofQueryServiceSubscribers = {};
+
+const triggerWorkspaceMemberDevicesProofQuery = (variablesString: string, variables: WorkspaceMemberDevicesProofQueryVariables) => {
+  getUrqlClient()
+    .query<WorkspaceMemberDevicesProofQuery, WorkspaceMemberDevicesProofQueryVariables>(WorkspaceMemberDevicesProofDocument, variables)
+    .toPromise()
+    .then((result) => {
+      workspaceMemberDevicesProofQueryServiceSubscribers[variablesString].callbacks.forEach(
+        (callback) => {
+          callback({
+            type: result.error ? "WorkspaceMemberDevicesProofQuery.ERROR" : "WorkspaceMemberDevicesProofQuery.UPDATE_RESULT",
+            result: result,
+          });
+        }
+      );
+    });
+};
+
+/**
+ * This service is used to query results every 4 seconds.
+ *
+ * It allows machines to spawn a service that will fetch the query
+ * and send the result to the machine.
+ * It will share the same interval for all machines.
+ * When the last subscription is stopped, the interval will be cleared.
+ * It also considers the variables passed to the service.
+ */
+export const workspaceMemberDevicesProofQueryService =
+  (variables: WorkspaceMemberDevicesProofQueryVariables, intervalInMs?: number) => (callback, onReceive) => {
+    const variablesString = canonicalize(variables) as string;
+    if (workspaceMemberDevicesProofQueryServiceSubscribers[variablesString]) {
+      workspaceMemberDevicesProofQueryServiceSubscribers[variablesString].callbacks.push(callback);
+    } else {
+      workspaceMemberDevicesProofQueryServiceSubscribers[variablesString] = {
+        variables,
+        callbacks: [callback],
+        intervalId: null,
+      };
+    }
+
+    triggerWorkspaceMemberDevicesProofQuery(variablesString, variables);
+    if (!workspaceMemberDevicesProofQueryServiceSubscribers[variablesString].intervalId) {
+      workspaceMemberDevicesProofQueryServiceSubscribers[variablesString].intervalId = setInterval(
+        () => {
+          triggerWorkspaceMemberDevicesProofQuery(variablesString, variables);
+        },
+        intervalInMs || 4000
+      );
+    }
+
+    const intervalId = workspaceMemberDevicesProofQueryServiceSubscribers[variablesString].intervalId;
+    return () => {
+      if (
+        workspaceMemberDevicesProofQueryServiceSubscribers[variablesString].callbacks.length === 0 &&
+        intervalId
+      ) {
+        // perform cleanup
+        clearInterval(intervalId);
+        workspaceMemberDevicesProofQueryServiceSubscribers[variablesString].intervalId = null;
+      }
+    };
+  };
+
+
+
+export const runWorkspaceMemberDevicesProofsQuery = async (variables: WorkspaceMemberDevicesProofsQueryVariables, options?: any) => {
+  return await getUrqlClient()
+    .query<WorkspaceMemberDevicesProofsQuery, WorkspaceMemberDevicesProofsQueryVariables>(
+      WorkspaceMemberDevicesProofsDocument,
+      variables,
+      {
+        // better to be safe here and always refetch
+        requestPolicy: "network-only",
+        ...options
+      }
+    )
+    .toPromise();
+};
+
+export type WorkspaceMemberDevicesProofsQueryResult = Urql.OperationResult<WorkspaceMemberDevicesProofsQuery, WorkspaceMemberDevicesProofsQueryVariables>;
+
+export type WorkspaceMemberDevicesProofsQueryUpdateResultEvent = {
+  type: "WorkspaceMemberDevicesProofsQuery.UPDATE_RESULT";
+  result: WorkspaceMemberDevicesProofsQueryResult;
+};
+
+export type WorkspaceMemberDevicesProofsQueryErrorEvent = {
+  type: "WorkspaceMemberDevicesProofsQuery.ERROR";
+  result: WorkspaceMemberDevicesProofsQueryResult;
+};
+
+export type WorkspaceMemberDevicesProofsQueryServiceEvent = WorkspaceMemberDevicesProofsQueryUpdateResultEvent | WorkspaceMemberDevicesProofsQueryErrorEvent;
+
+type WorkspaceMemberDevicesProofsQueryServiceSubscribersEntry = {
+  variables: WorkspaceMemberDevicesProofsQueryVariables;
+  callbacks: ((event: WorkspaceMemberDevicesProofsQueryServiceEvent) => void)[];
+  intervalId: NodeJS.Timer | null;
+};
+
+type WorkspaceMemberDevicesProofsQueryServiceSubscribers = {
+  [variables: string]: WorkspaceMemberDevicesProofsQueryServiceSubscribersEntry;
+};
+
+const workspaceMemberDevicesProofsQueryServiceSubscribers: WorkspaceMemberDevicesProofsQueryServiceSubscribers = {};
+
+const triggerWorkspaceMemberDevicesProofsQuery = (variablesString: string, variables: WorkspaceMemberDevicesProofsQueryVariables) => {
+  getUrqlClient()
+    .query<WorkspaceMemberDevicesProofsQuery, WorkspaceMemberDevicesProofsQueryVariables>(WorkspaceMemberDevicesProofsDocument, variables)
+    .toPromise()
+    .then((result) => {
+      workspaceMemberDevicesProofsQueryServiceSubscribers[variablesString].callbacks.forEach(
+        (callback) => {
+          callback({
+            type: result.error ? "WorkspaceMemberDevicesProofsQuery.ERROR" : "WorkspaceMemberDevicesProofsQuery.UPDATE_RESULT",
+            result: result,
+          });
+        }
+      );
+    });
+};
+
+/**
+ * This service is used to query results every 4 seconds.
+ *
+ * It allows machines to spawn a service that will fetch the query
+ * and send the result to the machine.
+ * It will share the same interval for all machines.
+ * When the last subscription is stopped, the interval will be cleared.
+ * It also considers the variables passed to the service.
+ */
+export const workspaceMemberDevicesProofsQueryService =
+  (variables: WorkspaceMemberDevicesProofsQueryVariables, intervalInMs?: number) => (callback, onReceive) => {
+    const variablesString = canonicalize(variables) as string;
+    if (workspaceMemberDevicesProofsQueryServiceSubscribers[variablesString]) {
+      workspaceMemberDevicesProofsQueryServiceSubscribers[variablesString].callbacks.push(callback);
+    } else {
+      workspaceMemberDevicesProofsQueryServiceSubscribers[variablesString] = {
+        variables,
+        callbacks: [callback],
+        intervalId: null,
+      };
+    }
+
+    triggerWorkspaceMemberDevicesProofsQuery(variablesString, variables);
+    if (!workspaceMemberDevicesProofsQueryServiceSubscribers[variablesString].intervalId) {
+      workspaceMemberDevicesProofsQueryServiceSubscribers[variablesString].intervalId = setInterval(
+        () => {
+          triggerWorkspaceMemberDevicesProofsQuery(variablesString, variables);
+        },
+        intervalInMs || 4000
+      );
+    }
+
+    const intervalId = workspaceMemberDevicesProofsQueryServiceSubscribers[variablesString].intervalId;
+    return () => {
+      if (
+        workspaceMemberDevicesProofsQueryServiceSubscribers[variablesString].callbacks.length === 0 &&
+        intervalId
+      ) {
+        // perform cleanup
+        clearInterval(intervalId);
+        workspaceMemberDevicesProofsQueryServiceSubscribers[variablesString].intervalId = null;
       }
     };
   };

@@ -1,9 +1,14 @@
 import { client, ready as opaqueReady } from "@serenity-kit/opaque";
 import * as userChain from "@serenity-kit/user-chain";
+import * as workspaceMemberDevicesProofUtil from "@serenity-kit/workspace-member-devices-proof";
 import { LocalDevice, createDevice, generateId } from "@serenity-tools/common";
 import { gql } from "graphql-request";
 import sodium from "react-native-libsodium";
+import { prisma } from "../../../src/database/prisma";
+import { getLastUserChainEventWithState } from "../../../src/database/userChain/getLastUserChainEventWithState";
+import { getWorkspaceMemberDevicesProofs } from "../../../src/database/workspace/getWorkspaceMemberDevicesProofs";
 import { addHours } from "../../../src/utils/addHours/addHours";
+import { getLastWorkspaceChainEvent } from "../workspace/getLastWorkspaceChainEvent";
 import { requestLoginChallengeResponse } from "./requestLoginChallengeResponse";
 
 type Params = {
@@ -80,6 +85,10 @@ export const loginUser = async ({
       finishLoginResult.finishLogin.userChain.length - 1
     ].serializedContent
   );
+  const firstUserChainEvent = JSON.parse(
+    finishLoginResult.finishLogin.userChain[0].serializedContent
+  );
+  const userId = firstUserChainEvent.transaction.id;
 
   const addDeviceEvent = userChain.addDevice({
     authorKeyPair: {
@@ -92,6 +101,53 @@ export const loginUser = async ({
     prevEvent: lastUserChainEvent,
     expiresAt,
   });
+
+  const { userChainState } = await getLastUserChainEventWithState({
+    prisma,
+    userId,
+  });
+
+  const newUserChainState = userChain.applyEvent({
+    state: userChainState,
+    event: addDeviceEvent,
+    knownVersion: userChain.version,
+  });
+
+  const existingWorkspaceMemberDevicesProofs =
+    await getWorkspaceMemberDevicesProofs({
+      userId,
+      take: 100,
+    });
+
+  const workspaceMemberDevicesProofs = await Promise.all(
+    existingWorkspaceMemberDevicesProofs.map(async (existingEntry) => {
+      const { workspaceChainState } = await getLastWorkspaceChainEvent({
+        workspaceId: existingEntry.workspaceId,
+      });
+      const workspaceMemberDevicesProofData: workspaceMemberDevicesProofUtil.WorkspaceMemberDevicesProofData =
+        {
+          clock: existingEntry.proof.clock + 1,
+          userChainHashes: {
+            ...existingEntry.data.userChainHashes,
+            [userId]: newUserChainState.eventHash,
+          },
+          workspaceChainHash: workspaceChainState.lastEventHash,
+        };
+      const newProof =
+        workspaceMemberDevicesProofUtil.createWorkspaceMemberDevicesProof({
+          authorKeyPair: {
+            privateKey: sodium.from_base64(mainDevice.signingPrivateKey),
+            publicKey: sodium.from_base64(mainDevice.signingPublicKey),
+            keyType: "ed25519",
+          },
+          workspaceMemberDevicesProofData,
+        });
+      return {
+        workspaceId: existingEntry.workspaceId,
+        serializedWorkspaceMemberDevicesProof: JSON.stringify(newProof),
+      };
+    })
+  );
 
   const addDeviceQuery = gql`
     mutation addDevice($input: AddDeviceInput!) {
@@ -114,6 +170,7 @@ export const loginUser = async ({
       serializedUserChainEvent: JSON.stringify(addDeviceEvent),
       webDeviceCiphertext: "webDeviceCiphertextMock-local",
       webDeviceNonce: `webDeviceNonceMock-local${generateId()}`, // since it must be unique
+      workspaceMemberDevicesProofs,
     },
   });
 

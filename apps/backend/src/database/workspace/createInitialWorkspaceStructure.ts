@@ -1,5 +1,6 @@
 import * as documentChain from "@serenity-kit/document-chain";
 import * as workspaceChain from "@serenity-kit/workspace-chain";
+import * as workspaceMemberDevicesProofUtil from "@serenity-kit/workspace-member-devices-proof";
 import {
   KeyDerivationTrace,
   SerenitySnapshotWithClientData,
@@ -41,8 +42,10 @@ export type Params = {
   workspaceChainEvent: workspaceChain.CreateChainWorkspaceChainEvent;
   folder: FolderParams;
   document: DocumentParams;
+  userMainDeviceSigningPublicKey: string;
   creatorDeviceSigningPublicKey: string;
   documentChainEvent: documentChain.CreateDocumentChainEvent;
+  workspaceMemberDevicesProof: workspaceMemberDevicesProofUtil.WorkspaceMemberDevicesProof;
 };
 
 // TODO run all of these operations in a transaction
@@ -53,7 +56,9 @@ export async function createInitialWorkspaceStructure({
   folder,
   document,
   creatorDeviceSigningPublicKey,
+  userMainDeviceSigningPublicKey,
   documentChainEvent,
+  workspaceMemberDevicesProof,
 }: Params) {
   const createdWorkspace = await createWorkspace({
     id: workspace.id,
@@ -61,9 +66,11 @@ export async function createInitialWorkspaceStructure({
     infoNonce: workspace.infoNonce,
     userId,
     creatorDeviceSigningPublicKey,
+    userMainDeviceSigningPublicKey,
     deviceWorkspaceKeyBoxes: workspace.deviceWorkspaceKeyBoxes,
     workspaceKeyId: workspace.workspaceKeyId,
     workspaceChainEvent,
+    workspaceMemberDevicesProof,
   });
   const workspaceKey = createdWorkspace.currentWorkspaceKey;
   const createdFolder = await createFolder({
