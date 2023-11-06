@@ -1,7 +1,7 @@
 import * as workspaceChain from "@serenity-kit/workspace-chain";
 import { generateId } from "@serenity-tools/common";
 import { gql } from "graphql-request";
-import sodium from "react-native-libsodium";
+import sodium from "libsodium-wrappers";
 import { Role } from "../../../../prisma/generated/output";
 import deleteAllRecords from "../../../../test/helpers/deleteAllRecords";
 import setupGraphql from "../../../../test/helpers/setupGraphql";
@@ -63,8 +63,9 @@ test("update a workspace member role", async () => {
   const result = await updateWorkspaceMemberRole({
     graphql,
     workspaceId: userData1.workspace.id,
-    serializedWorkspaceChainEvent: JSON.stringify(updateMemberEvent),
     authorizationHeader: userData1.sessionKey,
+    workspaceChainEvent: updateMemberEvent,
+    mainDevice: userData1.mainDevice,
   });
   // TODO improve by checking actual role instead of relying on success here
   expect(result.updateWorkspaceMemberRole.workspace).toBeDefined();
@@ -87,7 +88,8 @@ test("update my own workspace member role", async () => {
   await updateWorkspaceMemberRole({
     graphql,
     workspaceId: userData1.workspace.id,
-    serializedWorkspaceChainEvent: JSON.stringify(updateMemberEvent),
+    workspaceChainEvent: updateMemberEvent,
+    mainDevice: userData1.mainDevice,
     authorizationHeader: userData1.sessionKey,
   });
 
@@ -107,7 +109,8 @@ test("update my own workspace member role", async () => {
   const result2 = await updateWorkspaceMemberRole({
     graphql,
     workspaceId: userData1.workspace.id,
-    serializedWorkspaceChainEvent: JSON.stringify(updateMemberEvent2),
+    workspaceChainEvent: updateMemberEvent2,
+    mainDevice: userData1.mainDevice,
     authorizationHeader: userData1.sessionKey,
   });
 
@@ -135,33 +138,8 @@ test("user should not be able to update a workspace they don't own", async () =>
       await updateWorkspaceMemberRole({
         graphql,
         workspaceId: userData2.workspace.id,
-        serializedWorkspaceChainEvent: JSON.stringify(updateMemberEvent),
-        authorizationHeader: userData1.sessionKey,
-      }))()
-  ).rejects.toThrow("Unauthorized");
-});
-
-test("user should not be able to update a workspace for a workspace that doesn't exist", async () => {
-  const { lastChainEntry } = await getLastWorkspaceChainEvent({
-    workspaceId: userData1.workspace.id,
-  });
-  const updateMemberEvent = workspaceChain.updateMember(
-    workspaceChain.hashTransaction(lastChainEntry.transaction),
-    {
-      keyType: "ed25519",
-      privateKey: sodium.from_base64(userData1.mainDevice.signingPrivateKey),
-      publicKey: sodium.from_base64(userData1.mainDevice.signingPublicKey),
-    },
-    userData2.mainDevice.signingPublicKey,
-    "ADMIN"
-  );
-
-  await expect(
-    (async () =>
-      await updateWorkspaceMemberRole({
-        graphql,
-        workspaceId: "LALA",
-        serializedWorkspaceChainEvent: JSON.stringify(updateMemberEvent),
+        workspaceChainEvent: updateMemberEvent,
+        mainDevice: userData1.mainDevice,
         authorizationHeader: userData1.sessionKey,
       }))()
   ).rejects.toThrow("Unauthorized");
@@ -187,7 +165,8 @@ test("Unauthenticated", async () => {
       await updateWorkspaceMemberRole({
         graphql,
         workspaceId: userData1.workspace.id,
-        serializedWorkspaceChainEvent: JSON.stringify(updateMemberEvent),
+        workspaceChainEvent: updateMemberEvent,
+        mainDevice: userData1.mainDevice,
         authorizationHeader: "WRONG_SESSION",
       }))()
   ).rejects.toThrowError(/UNAUTHENTICATED/);

@@ -1190,6 +1190,7 @@ export type UpdateFolderNameResult = {
 
 export type UpdateWorkspaceMemberRoleInput = {
   serializedWorkspaceChainEvent: Scalars['String'];
+  serializedWorkspaceMemberDevicesProof: Scalars['String'];
   workspaceId: Scalars['String'];
 };
 

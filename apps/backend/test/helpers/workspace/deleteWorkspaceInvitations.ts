@@ -2,7 +2,7 @@ import * as workspaceChain from "@serenity-kit/workspace-chain";
 import * as workspaceMemberDevicesProofUtil from "@serenity-kit/workspace-member-devices-proof";
 import { LocalDevice } from "@serenity-tools/common";
 import { gql } from "graphql-request";
-import sodium from "react-native-libsodium";
+import sodium from "libsodium-wrappers";
 import { prisma } from "../../../src/database/prisma";
 import { getWorkspaceMemberDevicesProofByWorkspaceId } from "../../../src/database/workspace/getWorkspaceMemberDevicesProofByWorkspaceId";
 

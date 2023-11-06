@@ -1,4 +1,5 @@
 import * as workspaceChain from "@serenity-kit/workspace-chain";
+import * as workspaceMemberDevicesProofUtil from "@serenity-kit/workspace-member-devices-proof";
 import {
   Avatar,
   CenterContent,
@@ -25,6 +26,7 @@ import { CreateWorkspaceInvitation } from "../../../components/workspace/CreateW
 import { useWorkspace } from "../../../context/WorkspaceContext";
 import {
   runRemoveMemberAndRotateWorkspaceKeyMutation,
+  runWorkspaceMemberDevicesProofQuery,
   useUpdateWorkspaceMemberRoleMutation,
 } from "../../../generated/graphql";
 import { useAuthenticatedAppContext } from "../../../hooks/useAuthenticatedAppContext";
@@ -102,9 +104,50 @@ export default function WorkspaceSettingsMembersScreen(
       role
     );
 
+    const workspaceMemberDevicesProofQueryResult =
+      await runWorkspaceMemberDevicesProofQuery({
+        workspaceId,
+      });
+
+    if (
+      !workspaceMemberDevicesProofQueryResult.data?.workspaceMemberDevicesProof
+    ) {
+      throw new Error("Missing workspaceMemberDevicesProof");
+    }
+
+    const tmpResult =
+      workspaceMemberDevicesProofQueryResult.data?.workspaceMemberDevicesProof;
+    const existingWorkspaceMemberDevicesProofData =
+      workspaceMemberDevicesProofUtil.WorkspaceMemberDevicesProofData.parse(
+        JSON.parse(tmpResult.serializedData)
+      );
+
+    // TODO verify the result using isValidWorkspaceMemberDevicesProof
+    // TODO verify the result using workspaceChainHash
+    // TODO verify your own user chain entry
+
+    const workspaceMemberDevicesProof =
+      workspaceMemberDevicesProofUtil.createWorkspaceMemberDevicesProof({
+        authorKeyPair: {
+          privateKey: sodium.from_base64(mainDevice.signingPrivateKey),
+          publicKey: sodium.from_base64(mainDevice.signingPublicKey),
+          keyType: "ed25519",
+        },
+        workspaceMemberDevicesProofData: {
+          ...existingWorkspaceMemberDevicesProofData,
+          clock: existingWorkspaceMemberDevicesProofData.clock + 1,
+          workspaceChainHash: workspaceChain.hashTransaction(
+            updateMemberEvent.transaction
+          ),
+        },
+      });
+
     const updateWorkspaceResult = await updateWorkspaceMemberRoleMutation({
       input: {
         serializedWorkspaceChainEvent: JSON.stringify(updateMemberEvent),
+        serializedWorkspaceMemberDevicesProof: JSON.stringify(
+          workspaceMemberDevicesProof
+        ),
         workspaceId: workspaceId,
       },
     });

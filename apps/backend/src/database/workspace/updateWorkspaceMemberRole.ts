@@ -1,20 +1,26 @@
 import * as workspaceChain from "@serenity-kit/workspace-chain";
+import * as workspaceMemberDevicesProofUtil from "@serenity-kit/workspace-member-devices-proof";
 import { ForbiddenError } from "apollo-server-express";
 import { Prisma, Role } from "../../../prisma/generated/output";
 import { Workspace, formatWorkspace } from "../../types/workspace";
 import { prisma } from "../prisma";
 import { getLastWorkspaceChainEventWithState } from "../workspaceChain/getLastWorkspaceChainEventWithState";
+import { updateWorkspaceMemberDevicesProof } from "./updateWorkspaceMemberDevicesProof";
 
 type Params = {
   workspaceId: string;
   userId: string;
   workspaceChainEvent: workspaceChain.UpdateMemberWorkspaceChainEvent;
+  workspaceMemberDevicesProof: workspaceMemberDevicesProofUtil.WorkspaceMemberDevicesProof;
+  mainDeviceSigningPublicKey: string;
 };
 
 export async function updateWorkspaceMemberRole({
   workspaceId,
   userId,
   workspaceChainEvent,
+  workspaceMemberDevicesProof,
+  mainDeviceSigningPublicKey,
 }: Params): Promise<Workspace> {
   return await prisma.$transaction(
     async (prisma) => {
@@ -56,6 +62,14 @@ export async function updateWorkspaceMemberRole({
           mainDeviceSigningPublicKey:
             workspaceChainEvent.transaction.memberMainDeviceSigningPublicKey,
         },
+      });
+
+      await updateWorkspaceMemberDevicesProof({
+        authorPublicKey: mainDeviceSigningPublicKey,
+        userId,
+        prisma,
+        workspaceId,
+        workspaceMemberDevicesProof,
       });
 
       await prisma.usersToWorkspaces.update({
