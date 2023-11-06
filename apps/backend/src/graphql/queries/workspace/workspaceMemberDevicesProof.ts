@@ -8,6 +8,7 @@ export const workspaceMemberDevicesProofQuery = queryField((t) => {
     type: WorkspaceMemberDevicesProof,
     args: {
       workspaceId: nonNull(idArg()),
+      invitationId: idArg(),
     },
     async resolve(root, args, context) {
       if (!context.user) {
@@ -16,6 +17,7 @@ export const workspaceMemberDevicesProofQuery = queryField((t) => {
 
       return await getWorkspaceMemberDevicesProof({
         workspaceId: args.workspaceId,
+        invitationId: args.invitationId || undefined,
         userId: context.user.id,
       });
     },

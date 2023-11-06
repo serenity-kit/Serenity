@@ -1,3 +1,4 @@
+import { UserChainState } from "@serenity-kit/user-chain";
 import { decryptWorkspaceInvitationKey } from "@serenity-tools/common";
 import {
   Box,
@@ -62,7 +63,10 @@ export default function RegistrationVerificationScreen(
     props.navigation.push("Login");
   };
 
-  const acceptPendingWorkspaceInvitation = async (exportKey: string) => {
+  const acceptPendingWorkspaceInvitation = async (
+    exportKey: string,
+    userChainState: UserChainState
+  ) => {
     const mainDevice = getMainDevice();
     if (!mainDevice) {
       console.error("No main device found!");
@@ -109,6 +113,8 @@ export default function RegistrationVerificationScreen(
               .invitationSigningPublicKey,
           workspaceId: workspaceInvitation.data.workspaceInvitation.workspaceId,
           role: workspaceInvitation.data.workspaceInvitation.role,
+          currentUserChainHash: userChainState.eventHash,
+          currentUserId: userChainState.id,
         });
       } catch (error) {
         setGraphqlError(error.message);
@@ -156,7 +162,10 @@ export default function RegistrationVerificationScreen(
         activeDevice: loginResult.device,
       });
 
-      await acceptPendingWorkspaceInvitation(loginResult.result.exportKey);
+      await acceptPendingWorkspaceInvitation(
+        loginResult.result.exportKey,
+        loginResult.userChainState
+      );
       navigateToNextAuthenticatedPage({
         navigation: props.navigation,
         pendingWorkspaceInvitationId: null,

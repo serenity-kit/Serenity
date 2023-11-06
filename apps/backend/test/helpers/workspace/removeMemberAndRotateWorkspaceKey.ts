@@ -15,6 +15,7 @@ type Params = {
   authorizationHeader: string;
   workspaceChainEvent: workspaceChain.WorkspaceChainEvent;
   mainDevice: LocalDevice;
+  userIdToRemove: string;
 };
 
 export const removeMemberAndRotateWorkspaceKey = async ({
@@ -25,6 +26,7 @@ export const removeMemberAndRotateWorkspaceKey = async ({
   authorizationHeader,
   workspaceChainEvent,
   mainDevice,
+  userIdToRemove,
 }: Params) => {
   const authorizationHeaders = {
     authorization: authorizationHeader,
@@ -35,10 +37,13 @@ export const removeMemberAndRotateWorkspaceKey = async ({
     workspaceId,
   });
 
+  const userChainHashes = { ...existingEntry.data.userChainHashes };
+  delete userChainHashes[userIdToRemove];
+
   const workspaceMemberDevicesProofData: workspaceMemberDevicesProofUtil.WorkspaceMemberDevicesProofData =
     {
       clock: existingEntry.proof.clock + 1,
-      userChainHashes: existingEntry.data.userChainHashes,
+      userChainHashes,
       workspaceChainHash: workspaceChain.hashTransaction(
         workspaceChainEvent.transaction
       ),

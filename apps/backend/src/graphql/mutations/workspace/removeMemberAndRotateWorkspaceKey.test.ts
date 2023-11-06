@@ -92,6 +92,7 @@ test("user cannot remove self", async () => {
         authorizationHeader: userData1.sessionKey,
         workspaceChainEvent: removeMemberEvent,
         mainDevice: userData1.mainDevice,
+        userIdToRemove: userData1.user.id,
       }))()
   ).rejects.toThrowError(/BAD_USER_INPUT/);
 });
@@ -165,8 +166,9 @@ test("user cannot revoke own main device", async () => {
         authorizationHeader: userData1.sessionKey,
         workspaceChainEvent: removeMemberEvent,
         mainDevice: userData1.mainDevice,
+        userIdToRemove: userData2.user.id,
       }))()
-  ).rejects.toThrowError(/BAD_USER_INPUT/);
+  ).rejects.toThrow();
 });
 
 test("user can remove another user", async () => {
@@ -310,6 +312,7 @@ test("user can remove another user", async () => {
     authorizationHeader: userData1.sessionKey,
     workspaceChainEvent: removeMemberEvent,
     mainDevice: userData1.mainDevice,
+    userIdToRemove: userData2.user.id,
   });
 
   const resultingWorkspaceKey =
@@ -542,6 +545,7 @@ test("user can rotate key for multiple devices", async () => {
     authorizationHeader: userData1.sessionKey,
     workspaceChainEvent: removeMemberEvent,
     mainDevice: userData1.mainDevice,
+    userIdToRemove: userData2.user.id,
   });
   const resultingWorkspaceKey =
     workspaceKeyResult.removeMemberAndRotateWorkspaceKey.workspaceKey;

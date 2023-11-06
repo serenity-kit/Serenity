@@ -292,6 +292,7 @@ export const login = async ({
     device,
     webDeviceKey,
     webDeviceAccessToken: addDeviceResult.data.addDevice.webDeviceAccessToken,
+    userChainState: newUserChainState,
   };
 };
 

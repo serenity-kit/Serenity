@@ -5,11 +5,19 @@ import { prisma } from "../prisma";
 type Params = {
   workspaceId: string;
   userId: string;
+  invitationId?: string;
 };
 export async function getWorkspaceMemberDevicesProof({
   workspaceId,
   userId,
+  invitationId,
 }: Params) {
+  const invitation = invitationId
+    ? await prisma.workspaceInvitations.findFirstOrThrow({
+        where: { id: invitationId, expiresAt: { gte: new Date() } },
+        select: { workspaceId: true },
+      })
+    : undefined;
   const userWorkspace = await prisma.usersToWorkspaces.findFirst({
     where: {
       userId,
@@ -17,7 +25,7 @@ export async function getWorkspaceMemberDevicesProof({
     },
     select: { workspace: true },
   });
-  if (!userWorkspace) {
+  if (!userWorkspace && !invitation) {
     throw new ForbiddenError("Unauthorized");
   }
   const workspaceMemberDevicesProof =

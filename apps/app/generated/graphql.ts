@@ -20,6 +20,7 @@ export type Scalars = {
 
 export type AcceptWorkspaceInvitationInput = {
   serializedWorkspaceChainEvent: Scalars['String'];
+  serializedWorkspaceMemberDevicesProof: Scalars['String'];
 };
 
 export type AcceptWorkspaceInvitationResult = {
@@ -1030,6 +1031,7 @@ export type QueryWorkspaceKeyByDocumentIdArgs = {
 
 
 export type QueryWorkspaceMemberDevicesProofArgs = {
+  invitationId?: InputMaybe<Scalars['ID']>;
   workspaceId: Scalars['ID'];
 };
 
@@ -1896,6 +1898,7 @@ export type WorkspaceInvitationsQuery = { __typename?: 'Query', workspaceInvitat
 
 export type WorkspaceMemberDevicesProofQueryVariables = Exact<{
   workspaceId: Scalars['ID'];
+  invitationId?: InputMaybe<Scalars['ID']>;
 }>;
 
 
@@ -3041,8 +3044,11 @@ export function useWorkspaceInvitationsQuery(options: Omit<Urql.UseQueryArgs<Wor
   return Urql.useQuery<WorkspaceInvitationsQuery, WorkspaceInvitationsQueryVariables>({ query: WorkspaceInvitationsDocument, ...options });
 };
 export const WorkspaceMemberDevicesProofDocument = gql`
-    query workspaceMemberDevicesProof($workspaceId: ID!) {
-  workspaceMemberDevicesProof(workspaceId: $workspaceId) {
+    query workspaceMemberDevicesProof($workspaceId: ID!, $invitationId: ID) {
+  workspaceMemberDevicesProof(
+    workspaceId: $workspaceId
+    invitationId: $invitationId
+  ) {
     proof {
       hash
       hashSignature
