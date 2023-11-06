@@ -1,6 +1,6 @@
 import * as userChain from "@serenity-kit/user-chain";
 import * as workspaceMemberDevicesProofUtil from "@serenity-kit/workspace-member-devices-proof";
-import { Device, generateId } from "@serenity-tools/common";
+import { Device, equalStringArrays, generateId } from "@serenity-tools/common";
 import { z } from "zod";
 import { Prisma } from "../../../prisma/generated/output";
 import { addDays } from "../../utils/addDays/addDays";
@@ -104,6 +104,25 @@ export async function createSessionAndDevice({
           position: lastUserChainEvent.position + 1,
         },
       });
+
+      const userWorkspacesIncludingUnauthorized =
+        await prisma.usersToWorkspaces.findMany({
+          where: { userId },
+          select: { workspaceId: true },
+        });
+
+      const workspaceIds = userWorkspacesIncludingUnauthorized.map(
+        (entry) => entry.workspaceId
+      );
+
+      if (
+        !equalStringArrays(
+          workspaceMemberDevicesProofEntries.map((entry) => entry.workspaceId),
+          workspaceIds
+        )
+      ) {
+        throw new Error("Invalid workspaceMemberDevicesProofEntries");
+      }
 
       for (const entry of workspaceMemberDevicesProofEntries) {
         await updateWorkspaceMemberDevicesProof({

@@ -48,6 +48,7 @@ export async function getWorkspaceMemberDevicesProofs({
       data: proof.data as workspaceMemberDevicesProofUtil.WorkspaceMemberDevicesProofData,
       serializedData: JSON.stringify(proof.data),
       workspaceId: workspace.id,
+      authorMainDeviceSigningPublicKey: proof.authorMainDeviceSigningPublicKey,
     };
   });
 }

@@ -44,5 +44,7 @@ export async function getWorkspaceMemberDevicesProof({
     data: workspaceMemberDevicesProof.data as workspaceMemberDevicesProofUtil.WorkspaceMemberDevicesProofData,
     serializedData: JSON.stringify(workspaceMemberDevicesProof.data),
     workspaceId,
+    authorMainDeviceSigningPublicKey:
+      workspaceMemberDevicesProof.authorMainDeviceSigningPublicKey,
   };
 }

@@ -11,14 +11,7 @@ import {
 import sodium from "react-native-libsodium";
 import { createSessionAndDevice } from "../../../database/authentication/createSessionAndDevice";
 import { getLoginAttempt } from "../../../database/authentication/getLoginAttempt";
-
-export const WorkspaceMemberDevicesProofInput = inputObjectType({
-  name: "WorkspaceMemberDevicesProofInput",
-  definition(t) {
-    t.nonNull.string("workspaceId");
-    t.nonNull.string("serializedWorkspaceMemberDevicesProof");
-  },
-});
+import { WorkspaceMemberDevicesProofInput } from "../../types/workspaceMemberDevicesProof";
 
 export const AddDeviceInput = inputObjectType({
   name: "AddDeviceInput",

@@ -276,6 +276,7 @@ export type DeleteDeviceInput = {
   creatorSigningPublicKey: Scalars['String'];
   newDeviceWorkspaceKeyBoxes: Array<WorkspaceWithWorkspaceDevicesParingInput>;
   serializedUserChainEvent: Scalars['String'];
+  workspaceMemberDevicesProofs: Array<WorkspaceMemberDevicesProofInput>;
 };
 
 export type DeleteDeviceResult = {
@@ -1411,6 +1412,7 @@ export type WorkspaceMemberConnection = {
 
 export type WorkspaceMemberDevicesProof = {
   __typename?: 'WorkspaceMemberDevicesProof';
+  authorMainDeviceSigningPublicKey: Scalars['String'];
   proof: WorkspaceMemberDevicesProofContent;
   serializedData: Scalars['String'];
   workspaceId: Scalars['String'];
@@ -1596,7 +1598,7 @@ export type FinishLoginMutationVariables = Exact<{
 }>;
 
 
-export type FinishLoginMutation = { __typename?: 'Mutation', finishLogin?: { __typename?: 'FinishLoginResult', userChain: Array<{ __typename?: 'UserChainEvent', position: number, serializedContent: string }>, mainDevice: { __typename?: 'FinishLoginMainDevice', ciphertext: string, nonce: string }, workspaceMemberDevicesProofs: Array<{ __typename?: 'WorkspaceMemberDevicesProof', serializedData: string, workspaceId: string, proof: { __typename?: 'WorkspaceMemberDevicesProofContent', hash: string, hashSignature: string, clock: number, version: number } }> } | null };
+export type FinishLoginMutation = { __typename?: 'Mutation', finishLogin?: { __typename?: 'FinishLoginResult', userChain: Array<{ __typename?: 'UserChainEvent', position: number, serializedContent: string }>, mainDevice: { __typename?: 'FinishLoginMainDevice', ciphertext: string, nonce: string }, workspaceMemberDevicesProofs: Array<{ __typename?: 'WorkspaceMemberDevicesProof', serializedData: string, workspaceId: string, authorMainDeviceSigningPublicKey: string, proof: { __typename?: 'WorkspaceMemberDevicesProofContent', hash: string, hashSignature: string, clock: number, version: number } }> } | null };
 
 export type FinishRegistrationMutationVariables = Exact<{
   input: FinishRegistrationInput;
@@ -1902,12 +1904,12 @@ export type WorkspaceMemberDevicesProofQueryVariables = Exact<{
 }>;
 
 
-export type WorkspaceMemberDevicesProofQuery = { __typename?: 'Query', workspaceMemberDevicesProof?: { __typename?: 'WorkspaceMemberDevicesProof', serializedData: string, proof: { __typename?: 'WorkspaceMemberDevicesProofContent', hash: string, hashSignature: string, clock: number, version: number } } | null };
+export type WorkspaceMemberDevicesProofQuery = { __typename?: 'Query', workspaceMemberDevicesProof?: { __typename?: 'WorkspaceMemberDevicesProof', serializedData: string, authorMainDeviceSigningPublicKey: string, proof: { __typename?: 'WorkspaceMemberDevicesProofContent', hash: string, hashSignature: string, clock: number, version: number } } | null };
 
 export type WorkspaceMemberDevicesProofsQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type WorkspaceMemberDevicesProofsQuery = { __typename?: 'Query', workspaceMemberDevicesProofs?: { __typename?: 'WorkspaceMemberDevicesProofConnection', nodes?: Array<{ __typename?: 'WorkspaceMemberDevicesProof', serializedData: string, workspaceId: string, proof: { __typename?: 'WorkspaceMemberDevicesProofContent', hash: string, hashSignature: string, clock: number, version: number } } | null> | null } | null };
+export type WorkspaceMemberDevicesProofsQuery = { __typename?: 'Query', workspaceMemberDevicesProofs?: { __typename?: 'WorkspaceMemberDevicesProofConnection', nodes?: Array<{ __typename?: 'WorkspaceMemberDevicesProof', serializedData: string, workspaceId: string, authorMainDeviceSigningPublicKey: string, proof: { __typename?: 'WorkspaceMemberDevicesProofContent', hash: string, hashSignature: string, clock: number, version: number } } | null> | null } | null };
 
 export type WorkspaceMembersQueryVariables = Exact<{
   workspaceId: Scalars['ID'];
@@ -2255,6 +2257,7 @@ export const FinishLoginDocument = gql`
       }
       serializedData
       workspaceId
+      authorMainDeviceSigningPublicKey
     }
   }
 }
@@ -3056,6 +3059,7 @@ export const WorkspaceMemberDevicesProofDocument = gql`
       version
     }
     serializedData
+    authorMainDeviceSigningPublicKey
   }
 }
     `;
@@ -3075,6 +3079,7 @@ export const WorkspaceMemberDevicesProofsDocument = gql`
       }
       serializedData
       workspaceId
+      authorMainDeviceSigningPublicKey
     }
   }
 }

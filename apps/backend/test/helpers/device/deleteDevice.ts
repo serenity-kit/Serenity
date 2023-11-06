@@ -1,8 +1,12 @@
 import * as userChain from "@serenity-kit/user-chain";
+import * as workspaceMemberDevicesProofUtil from "@serenity-kit/workspace-member-devices-proof";
 import { LocalDevice } from "@serenity-tools/common";
 import { gql } from "graphql-request";
+import sodium from "react-native-libsodium";
+import { getWorkspaceMemberDevicesProofs } from "../../../src/database/workspace/getWorkspaceMemberDevicesProofs";
 import { WorkspaceWithWorkspaceDevicesParing } from "../../../src/types/workspaceDevice";
 import { getLastUserChainEventByMainDeviceSigningPublicKey } from "../userChain/getLastUserChainEventByMainDeviceSigningPublicKey";
+import { getLastWorkspaceChainEvent } from "../workspace/getLastWorkspaceChainEvent";
 
 type Params = {
   graphql: any;
@@ -21,7 +25,7 @@ export const deleteDevice = async ({
   deviceSigningPublicKeyToBeDeleted,
   mainDevice,
 }: Params) => {
-  const { lastChainEvent } =
+  const { lastChainEvent, userChainState } =
     await getLastUserChainEventByMainDeviceSigningPublicKey({
       mainDeviceSigningPublicKey: mainDevice.signingPublicKey,
     });
@@ -34,6 +38,47 @@ export const deleteDevice = async ({
     signingPublicKey: deviceSigningPublicKeyToBeDeleted,
     prevEvent: lastChainEvent,
   });
+  const newUserChainState = userChain.applyEvent({
+    state: userChainState,
+    event,
+    knownVersion: userChain.version,
+  });
+
+  const existingWorkspaceMemberDevicesProofs =
+    await getWorkspaceMemberDevicesProofs({
+      userId: userChainState.id,
+      take: 100,
+    });
+
+  const workspaceMemberDevicesProofs = await Promise.all(
+    existingWorkspaceMemberDevicesProofs.map(async (existingEntry) => {
+      const { workspaceChainState } = await getLastWorkspaceChainEvent({
+        workspaceId: existingEntry.workspaceId,
+      });
+      const workspaceMemberDevicesProofData: workspaceMemberDevicesProofUtil.WorkspaceMemberDevicesProofData =
+        {
+          clock: existingEntry.proof.clock + 1,
+          userChainHashes: {
+            ...existingEntry.data.userChainHashes,
+            [userChainState.id]: newUserChainState.eventHash,
+          },
+          workspaceChainHash: workspaceChainState.lastEventHash,
+        };
+      const newProof =
+        workspaceMemberDevicesProofUtil.createWorkspaceMemberDevicesProof({
+          authorKeyPair: {
+            privateKey: sodium.from_base64(mainDevice.signingPrivateKey),
+            publicKey: sodium.from_base64(mainDevice.signingPublicKey),
+            keyType: "ed25519",
+          },
+          workspaceMemberDevicesProofData,
+        });
+      return {
+        workspaceId: existingEntry.workspaceId,
+        serializedWorkspaceMemberDevicesProof: JSON.stringify(newProof),
+      };
+    })
+  );
 
   const authorizationHeaders = {
     authorization: authorizationHeader,
@@ -52,6 +97,7 @@ export const deleteDevice = async ({
         creatorSigningPublicKey,
         newDeviceWorkspaceKeyBoxes,
         serializedUserChainEvent: JSON.stringify(event),
+        workspaceMemberDevicesProofs,
       },
     },
     authorizationHeaders

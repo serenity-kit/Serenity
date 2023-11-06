@@ -242,12 +242,13 @@ model WorkspaceChainEvent {
 }
 
 model WorkspaceMemberDevicesProof {
-  hash        String    @unique
-  proof       Json
-  data        Json
-  clock       Int
-  workspace   Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
-  workspaceId String
+  hash                             String    @unique
+  proof                            Json
+  data                             Json
+  clock                            Int
+  workspace                        Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  workspaceId                      String
+  authorMainDeviceSigningPublicKey String
 
   @@id([workspaceId, clock])
   @@index([workspaceId, clock(sort: Asc)])

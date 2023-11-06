@@ -126,6 +126,7 @@ export async function createWorkspace({
               data: workspaceMemberDevicesProofData,
               proof: workspaceMemberDevicesProof,
               hash: workspaceMemberDevicesProof.hash,
+              authorMainDeviceSigningPublicKey: userMainDeviceSigningPublicKey,
             },
           },
         },

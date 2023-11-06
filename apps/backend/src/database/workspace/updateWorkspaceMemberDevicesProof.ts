@@ -72,6 +72,7 @@ export async function updateWorkspaceMemberDevicesProof({
       clock: workspaceMemberDevicesProofData.clock,
       proof: workspaceMemberDevicesProof,
       data: workspaceMemberDevicesProofData,
+      authorMainDeviceSigningPublicKey: authorPublicKey,
     },
   });
 }

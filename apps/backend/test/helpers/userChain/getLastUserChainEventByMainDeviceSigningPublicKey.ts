@@ -22,7 +22,8 @@ export const getLastUserChainEventByMainDeviceSigningPublicKey = async ({
     lastChainEntryFromDb.content
   );
 
-  return {
-    lastChainEvent,
-  };
+  const userChainState = userChain.UserChainState.parse(
+    lastChainEntryFromDb.state
+  );
+  return { lastChainEvent, userChainState };
 };

@@ -210,9 +210,11 @@ export const login = async ({
       );
     }
 
+    // TODO validate entry.authorMainDeviceSigningPublicKey is part of the workspace chain
+
     const isValid =
       workspaceMemberDevicesProofUtil.isValidWorkspaceMemberDevicesProof({
-        authorPublicKey: mainDevice.signingPublicKey,
+        authorPublicKey: entry.authorMainDeviceSigningPublicKey,
         workspaceMemberDevicesProof: entry.proof,
         workspaceMemberDevicesProofData: data,
       });

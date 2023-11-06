@@ -10,5 +10,6 @@ query workspaceMemberDevicesProof($workspaceId: ID!, $invitationId: ID) {
       version
     }
     serializedData
+    authorMainDeviceSigningPublicKey
   }
 }
