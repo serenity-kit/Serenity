@@ -7,6 +7,7 @@ import { Client } from "urql";
 import * as userChainStore from "../store/userChainStore";
 import * as userStore from "../store/userStore";
 import * as workspaceChainStore from "../store/workspaceChainStore";
+import * as workspaceMemberDevicesProofStore from "../store/workspaceMemberDevicesProofStore";
 import * as workspaceStore from "../store/workspaceStore";
 import * as SessionKeyStore from "../utils/authentication/sessionKeyStore";
 import { getSessionKey } from "../utils/authentication/sessionKeyStore";
@@ -33,6 +34,7 @@ export default function useCachedResources() {
           }),
           workspaceStore.initialize(),
           workspaceChainStore.initialize(),
+          workspaceMemberDevicesProofStore.initialize(),
           userStore.initialize(),
           userChainStore.initialize(),
         ]);

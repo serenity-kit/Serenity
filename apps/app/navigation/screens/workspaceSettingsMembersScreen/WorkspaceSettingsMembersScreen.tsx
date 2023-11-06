@@ -26,7 +26,6 @@ import { CreateWorkspaceInvitation } from "../../../components/workspace/CreateW
 import { useWorkspace } from "../../../context/WorkspaceContext";
 import {
   runRemoveMemberAndRotateWorkspaceKeyMutation,
-  runWorkspaceMemberDevicesProofQuery,
   useUpdateWorkspaceMemberRoleMutation,
 } from "../../../generated/graphql";
 import { useAuthenticatedAppContext } from "../../../hooks/useAuthenticatedAppContext";
@@ -35,6 +34,7 @@ import {
   loadRemoteWorkspaceChain,
   useLocalLastWorkspaceChainEvent,
 } from "../../../store/workspaceChainStore";
+import { loadRemoteWorkspaceMemberDevicesProofQuery } from "../../../store/workspaceMemberDevicesProofStore";
 import { WorkspaceStackScreenProps } from "../../../types/navigationProps";
 import { getMainDevice } from "../../../utils/device/mainDeviceMemoryStore";
 import { showToast } from "../../../utils/toast/showToast";
@@ -104,27 +104,8 @@ export default function WorkspaceSettingsMembersScreen(
       role
     );
 
-    const workspaceMemberDevicesProofQueryResult =
-      await runWorkspaceMemberDevicesProofQuery({
-        workspaceId,
-      });
-
-    if (
-      !workspaceMemberDevicesProofQueryResult.data?.workspaceMemberDevicesProof
-    ) {
-      throw new Error("Missing workspaceMemberDevicesProof");
-    }
-
-    const tmpResult =
-      workspaceMemberDevicesProofQueryResult.data?.workspaceMemberDevicesProof;
-    const existingWorkspaceMemberDevicesProofData =
-      workspaceMemberDevicesProofUtil.WorkspaceMemberDevicesProofData.parse(
-        JSON.parse(tmpResult.serializedData)
-      );
-
-    // TODO verify the result using isValidWorkspaceMemberDevicesProof
-    // TODO verify the result using workspaceChainHash
-    // TODO verify your own user chain entry
+    const lastWorkspaceMemberDevicesProof =
+      await loadRemoteWorkspaceMemberDevicesProofQuery({ workspaceId });
 
     const workspaceMemberDevicesProof =
       workspaceMemberDevicesProofUtil.createWorkspaceMemberDevicesProof({
@@ -134,8 +115,8 @@ export default function WorkspaceSettingsMembersScreen(
           keyType: "ed25519",
         },
         workspaceMemberDevicesProofData: {
-          ...existingWorkspaceMemberDevicesProofData,
-          clock: existingWorkspaceMemberDevicesProofData.clock + 1,
+          ...lastWorkspaceMemberDevicesProof.data,
+          clock: lastWorkspaceMemberDevicesProof.clock + 1,
           workspaceChainHash: workspaceChain.hashTransaction(
             updateMemberEvent.transaction
           ),
@@ -198,27 +179,8 @@ export default function WorkspaceSettingsMembersScreen(
       mainDeviceSigningPublicKey
     );
 
-    const workspaceMemberDevicesProofQueryResult =
-      await runWorkspaceMemberDevicesProofQuery({
-        workspaceId,
-      });
-
-    if (
-      !workspaceMemberDevicesProofQueryResult.data?.workspaceMemberDevicesProof
-    ) {
-      throw new Error("Missing workspaceMemberDevicesProof");
-    }
-
-    const tmpResult =
-      workspaceMemberDevicesProofQueryResult.data?.workspaceMemberDevicesProof;
-    const existingWorkspaceMemberDevicesProofData =
-      workspaceMemberDevicesProofUtil.WorkspaceMemberDevicesProofData.parse(
-        JSON.parse(tmpResult.serializedData)
-      );
-
-    // TODO verify the result using isValidWorkspaceMemberDevicesProof
-    // TODO verify the result using workspaceChainHash
-    // TODO verify your own user chain entry
+    const lastWorkspaceMemberDevicesProof =
+      await loadRemoteWorkspaceMemberDevicesProofQuery({ workspaceId });
 
     const workspaceMemberDevicesProof =
       workspaceMemberDevicesProofUtil.createWorkspaceMemberDevicesProof({
@@ -228,8 +190,8 @@ export default function WorkspaceSettingsMembersScreen(
           keyType: "ed25519",
         },
         workspaceMemberDevicesProofData: {
-          ...existingWorkspaceMemberDevicesProofData,
-          clock: existingWorkspaceMemberDevicesProofData.clock + 1,
+          ...lastWorkspaceMemberDevicesProof.data,
+          clock: lastWorkspaceMemberDevicesProof.clock + 1,
           workspaceChainHash: workspaceChain.hashTransaction(
             removeMemberEvent.transaction
           ),

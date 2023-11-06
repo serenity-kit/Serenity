@@ -18,13 +18,13 @@ import { useWorkspace } from "../../context/WorkspaceContext";
 import {
   Role,
   runCreateWorkspaceInvitationMutation,
-  runWorkspaceMemberDevicesProofQuery,
   useDeleteWorkspaceInvitationsMutation,
 } from "../../generated/graphql";
 import {
   loadRemoteWorkspaceChain,
   useLocalLastWorkspaceChainEvent,
 } from "../../store/workspaceChainStore";
+import { loadRemoteWorkspaceMemberDevicesProofQuery } from "../../store/workspaceMemberDevicesProofStore";
 import { getMainDevice } from "../../utils/device/mainDeviceMemoryStore";
 import { getEnvironmentUrls } from "../../utils/getEnvironmentUrls/getEnvironmentUrls";
 import { VerifyPasswordModal } from "../verifyPasswordModal/VerifyPasswordModal";
@@ -126,27 +126,8 @@ export function CreateWorkspaceInvitation(props: Props) {
       throw new Error("Expected invitation transaction");
     }
 
-    const workspaceMemberDevicesProofQueryResult =
-      await runWorkspaceMemberDevicesProofQuery({
-        workspaceId,
-      });
-
-    if (
-      !workspaceMemberDevicesProofQueryResult.data?.workspaceMemberDevicesProof
-    ) {
-      throw new Error("Missing workspaceMemberDevicesProof");
-    }
-
-    const tmpResult =
-      workspaceMemberDevicesProofQueryResult.data?.workspaceMemberDevicesProof;
-    const existingWorkspaceMemberDevicesProofData =
-      workspaceMemberDevicesProofUtil.WorkspaceMemberDevicesProofData.parse(
-        JSON.parse(tmpResult.serializedData)
-      );
-
-    // TODO verify the result using isValidWorkspaceMemberDevicesProof
-    // TODO verify the result using workspaceChainHash
-    // TODO verify your own user chain entry
+    const lastWorkspaceMemberDevicesProof =
+      await loadRemoteWorkspaceMemberDevicesProofQuery({ workspaceId });
 
     const workspaceMemberDevicesProof =
       workspaceMemberDevicesProofUtil.createWorkspaceMemberDevicesProof({
@@ -156,8 +137,8 @@ export function CreateWorkspaceInvitation(props: Props) {
           keyType: "ed25519",
         },
         workspaceMemberDevicesProofData: {
-          ...existingWorkspaceMemberDevicesProofData,
-          clock: existingWorkspaceMemberDevicesProofData.clock + 1,
+          ...lastWorkspaceMemberDevicesProof.data,
+          clock: lastWorkspaceMemberDevicesProof.clock + 1,
           workspaceChainHash: workspaceChain.hashTransaction(
             invitation.transaction
           ),
@@ -203,27 +184,8 @@ export function CreateWorkspaceInvitation(props: Props) {
       invitationIds: [invitationId],
     });
 
-    const workspaceMemberDevicesProofQueryResult =
-      await runWorkspaceMemberDevicesProofQuery({
-        workspaceId,
-      });
-
-    if (
-      !workspaceMemberDevicesProofQueryResult.data?.workspaceMemberDevicesProof
-    ) {
-      throw new Error("Missing workspaceMemberDevicesProof");
-    }
-
-    const tmpResult =
-      workspaceMemberDevicesProofQueryResult.data?.workspaceMemberDevicesProof;
-    const existingWorkspaceMemberDevicesProofData =
-      workspaceMemberDevicesProofUtil.WorkspaceMemberDevicesProofData.parse(
-        JSON.parse(tmpResult.serializedData)
-      );
-
-    // TODO verify the result using isValidWorkspaceMemberDevicesProof
-    // TODO verify the result using workspaceChainHash
-    // TODO verify your own user chain entry
+    const lastWorkspaceMemberDevicesProof =
+      await loadRemoteWorkspaceMemberDevicesProofQuery({ workspaceId });
 
     const workspaceMemberDevicesProof =
       workspaceMemberDevicesProofUtil.createWorkspaceMemberDevicesProof({
@@ -233,8 +195,8 @@ export function CreateWorkspaceInvitation(props: Props) {
           keyType: "ed25519",
         },
         workspaceMemberDevicesProofData: {
-          ...existingWorkspaceMemberDevicesProofData,
-          clock: existingWorkspaceMemberDevicesProofData.clock + 1,
+          ...lastWorkspaceMemberDevicesProof.data,
+          clock: lastWorkspaceMemberDevicesProof.clock + 1,
           workspaceChainHash: workspaceChain.hashTransaction(
             removeInvitationEvent.transaction
           ),
