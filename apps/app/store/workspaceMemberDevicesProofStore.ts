@@ -1,8 +1,16 @@
 import * as workspaceMemberDevicesProofUtil from "@serenity-kit/workspace-member-devices-proof";
+import { notNull, notUndefined } from "@serenity-tools/common";
 import canonicalize from "canonicalize";
-import { runWorkspaceMemberDevicesProofQuery } from "../generated/graphql";
+import {
+  runWorkspaceMemberDevicesProofQuery,
+  runWorkspaceMemberDevicesProofsQuery,
+} from "../generated/graphql";
 import { showToast } from "../utils/toast/showToast";
 import * as sql from "./sql/sql";
+import {
+  getWorkspaceChainEventByHash,
+  loadRemoteWorkspaceChain,
+} from "./workspaceChainStore";
 import * as workspaceStore from "./workspaceStore";
 
 export const table = "workspace_member_devices_proof_v1";
@@ -39,7 +47,8 @@ export const createWorkspaceMemberDevicesProof = ({
   authorMainDeviceSigningPublicKey: string;
   triggerRerender?: boolean;
 }) => {
-  sql.execute(`INSERT INTO ${table} VALUES (?, ?, ?, ?, ?, ?);`, [
+  // we don't want to overwrite existing entries
+  sql.execute(`INSERT OR IGNORE INTO  ${table} VALUES (?, ?, ?, ?, ?, ?);`, [
     clock,
     JSON.stringify(proof),
     JSON.stringify(data),
@@ -52,6 +61,94 @@ export const createWorkspaceMemberDevicesProof = ({
   // }
 };
 
+export const loadRemoteWorkspaceMemberDevicesProofsQuery = async () => {
+  const workspaceMemberDevicesProofsQueryResult =
+    await runWorkspaceMemberDevicesProofsQuery({});
+
+  if (workspaceMemberDevicesProofsQueryResult.error) {
+    showToast(
+      "Failed to load the workspace data (memberDeviceProofs).",
+      "error"
+    );
+  }
+
+  if (
+    !workspaceMemberDevicesProofsQueryResult.data?.workspaceMemberDevicesProofs
+      ?.nodes
+  ) {
+    return [];
+  }
+
+  const workspaceIds: string[] = [];
+  for (const entry of workspaceMemberDevicesProofsQueryResult.data.workspaceMemberDevicesProofs.nodes
+    .filter(notNull)
+    .filter(notUndefined)) {
+    workspaceIds.push(entry.workspaceId);
+
+    const data =
+      workspaceMemberDevicesProofUtil.WorkspaceMemberDevicesProofData.parse(
+        JSON.parse(entry.serializedData)
+      );
+
+    // load latest workspace chain entries and check if the workspace chain event is included
+    // to verify that the server is providing this or a newer workspace chain
+    await loadRemoteWorkspaceChain({
+      workspaceId: entry.workspaceId,
+    });
+    const workspaceChainEvent = getWorkspaceChainEventByHash({
+      hash: data.workspaceChainHash,
+      workspaceId: entry.workspaceId,
+    });
+    if (!workspaceChainEvent) {
+      throw new Error(
+        "Workspace chain event not found in the current workspace chain"
+      );
+    }
+
+    const lastWorkspaceMemberDevicesProofEntry =
+      getLastWorkspaceMemberDevicesProof({
+        workspaceId: entry.workspaceId,
+      });
+
+    const lastWorkspaceMemberDevicesProof = lastWorkspaceMemberDevicesProofEntry
+      ? lastWorkspaceMemberDevicesProofEntry.proof
+      : undefined;
+
+    // we ignore the entry if it is already in the database
+    if (
+      lastWorkspaceMemberDevicesProof &&
+      lastWorkspaceMemberDevicesProof.clock === entry.proof.clock
+    ) {
+      continue;
+    }
+
+    const isValid =
+      workspaceMemberDevicesProofUtil.isValidWorkspaceMemberDevicesProof({
+        authorPublicKey: entry.authorMainDeviceSigningPublicKey,
+        workspaceMemberDevicesProof: entry.proof,
+        workspaceMemberDevicesProofData: data,
+        pastKnownWorkspaceMemberDevicesProof: lastWorkspaceMemberDevicesProof,
+      });
+    if (!isValid) {
+      throw new Error("Invalid workspace member devices proof");
+    }
+    createWorkspaceMemberDevicesProof({
+      authorMainDeviceSigningPublicKey: entry.authorMainDeviceSigningPublicKey,
+      clock: entry.proof.clock,
+      data,
+      proof: entry.proof,
+      workspaceId: entry.workspaceId,
+    });
+  }
+
+  return workspaceIds.map((workspaceId) => {
+    return {
+      ...getLastWorkspaceMemberDevicesProof({ workspaceId }),
+      workspaceId,
+    };
+  });
+};
+
 export const loadRemoteWorkspaceMemberDevicesProofQuery = async ({
   workspaceId,
   invitationId,
@@ -59,8 +156,6 @@ export const loadRemoteWorkspaceMemberDevicesProofQuery = async ({
   workspaceId: string;
   invitationId?: string;
 }) => {
-  // const lastEvent = getLastWorkspaceMemberDevicesProof({ workspaceId });
-
   const workspaceMemberDevicesProofQueryResult =
     await runWorkspaceMemberDevicesProofQuery({ workspaceId, invitationId });
 
@@ -78,7 +173,34 @@ export const loadRemoteWorkspaceMemberDevicesProofQuery = async ({
         JSON.parse(entry.serializedData)
       );
 
-    // TODO check that workspaceMemberDevicesProofData.workspaceChainHash is part ot the workspace chain
+    // load latest workspace chain entries and check if the workspace chain event is included
+    // to verify that the server is providing this or a newer workspace chain
+    await loadRemoteWorkspaceChain({ workspaceId });
+    const workspaceChainEvent = getWorkspaceChainEventByHash({
+      hash: workspaceMemberDevicesProofData.workspaceChainHash,
+      workspaceId,
+    });
+    if (!workspaceChainEvent) {
+      throw new Error(
+        "Workspace chain event not found in the current workspace chain"
+      );
+    }
+
+    const lastWorkspaceMemberDevicesProofEntry =
+      getLastWorkspaceMemberDevicesProof({
+        workspaceId,
+      });
+    const lastWorkspaceMemberDevicesProof = lastWorkspaceMemberDevicesProofEntry
+      ? lastWorkspaceMemberDevicesProofEntry.proof
+      : undefined;
+
+    // we ignore the entry if it is already in the database
+    if (
+      lastWorkspaceMemberDevicesProof &&
+      lastWorkspaceMemberDevicesProof.clock === entry.proof.clock
+    ) {
+      return getLastWorkspaceMemberDevicesProof({ workspaceId });
+    }
 
     if (
       !workspaceMemberDevicesProofUtil.isValidWorkspaceMemberDevicesProof({
@@ -86,7 +208,7 @@ export const loadRemoteWorkspaceMemberDevicesProofQuery = async ({
         // TODO verify the author was part of the chain at entry - workspaceMemberDevicesProofData.workspaceChainHash
         authorPublicKey: entry.authorMainDeviceSigningPublicKey,
         workspaceMemberDevicesProofData,
-        // pastKnownWorkspaceMemberDevicesProof - TODO add this to check the clock
+        pastKnownWorkspaceMemberDevicesProof: lastWorkspaceMemberDevicesProof,
       })
     ) {
       throw new Error(
