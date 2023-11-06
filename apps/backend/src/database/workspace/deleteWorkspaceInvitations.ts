@@ -1,14 +1,22 @@
 import * as workspaceChain from "@serenity-kit/workspace-chain";
+import * as workspaceMemberDevicesProofUtil from "@serenity-kit/workspace-member-devices-proof";
 import { Prisma } from "../../../prisma/generated/output";
 import { prisma } from "../prisma";
 import { getLastWorkspaceChainEventWithState } from "../workspaceChain/getLastWorkspaceChainEventWithState";
+import { updateWorkspaceMemberDevicesProof } from "./updateWorkspaceMemberDevicesProof";
 
 type Params = {
+  userId: string;
   workspaceChainEvent: workspaceChain.RemoveInvitationsWorkspaceChainEvent;
+  workspaceMemberDevicesProof: workspaceMemberDevicesProofUtil.WorkspaceMemberDevicesProof;
+  mainDeviceSigningPublicKey: string;
 };
 
 export async function deleteWorkspaceInvitations({
+  userId,
   workspaceChainEvent,
+  workspaceMemberDevicesProof,
+  mainDeviceSigningPublicKey,
 }: Params) {
   await prisma.$transaction(
     async (prisma) => {
@@ -40,6 +48,14 @@ export async function deleteWorkspaceInvitations({
           workspaceId,
           position: lastWorkspaceChainEvent.position + 1,
         },
+      });
+
+      await updateWorkspaceMemberDevicesProof({
+        authorPublicKey: mainDeviceSigningPublicKey,
+        userId,
+        prisma,
+        workspaceId,
+        workspaceMemberDevicesProof,
       });
 
       // delete workspace invitations

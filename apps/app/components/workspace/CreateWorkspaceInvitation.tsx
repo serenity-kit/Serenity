@@ -203,9 +203,50 @@ export function CreateWorkspaceInvitation(props: Props) {
       invitationIds: [invitationId],
     });
 
+    const workspaceMemberDevicesProofQueryResult =
+      await runWorkspaceMemberDevicesProofQuery({
+        workspaceId,
+      });
+
+    if (
+      !workspaceMemberDevicesProofQueryResult.data?.workspaceMemberDevicesProof
+    ) {
+      throw new Error("Missing workspaceMemberDevicesProof");
+    }
+
+    const tmpResult =
+      workspaceMemberDevicesProofQueryResult.data?.workspaceMemberDevicesProof;
+    const existingWorkspaceMemberDevicesProofData =
+      workspaceMemberDevicesProofUtil.WorkspaceMemberDevicesProofData.parse(
+        JSON.parse(tmpResult.serializedData)
+      );
+
+    // TODO verify the result using isValidWorkspaceMemberDevicesProof
+    // TODO verify the result using workspaceChainHash
+    // TODO verify your own user chain entry
+
+    const workspaceMemberDevicesProof =
+      workspaceMemberDevicesProofUtil.createWorkspaceMemberDevicesProof({
+        authorKeyPair: {
+          privateKey: sodium.from_base64(mainDevice.signingPrivateKey),
+          publicKey: sodium.from_base64(mainDevice.signingPublicKey),
+          keyType: "ed25519",
+        },
+        workspaceMemberDevicesProofData: {
+          ...existingWorkspaceMemberDevicesProofData,
+          clock: existingWorkspaceMemberDevicesProofData.clock + 1,
+          workspaceChainHash: workspaceChain.hashTransaction(
+            removeInvitationEvent.transaction
+          ),
+        },
+      });
+
     await deleteWorkspaceInvitationsMutation({
       input: {
         serializedWorkspaceChainEvent: JSON.stringify(removeInvitationEvent),
+        serializedWorkspaceMemberDevicesProof: JSON.stringify(
+          workspaceMemberDevicesProof
+        ),
       },
     });
     setSelectedWorkspaceInvitationId(null);

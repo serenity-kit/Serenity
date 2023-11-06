@@ -304,6 +304,7 @@ export type DeleteFoldersResult = {
 
 export type DeleteWorkspaceInvitationsInput = {
   serializedWorkspaceChainEvent: Scalars['String'];
+  serializedWorkspaceMemberDevicesProof: Scalars['String'];
 };
 
 export type DeleteWorkspaceInvitationsResult = {
