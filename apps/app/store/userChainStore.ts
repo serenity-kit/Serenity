@@ -10,6 +10,7 @@ export const initialize = () => {
       "content"	TEXT NOT NULL,
       "state"	TEXT NOT NULL,
       "userId"	TEXT NOT NULL,
+      "hash"	TEXT NOT NULL,
       PRIMARY KEY("position","userId")
       FOREIGN KEY("userId") REFERENCES "${userStore.table}" ON DELETE CASCADE
     );`
