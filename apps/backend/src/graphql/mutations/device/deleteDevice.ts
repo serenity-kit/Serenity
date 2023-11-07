@@ -10,7 +10,7 @@ import {
 } from "nexus";
 import { deleteDevice } from "../../../database/device/deleteDevice";
 import { WorkspaceWithWorkspaceDevicesParingInput } from "../../types/workspaceDevice";
-import { WorkspaceMemberDevicesProofInput } from "../../types/workspaceMemberDevicesProof";
+import { WorkspaceMemberDevicesProofEntryInput } from "../../types/workspaceMemberDevicesProof";
 
 export const DeleteDeviceResult = objectType({
   name: "DeleteDeviceResult",
@@ -28,7 +28,7 @@ export const DeleteDeviceInput = inputObjectType({
     });
     t.nonNull.string("serializedUserChainEvent");
     t.nonNull.list.nonNull.field("workspaceMemberDevicesProofs", {
-      type: WorkspaceMemberDevicesProofInput,
+      type: WorkspaceMemberDevicesProofEntryInput,
     });
   },
 });

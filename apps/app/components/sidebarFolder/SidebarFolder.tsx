@@ -42,6 +42,7 @@ import {
   useFoldersQuery,
 } from "../../generated/graphql";
 import { useAuthenticatedAppContext } from "../../hooks/useAuthenticatedAppContext";
+import { loadRemoteWorkspaceMemberDevicesProofQuery } from "../../store/workspaceMemberDevicesProofStore";
 import { RootStackScreenProps } from "../../types/navigationProps";
 import {
   getDocumentPath,
@@ -316,6 +317,12 @@ export default function SidebarFolder(props: Props) {
       privateKey: sodium.from_base64(activeDevice.signingPrivateKey!),
       keyType: "ed25519",
     };
+
+    const workspaceMemberDevicesProof =
+      await loadRemoteWorkspaceMemberDevicesProofQuery({
+        workspaceId: props.workspaceId,
+      });
+
     const publicData: SnapshotPublicData & SerenitySnapshotPublicData = {
       snapshotId: snapshotId,
       docId: documentId,
@@ -324,6 +331,7 @@ export default function SidebarFolder(props: Props) {
       documentChainEventHash: documentChainState.currentState.eventHash,
       parentSnapshotId: "",
       parentSnapshotUpdateClocks: {},
+      workspaceMemberDevicesProof: workspaceMemberDevicesProof.proof,
     };
     // created using:
     // const yDocState = Yjs.encodeStateAsUpdateV2(yDocRef.current);

@@ -89,6 +89,10 @@ export const loadRemoteWorkspaceMemberDevicesProofsQuery = async () => {
       workspaceMemberDevicesProofUtil.WorkspaceMemberDevicesProofData.parse(
         JSON.parse(entry.serializedData)
       );
+    const proof =
+      workspaceMemberDevicesProofUtil.WorkspaceMemberDevicesProof.parse(
+        entry.proof
+      );
 
     // load latest workspace chain entries and check if the workspace chain event is included
     // to verify that the server is providing this or a newer workspace chain
@@ -117,7 +121,7 @@ export const loadRemoteWorkspaceMemberDevicesProofsQuery = async () => {
     // we ignore the entry if it is already in the database
     if (
       lastWorkspaceMemberDevicesProof &&
-      lastWorkspaceMemberDevicesProof.clock === entry.proof.clock
+      lastWorkspaceMemberDevicesProof.clock === proof.clock
     ) {
       continue;
     }
@@ -125,7 +129,7 @@ export const loadRemoteWorkspaceMemberDevicesProofsQuery = async () => {
     const isValid =
       workspaceMemberDevicesProofUtil.isValidWorkspaceMemberDevicesProof({
         authorPublicKey: entry.authorMainDeviceSigningPublicKey,
-        workspaceMemberDevicesProof: entry.proof,
+        workspaceMemberDevicesProof: proof,
         workspaceMemberDevicesProofData: data,
         pastKnownWorkspaceMemberDevicesProof: lastWorkspaceMemberDevicesProof,
       });
@@ -134,9 +138,9 @@ export const loadRemoteWorkspaceMemberDevicesProofsQuery = async () => {
     }
     createWorkspaceMemberDevicesProof({
       authorMainDeviceSigningPublicKey: entry.authorMainDeviceSigningPublicKey,
-      clock: entry.proof.clock,
+      clock: proof.clock,
       data,
-      proof: entry.proof,
+      proof: proof,
       workspaceId: entry.workspaceId,
     });
   }
@@ -168,16 +172,20 @@ export const loadRemoteWorkspaceMemberDevicesProofQuery = async ({
   ) {
     const entry =
       workspaceMemberDevicesProofQueryResult.data.workspaceMemberDevicesProof;
-    const workspaceMemberDevicesProofData =
+    const data =
       workspaceMemberDevicesProofUtil.WorkspaceMemberDevicesProofData.parse(
         JSON.parse(entry.serializedData)
+      );
+    const proof =
+      workspaceMemberDevicesProofUtil.WorkspaceMemberDevicesProof.parse(
+        entry.proof
       );
 
     // load latest workspace chain entries and check if the workspace chain event is included
     // to verify that the server is providing this or a newer workspace chain
     await loadRemoteWorkspaceChain({ workspaceId });
     const workspaceChainEvent = getWorkspaceChainEventByHash({
-      hash: workspaceMemberDevicesProofData.workspaceChainHash,
+      hash: data.workspaceChainHash,
       workspaceId,
     });
     if (!workspaceChainEvent) {
@@ -197,17 +205,17 @@ export const loadRemoteWorkspaceMemberDevicesProofQuery = async ({
     // we ignore the entry if it is already in the database
     if (
       lastWorkspaceMemberDevicesProof &&
-      lastWorkspaceMemberDevicesProof.clock === entry.proof.clock
+      lastWorkspaceMemberDevicesProof.clock === proof.clock
     ) {
       return getLastWorkspaceMemberDevicesProof({ workspaceId });
     }
 
     if (
       !workspaceMemberDevicesProofUtil.isValidWorkspaceMemberDevicesProof({
-        workspaceMemberDevicesProof: entry.proof,
+        workspaceMemberDevicesProof: proof,
         // TODO verify the author was part of the chain at entry - workspaceMemberDevicesProofData.workspaceChainHash
         authorPublicKey: entry.authorMainDeviceSigningPublicKey,
-        workspaceMemberDevicesProofData,
+        workspaceMemberDevicesProofData: data,
         pastKnownWorkspaceMemberDevicesProof: lastWorkspaceMemberDevicesProof,
       })
     ) {
@@ -217,9 +225,9 @@ export const loadRemoteWorkspaceMemberDevicesProofQuery = async ({
     }
     createWorkspaceMemberDevicesProof({
       authorMainDeviceSigningPublicKey: entry.authorMainDeviceSigningPublicKey,
-      clock: entry.proof.clock,
-      data: workspaceMemberDevicesProofData,
-      proof: entry.proof,
+      clock: proof.clock,
+      data,
+      proof,
       workspaceId,
     });
   }

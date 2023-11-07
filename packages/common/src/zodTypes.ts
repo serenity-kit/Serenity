@@ -1,3 +1,4 @@
+import * as workspaceMemberDevicesProofUtil from "@serenity-kit/workspace-member-devices-proof";
 import { Snapshot, SnapshotWithClientData } from "@serenity-tools/secsync";
 import { z } from "zod";
 
@@ -56,6 +57,8 @@ export type KeyDerivationTrace = z.infer<typeof KeyDerivationTrace>;
 export const SerenitySnapshotPublicData = z.object({
   keyDerivationTrace: KeyDerivationTrace,
   documentChainEventHash: z.string(),
+  workspaceMemberDevicesProof:
+    workspaceMemberDevicesProofUtil.WorkspaceMemberDevicesProof,
 });
 
 export type SerenitySnapshotPublicData = z.infer<

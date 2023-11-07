@@ -44,7 +44,7 @@ export type AddDeviceInput = {
   sessionTokenSignature: Scalars['String'];
   webDeviceCiphertext?: InputMaybe<Scalars['String']>;
   webDeviceNonce?: InputMaybe<Scalars['String']>;
-  workspaceMemberDevicesProofs: Array<WorkspaceMemberDevicesProofInput>;
+  workspaceMemberDevicesProofs: Array<WorkspaceMemberDevicesProofEntryInput>;
 };
 
 export type AddDeviceResult = {
@@ -276,7 +276,7 @@ export type DeleteDeviceInput = {
   creatorSigningPublicKey: Scalars['String'];
   newDeviceWorkspaceKeyBoxes: Array<WorkspaceWithWorkspaceDevicesParingInput>;
   serializedUserChainEvent: Scalars['String'];
-  workspaceMemberDevicesProofs: Array<WorkspaceMemberDevicesProofInput>;
+  workspaceMemberDevicesProofs: Array<WorkspaceMemberDevicesProofEntryInput>;
 };
 
 export type DeleteDeviceResult = {
@@ -462,6 +462,7 @@ export type DocumentSnapshotPublicDataInput = {
   parentSnapshotUpdateClocks: DocumentSnapshotPublicDataParentSnapshotClocksInput;
   pubKey: Scalars['String'];
   snapshotId?: InputMaybe<Scalars['String']>;
+  workspaceMemberDevicesProof: WorkspaceMemberDevicesProofInput;
 };
 
 export type DocumentSnapshotPublicDataParentSnapshotClocksInput = {
@@ -588,7 +589,7 @@ export type KeyDerivationTraceInput = {
 
 export type LogoutInput = {
   serializedUserChainEvent: Scalars['String'];
-  workspaceMemberDevicesProofs: Array<WorkspaceMemberDevicesProofInput>;
+  workspaceMemberDevicesProofs: Array<WorkspaceMemberDevicesProofEntryInput>;
 };
 
 export type LogoutResult = {
@@ -1445,9 +1446,16 @@ export type WorkspaceMemberDevicesProofEdge = {
   node?: Maybe<WorkspaceMemberDevicesProof>;
 };
 
-export type WorkspaceMemberDevicesProofInput = {
+export type WorkspaceMemberDevicesProofEntryInput = {
   serializedWorkspaceMemberDevicesProof: Scalars['String'];
   workspaceId: Scalars['String'];
+};
+
+export type WorkspaceMemberDevicesProofInput = {
+  clock: Scalars['Int'];
+  hash: Scalars['String'];
+  hashSignature: Scalars['String'];
+  version: Scalars['Int'];
 };
 
 export type WorkspaceMemberEdge = {

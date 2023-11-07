@@ -20,10 +20,20 @@ export const WorkspaceMemberDevicesProof = objectType({
   },
 });
 
-export const WorkspaceMemberDevicesProofInput = inputObjectType({
-  name: "WorkspaceMemberDevicesProofInput",
+export const WorkspaceMemberDevicesProofEntryInput = inputObjectType({
+  name: "WorkspaceMemberDevicesProofEntryInput",
   definition(t) {
     t.nonNull.string("workspaceId");
     t.nonNull.string("serializedWorkspaceMemberDevicesProof");
+  },
+});
+
+export const WorkspaceMemberDevicesProofInput = inputObjectType({
+  name: "WorkspaceMemberDevicesProofInput",
+  definition(t) {
+    t.nonNull.string("hash");
+    t.nonNull.string("hashSignature");
+    t.nonNull.int("version");
+    t.nonNull.int("clock");
   },
 });

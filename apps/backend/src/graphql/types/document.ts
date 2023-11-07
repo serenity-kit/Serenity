@@ -1,6 +1,7 @@
 import { inputObjectType, objectType } from "nexus";
 import { KeyDerivationTraceInput } from "./keyDerivation";
 import { WorkspaceKey } from "./workspace";
+import { WorkspaceMemberDevicesProofInput } from "./workspaceMemberDevicesProof";
 
 export const Document = objectType({
   name: "Document",
@@ -36,6 +37,9 @@ export const DocumentSnapshotPublicDataInput = inputObjectType({
     t.nonNull.string("parentSnapshotId");
     t.nonNull.field("parentSnapshotUpdateClocks", {
       type: DocumentSnapshotPublicDataParentSnapshotClocksInput,
+    });
+    t.nonNull.field("workspaceMemberDevicesProof", {
+      type: WorkspaceMemberDevicesProofInput,
     });
   },
 });
