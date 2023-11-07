@@ -11,7 +11,7 @@ import {
 import sodium from "react-native-libsodium";
 import { createSessionAndDevice } from "../../../database/authentication/createSessionAndDevice";
 import { getLoginAttempt } from "../../../database/authentication/getLoginAttempt";
-import { WorkspaceMemberDevicesProofInput } from "../../types/workspaceMemberDevicesProof";
+import { WorkspaceMemberDevicesProofEntryInput } from "../../types/workspaceMemberDevicesProof";
 
 export const AddDeviceInput = inputObjectType({
   name: "AddDeviceInput",
@@ -25,7 +25,7 @@ export const AddDeviceInput = inputObjectType({
     t.nonNull.string("deviceType");
     t.nonNull.string("serializedUserChainEvent");
     t.nonNull.list.nonNull.field("workspaceMemberDevicesProofs", {
-      type: WorkspaceMemberDevicesProofInput,
+      type: WorkspaceMemberDevicesProofEntryInput,
     });
     t.string("webDeviceCiphertext");
     t.string("webDeviceNonce");

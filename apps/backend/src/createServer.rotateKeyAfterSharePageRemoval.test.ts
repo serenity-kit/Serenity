@@ -28,6 +28,7 @@ import { getWorkspace } from "../test/helpers/workspace/getWorkspace";
 import { prisma } from "./database/prisma";
 import { getSnapshot } from "./database/snapshot/getSnapshot";
 import createUserWithWorkspace from "./database/testHelpers/createUserWithWorkspace";
+import { getWorkspaceMemberDevicesProofByWorkspaceId } from "./database/workspace/getWorkspaceMemberDevicesProofByWorkspaceId";
 
 const graphql = setupGraphql();
 const username = "59f80f08-c065-4acc-a542-2725fb2dff6c@example.com";
@@ -127,6 +128,12 @@ test("successfully creates a snapshot", async () => {
     keyType: "ed25519",
   };
   const { state } = await getLastDocumentChainEventByDocumentId({ documentId });
+  const workspaceMemberDevicesProofEntry =
+    await getWorkspaceMemberDevicesProofByWorkspaceId({
+      prisma,
+      workspaceId,
+    });
+
   const publicData: SnapshotPublicData & SerenitySnapshotPublicData = {
     snapshotId: id,
     docId: documentId,
@@ -135,6 +142,7 @@ test("successfully creates a snapshot", async () => {
     documentChainEventHash: state.eventHash,
     parentSnapshotId: initialSnapshot.id,
     parentSnapshotUpdateClocks: {},
+    workspaceMemberDevicesProof: workspaceMemberDevicesProofEntry.proof,
   };
   firstSnapshot = createSnapshot(
     "CONTENT DUMMY",
@@ -298,6 +306,13 @@ test("successfully creates a snapshot", async () => {
   };
 
   const { state } = await getLastDocumentChainEventByDocumentId({ documentId });
+
+  const workspaceMemberDevicesProofEntry =
+    await getWorkspaceMemberDevicesProofByWorkspaceId({
+      prisma,
+      workspaceId,
+    });
+
   const publicData: SnapshotPublicData & SerenitySnapshotPublicData = {
     snapshotId: id,
     docId: documentId,
@@ -308,6 +323,7 @@ test("successfully creates a snapshot", async () => {
     parentSnapshotUpdateClocks: {
       [webDevice!.signingPublicKey]: 0,
     },
+    workspaceMemberDevicesProof: workspaceMemberDevicesProofEntry.proof,
   };
   const snapshot = createSnapshot(
     "CONTENT DUMMY",

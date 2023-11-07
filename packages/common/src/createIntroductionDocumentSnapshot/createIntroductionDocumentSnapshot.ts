@@ -1,3 +1,4 @@
+import * as workspaceMemberDevicesProofUtil from "@serenity-kit/workspace-member-devices-proof";
 import {
   createInitialSnapshot,
   SnapshotPublicData,
@@ -18,12 +19,14 @@ export const createIntroductionDocumentSnapshot = ({
   keyDerivationTrace,
   device,
   documentChainEventHash,
+  workspaceMemberDevicesProof,
 }: {
   documentId: string;
   snapshotEncryptionKey: Uint8Array;
   keyDerivationTrace: KeyDerivationTrace;
   documentChainEventHash: string;
   device: LocalDevice;
+  workspaceMemberDevicesProof: workspaceMemberDevicesProofUtil.WorkspaceMemberDevicesProof;
 }) => {
   const signatureKeyPair: KeyPair = {
     keyType: "ed25519",
@@ -39,6 +42,7 @@ export const createIntroductionDocumentSnapshot = ({
     documentChainEventHash,
     parentSnapshotId: "",
     parentSnapshotUpdateClocks: {},
+    workspaceMemberDevicesProof,
   };
 
   return createInitialSnapshot(

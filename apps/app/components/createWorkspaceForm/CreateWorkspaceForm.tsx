@@ -134,11 +134,26 @@ export function CreateWorkspaceForm(props: CreateWorkspaceFormProps) {
         knownVersion: documentChain.version,
       });
 
+      const workspaceMemberDevicesProof =
+        workspaceMemberDevicesProofUtil.createWorkspaceMemberDevicesProof({
+          authorKeyPair: {
+            privateKey: sodium.from_base64(mainDevice.signingPrivateKey),
+            publicKey: sodium.from_base64(mainDevice.signingPublicKey),
+            keyType: "ed25519",
+          },
+          workspaceMemberDevicesProofData: {
+            clock: 0,
+            userChainHashes: { [userId]: userChainState.eventHash },
+            workspaceChainHash: workspaceChainState.lastEventHash,
+          },
+        });
+
       const snapshotId = generateId();
       const snapshot = createIntroductionDocumentSnapshot({
         documentId: createDocumentChainEvent.transaction.id,
         snapshotEncryptionKey: sodium.from_base64(snapshotKey.key),
         documentChainEventHash: documentChainState.currentState.eventHash,
+        workspaceMemberDevicesProof,
         keyDerivationTrace: {
           workspaceKeyId,
           trace: [
@@ -182,20 +197,6 @@ export function CreateWorkspaceForm(props: CreateWorkspaceFormProps) {
         name,
         key: workspaceKey,
       });
-
-      const workspaceMemberDevicesProof =
-        workspaceMemberDevicesProofUtil.createWorkspaceMemberDevicesProof({
-          authorKeyPair: {
-            privateKey: sodium.from_base64(mainDevice.signingPrivateKey),
-            publicKey: sodium.from_base64(mainDevice.signingPublicKey),
-            keyType: "ed25519",
-          },
-          workspaceMemberDevicesProofData: {
-            clock: 0,
-            userChainHashes: { [userId]: userChainState.eventHash },
-            workspaceChainHash: workspaceChainState.lastEventHash,
-          },
-        });
 
       const createInitialWorkspaceStructureResult =
         await createInitialWorkspaceStructure({

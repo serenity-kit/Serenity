@@ -214,10 +214,32 @@ export const createInitialWorkspaceStructure = async ({
     knownVersion: documentChain.version,
   });
   const snapshotId = generateId();
+
+  const userChainUser = await getAndConstructUserFromUserChainTestHelper({
+    mainDeviceSigningPublicKey: mainDevice.signingPublicKey,
+  });
+
+  const workspaceMemberDevicesProof =
+    workspaceMemberDevicesProofUtil.createWorkspaceMemberDevicesProof({
+      authorKeyPair: {
+        privateKey: sodium.from_base64(mainDevice.signingPrivateKey),
+        publicKey: sodium.from_base64(mainDevice.signingPublicKey),
+        keyType: "ed25519",
+      },
+      workspaceMemberDevicesProofData: {
+        clock: 0,
+        userChainHashes: {
+          [userChainUser.userId]: userChainUser.userChainState.eventHash,
+        },
+        workspaceChainHash: workspaceChainState.lastEventHash,
+      },
+    });
+
   const snapshot = createIntroductionDocumentSnapshot({
     documentId: createDocumentChainEvent.transaction.id,
     snapshotEncryptionKey: sodium.from_base64(snapshotKey.key),
     documentChainEventHash: documentChainState.currentState.eventHash,
+    workspaceMemberDevicesProof,
     keyDerivationTrace: {
       workspaceKeyId,
       trace: [
@@ -246,26 +268,6 @@ export const createInitialWorkspaceStructure = async ({
     snapshot,
     serializedDocumentChainEvent: JSON.stringify(createDocumentChainEvent),
   };
-
-  const userChainUser = await getAndConstructUserFromUserChainTestHelper({
-    mainDeviceSigningPublicKey: mainDevice.signingPublicKey,
-  });
-
-  const workspaceMemberDevicesProof =
-    workspaceMemberDevicesProofUtil.createWorkspaceMemberDevicesProof({
-      authorKeyPair: {
-        privateKey: sodium.from_base64(mainDevice.signingPrivateKey),
-        publicKey: sodium.from_base64(mainDevice.signingPublicKey),
-        keyType: "ed25519",
-      },
-      workspaceMemberDevicesProofData: {
-        clock: 0,
-        userChainHashes: {
-          [userChainUser.userId]: userChainUser.userChainState.eventHash,
-        },
-        workspaceChainHash: workspaceChainState.lastEventHash,
-      },
-    });
 
   // create the initial workspace structure
   const authorizationHeaders = {

@@ -19,6 +19,7 @@ import { gql } from "graphql-request";
 import { KeyPair } from "libsodium-wrappers";
 import sodium from "react-native-libsodium";
 import { prisma } from "../../../src/database/prisma";
+import { getWorkspaceMemberDevicesProofByWorkspaceId } from "../../../src/database/workspace/getWorkspaceMemberDevicesProofByWorkspaceId";
 import { createFolderKeyDerivationTrace } from "../folder/createFolderKeyDerivationTrace";
 
 type RunCreateDocumentMutationParams = {
@@ -185,6 +186,12 @@ export const createDocument = async ({
     keyType: "ed25519",
   };
 
+  const workspaceMemberDevicesProofEntry =
+    await getWorkspaceMemberDevicesProofByWorkspaceId({
+      prisma,
+      workspaceId,
+    });
+
   const publicData: SnapshotPublicData & SerenitySnapshotPublicData = {
     snapshotId: generateId(),
     docId: id,
@@ -193,6 +200,7 @@ export const createDocument = async ({
     documentChainEventHash: documentChainState.currentState.eventHash,
     parentSnapshotId: "",
     parentSnapshotUpdateClocks: {},
+    workspaceMemberDevicesProof: workspaceMemberDevicesProofEntry.proof,
   };
 
   const initialDocument = "";

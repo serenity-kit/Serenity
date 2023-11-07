@@ -21,8 +21,10 @@ import {
   createSocketClient,
   waitForClientState,
 } from "../test/helpers/websocket";
+import { prisma } from "./database/prisma";
 import { getSnapshot } from "./database/snapshot/getSnapshot";
 import createUserWithWorkspace from "./database/testHelpers/createUserWithWorkspace";
+import { getWorkspaceMemberDevicesProofByWorkspaceId } from "./database/workspace/getWorkspaceMemberDevicesProofByWorkspaceId";
 
 const graphql = setupGraphql();
 const username = "74176fce-8391-4f12-bbd5-d30a91e9ee7f@example.com";
@@ -173,6 +175,13 @@ test("successfully creates a snapshot", async () => {
     keyType: "ed25519",
   };
   const { state } = await getLastDocumentChainEventByDocumentId({ documentId });
+
+  const workspaceMemberDevicesProofEntry =
+    await getWorkspaceMemberDevicesProofByWorkspaceId({
+      prisma,
+      workspaceId,
+    });
+
   const publicData: SnapshotPublicData & SerenitySnapshotPublicData = {
     snapshotId: id,
     docId: documentId,
@@ -181,6 +190,7 @@ test("successfully creates a snapshot", async () => {
     parentSnapshotId: initialSnapshot.id,
     parentSnapshotUpdateClocks: {},
     documentChainEventHash: state.eventHash,
+    workspaceMemberDevicesProof: workspaceMemberDevicesProofEntry.proof,
   };
   const snapshot = createSnapshot(
     "CONTENT DUMMY",

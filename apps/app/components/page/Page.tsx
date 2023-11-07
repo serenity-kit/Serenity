@@ -37,6 +37,7 @@ import {
   runWorkspaceMembersQuery,
 } from "../../generated/graphql";
 import { useAuthenticatedAppContext } from "../../hooks/useAuthenticatedAppContext";
+import { loadRemoteWorkspaceMemberDevicesProofQuery } from "../../store/workspaceMemberDevicesProofStore";
 import { DocumentState } from "../../types/documentState";
 import { WorkspaceDrawerScreenProps } from "../../types/navigationProps";
 import { createNewSnapshotKey } from "../../utils/createNewSnapshotKey/createNewSnapshotKey";
@@ -159,6 +160,9 @@ export default function Page({
         subkeyId: document.subkeyId,
       });
 
+      const workspaceMemberDevicesProof =
+        await loadRemoteWorkspaceMemberDevicesProofQuery({ workspaceId });
+
       const documentTitleData = encryptDocumentTitle({
         title: documentTitle,
         activeDevice,
@@ -194,6 +198,7 @@ export default function Page({
         data: Yjs.encodeStateAsUpdateV2(yDocRef.current),
         key: sodium.from_base64(snapshotKeyData.key),
         publicData: {
+          workspaceMemberDevicesProof: workspaceMemberDevicesProof.proof,
           keyDerivationTrace: snapshotKeyData.keyDerivationTrace,
           documentChainEventHash:
             latestResolvedDocumentChain.currentState.eventHash,

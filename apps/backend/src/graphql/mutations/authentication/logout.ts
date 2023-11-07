@@ -3,14 +3,14 @@ import * as workspaceMemberDevicesProofUtil from "@serenity-kit/workspace-member
 import { AuthenticationError } from "apollo-server-express";
 import { arg, inputObjectType, mutationField, objectType } from "nexus";
 import { logout } from "../../../database/authentication/logout";
-import { WorkspaceMemberDevicesProofInput } from "../../types/workspaceMemberDevicesProof";
+import { WorkspaceMemberDevicesProofEntryInput } from "../../types/workspaceMemberDevicesProof";
 
 export const LogoutInput = inputObjectType({
   name: "LogoutInput",
   definition(t) {
     t.nonNull.string("serializedUserChainEvent");
     t.nonNull.list.nonNull.field("workspaceMemberDevicesProofs", {
-      type: WorkspaceMemberDevicesProofInput,
+      type: WorkspaceMemberDevicesProofEntryInput,
     });
   },
 });
