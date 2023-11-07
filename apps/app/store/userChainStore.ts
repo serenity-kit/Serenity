@@ -3,9 +3,7 @@ import * as userStore from "./userStore";
 
 export const table = "user_chain_v1";
 
-export const initialize = async () => {
-  await sql.ready();
-
+export const initialize = () => {
   sql.execute(
     `CREATE TABLE IF NOT EXISTS "${table}" (
       "position"	INTEGER NOT NULL,

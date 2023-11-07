@@ -10,6 +10,11 @@ export const ready = () => {
   return Promise.resolve();
 };
 
+export const resetInMemoryDatabase = () => {
+  db.close();
+  db = open({ name: ":memory:" });
+};
+
 export const execute = (statement: string, params?: (string | number)[]) => {
   const { rows } = db.execute(statement, params);
   return rows?._array || [];

@@ -14,9 +14,7 @@ import { loadRemoteWorkspaceChain } from "./workspaceChainStore";
 
 export const table = "workspace_v1";
 
-export const initialize = async () => {
-  await sql.ready();
-
+export const initialize = () => {
   sql.execute(
     `CREATE TABLE IF NOT EXISTS ${table} (
       "id"	TEXT,
