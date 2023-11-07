@@ -4,11 +4,7 @@ import * as SplashScreen from "expo-splash-screen";
 import { useCallback, useEffect, useState } from "react";
 import sodium from "react-native-libsodium";
 import { Client } from "urql";
-import * as userChainStore from "../store/userChainStore";
-import * as userStore from "../store/userStore";
-import * as workspaceChainStore from "../store/workspaceChainStore";
-import * as workspaceMemberDevicesProofStore from "../store/workspaceMemberDevicesProofStore";
-import * as workspaceStore from "../store/workspaceStore";
+import { createSqlTables } from "../store/createSqlTables";
 import * as SessionKeyStore from "../utils/authentication/sessionKeyStore";
 import { getSessionKey } from "../utils/authentication/sessionKeyStore";
 import { getActiveDevice } from "../utils/device/getActiveDevice";
@@ -32,11 +28,7 @@ export default function useCachedResources() {
           Font.loadAsync({
             "space-mono": require("../assets/fonts/SpaceMono-Regular.ttf"),
           }),
-          workspaceStore.initialize(),
-          workspaceChainStore.initialize(),
-          workspaceMemberDevicesProofStore.initialize(),
-          userStore.initialize(),
-          userChainStore.initialize(),
+          createSqlTables(),
         ]);
         setActiveDevice(result[0]);
         const sessionKey = await getSessionKey();

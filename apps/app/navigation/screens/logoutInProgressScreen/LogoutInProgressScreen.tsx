@@ -10,6 +10,8 @@ import {
   runLogoutMutation,
   runUserChainQuery,
 } from "../../../generated/graphql";
+import { createSqlTables } from "../../../store/createSqlTables";
+import { resetInMemoryDatabase } from "../../../store/sql/sql";
 import { getLastWorkspaceChainEvent } from "../../../store/workspaceChainStore";
 import { loadRemoteWorkspaceMemberDevicesProofsQuery } from "../../../store/workspaceMemberDevicesProofStore";
 import { RootStackScreenProps } from "../../../types/navigationProps";
@@ -150,6 +152,8 @@ export default function LogoutInProgress({
             "Failed to cleanup the local session data but logged out on the server. Please login and try again to log out on this device."
           );
         }
+        resetInMemoryDatabase();
+        await createSqlTables();
         navigation.navigate("Login");
       }
     }

@@ -10,9 +10,7 @@ import * as workspaceStore from "./workspaceStore";
 
 export const table = "workspace_chain_v1";
 
-export const initialize = async () => {
-  await sql.ready();
-
+export const initialize = () => {
   sql.execute(
     `CREATE TABLE IF NOT EXISTS "${table}" (
       "position"	INTEGER NOT NULL,
