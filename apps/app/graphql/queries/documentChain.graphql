@@ -1,5 +1,5 @@
-query documentChain($documentId: ID!) {
-  documentChain(documentId: $documentId, first: 5000) {
+query documentChain($documentId: ID!, $after: String) {
+  documentChain(documentId: $documentId, first: 5000, after: $after) {
     nodes {
       serializedContent
       position

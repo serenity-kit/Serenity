@@ -21,10 +21,10 @@ export const documentChainQuery = queryField((t) => {
       if (!context.user) {
         throw new AuthenticationError("Not authenticated");
       }
-      const cursor = args.after ? { id: args.after } : undefined;
+      const afterPosition = args.after ? parseInt(args.after, 10) : undefined;
       // prisma will include the cursor if skip: 1 is not set
       // https://www.prisma.io/docs/concepts/components/prisma-client/pagination#do-i-always-have-to-skip-1
-      const skip = cursor ? 1 : undefined;
+      const skip = typeof afterPosition === "number" ? 1 : undefined;
       // include one extra project to set hasNextPage value
       const take: any = args.first ? args.first + 1 : undefined;
 
@@ -32,7 +32,7 @@ export const documentChainQuery = queryField((t) => {
       const documentChain = await getDocumentChain({
         documentId: args.documentId,
         userId,
-        cursor,
+        afterPosition,
         skip,
         take,
       });

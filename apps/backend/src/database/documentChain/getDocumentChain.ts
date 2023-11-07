@@ -1,24 +1,19 @@
 import { ForbiddenError } from "apollo-server-express";
 import { prisma } from "../prisma";
 
-type Cursor = {
-  id?: string;
-};
-
 type Params = {
   documentId: string;
+  afterPosition?: number;
   userId: string;
-  cursor?: Cursor;
   skip?: number;
   take: number;
 };
 export async function getDocumentChain({
   documentId,
   userId,
-}: // cursor,
-// skip,
-// take,
-Params) {
+  afterPosition,
+  skip,
+}: Params) {
   // make sure the user has access to the workspace
   // by retrieving and verifying the workspace connection
   const document = await prisma.document.findUnique({
@@ -36,8 +31,10 @@ Params) {
 
   const documentChain = await prisma.documentChainEvent.findMany({
     where: { documentId },
-    // cursor,
-    // skip,
+    cursor: afterPosition
+      ? { documentId_position: { documentId, position: afterPosition } }
+      : undefined,
+    skip,
     // take,
     orderBy: { position: "asc" },
     select: { position: true, content: true },

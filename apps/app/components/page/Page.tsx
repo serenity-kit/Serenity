@@ -37,6 +37,10 @@ import {
   runWorkspaceMembersQuery,
 } from "../../generated/graphql";
 import { useAuthenticatedAppContext } from "../../hooks/useAuthenticatedAppContext";
+import {
+  getDocumentChainEventByHash,
+  loadRemoteDocumentChain,
+} from "../../store/documentChainStore";
 import { loadRemoteWorkspaceMemberDevicesProofQuery } from "../../store/workspaceMemberDevicesProofStore";
 import { DocumentState } from "../../types/documentState";
 import { WorkspaceDrawerScreenProps } from "../../types/navigationProps";
@@ -61,7 +65,7 @@ type Props = WorkspaceDrawerScreenProps<"Page"> & {
   signatureKeyPair: KeyPair;
   workspaceId: string;
   reloadPage: () => void;
-  latestResolvedDocumentChain: documentChain.ResolvedDocumentChain;
+  latestDocumentChainState: documentChain.DocumentChainState;
 };
 
 export default function Page({
@@ -70,7 +74,7 @@ export default function Page({
   signatureKeyPair,
   workspaceId,
   reloadPage,
-  latestResolvedDocumentChain,
+  latestDocumentChainState,
 }: Props) {
   const { pageId: docId, setActiveSnapshotAndCommentKeys } = usePage();
   const isNew = route.params?.isNew ?? false;
@@ -176,7 +180,7 @@ export default function Page({
 
       let documentShareLinkDeviceBoxes: DocumentShareLinkDeviceBox[] = [];
       documentShareLinkDeviceBoxes = Object.entries(
-        latestResolvedDocumentChain.currentState.devices
+        latestDocumentChainState.devices
       ).map(([shareLinkDeviceSigningPublicKey, deviceEntry]) => {
         const { documentShareLinkDeviceBox } =
           encryptSnapshotKeyForShareLinkDevice({
@@ -200,8 +204,7 @@ export default function Page({
         publicData: {
           workspaceMemberDevicesProof: workspaceMemberDevicesProof.proof,
           keyDerivationTrace: snapshotKeyData.keyDerivationTrace,
-          documentChainEventHash:
-            latestResolvedDocumentChain.currentState.eventHash,
+          documentChainEventHash: latestDocumentChainState.eventHash,
         },
         additionalServerData: {
           documentTitleData,
@@ -215,21 +218,28 @@ export default function Page({
           "SnapshotProofInfo not provided when trying to derive a new key"
         );
       }
-      if (!latestResolvedDocumentChain) {
-        console.error("latestResolvedDocumentChain not found");
-        throw new Error("latestDocumentChainStateRef.current not found");
+
+      let activeSnapshotDocumentChainEvent = getDocumentChainEventByHash({
+        documentId: docId,
+        hash: snapshotProofInfo.additionalPublicData.documentChainEventHash,
+      });
+
+      if (!activeSnapshotDocumentChainEvent) {
+        // refetch newest chain items and try again before returning an error
+        await loadRemoteDocumentChain({ documentId: docId });
+        activeSnapshotDocumentChainEvent = getDocumentChainEventByHash({
+          documentId: docId,
+          hash: snapshotProofInfo.additionalPublicData.documentChainEventHash,
+        });
+
+        if (!activeSnapshotDocumentChainEvent) {
+          console.error("activeSnapshotDocumentChainState not set");
+          throw new Error("activeSnapshotDocumentChainState not set");
+        }
       }
 
       activeSnapshotDocumentChainStateRef.current =
-        latestResolvedDocumentChain.statePerEvent[
-          snapshotProofInfo.additionalPublicData.documentChainEventHash
-        ];
-
-      // TODO refetch newest chain items and try again before returning an error
-      if (!activeSnapshotDocumentChainStateRef.current) {
-        console.error("activeSnapshotDocumentChainStateRef.current not set");
-        throw new Error("activeSnapshotDocumentChainStateRef.current not set");
-      }
+        activeSnapshotDocumentChainEvent.state;
 
       const snapshotKeyData = await deriveExistingSnapshotKey(
         docId,

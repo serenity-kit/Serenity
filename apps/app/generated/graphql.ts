@@ -1721,6 +1721,7 @@ export type DocumentQuery = { __typename?: 'Query', document?: { __typename?: 'D
 
 export type DocumentChainQueryVariables = Exact<{
   documentId: Scalars['ID'];
+  after?: InputMaybe<Scalars['String']>;
 }>;
 
 
@@ -2531,8 +2532,8 @@ export function useDocumentQuery(options: Omit<Urql.UseQueryArgs<DocumentQueryVa
   return Urql.useQuery<DocumentQuery, DocumentQueryVariables>({ query: DocumentDocument, ...options });
 };
 export const DocumentChainDocument = gql`
-    query documentChain($documentId: ID!) {
-  documentChain(documentId: $documentId, first: 5000) {
+    query documentChain($documentId: ID!, $after: String) {
+  documentChain(documentId: $documentId, first: 5000, after: $after) {
     nodes {
       serializedContent
       position
