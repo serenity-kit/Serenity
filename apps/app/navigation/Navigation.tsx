@@ -8,10 +8,6 @@ import {
 } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import {
-  constructUserFromSerializedUserChain,
-  notNull,
-} from "@serenity-tools/common";
-import {
   Heading,
   Text,
   tw,
@@ -30,13 +26,11 @@ import SharePageSidebar from "../components/sharePageSidebar/SharePageSidebar";
 import Sidebar from "../components/sidebar/Sidebar";
 import WorkspaceSettingsSidebar from "../components/workspaceSettingsSidebar/WorkspaceSettingsSidebar";
 import { WorkspaceProvider } from "../context/WorkspaceContext";
-import {
-  useWorkspaceMembersQuery,
-  useWorkspaceQuery,
-} from "../generated/graphql";
+import { useWorkspaceQuery } from "../generated/graphql";
 import { redirectToLoginIfMissingTheActiveDeviceOrSessionKey } from "../higherOrderComponents/redirectToLoginIfMissingTheActiveDeviceOrSessionKey";
 import { useAuthenticatedAppContext } from "../hooks/useAuthenticatedAppContext";
 import { useInterval } from "../hooks/useInterval";
+import { loadRemoteUserChainsForWorkspace } from "../store/userChainStore";
 import {
   loadRemoteWorkspaceChain,
   useLocalLastWorkspaceChainEvent,
@@ -249,26 +243,14 @@ function WorkspaceStackNavigator(props) {
 
   useEffect(() => {
     loadRemoteWorkspaceDetails({ workspaceId: props.route.params.workspaceId });
+    loadRemoteUserChainsForWorkspace({
+      workspaceId: props.route.params.workspaceId,
+    });
   }, []);
 
   const lastWorkspaceChainEvent = useLocalLastWorkspaceChainEvent({
     workspaceId: props.route.params.workspaceId,
   });
-
-  const [workspaceMembersQueryResult] = useWorkspaceMembersQuery({
-    variables: {
-      workspaceId: props.route.params.workspaceId,
-    },
-  });
-  const users = workspaceMembersQueryResult.data?.workspaceMembers?.nodes
-    ? workspaceMembersQueryResult.data.workspaceMembers.nodes
-        .filter(notNull)
-        .map((member) => {
-          return constructUserFromSerializedUserChain({
-            serializedUserChain: member.user.chain,
-          });
-        })
-    : null;
 
   useInterval(() => {
     if (activeDevice && lastWorkspaceChainEvent) {
@@ -300,7 +282,6 @@ function WorkspaceStackNavigator(props) {
       value={{
         workspaceId: props.route.params.workspaceId,
         workspaceQueryResult,
-        users,
       }}
     >
       <WorkspaceStack.Navigator

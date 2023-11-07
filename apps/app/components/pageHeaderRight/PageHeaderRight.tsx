@@ -12,6 +12,7 @@ import {
 import { HStack } from "native-base";
 import { useState } from "react";
 import { useWorkspace } from "../../context/WorkspaceContext";
+import { getLocalUserByDeviceSigningPublicKey } from "../../store/userStore";
 import { useLocalLastWorkspaceChainEvent } from "../../store/workspaceChainStore";
 import { useEditorStore } from "../../utils/editorStore/editorStore";
 import PageHeaderRightMenu from "../pageHeaderRightMenu/PageHeaderRightMenu";
@@ -27,7 +28,7 @@ export const PageHeaderRight: React.FC<Props> = ({
   hasShareButton,
 }) => {
   const hasEditorSidebar = useHasEditorSidebar();
-  const { workspaceId, users } = useWorkspace();
+  const { workspaceId } = useWorkspace();
   const lastWorkspaceChainEvent = useLocalLastWorkspaceChainEvent({
     workspaceId,
   });
@@ -35,18 +36,16 @@ export const PageHeaderRight: React.FC<Props> = ({
   const isInEditingMode = useEditorStore((state) => state.isInEditingMode);
   const triggerBlur = useEditorStore((state) => state.triggerBlur);
 
-  const activeWorkspaceMembers =
-    lastWorkspaceChainEvent?.state.members && users
-      ? Object.entries(lastWorkspaceChainEvent.state.members).map(
-          ([mainDeviceSigningPublicKey, member]) => {
-            const user = users.find(
-              (user) =>
-                user.mainDeviceSigningPublicKey === mainDeviceSigningPublicKey
-            );
-            return user;
-          }
-        )
-      : null;
+  const activeWorkspaceMembers = lastWorkspaceChainEvent?.state.members
+    ? Object.entries(lastWorkspaceChainEvent.state.members).map(
+        ([mainDeviceSigningPublicKey, member]) => {
+          const user = getLocalUserByDeviceSigningPublicKey({
+            signingPublicKey: mainDeviceSigningPublicKey,
+          });
+          return user;
+        }
+      )
+    : null;
 
   return (
     <>
@@ -79,10 +78,10 @@ export const PageHeaderRight: React.FC<Props> = ({
                   if (member) {
                     return (
                       <Avatar
-                        key={member.userId}
-                        color={hashToCollaboratorColor(member.userId)}
+                        key={member.id}
+                        color={hashToCollaboratorColor(member.id)}
                       >
-                        {member.email?.split("@")[0].substring(0, 1)}
+                        {member.username?.split("@")[0].substring(0, 1)}
                       </Avatar>
                     );
                   }

@@ -4,11 +4,9 @@ import {
   KeyDerivationTrace,
   LocalDevice,
   SerenitySnapshotPublicData,
-  constructUserFromSerializedUserChain,
   encryptDocumentTitle,
   encryptSnapshotKeyForShareLinkDevice,
   generateId,
-  notNull,
 } from "@serenity-tools/common";
 import { decryptDocumentTitleBasedOnSnapshotKey } from "@serenity-tools/common/src/decryptDocumentTitleBasedOnSnapshotKey/decryptDocumentTitleBasedOnSnapshotKey";
 import { useYjsSync } from "@serenity-tools/secsync";
@@ -30,17 +28,14 @@ import { Awareness } from "y-protocols/awareness";
 import * as Yjs from "yjs";
 import Editor from "../../components/editor/Editor";
 import { usePage } from "../../context/PageContext";
-import { useWorkspace } from "../../context/WorkspaceContext";
-import {
-  Document,
-  runDocumentQuery,
-  runWorkspaceMembersQuery,
-} from "../../generated/graphql";
+import { Document, runDocumentQuery } from "../../generated/graphql";
 import { useAuthenticatedAppContext } from "../../hooks/useAuthenticatedAppContext";
 import {
   getDocumentChainEventByHash,
   loadRemoteDocumentChain,
 } from "../../store/documentChainStore";
+import { loadRemoteUserChainsForWorkspace } from "../../store/userChainStore";
+import { getLocalUserByDeviceSigningPublicKey } from "../../store/userStore";
 import { loadRemoteWorkspaceMemberDevicesProofQuery } from "../../store/workspaceMemberDevicesProofStore";
 import { DocumentState } from "../../types/documentState";
 import { WorkspaceDrawerScreenProps } from "../../types/navigationProps";
@@ -50,7 +45,6 @@ import { useDocumentTitleStore } from "../../utils/document/documentTitleStore";
 import { getDocument } from "../../utils/document/getDocument";
 import { updateDocumentName } from "../../utils/document/updateDocumentName";
 import { useEditorStore } from "../../utils/editorStore/editorStore";
-import { findVerifiedUserByDeviceSigningPublicKey } from "../../utils/findVerifiedUserByDeviceSigningPublicKey/findVerifiedUserByDeviceSigningPublicKey";
 import { getEnvironmentUrls } from "../../utils/getEnvironmentUrls/getEnvironmentUrls";
 import {
   getLocalDocument,
@@ -112,7 +106,6 @@ export default function Page({
     useRef<documentChain.DocumentChainState>();
 
   const { websocketOrigin } = getEnvironmentUrls();
-  const { users } = useWorkspace();
 
   const [state, , , yAwareness] = useYjsSync({
     yDoc: yDocRef.current,
@@ -276,32 +269,20 @@ export default function Page({
       // allow to fetch a user that is or was part of the workspace
       // the must be cross-checked with workspaceChainData
 
-      if (users) {
-        const creator = findVerifiedUserByDeviceSigningPublicKey({
-          users,
-          signingPublicKey,
-        });
-        if (creator) {
-          return true;
-        }
+      const creator = getLocalUserByDeviceSigningPublicKey({
+        signingPublicKey,
+        includeExpired: true,
+        includeRemoved: true, // TODO depends on the workspace member devices proof
+      });
+      if (creator) {
+        return true;
       }
 
-      const workspaceMembersQueryResult = await runWorkspaceMembersQuery({
-        workspaceId,
-      });
-      const allUsers = workspaceMembersQueryResult.data?.workspaceMembers?.nodes
-        ? workspaceMembersQueryResult.data.workspaceMembers.nodes
-            .filter(notNull)
-            .map((member) => {
-              return constructUserFromSerializedUserChain({
-                serializedUserChain: member.user.chain,
-              });
-            })
-        : null;
-
-      const creator2 = findVerifiedUserByDeviceSigningPublicKey({
-        users: allUsers,
+      await loadRemoteUserChainsForWorkspace({ workspaceId });
+      const creator2 = getLocalUserByDeviceSigningPublicKey({
         signingPublicKey,
+        includeExpired: true,
+        includeRemoved: true, // TODO depends on the workspace member devices proof
       });
       if (Boolean(creator2)) {
         return true;

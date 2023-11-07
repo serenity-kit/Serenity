@@ -10,9 +10,8 @@ import { formatDistanceToNow, parseJSON } from "date-fns";
 import { HStack } from "native-base";
 import React from "react";
 import { usePage } from "../../context/PageContext";
-import { useWorkspace } from "../../context/WorkspaceContext";
 import { DecryptedReply } from "../../machines/commentsMachine";
-import { findVerifiedUserByDeviceSigningPublicKey } from "../../utils/findVerifiedUserByDeviceSigningPublicKey/findVerifiedUserByDeviceSigningPublicKey";
+import { getLocalUserByDeviceSigningPublicKey } from "../../store/userStore";
 import CommentsMenu from "../commentsMenu/CommentsMenu";
 
 type Props = {
@@ -28,17 +27,17 @@ export default function CommentReply({
   commentId,
   naked = false,
 }: Props) {
-  const { users } = useWorkspace();
   const { commentsService } = usePage();
   const [, send] = useActor(commentsService);
   const [isHovered, setIsHovered] = React.useState(false);
 
-  const replyCreator = findVerifiedUserByDeviceSigningPublicKey({
-    users,
+  const replyCreator = getLocalUserByDeviceSigningPublicKey({
     signingPublicKey: reply.creatorDevice.signingPublicKey,
+    includeExpired: true,
+    includeRemoved: true,
   });
 
-  const isMyReply = replyCreator?.userId === meId;
+  const isMyReply = replyCreator?.id === meId;
 
   return (
     <View
@@ -52,11 +51,11 @@ export default function CommentReply({
           {/* TODO if comment has been read change color to gray */}
           {replyCreator ? (
             <Avatar
-              key={replyCreator.userId}
-              color={hashToCollaboratorColor(replyCreator.userId)}
+              key={replyCreator.id}
+              color={hashToCollaboratorColor(replyCreator.id)}
               size="xs"
             >
-              {replyCreator.email?.split("@")[0].substring(0, 1)}
+              {replyCreator.username?.split("@")[0].substring(0, 1)}
             </Avatar>
           ) : (
             <Avatar color="arctic" size="xs">
@@ -70,7 +69,7 @@ export default function CommentReply({
             numberOfLines={1}
             ellipsizeMode="tail"
           >
-            {replyCreator?.email || "External"}
+            {replyCreator?.username || "External"}
           </Text>
         </HStack>
         {isMyReply && isHovered ? (
