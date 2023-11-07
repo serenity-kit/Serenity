@@ -1,10 +1,6 @@
 import * as userChain from "@serenity-kit/user-chain";
 import * as workspaceMemberDevicesProofUtil from "@serenity-kit/workspace-member-devices-proof";
-import {
-  getExpiredTextFromString,
-  notNull,
-  notUndefined,
-} from "@serenity-tools/common";
+import { getExpiredTextFromString, notNull } from "@serenity-tools/common";
 import {
   Description,
   Heading,
@@ -26,17 +22,14 @@ import { useWindowDimensions } from "react-native";
 import sodium from "react-native-libsodium";
 import { VerifyPasswordModal } from "../../../components/verifyPasswordModal/VerifyPasswordModal";
 import {
-  runWorkspaceMemberDevicesProofsQuery,
   useDeleteDeviceMutation,
   useDevicesQuery,
   useUserChainQuery,
 } from "../../../generated/graphql";
 import { useAuthenticatedAppContext } from "../../../hooks/useAuthenticatedAppContext";
 import { loadMeAndVerifyMachine } from "../../../machines/loadMeAndVerifyMachine";
-import {
-  getWorkspaceChainEventByHash,
-  loadRemoteWorkspaceChain,
-} from "../../../store/workspaceChainStore";
+import { getLastWorkspaceChainEvent } from "../../../store/workspaceChainStore";
+import { loadRemoteWorkspaceMemberDevicesProofsQuery } from "../../../store/workspaceMemberDevicesProofStore";
 import { RootStackScreenProps } from "../../../types/navigationProps";
 import { WorkspaceWithWorkspaceDevicesParing } from "../../../types/workspaceDevice";
 import { getMainDevice } from "../../../utils/device/mainDeviceMemoryStore";
@@ -113,16 +106,6 @@ export default function AccountDevicesSettingsScreen(
       deviceSigningPublicKey: activeDevice.signingPublicKey,
     });
 
-    const workspaceMemberDevicesProofsQueryResult =
-      await runWorkspaceMemberDevicesProofsQuery({});
-
-    if (
-      !workspaceMemberDevicesProofsQueryResult.data
-        ?.workspaceMemberDevicesProofs?.nodes
-    ) {
-      throw new Error("Failed to fetch workspaceMemberDevicesProofs");
-    }
-
     if (!workspaces) {
       console.error("no workspaces found for user");
       setSigningPublicKeyToBeDeleted(undefined);
@@ -158,42 +141,18 @@ export default function AccountDevicesSettingsScreen(
       knownVersion: userChain.version,
     });
 
+    const existingWorkspaceMemberDevicesProofs =
+      await loadRemoteWorkspaceMemberDevicesProofsQuery();
+
     const newWorkspaceMemberDevicesProofs: {
       workspaceId: string;
       serializedWorkspaceMemberDevicesProof: string;
     }[] = [];
-    for (const entry of workspaceMemberDevicesProofsQueryResult.data.workspaceMemberDevicesProofs.nodes
-      .filter(notNull)
-      .filter(notUndefined)) {
-      const data =
-        workspaceMemberDevicesProofUtil.WorkspaceMemberDevicesProofData.parse(
-          JSON.parse(entry.serializedData)
-        );
 
-      // load latest workspace chain entries and check if the workspace chain event is included
-      // to verify that the server is providing this or a newer workspace chain
-      const { state } = await loadRemoteWorkspaceChain({
+    for (const entry of existingWorkspaceMemberDevicesProofs) {
+      const { state } = getLastWorkspaceChainEvent({
         workspaceId: entry.workspaceId,
       });
-      const workspaceChainEvent = getWorkspaceChainEventByHash({
-        hash: data.workspaceChainHash,
-        workspaceId: entry.workspaceId,
-      });
-      if (!workspaceChainEvent) {
-        throw new Error(
-          "Workspace chain event not found in the current workspace chain"
-        );
-      }
-
-      const isValid =
-        workspaceMemberDevicesProofUtil.isValidWorkspaceMemberDevicesProof({
-          authorPublicKey: entry.authorMainDeviceSigningPublicKey,
-          workspaceMemberDevicesProof: entry.proof,
-          workspaceMemberDevicesProofData: data,
-        });
-      if (!isValid) {
-        throw new Error("Invalid workspace member devices proof");
-      }
 
       const newProof =
         workspaceMemberDevicesProofUtil.createWorkspaceMemberDevicesProof({
@@ -203,9 +162,9 @@ export default function AccountDevicesSettingsScreen(
             keyType: "ed25519",
           },
           workspaceMemberDevicesProofData: {
-            clock: data.clock + 1,
+            clock: entry.clock + 1,
             userChainHashes: {
-              ...data.userChainHashes,
+              ...entry.data.userChainHashes,
               [newUserChainState.id]: newUserChainState.eventHash,
             },
             workspaceChainHash: state.lastEventHash,
