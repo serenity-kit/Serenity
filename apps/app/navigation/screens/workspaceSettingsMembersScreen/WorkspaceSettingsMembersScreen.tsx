@@ -18,7 +18,7 @@ import {
   useIsDesktopDevice,
 } from "@serenity-tools/ui";
 import { useMachine } from "@xstate/react";
-import { useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import sodium from "react-native-libsodium";
 import MemberMenu from "../../../components/memberMenu/MemberMenu";
 import { VerifyPasswordModal } from "../../../components/verifyPasswordModal/VerifyPasswordModal";
@@ -30,6 +30,8 @@ import {
 } from "../../../generated/graphql";
 import { useAuthenticatedAppContext } from "../../../hooks/useAuthenticatedAppContext";
 import { workspaceSettingsLoadWorkspaceMachine } from "../../../machines/workspaceSettingsLoadWorkspaceMachine";
+import { loadRemoteUserChainsForWorkspace } from "../../../store/userChainStore";
+import { getLocalUserByDeviceSigningPublicKey } from "../../../store/userStore";
 import {
   loadRemoteWorkspaceChain,
   useLocalLastWorkspaceChainEvent,
@@ -53,8 +55,11 @@ type RemoveMemberInfo = {
 export default function WorkspaceSettingsMembersScreen(
   props: WorkspaceStackScreenProps<"WorkspaceSettingsMembers">
 ) {
+  const [, updateState] = useState<any>();
+  const forceRender = useCallback(() => updateState({}), []);
+
   const isDesktopDevice = useIsDesktopDevice();
-  const { workspaceId, users } = useWorkspace();
+  const { workspaceId } = useWorkspace();
   const lastWorkspaceChainEvent = useLocalLastWorkspaceChainEvent({
     workspaceId,
   });
@@ -246,28 +251,35 @@ export default function WorkspaceSettingsMembersScreen(
     );
   }
 
-  const activeWorkspaceMembers =
-    lastWorkspaceChainEvent?.state.members && users
-      ? Object.entries(lastWorkspaceChainEvent.state.members).map(
-          ([mainDeviceSigningPublicKey, member]) => {
-            const user = users.find(
-              (user) =>
-                user.mainDeviceSigningPublicKey === mainDeviceSigningPublicKey
-            );
-            if (user) {
-              return { ...user, role: member.role, addedBy: member.addedBy };
-            } else {
-              return {
-                mainDeviceSigningPublicKey,
-                role: member.role,
-                addedBy: member.addedBy,
-                email: undefined,
-                userId: undefined,
-              };
-            }
+  useEffect(() => {
+    // TODO better to build a hook for this
+    const fetchMembers = async () => {
+      await loadRemoteUserChainsForWorkspace({ workspaceId });
+      forceRender();
+    };
+    fetchMembers();
+  }, []);
+
+  const activeWorkspaceMembers = lastWorkspaceChainEvent?.state.members
+    ? Object.entries(lastWorkspaceChainEvent.state.members).map(
+        ([mainDeviceSigningPublicKey, member]) => {
+          const user = getLocalUserByDeviceSigningPublicKey({
+            signingPublicKey: mainDeviceSigningPublicKey,
+          });
+          if (user) {
+            return { ...user, role: member.role, addedBy: member.addedBy };
+          } else {
+            return {
+              mainDeviceSigningPublicKey,
+              role: member.role,
+              addedBy: member.addedBy,
+              username: undefined,
+              id: undefined,
+            };
           }
-        )
-      : null;
+        }
+      )
+    : null;
 
   return (
     <>
@@ -325,15 +337,15 @@ export default function WorkspaceSettingsMembersScreen(
                     state.context.meWithWorkspaceLoadingInfoQueryResult?.data
                       ?.me?.id;
                   // TODO use the username when available
-                  const username = member.email
-                    ? member.email.slice(0, member.email.indexOf("@"))
+                  const displayName = member.username
+                    ? member.username.slice(0, member.username.indexOf("@"))
                     : "Unknown";
                   // TODO use initials when we have a username
-                  const initials = username.substring(0, 1);
-                  const email = member.email;
+                  const initials = displayName.substring(0, 1);
+                  const username = member.username;
 
                   const allowEditing =
-                    currentUserIsAdmin && member.userId !== adminUserId;
+                    currentUserIsAdmin && member.id !== adminUserId;
 
                   // capitalize by css doesn't work here as it will only affect the first letter
                   const roleName =
@@ -347,10 +359,10 @@ export default function WorkspaceSettingsMembersScreen(
                       mainItem={
                         <ListIconText
                           main={
-                            username +
-                            (member.userId === adminUserId ? " (you)" : "")
+                            displayName +
+                            (member.id === adminUserId ? " (you)" : "")
                           }
-                          secondary={email}
+                          secondary={username}
                           avatar={
                             <Avatar size={isDesktopDevice ? "xs" : "sm"}>
                               {initials}
@@ -362,7 +374,7 @@ export default function WorkspaceSettingsMembersScreen(
                       actionItem={
                         allowEditing ? (
                           <MemberMenu
-                            memberId={member.userId || "unknown"}
+                            memberId={member.id || "unknown"}
                             role={member.role}
                             onUpdateRole={(role) => {
                               updateMemberRolePreflight({
@@ -375,7 +387,7 @@ export default function WorkspaceSettingsMembersScreen(
                               removeMemberPreflight({
                                 mainDeviceSigningPublicKey:
                                   member.mainDeviceSigningPublicKey,
-                                userId: member.userId || "unknown",
+                                userId: member.id || "unknown",
                               });
                             }}
                           />

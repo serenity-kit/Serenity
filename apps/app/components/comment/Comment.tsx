@@ -13,10 +13,9 @@ import { HStack } from "native-base";
 import React from "react";
 import { StyleSheet } from "react-native";
 import { usePage } from "../../context/PageContext";
-import { useWorkspace } from "../../context/WorkspaceContext";
 import { DecryptedComment } from "../../machines/commentsMachine";
+import { getLocalUserByDeviceSigningPublicKey } from "../../store/userStore";
 import { useEditorStore } from "../../utils/editorStore/editorStore";
-import { findVerifiedUserByDeviceSigningPublicKey } from "../../utils/findVerifiedUserByDeviceSigningPublicKey/findVerifiedUserByDeviceSigningPublicKey";
 import CommentReply from "../commentReply/CommentReply";
 import CommentsMenu from "../commentsMenu/CommentsMenu";
 
@@ -28,18 +27,18 @@ type Props = {
 };
 
 export default function Comment({ comment, meId, meName, canComment }: Props) {
-  const { users } = useWorkspace();
   const { commentsService } = usePage();
   const [state, send] = useActor(commentsService);
   const [isHovered, setIsHovered] = React.useState(false);
   const documentState = useEditorStore((state) => state.documentState);
 
-  const commentCreator = findVerifiedUserByDeviceSigningPublicKey({
-    users,
+  const commentCreator = getLocalUserByDeviceSigningPublicKey({
     signingPublicKey: comment.creatorDevice.signingPublicKey,
+    includeExpired: true,
+    includeRemoved: true,
   });
   const isActiveComment = comment.id === state.context.highlightedComment?.id;
-  const isMyComment = commentCreator?.userId === meId;
+  const isMyComment = commentCreator?.id === meId;
 
   const replyLength = comment.replies.length;
   const replyString = {
@@ -83,12 +82,12 @@ export default function Comment({ comment, meId, meName, canComment }: Props) {
         <HStack alignItems="center" space="1.5">
           {commentCreator ? (
             <Avatar
-              key={commentCreator.userId}
-              color={hashToCollaboratorColor(commentCreator.userId)}
+              key={commentCreator.id}
+              color={hashToCollaboratorColor(commentCreator.id)}
               size="xs"
               muted={!isActiveComment}
             >
-              {commentCreator.email?.split("@")[0].substring(0, 1)}
+              {commentCreator.username?.split("@")[0].substring(0, 1)}
             </Avatar>
           ) : (
             <Avatar color="arctic" size="xs" muted={!isActiveComment}>
@@ -105,7 +104,7 @@ export default function Comment({ comment, meId, meName, canComment }: Props) {
             numberOfLines={1}
             ellipsizeMode="tail"
           >
-            {commentCreator?.email || "External"}
+            {commentCreator?.username || "External"}
           </Text>
         </HStack>
         {isMyComment && (isActiveComment || isHovered) ? (

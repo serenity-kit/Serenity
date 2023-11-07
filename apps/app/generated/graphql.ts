@@ -1926,7 +1926,7 @@ export type WorkspaceMembersQueryVariables = Exact<{
 }>;
 
 
-export type WorkspaceMembersQuery = { __typename?: 'Query', workspaceMembers?: { __typename?: 'WorkspaceMemberConnection', nodes?: Array<{ __typename?: 'WorkspaceMember', id: string, user: { __typename?: 'User', id: string, username: string, chain: Array<{ __typename?: 'UserChainEvent', serializedContent: string }> } } | null> | null, pageInfo: { __typename?: 'PageInfo', hasNextPage: boolean, endCursor?: string | null } } | null };
+export type WorkspaceMembersQuery = { __typename?: 'Query', workspaceMembers?: { __typename?: 'WorkspaceMemberConnection', nodes?: Array<{ __typename?: 'WorkspaceMember', id: string, user: { __typename?: 'User', id: string, username: string, chain: Array<{ __typename?: 'UserChainEvent', serializedContent: string, position: number }> } } | null> | null, pageInfo: { __typename?: 'PageInfo', hasNextPage: boolean, endCursor?: string | null } } | null };
 
 export type WorkspaceMembersByMainDeviceSigningPublicKeyQueryVariables = Exact<{
   workspaceId: Scalars['ID'];
@@ -3108,6 +3108,7 @@ export const WorkspaceMembersDocument = gql`
         username
         chain {
           serializedContent
+          position
         }
       }
     }

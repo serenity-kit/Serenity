@@ -1,4 +1,3 @@
-import { VerifiedUserFromUserChain } from "@serenity-tools/common";
 import React, { useContext } from "react";
 import { UseQueryState } from "urql";
 import { Exact, InputMaybe, WorkspaceQuery } from "../generated/graphql";
@@ -12,7 +11,6 @@ type WorkspaceContext = {
       deviceSigningPublicKey: string;
     }>
   >;
-  users: VerifiedUserFromUserChain[] | null;
 };
 
 const workspaceContext = React.createContext<WorkspaceContext>({
@@ -23,7 +21,6 @@ const workspaceContext = React.createContext<WorkspaceContext>({
     data: undefined,
     error: undefined,
   },
-  users: null,
 });
 
 export const WorkspaceProvider = workspaceContext.Provider;
