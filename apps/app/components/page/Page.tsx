@@ -82,9 +82,13 @@ export default function Page({
     keyDerivationTrace: KeyDerivationTrace;
     key: Uint8Array;
   } | null>(null);
-  const snapshotInFlightKeyRef = useRef<{
-    keyDerivationTrace: KeyDerivationTrace;
-    key: Uint8Array;
+  const snapshotInFlightDataRef = useRef<{
+    snapshotKey: {
+      keyDerivationTrace: KeyDerivationTrace;
+      key: Uint8Array;
+    };
+    documentChainState: documentChain.DocumentChainState;
+    workspaceMemberDevicesProofEntry: WorkspaceMemberDevicesProofLocalDbEntry;
   } | null>(null);
   const [documentLoadedFromLocalDb, setDocumentLoadedFromLocalDb] =
     useState(false);
@@ -121,16 +125,24 @@ export default function Page({
     websocketSessionKey: sessionKey,
     onDocumentUpdated: ({ type, knownSnapshotInfo }) => {
       if (type === "snapshot-saved") {
-        snapshotKeyRef.current = snapshotInFlightKeyRef.current;
-        snapshotInFlightKeyRef.current = null;
-        if (snapshotKeyRef.current) {
+        if (snapshotInFlightDataRef.current) {
+          snapshotKeyRef.current = snapshotInFlightDataRef.current.snapshotKey;
+          activeSnapshotDocumentChainStateRef.current =
+            snapshotInFlightDataRef.current.documentChainState;
+          activeSnapshotWorkspaceMemberDevicesProofEntryRef.current =
+            snapshotInFlightDataRef.current.workspaceMemberDevicesProofEntry;
           setSnapshotKey(snapshotKeyRef.current.key);
           setSnapshotId(knownSnapshotInfo.snapshotId);
-        }
 
-        // TODO activeSnapshotDocumentChainStateRef
-        // TODO activeSnapshotWorkspaceMemberDevicesRef
-        // TODO setActiveSnapshotAndCommentKeys
+          setActiveSnapshotAndCommentKeys(
+            {
+              id: knownSnapshotInfo.snapshotId,
+              key: sodium.to_base64(snapshotKeyRef.current.key),
+            },
+            {}
+          );
+        }
+        snapshotInFlightDataRef.current = null;
       }
     },
     getNewSnapshotData: async ({ id }) => {
@@ -146,9 +158,15 @@ export default function Page({
         snapshotId,
         activeDevice,
       });
-      snapshotInFlightKeyRef.current = {
-        keyDerivationTrace: snapshotKeyData.keyDerivationTrace,
-        key: sodium.from_base64(snapshotKeyData.key),
+      snapshotInFlightDataRef.current = {
+        snapshotKey: {
+          keyDerivationTrace: snapshotKeyData.keyDerivationTrace,
+          key: sodium.from_base64(snapshotKeyData.key),
+        },
+        documentChainState: latestDocumentChainState,
+        workspaceMemberDevicesProofEntry: getLastWorkspaceMemberDevicesProof({
+          workspaceId,
+        }),
       };
 
       const workspace = await getWorkspace({
