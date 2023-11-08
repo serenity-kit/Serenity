@@ -1,7 +1,12 @@
-query workspaceMemberDevicesProof($workspaceId: ID!, $invitationId: ID) {
+query workspaceMemberDevicesProof(
+  $workspaceId: ID!
+  $invitationId: ID
+  $hash: String
+) {
   workspaceMemberDevicesProof(
     workspaceId: $workspaceId
     invitationId: $invitationId
+    hash: $hash
   ) {
     proof {
       hash

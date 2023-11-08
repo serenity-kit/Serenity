@@ -1,5 +1,5 @@
 import { AuthenticationError, UserInputError } from "apollo-server-express";
-import { queryField } from "nexus";
+import { idArg, queryField } from "nexus";
 import { getUserChain } from "../../../database/userChain/getUserChain";
 import { UserChainEvent } from "../../types/userChain";
 
@@ -9,10 +9,23 @@ export const userChainQuery = queryField((t) => {
     type: UserChainEvent,
     disableBackwardPagination: true,
     cursorFromNode: (node) => (node ? `${node.position}` : ""),
+    // by default returning your user chain, but can also request one from another user
+    additionalArgs: {
+      userId: idArg(),
+      workspaceId: idArg(),
+    },
     async nodes(root, args, context) {
       if (args.first > 5000) {
         throw new UserInputError(
           "Requested too many user chain events. First value exceeds 5000."
+        );
+      }
+      if (
+        (args.userId && !args.workspaceId) ||
+        (!args.userId && args.workspaceId)
+      ) {
+        throw new UserInputError(
+          "If a userId is provided, a workspaceId must also be provided."
         );
       }
       if (!context.user) {
@@ -31,6 +44,13 @@ export const userChainQuery = queryField((t) => {
         cursor,
         skip,
         take,
+        userParams:
+          args.userId && args.workspaceId
+            ? {
+                userId: args.userId,
+                workspaceId: args.workspaceId,
+              }
+            : undefined,
       });
       return userChain;
     },

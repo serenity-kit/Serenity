@@ -7,6 +7,12 @@ import * as userStore from "./userStore";
 
 export const table = "user_chain_v1";
 
+export type UserChainEntry = {
+  position: number;
+  event: userChain.UserChainEvent;
+  state: userChain.UserChainState;
+};
+
 export const initialize = () => {
   sql.execute(
     `CREATE TABLE IF NOT EXISTS "${table}" (
@@ -47,11 +53,7 @@ export const createUserChainEvent = ({
 };
 
 let getLastUserChainEventCache: {
-  [workspaceId: string]: {
-    position: number;
-    event: userChain.UserChainEvent;
-    state: userChain.UserChainState;
-  };
+  [workspaceId: string]: UserChainEntry;
 } = {};
 export const getLastUserChainEvent = ({ userId }: { userId: string }) => {
   // TODO create helper to get one
@@ -79,6 +81,30 @@ export const getLastUserChainEvent = ({ userId }: { userId: string }) => {
   return getLastUserChainEventCache[userId];
 };
 
+export const getUserChainEntryByHash = ({
+  userId,
+  hash,
+}: {
+  userId: string;
+  hash: string;
+}) => {
+  const userChainRawEntry = sql.execute(
+    `SELECT * FROM ${table} WHERE userId = ? AND hash = ? LIMIT 1`,
+    [userId, hash]
+  ) as any;
+  // TODO create helper to get one
+  const userChainEntry =
+    userChainRawEntry.length > 0
+      ? ({
+          position: userChainRawEntry[0].position,
+          event: JSON.parse(userChainRawEntry[0].content),
+          state: JSON.parse(userChainRawEntry[0].state),
+        } as UserChainEntry)
+      : undefined;
+
+  return userChainEntry;
+};
+
 export const loadRemoteUserChainsForWorkspace = async ({
   workspaceId,
 }: {
@@ -92,11 +118,6 @@ export const loadRemoteUserChainsForWorkspace = async ({
       workspaceMembersQueryResult.data.workspaceMembers.nodes.filter(notNull);
 
     member.forEach((member) => {
-      userStore.createUser({
-        id: member.user.id,
-        username: member.user.username,
-      });
-
       const lastEvent = getLastUserChainEvent({ userId: member.user.id });
 
       let chain = member.user.chain.filter(notNull);
@@ -144,6 +165,11 @@ export const loadRemoteUserChainsForWorkspace = async ({
           triggerRerender: false,
           position: rawEvent.position,
         });
+      });
+
+      userStore.createUser({
+        id: state.id,
+        username: state.email,
       });
     });
   }

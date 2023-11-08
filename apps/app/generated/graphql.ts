@@ -987,6 +987,8 @@ export type QuerySnapshotArgs = {
 export type QueryUserChainArgs = {
   after?: InputMaybe<Scalars['String']>;
   first: Scalars['Int'];
+  userId?: InputMaybe<Scalars['ID']>;
+  workspaceId?: InputMaybe<Scalars['ID']>;
 };
 
 
@@ -1034,6 +1036,7 @@ export type QueryWorkspaceKeyByDocumentIdArgs = {
 
 
 export type QueryWorkspaceMemberDevicesProofArgs = {
+  hash?: InputMaybe<Scalars['String']>;
   invitationId?: InputMaybe<Scalars['ID']>;
   workspaceId: Scalars['ID'];
 };
@@ -1859,7 +1862,10 @@ export type UnauthorizedMemberQueryVariables = Exact<{ [key: string]: never; }>;
 
 export type UnauthorizedMemberQuery = { __typename?: 'Query', unauthorizedMember?: { __typename?: 'UnauthorizedMemberResult', userId: string, userMainDeviceSigningPublicKey: string, workspaceId: string } | null };
 
-export type UserChainQueryVariables = Exact<{ [key: string]: never; }>;
+export type UserChainQueryVariables = Exact<{
+  workspaceId?: InputMaybe<Scalars['ID']>;
+  userId?: InputMaybe<Scalars['ID']>;
+}>;
 
 
 export type UserChainQuery = { __typename?: 'Query', userChain?: { __typename?: 'UserChainEventConnection', nodes?: Array<{ __typename?: 'UserChainEvent', serializedContent: string, position: number } | null> | null } | null };
@@ -1911,6 +1917,7 @@ export type WorkspaceInvitationsQuery = { __typename?: 'Query', workspaceInvitat
 export type WorkspaceMemberDevicesProofQueryVariables = Exact<{
   workspaceId: Scalars['ID'];
   invitationId?: InputMaybe<Scalars['ID']>;
+  hash?: InputMaybe<Scalars['String']>;
 }>;
 
 
@@ -2900,8 +2907,8 @@ export function useUnauthorizedMemberQuery(options?: Omit<Urql.UseQueryArgs<Unau
   return Urql.useQuery<UnauthorizedMemberQuery, UnauthorizedMemberQueryVariables>({ query: UnauthorizedMemberDocument, ...options });
 };
 export const UserChainDocument = gql`
-    query userChain {
-  userChain(first: 5000) {
+    query userChain($workspaceId: ID, $userId: ID) {
+  userChain(first: 5000, workspaceId: $workspaceId, userId: $userId) {
     nodes {
       serializedContent
       position
@@ -3057,10 +3064,11 @@ export function useWorkspaceInvitationsQuery(options: Omit<Urql.UseQueryArgs<Wor
   return Urql.useQuery<WorkspaceInvitationsQuery, WorkspaceInvitationsQueryVariables>({ query: WorkspaceInvitationsDocument, ...options });
 };
 export const WorkspaceMemberDevicesProofDocument = gql`
-    query workspaceMemberDevicesProof($workspaceId: ID!, $invitationId: ID) {
+    query workspaceMemberDevicesProof($workspaceId: ID!, $invitationId: ID, $hash: String) {
   workspaceMemberDevicesProof(
     workspaceId: $workspaceId
     invitationId: $invitationId
+    hash: $hash
   ) {
     proof {
       hash

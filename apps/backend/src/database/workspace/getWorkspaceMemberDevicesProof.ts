@@ -5,11 +5,13 @@ import { prisma } from "../prisma";
 type Params = {
   workspaceId: string;
   userId: string;
+  hash?: string;
   invitationId?: string;
 };
 export async function getWorkspaceMemberDevicesProof({
   workspaceId,
   userId,
+  hash,
   invitationId,
 }: Params) {
   const invitation = invitationId
@@ -30,9 +32,14 @@ export async function getWorkspaceMemberDevicesProof({
   }
   const workspaceMemberDevicesProof =
     await prisma.workspaceMemberDevicesProof.findFirstOrThrow({
-      where: {
-        workspaceId,
-      },
+      where: hash
+        ? {
+            workspaceId,
+            hash,
+          }
+        : {
+            workspaceId,
+          },
       orderBy: {
         clock: "desc",
       },
