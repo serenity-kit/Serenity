@@ -35,6 +35,7 @@ import {
   loadRemoteWorkspaceChain,
   useLocalLastWorkspaceChainEvent,
 } from "../store/workspaceChainStore";
+import { loadRemoteWorkspaceMemberDevicesProofQuery } from "../store/workspaceMemberDevicesProofStore";
 import { loadRemoteWorkspaceDetails } from "../store/workspaceStore";
 import {
   RootStackParamList,
@@ -244,6 +245,9 @@ function WorkspaceStackNavigator(props) {
   useEffect(() => {
     loadRemoteWorkspaceDetails({ workspaceId: props.route.params.workspaceId });
     loadRemoteUserChainsForWorkspace({
+      workspaceId: props.route.params.workspaceId,
+    });
+    loadRemoteWorkspaceMemberDevicesProofQuery({
       workspaceId: props.route.params.workspaceId,
     });
   }, []);

@@ -34,9 +34,13 @@ import {
   getDocumentChainEventByHash,
   loadRemoteDocumentChain,
 } from "../../store/documentChainStore";
-import { loadRemoteUserChainsForWorkspace } from "../../store/userChainStore";
-import { getLocalUserByDeviceSigningPublicKey } from "../../store/userStore";
-import { loadRemoteWorkspaceMemberDevicesProofQuery } from "../../store/workspaceMemberDevicesProofStore";
+import { getLocalOrLoadRemoteUserByUserChainHash } from "../../store/userStore";
+import {
+  WorkspaceMemberDevicesProofLocalDbEntry,
+  getLastWorkspaceMemberDevicesProof,
+  getLocalOrLoadRemoteWorkspaceMemberDevicesProofQueryByHash,
+  loadRemoteWorkspaceMemberDevicesProofQuery,
+} from "../../store/workspaceMemberDevicesProofStore";
 import { DocumentState } from "../../types/documentState";
 import { WorkspaceDrawerScreenProps } from "../../types/navigationProps";
 import { createNewSnapshotKey } from "../../utils/createNewSnapshotKey/createNewSnapshotKey";
@@ -104,6 +108,8 @@ export default function Page({
   );
   let activeSnapshotDocumentChainStateRef =
     useRef<documentChain.DocumentChainState>();
+  let activeSnapshotWorkspaceMemberDevicesProofEntryRef =
+    useRef<WorkspaceMemberDevicesProofLocalDbEntry>();
 
   const { websocketOrigin } = getEnvironmentUrls();
 
@@ -121,6 +127,10 @@ export default function Page({
           setSnapshotKey(snapshotKeyRef.current.key);
           setSnapshotId(knownSnapshotInfo.snapshotId);
         }
+
+        // TODO activeSnapshotDocumentChainStateRef
+        // TODO activeSnapshotWorkspaceMemberDevicesRef
+        // TODO setActiveSnapshotAndCommentKeys
       }
     },
     getNewSnapshotData: async ({ id }) => {
@@ -212,6 +222,13 @@ export default function Page({
         );
       }
 
+      activeSnapshotWorkspaceMemberDevicesProofEntryRef.current =
+        await getLocalOrLoadRemoteWorkspaceMemberDevicesProofQueryByHash({
+          workspaceId,
+          hash: snapshotProofInfo.additionalPublicData
+            .workspaceMemberDevicesProof.hash,
+        });
+
       let activeSnapshotDocumentChainEvent = getDocumentChainEventByHash({
         documentId: docId,
         hash: snapshotProofInfo.additionalPublicData.documentChainEventHash,
@@ -262,41 +279,38 @@ export default function Page({
     },
     shouldSendSnapshot: ({ snapshotUpdatesCount }) => {
       // create a new snapshot if the active snapshot has more than 100 updates
-      return snapshotUpdatesCount !== null && snapshotUpdatesCount > 100;
+      const tooManyUpdate =
+        snapshotUpdatesCount !== null && snapshotUpdatesCount > 100;
+      if (tooManyUpdate) return true;
+      const lastProof = getLastWorkspaceMemberDevicesProof({ workspaceId });
+      if (
+        activeSnapshotWorkspaceMemberDevicesProofEntryRef.current?.proof
+          .hash !== lastProof.proof.hash
+      ) {
+        return true;
+      }
+      return false;
     },
     isValidClient: async (signingPublicKey: string) => {
-      // TODO this should also work for users that have been removed
-      // allow to fetch a user that is or was part of the workspace
-      // the must be cross-checked with workspaceChainData
-
-      const creator = getLocalUserByDeviceSigningPublicKey({
-        signingPublicKey,
-        includeExpired: true,
-        includeRemoved: true, // TODO depends on the workspace member devices proof
-      });
-      if (creator) {
-        return true;
+      // TODO verify that the users match the entries in the workspaceChain when verifying the proof?
+      if (activeSnapshotWorkspaceMemberDevicesProofEntryRef.current) {
+        for (const [userId, userChainHash] of Object.entries(
+          activeSnapshotWorkspaceMemberDevicesProofEntryRef.current.data
+            .userChainHashes
+        )) {
+          const user = await getLocalOrLoadRemoteUserByUserChainHash({
+            userChainHash,
+            userId,
+            workspaceId,
+          });
+          if (user && Object.keys(user.devices).includes(signingPublicKey)) {
+            return true;
+          }
+        }
       }
 
-      await loadRemoteUserChainsForWorkspace({ workspaceId });
-      const creator2 = getLocalUserByDeviceSigningPublicKey({
-        signingPublicKey,
-        includeExpired: true,
-        includeRemoved: true, // TODO depends on the workspace member devices proof
-      });
-      if (Boolean(creator2)) {
-        return true;
-      } else {
-        console.warn(
-          "Snapshot, Update or EphemeralUpdate creator could not be validated. Probably since it is an already removed device. This is not yet implemented."
-        );
-        return true;
-        // return false;
-      }
+      return false;
     },
-    // onCustomMessage: async (message) => {
-    //   console.log("CUSTOM MESSAGE:", message);
-    // },
     additionalAuthenticationDataValidations: {
       snapshot: SerenitySnapshotPublicData,
     },

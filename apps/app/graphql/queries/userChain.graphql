@@ -1,5 +1,5 @@
-query userChain {
-  userChain(first: 5000) {
+query userChain($workspaceId: ID, $userId: ID) {
+  userChain(first: 5000, workspaceId: $workspaceId, userId: $userId) {
     nodes {
       serializedContent
       position
