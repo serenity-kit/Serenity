@@ -26,17 +26,11 @@ export const createWorkspaceMemberDevicesProof = ({
     sodium.crypto_generichash(64, workspaceDataString)
   );
 
-  const message = canonicalize({
-    hash,
-    workspaceMemberDevicesProofDomainContext,
-  });
-  if (typeof message !== "string") {
-    throw new Error(
-      "Failed to canonicalize the workspaceMemberDevicesProof proof signature message"
-    );
-  }
   const hashSignature = sodium.to_base64(
-    sodium.crypto_sign_detached(message, authorKeyPair.privateKey)
+    sodium.crypto_sign_detached(
+      workspaceMemberDevicesProofDomainContext + hash,
+      authorKeyPair.privateKey
+    )
   );
   return {
     hash,

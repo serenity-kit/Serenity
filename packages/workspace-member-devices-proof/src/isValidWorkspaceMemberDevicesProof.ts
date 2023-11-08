@@ -54,19 +54,10 @@ export const isValidWorkspaceMemberDevicesProof = ({
       return false;
     }
 
-    const message = canonicalize({
-      hash: workspaceMemberDevicesProof.hash,
-      workspaceMemberDevicesProofDomainContext,
-    });
-    if (typeof message !== "string") {
-      throw new Error(
-        "Failed to canonicalize the workspaceMemberDevicesProof signature message"
-      );
-    }
-
     return sodium.crypto_sign_verify_detached(
       sodium.from_base64(workspaceMemberDevicesProof.hashSignature),
-      message,
+      workspaceMemberDevicesProofDomainContext +
+        workspaceMemberDevicesProof.hash,
       sodium.from_base64(authorPublicKey)
     );
   } catch (error) {
