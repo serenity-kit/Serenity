@@ -30,8 +30,8 @@ export type User = {
   removedDevices: userChain.Devices;
 };
 
+// TODO this should probably overwrite the existing user
 export const createUser = (params: User) => {
-  // id and username can not change so we can use INSERT OR IGNORE
   sql.execute(`INSERT OR IGNORE INTO ${table} VALUES (?, ?, ?, ?);`, [
     params.id,
     params.username,

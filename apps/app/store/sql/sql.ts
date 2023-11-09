@@ -17,7 +17,7 @@ export const resetInMemoryDatabase = () => {
 
 export const execute = (
   statement: string,
-  params?: (string | number | null)[]
+  params?: (string | number | Uint8Array | null)[]
 ) => {
   try {
     const { rows } = db.execute(statement, params);

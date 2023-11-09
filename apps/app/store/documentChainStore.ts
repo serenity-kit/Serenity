@@ -14,6 +14,9 @@ type DocumentChainEntry = {
   state: documentChain.DocumentChainState;
 };
 
+// NOT sure if we want a foreign key
+// FOREIGN KEY("documentId") REFERENCES "${documentStore.table}" ON DELETE CASCADE
+
 export const initialize = () => {
   sql.execute(
     `CREATE TABLE IF NOT EXISTS "${table}" (
