@@ -24,7 +24,10 @@ export const resetInMemoryDatabase = () => {
   db = new SQL.Database();
 };
 
-export const execute = (statement: string, params?: (string | number)[]) => {
+export const execute = (
+  statement: string,
+  params?: (string | number | null)[]
+) => {
   const resultArray = db.exec(statement, params);
   const result = resultArray[0];
   if (result === undefined) {

@@ -1,14 +1,14 @@
 import { assign, createMachine } from "xstate";
 import {
-  loadInitialDataMachine,
   MeWithWorkspaceLoadingInfoQueryResult,
+  loadInitialDataMachine,
 } from "../../../machines/loadInitialData";
-import { getLastUsedDocumentId } from "../../../utils/lastUsedWorkspaceAndDocumentStore/lastUsedWorkspaceAndDocumentStore";
+import { getLastOpenDocumentId } from "../../../store/workspaceStore";
 
 type Context = {
   workspaceId: string;
   navigation: any;
-  lastUsedDocumentId?: string;
+  lastOpenDocumentId?: string;
   meWithWorkspaceLoadingInfoQueryResult: MeWithWorkspaceLoadingInfoQueryResult;
 };
 
@@ -55,12 +55,13 @@ export const workspaceRootScreenMachine =
           type: "final",
         },
         loadLastUsedDocumentId: {
+          // TODO doesn't need to be async
           invoke: {
             src: "getLastUsedDocumentId",
             onDone: [
               {
                 actions: assign({
-                  lastUsedDocumentId: (_, event) => {
+                  lastOpenDocumentId: (_, event) => {
                     return event.data;
                   },
                 }),
@@ -118,7 +119,9 @@ export const workspaceRootScreenMachine =
       services: {
         loadInitialDataMachine,
         getLastUsedDocumentId: async (context) => {
-          return await getLastUsedDocumentId(context.workspaceId);
+          return getLastOpenDocumentId({
+            workspaceId: context.workspaceId,
+          });
         },
       },
     }

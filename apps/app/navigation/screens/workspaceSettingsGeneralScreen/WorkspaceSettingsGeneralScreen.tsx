@@ -25,10 +25,6 @@ import { useAuthenticatedAppContext } from "../../../hooks/useAuthenticatedAppCo
 import { workspaceSettingsLoadWorkspaceMachine } from "../../../machines/workspaceSettingsLoadWorkspaceMachine";
 import { useLocalLastWorkspaceChainEvent } from "../../../store/workspaceChainStore";
 import { WorkspaceStackScreenProps } from "../../../types/navigationProps";
-import {
-  removeLastUsedDocumentId,
-  removeLastUsedWorkspaceId,
-} from "../../../utils/lastUsedWorkspaceAndDocumentStore/lastUsedWorkspaceAndDocumentStore";
 import { showToast } from "../../../utils/toast/showToast";
 
 export default function WorkspaceSettingsGeneralScreen(
@@ -76,8 +72,6 @@ export default function WorkspaceSettingsGeneralScreen(
       },
     });
     if (deleteWorkspaceResult.data?.deleteWorkspaces?.status) {
-      removeLastUsedDocumentId(workspaceId);
-      removeLastUsedWorkspaceId();
       props.navigation.navigate("Root");
     } else if (deleteWorkspaceResult?.error) {
       showToast(

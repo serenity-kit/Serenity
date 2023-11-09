@@ -10,7 +10,6 @@ import {
   runAddDeviceMutation,
   runFinishLoginMutation,
   runLogoutMutation,
-  runMeQuery,
   runStartLoginMutation,
 } from "../../generated/graphql";
 import {
@@ -19,26 +18,7 @@ import {
 } from "../../store/workspaceChainStore";
 import { setMainDevice } from "../device/mainDeviceMemoryStore";
 import { getOpaqueServerPublicKey } from "../getOpaqueServerPublicKey/getOpaqueServerPublicKey";
-import { removeLastUsedDocumentIdAndWorkspaceId } from "../lastUsedWorkspaceAndDocumentStore/lastUsedWorkspaceAndDocumentStore";
 import { createDeviceWithInfo } from "./createDeviceWithInfo";
-import {
-  isUserIdSameAsLastLogin,
-  removeLastLogin,
-  setLoggedInUserId,
-} from "./lastLoginStore";
-
-const removeLastUsedWorkspaceIdIfLoginChanged = async (userId?: string) => {
-  if (!userId) {
-    await removeLastUsedDocumentIdAndWorkspaceId();
-    await removeLastLogin();
-  } else {
-    const isLoginSame = await isUserIdSameAsLastLogin(userId);
-    if (!isLoginSame) {
-      await removeLastUsedDocumentIdAndWorkspaceId();
-      await setLoggedInUserId(userId);
-    }
-  }
-};
 
 export const getDeviceType = (useExtendedLogin: boolean) => {
   if (Platform.OS === "ios" || Platform.OS === "android") {
@@ -65,12 +45,7 @@ export const login = async ({
   // ideally we would remove the device, but that requires access to the mainDevice
   // running the logoutMutation without the removeDevice user-chain event at least
   // removes the session on the server
-  const logoutResult = await runLogoutMutation({}, {});
-  const remoteCleanupSuccessful = logoutResult.data?.logout?.success || false;
-  if (!remoteCleanupSuccessful) {
-    // todo: report to user
-    console.error("Remote logout failed");
-  }
+  await runLogoutMutation({});
   await updateAuthentication(null);
   const clientLoginResult = client.startLogin({ password });
   const startLoginResult = await runStartLoginMutation({
@@ -272,18 +247,6 @@ export const login = async ({
     sessionKey: result.sessionKey,
     expiresAt: addDeviceResult.data?.addDevice.expiresAt,
   });
-  const meResult = await runMeQuery({});
-  if (meResult.error) {
-    // TODO: handle this error in the UI
-    throw new Error(meResult.error.message);
-  }
-  if (!meResult.data?.me) {
-    // TODO: handle this error in the UI
-    throw new Error("Could not query me. Probably not logged in");
-  }
-  const userId = meResult.data.me.username;
-  // if the user has changed, remove the previous lastusedworkspaceId and lastUsedDocumentId
-  await removeLastUsedWorkspaceIdIfLoginChanged(userId);
 
   setMainDevice(mainDevice); // so it's locally available
 
