@@ -3,10 +3,8 @@ import {
   MeWithWorkspaceLoadingInfoQuery,
   runMeWithWorkspaceLoadingInfoQuery,
 } from "../../../generated/graphql";
-import {
-  getLastUsedDocumentId,
-  getLastUsedWorkspaceId,
-} from "../../../utils/lastUsedWorkspaceAndDocumentStore/lastUsedWorkspaceAndDocumentStore";
+import { getLastOpenWorkspaceId } from "../../../store/appStateStore";
+import { getLastOpenDocumentId } from "../../../store/workspaceStore";
 
 export type MeWithWorkspaceLoadingInfoQueryResult = {
   data?: MeWithWorkspaceLoadingInfoQuery;
@@ -52,8 +50,8 @@ export const rootScreenMachine =
                     target: "loading",
                     actions: assign((_, event) => {
                       return {
-                        lastUsedWorkspaceId: event.data.lastUsedWorkspaceId, // might be undefined
-                        lastUsedDocumentId: event.data.lastUsedDocumentId, // might be undefined
+                        lastOpenWorkspaceId: event.data.lastOpenWorkspaceId, // might be undefined
+                        lastOpenDocumentId: event.data.lastOpenDocumentId, // might be undefined
                         returnOtherWorkspaceIfNotFound: true,
                         returnOtherDocumentIfNotFound: true,
                       };
@@ -233,19 +231,21 @@ export const rootScreenMachine =
         },
       },
       services: {
+        // TODO doesn't need to be async
         getLastUsedWorkspaceAndDocumentId: async (context) => {
-          const lastUsedWorkspaceId = await getLastUsedWorkspaceId();
-          if (lastUsedWorkspaceId) {
-            const lastUsedDocumentId = await getLastUsedDocumentId(
-              lastUsedWorkspaceId
-            );
+          const lastOpenWorkspaceId = getLastOpenWorkspaceId();
+
+          if (lastOpenWorkspaceId) {
+            const lastOpenDocumentId = getLastOpenDocumentId({
+              workspaceId: lastOpenWorkspaceId,
+            });
             return {
-              lastUsedWorkspaceId,
-              lastUsedDocumentId,
+              lastOpenWorkspaceId,
+              lastOpenDocumentId,
             };
           }
           return {
-            lastUsedWorkspaceId,
+            lastOpenWorkspaceId,
           };
         },
         fetchMeWithWorkspaceLoadingInfo: (context) => {

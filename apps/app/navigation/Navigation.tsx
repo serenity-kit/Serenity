@@ -30,6 +30,7 @@ import { useWorkspaceQuery } from "../generated/graphql";
 import { redirectToLoginIfMissingTheActiveDeviceOrSessionKey } from "../higherOrderComponents/redirectToLoginIfMissingTheActiveDeviceOrSessionKey";
 import { useAuthenticatedAppContext } from "../hooks/useAuthenticatedAppContext";
 import { useInterval } from "../hooks/useInterval";
+import { updateLastOpenWorkspaceId } from "../store/appStateStore";
 import { loadRemoteUserChainsForWorkspace } from "../store/userChainStore";
 import {
   loadRemoteWorkspaceChain,
@@ -41,7 +42,6 @@ import {
   RootStackParamList,
   WorkspaceStackParamList,
 } from "../types/navigation";
-import { setLastUsedWorkspaceId } from "../utils/lastUsedWorkspaceAndDocumentStore/lastUsedWorkspaceAndDocumentStore";
 import {
   authorizeMembersIfNecessary,
   secondsBetweenNewMemberChecks,
@@ -273,7 +273,7 @@ function WorkspaceStackNavigator(props) {
 
   useEffect(() => {
     if (props.route.params.workspaceId) {
-      setLastUsedWorkspaceId(props.route.params.workspaceId);
+      updateLastOpenWorkspaceId(props.route.params.workspaceId);
     }
   }, [props.route.params.workspaceId]);
 

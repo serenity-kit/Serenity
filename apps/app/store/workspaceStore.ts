@@ -20,6 +20,7 @@ export const initialize = () => {
       "id"	TEXT,
       "name"	TEXT NOT NULL,
       "remoteDeleted"	INTEGER NOT NULL,
+      "lastOpenDocumentId"	TEXT,
       PRIMARY KEY("id")
     );`
   );
@@ -29,15 +30,42 @@ type Workspace = {
   id: string;
   name: string;
   remoteDeleted: number; // 0 or 1
+  lastOpenDocumentId?: string;
 };
 
 export const createWorkspace = (params: Omit<Workspace, "remoteDeleted">) => {
-  sql.execute(`INSERT INTO ${table} VALUES (?, ?, ?);`, [
+  sql.execute(`INSERT INTO ${table} VALUES (?, ?, ?, ?);`, [
     params.id,
     params.name,
     0,
+    null,
   ]);
   triggerGetWorkspaces();
+};
+
+export const updateLastOpenDocumentId = ({
+  documentId,
+  workspaceId,
+}: {
+  documentId: string;
+  workspaceId: string;
+}) => {
+  sql.execute(`UPDATE ${table} SET lastOpenDocumentId = ? WHERE id = ?`, [
+    documentId,
+    workspaceId,
+  ]);
+  triggerGetWorkspaces();
+};
+
+export const getLastOpenDocumentId = ({
+  workspaceId,
+}: {
+  workspaceId: string;
+}) => {
+  const workspace = sql.execute(`SELECT * FROM ${table} WHERE id = ?`, [
+    workspaceId,
+  ]) as Workspace[];
+  return workspace[0]?.lastOpenDocumentId;
 };
 
 let getWorkspacesCache: Workspace[] = [];
@@ -75,8 +103,6 @@ export const loadRemoteWorkspaceDetails = async ({
 }: {
   workspaceId: string;
 }) => {
-  // TODO load the workspaceDetails
-
   await loadRemoteWorkspaceChain({ workspaceId });
 };
 
@@ -142,10 +168,11 @@ export const loadRemoteWorkspaces = async ({
           typeof decryptedWorkspaceInfo.name === "string"
         ) {
           workspaceListName = decryptedWorkspaceInfo.name as string;
-          sql.execute(`REPLACE INTO ${table} VALUES (?, ?, ?);`, [
+          sql.execute(`REPLACE INTO ${table} VALUES (?, ?, ?, ?);`, [
             workspace.id,
             workspaceListName,
             0,
+            null,
           ]);
         }
       }

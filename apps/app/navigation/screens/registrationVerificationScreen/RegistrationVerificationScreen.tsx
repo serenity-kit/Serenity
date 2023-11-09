@@ -34,7 +34,6 @@ import {
   persistWebDeviceAccess,
   removeWebDeviceAccess,
 } from "../../../utils/device/webDeviceStore";
-import { removeLastUsedWorkspaceId } from "../../../utils/lastUsedWorkspaceAndDocumentStore/lastUsedWorkspaceAndDocumentStore";
 import { acceptWorkspaceInvitation } from "../../../utils/workspace/acceptWorkspaceInvitation";
 import { attachDeviceToWorkspaces } from "../../../utils/workspace/attachDeviceToWorkspaces";
 import { getPendingWorkspaceInvitation } from "../../../utils/workspace/getPendingWorkspaceInvitation";
@@ -57,11 +56,6 @@ export default function RegistrationVerificationScreen(
     useState<VerificationError>("none");
   const [graphqlError, setGraphqlError] = useState("");
   const { updateAuthentication, updateActiveDevice } = useAppContext();
-
-  const navigateToLoginScreen = async () => {
-    await removeLastUsedWorkspaceId();
-    props.navigation.push("Login");
-  };
 
   const acceptPendingWorkspaceInvitation = async (
     exportKey: string,
@@ -126,7 +120,7 @@ export default function RegistrationVerificationScreen(
     const registrationInfo = getRegistrationInfo();
     clearRegistrationInfo();
     if (!registrationInfo) {
-      navigateToLoginScreen();
+      props.navigation.push("Login");
       return;
     }
     try {
@@ -208,7 +202,7 @@ export default function RegistrationVerificationScreen(
       if (isRegistrationInfoStored()) {
         await loginWithStoredUsernamePassword();
       } else {
-        navigateToLoginScreen();
+        props.navigation.push("Login");
       }
     } catch (err) {
       setErrorMessage("Verification failed.");

@@ -7,7 +7,7 @@ import {
 type Context = {
   workspaceId: string;
   navigation: any;
-  lastUsedDocumentId?: string;
+  lastOpenDocumentId?: string;
   meWithWorkspaceLoadingInfoQueryResult: MeWithWorkspaceLoadingInfoQueryResult;
 };
 

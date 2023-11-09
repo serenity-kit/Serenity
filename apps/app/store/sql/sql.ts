@@ -15,7 +15,10 @@ export const resetInMemoryDatabase = () => {
   db = open({ name: ":memory:" });
 };
 
-export const execute = (statement: string, params?: (string | number)[]) => {
+export const execute = (
+  statement: string,
+  params?: (string | number | null)[]
+) => {
   const { rows } = db.execute(statement, params);
   return rows?._array || [];
 };

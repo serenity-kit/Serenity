@@ -26,13 +26,13 @@ import { commentsDrawerWidth } from "../../../constants";
 import { PageProvider } from "../../../context/PageContext";
 import { commentsMachine } from "../../../machines/commentsMachine";
 import { loadRemoteDocumentChain } from "../../../store/documentChainStore";
+import { updateLastOpenDocumentId } from "../../../store/workspaceStore";
 import {
   getDocumentPath,
   useDocumentPathStore,
 } from "../../../utils/document/documentPathStore";
 import { useFolderKeyStore } from "../../../utils/folder/folderKeyStore";
 import { useOpenFolderStore } from "../../../utils/folder/openFolderStore";
-import { setLastUsedDocumentId } from "../../../utils/lastUsedWorkspaceAndDocumentStore/lastUsedWorkspaceAndDocumentStore";
 import { loadPageMachine } from "./loadPageMachine";
 
 const ActualPageScreen = (
@@ -108,7 +108,7 @@ const ActualPageScreen = (
   };
 
   useEffect(() => {
-    setLastUsedDocumentId(pageId, workspaceId);
+    updateLastOpenDocumentId({ documentId: pageId, workspaceId });
     updateDocumentFolderPath(pageId);
 
     // removing the isNew param right after the first render so users don't have it after a refresh
