@@ -13,9 +13,7 @@
       "**/electron-squirrel-startup",
       "**/electron-squirrel-startup/**",
       "**/@electron-forge",
-      "**/@electron-forge/**",
-      "**/sqlite3",
-      "**/sqlite3/**"
+      "**/@electron-forge/**"
     ]
   },
   "devDependencies": {

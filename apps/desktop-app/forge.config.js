@@ -22,12 +22,7 @@ module.exports = {
   rebuildConfig: {},
   hooks: {
     packageAfterPrune: async (forgeConfig, buildPath) => {
-      const sqliteBuildPath = path.join(
-        buildPath,
-        "node_modules",
-        "sqlite3",
-        "build"
-      );
+      const sqliteBuildPath = path.join(buildPath, "node_modules", "build");
       // console.log("Sqlite BuildPath: ", sqliteBuildPath);
       // needs to be deleted otherwise macos codesign will fail
       fs.rmSync(sqliteBuildPath, {
