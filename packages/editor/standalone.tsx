@@ -20,6 +20,7 @@ window.ydoc = ydoc;
 window.isNew = window.isNew === undefined ? false : window.isNew;
 window.editorEditable =
   window.editorEditable === undefined ? false : window.editorEditable;
+window.workspaceDevicesToUsernames = {};
 
 if (window.initialContent) {
   const update = new Uint8Array(window.initialContent);
@@ -96,6 +97,17 @@ window.setEditorEditable = (editable: boolean) => {
   renderEditor();
 };
 
+window.setWorkspaceDevicesToUsernames = (
+  serializedWorkspaceDevicesToUsernames: string
+) => {
+  let decodedParamsString = serializedWorkspaceDevicesToUsernames;
+  if (serializedWorkspaceDevicesToUsernames.startsWith("BASE64")) {
+    decodedParamsString = atob(serializedWorkspaceDevicesToUsernames.slice(6));
+  }
+  window.workspaceDevicesToUsernames = JSON.parse(decodedParamsString);
+  renderEditor();
+};
+
 window.resolveImageRequest = (fileId, base64) => {
   const fileRequest = fileRequests[fileId];
   if (fileRequest) {
@@ -134,6 +146,7 @@ const renderEditor = () => {
         onCreate={(params) => (window.editor = params.editor)}
         comments={[]}
         createComment={() => {}}
+        workspaceDevicesToUsernames={window.workspaceDevicesToUsernames}
         highlightComment={(commentId, openSidebar) => {
           window.ReactNativeWebView.postMessage(
             JSON.stringify({

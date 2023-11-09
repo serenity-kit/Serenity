@@ -12,7 +12,7 @@ import {
   Spinner,
   useHasEditorSidebar,
 } from "@serenity-tools/ui";
-import sodium, { base64_variants } from "react-native-libsodium";
+import sodium from "react-native-libsodium";
 import {
   applyAwarenessUpdate,
   encodeAwarenessUpdate,
@@ -20,6 +20,7 @@ import {
 import * as Y from "yjs";
 import { usePage } from "../../context/PageContext";
 import { editorToolbarService } from "../../machines/editorToolbarMachine";
+import { useWorkspaceMemberDevicesToUsernames } from "../../store/workspaceStore";
 import { DocumentState } from "../../types/documentState";
 import { useEditorStore } from "../../utils/editorStore/editorStore";
 import { createDownloadAndDecryptFileFunction } from "../../utils/file/createDownloadAndDecryptFileFunction";
@@ -125,6 +126,24 @@ export default function Editor({
     });
   }, [workspaceId, documentId]);
 
+  const workspaceDevicesToUsernames = useWorkspaceMemberDevicesToUsernames({
+    workspaceId,
+  });
+  useEffect(() => {
+    if (!webviewLoaded) {
+      return;
+    }
+
+    const content = sodium.to_base64(
+      JSON.stringify(workspaceDevicesToUsernames),
+      1 // sodium.base64_variants.ORIGINAL was failing in the iOS Simulator
+    );
+    webViewRef.current?.injectJavaScript(`
+    window.setWorkspaceDevicesToUsernames("BASE64${content}");
+    true;
+  `);
+  }, [workspaceDevicesToUsernames, webviewLoaded]);
+
   useEffect(() => {
     if (!webviewLoaded) {
       return;
@@ -182,7 +201,7 @@ export default function Editor({
       webViewRef.current?.injectJavaScript(`
         window.updateEditor("BASE64${sodium.to_base64(
           commentsJson,
-          base64_variants.ORIGINAL
+          1 // sodium.base64_variants.ORIGINAL
         )}");
         true;
       `);

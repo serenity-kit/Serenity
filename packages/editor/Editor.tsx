@@ -77,6 +77,7 @@ type EditorProps = {
   hasOpenCommentsSidebar: () => boolean;
   editable: boolean;
   documentState: DocumentState;
+  workspaceDevicesToUsernames: Record<string, string>;
 };
 
 const headingLevels: Level[] = [1, 2, 3];
@@ -146,19 +147,19 @@ export const Editor = (props: EditorProps) => {
         YAwarenessExtension.configure({
           awareness: props.yAwarenessRef.current,
           render: (user) => {
+            const username =
+              props.workspaceDevicesToUsernames[user.publicKey] || "Unknown";
             const cursor = document.createElement("span");
-            cursor.style.setProperty("--collab-color", "#444");
-            cursor.classList.add("collaboration-cursor__caret");
+            if (username) {
+              cursor.style.setProperty("--collab-color", "#444");
+              cursor.classList.add("collaboration-cursor__caret");
 
-            const label = document.createElement("div");
-            label.classList.add("collaboration-cursor__label");
+              const label = document.createElement("div");
+              label.classList.add("collaboration-cursor__label");
 
-            label.insertBefore(
-              document.createTextNode(`Client publicKeyXXX: ${user.publicKey}`),
-              null
-            );
-            cursor.insertBefore(label, null);
-
+              label.insertBefore(document.createTextNode(username), null);
+              cursor.insertBefore(label, null);
+            }
             return cursor;
           },
         }),

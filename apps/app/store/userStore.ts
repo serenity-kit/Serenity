@@ -23,7 +23,7 @@ export const initialize = () => {
   );
 };
 
-type User = {
+export type User = {
   id: string;
   username: string;
   devices: userChain.Devices;
@@ -40,15 +40,18 @@ export const createUser = (params: User) => {
   ]);
 };
 
+const internalConvertUserResultToUser = (userResult: any) => {
+  return {
+    id: userResult.id,
+    username: userResult.username,
+    devices: JSON.parse(userResult.devices),
+    removedDevices: JSON.parse(userResult.removedDevices),
+  } as User;
+};
+
 const internalGetSingleUser = (result: any[]) => {
   if (result.length === 0) return undefined;
-  const user = result[0];
-  return {
-    id: user.id,
-    username: user.username,
-    devices: JSON.parse(user.devices),
-    removedDevices: JSON.parse(user.removedDevices),
-  } as User;
+  return internalConvertUserResultToUser(result[0]);
 };
 
 export const getLocalUserByDeviceSigningPublicKey = ({
@@ -192,4 +195,12 @@ export const getLocalOrLoadRemoteUserByUserChainHash = async ({
       removedDevices: entry2.state.removedDevices,
     };
   }
+};
+
+export const getLocalUsersByIds = (userIds: string[]) => {
+  const result = sql.execute(
+    `SELECT * FROM ${table} WHERE id IN (${userIds.map(() => "?").join(",")})`,
+    userIds
+  );
+  return result.map(internalConvertUserResultToUser);
 };

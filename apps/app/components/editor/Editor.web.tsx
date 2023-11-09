@@ -12,6 +12,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { View as RNView } from "react-native";
 import { usePage } from "../../context/PageContext";
 import { editorToolbarService } from "../../machines/editorToolbarMachine";
+import { useWorkspaceMemberDevicesToUsernames } from "../../store/workspaceStore";
 import { useEditorStore } from "../../utils/editorStore/editorStore";
 import { createDownloadAndDecryptFileFunction } from "../../utils/file/createDownloadAndDecryptFileFunction";
 import { createEncryptAndUploadFileFunction } from "../../utils/file/createEncryptAndUploadFileFunction";
@@ -49,6 +50,10 @@ export default function Editor({
 
   const { commentsService } = usePage();
   const [commentsState, send] = useActor(commentsService);
+
+  const workspaceDevicesToUsernames = useWorkspaceMemberDevicesToUsernames({
+    workspaceId,
+  });
 
   // hasOpenCommentsSidebarRef is a hack needed since the shouldShow prop
   // of the BubbleMenu seems to be cached internally in the BubbleMenu component
@@ -139,6 +144,7 @@ export default function Editor({
         updateTitle={updateTitle}
         downloadAndDecryptFile={downloadAndDecryptFile}
         comments={commentsState.context.decryptedComments}
+        workspaceDevicesToUsernames={workspaceDevicesToUsernames}
         createComment={(comment) => {
           send({
             type: "CREATE_COMMENT",
