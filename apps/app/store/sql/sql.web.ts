@@ -16,12 +16,21 @@ export const ready = async () => {
       return `https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.8.0/${file}`;
     },
   });
+
   db = new SQL.Database();
 };
 
 export const resetInMemoryDatabase = () => {
   db.close();
   db = new SQL.Database();
+};
+
+export const triggerDebouncedDatabasePersisting = () => {
+  // no-op
+};
+
+export const destroyPersistedDatabase = async () => {
+  return Promise.resolve();
 };
 
 export const execute = (
@@ -42,4 +51,12 @@ export const execute = (
     return item;
   });
   return rows;
+};
+
+export const getInstances = () => {
+  return { db, SQL };
+};
+
+export const setDatabase = (newDb: Database) => {
+  db = newDb;
 };

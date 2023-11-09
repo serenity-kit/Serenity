@@ -34,6 +34,7 @@ export const createOrReplaceDocument = ({
     name || null,
     content || null,
   ]);
+  sql.triggerDebouncedDatabasePersisting();
 };
 
 export const getLocalDocument = ({ documentId }: { documentId: string }) => {
