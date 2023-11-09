@@ -34,6 +34,10 @@ import {
   getDocumentChainEventByHash,
   loadRemoteDocumentChain,
 } from "../../store/documentChainStore";
+import {
+  createOrReplaceDocument,
+  getLocalDocument,
+} from "../../store/documentStore";
 import { getLocalOrLoadRemoteUserByUserChainHash } from "../../store/userStore";
 import {
   WorkspaceMemberDevicesProofLocalDbEntry,
@@ -340,15 +344,15 @@ export default function Page({
     }, 6000);
 
     async function initDocument() {
-      // const localDocument = await getLocalDocument(docId);
-      // if (localDocument) {
-      //   Yjs.applyUpdateV2(
-      //     yDocRef.current,
-      //     localDocument.content,
-      //     "serenity-local-sqlite"
-      //   );
-      //   setDocumentLoadedFromLocalDb(true);
-      // }
+      const localDocument = getLocalDocument({ documentId: docId });
+      if (localDocument && localDocument.content) {
+        Yjs.applyUpdateV2(
+          yDocRef.current,
+          localDocument.content,
+          "serenity-local-sqlite"
+        );
+        setDocumentLoadedFromLocalDb(true);
+      }
 
       let document: Document | undefined = undefined;
       try {
@@ -371,10 +375,10 @@ export default function Page({
       yDocRef.current.on("updateV2", async (update, origin) => {
         // TODO pending updates should be stored in the local db if possible (not possible on web)
         // TODO pending updates should be sent when the websocket connection is re-established
-        // setLocalDocument({
-        //   id: docId,
-        //   content: Yjs.encodeStateAsUpdateV2(yDocRef.current),
-        // });
+        createOrReplaceDocument({
+          documentId: docId,
+          content: Yjs.encodeStateAsUpdateV2(yDocRef.current),
+        });
       });
     }
 
