@@ -16,6 +16,8 @@ export const initialize = () => {
     `CREATE TABLE IF NOT EXISTS "${table}" (
       "id"	TEXT NOT NULL,
       "username"	TEXT NOT NULL,
+      "devices"	TEXT NOT NULL,
+      "removedDevices"	TEXT NOT NULL,
       PRIMARY KEY("id")
     );`
   );
@@ -24,14 +26,29 @@ export const initialize = () => {
 type User = {
   id: string;
   username: string;
+  devices: userChain.Devices;
+  removedDevices: userChain.Devices;
 };
 
 export const createUser = (params: User) => {
   // id and username can not change so we can use INSERT OR IGNORE
-  sql.execute(`INSERT OR IGNORE INTO ${table} VALUES (?, ?);`, [
+  sql.execute(`INSERT OR IGNORE INTO ${table} VALUES (?, ?, ?, ?);`, [
     params.id,
     params.username,
+    JSON.stringify(params.devices),
+    JSON.stringify(params.removedDevices),
   ]);
+};
+
+const internalGetSingleUser = (result: any[]) => {
+  if (result.length === 0) return undefined;
+  const user = result[0];
+  return {
+    id: user.id,
+    username: user.username,
+    devices: JSON.parse(user.devices),
+    removedDevices: JSON.parse(user.removedDevices),
+  } as User;
 };
 
 export const getLocalUserByDeviceSigningPublicKey = ({
@@ -43,45 +60,46 @@ export const getLocalUserByDeviceSigningPublicKey = ({
   includeExpired?: boolean;
   includeRemoved?: boolean;
 }) => {
-  const users = sql.execute(`SELECT * FROM ${table}`) as User[];
+  const removedUserResult = includeRemoved
+    ? sql.execute(`SELECT * FROM ${table} WHERE removedDevices like ?`, [
+        `%${signingPublicKey}%`,
+      ])
+    : [];
+  const removedUser = internalGetSingleUser(removedUserResult);
+  if (removedUser) {
+    const userChainEventResult = getLastUserChainEvent({
+      userId: removedUser.id,
+    });
+    return {
+      ...removedUser,
+      mainDeviceSigningPublicKey:
+        userChainEventResult.state.mainDeviceSigningPublicKey,
+    };
+  }
 
-  const user = users.find((user) => {
-    const userChainEventResult = getLastUserChainEvent({ userId: user.id });
-    if (!userChainEventResult) return false;
-
-    const devices = userChainEventResult.state.devices;
-    if (devices[signingPublicKey]) {
-      if (includeExpired) {
-        return true;
-      }
-
-      const expiresAt = devices[signingPublicKey].expiresAt;
-      if (expiresAt === undefined) {
-        return true;
-      } else if (new Date(expiresAt) > new Date()) {
-        return true;
-      } else {
-        return false;
-      }
-    }
-
-    const removedDevices = userChainEventResult.state.removedDevices;
-    if (includeRemoved && removedDevices[signingPublicKey]) {
-      return true;
-    }
-    return false;
-  });
-
+  const userResult = sql.execute(
+    `SELECT * FROM ${table} WHERE devices like ?`,
+    [`%${signingPublicKey}%`]
+  );
+  const user = internalGetSingleUser(userResult);
   if (!user) return undefined;
 
-  const userChainEventResult = getLastUserChainEvent({ userId: user.id });
-  return {
-    ...user,
-    mainDeviceSigningPublicKey:
-      userChainEventResult.state.mainDeviceSigningPublicKey,
-    devices: userChainEventResult.state.devices,
-    removedDevices: userChainEventResult.state.removedDevices,
-  };
+  const expiresAt = user.devices[signingPublicKey].expiresAt;
+  if (
+    includeExpired ||
+    expiresAt === undefined ||
+    new Date(expiresAt) > new Date()
+  ) {
+    const userChainEventResult = getLastUserChainEvent({
+      userId: user.id,
+    });
+    return {
+      ...user,
+      mainDeviceSigningPublicKey:
+        userChainEventResult.state.mainDeviceSigningPublicKey,
+    };
+  }
+  return undefined;
 };
 
 export const getLocalOrLoadRemoteUserByUserChainHash = async ({
@@ -162,6 +180,8 @@ export const getLocalOrLoadRemoteUserByUserChainHash = async ({
   createUser({
     id: state.id,
     username: state.email,
+    devices: state.devices,
+    removedDevices: state.removedDevices,
   });
 
   const entry2 = getUserChainEntryByHash({ userId, hash: userChainHash });

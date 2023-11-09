@@ -170,6 +170,8 @@ export const loadRemoteUserChainsForWorkspace = async ({
       userStore.createUser({
         id: state.id,
         username: state.email,
+        devices: state.devices,
+        removedDevices: state.removedDevices,
       });
     });
   }

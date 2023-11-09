@@ -145,6 +145,22 @@ export const Editor = (props: EditorProps) => {
         }),
         YAwarenessExtension.configure({
           awareness: props.yAwarenessRef.current,
+          render: (user) => {
+            const cursor = document.createElement("span");
+            cursor.style.setProperty("--collab-color", "#444");
+            cursor.classList.add("collaboration-cursor__caret");
+
+            const label = document.createElement("div");
+            label.classList.add("collaboration-cursor__label");
+
+            label.insertBefore(
+              document.createTextNode(`Client publicKeyXXX: ${user.publicKey}`),
+              null
+            );
+            cursor.insertBefore(label, null);
+
+            return cursor;
+          },
         }),
         SerenityScrollIntoViewForEditModeExtension.configure({}),
         FileNodeExtension.configure({
