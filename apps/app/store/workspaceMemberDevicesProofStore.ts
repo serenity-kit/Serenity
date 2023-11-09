@@ -1,6 +1,7 @@
 import * as workspaceMemberDevicesProofUtil from "@serenity-kit/workspace-member-devices-proof";
-import { notNull, notUndefined } from "@serenity-tools/common";
+import { generateId, notNull, notUndefined } from "@serenity-tools/common";
 import canonicalize from "canonicalize";
+import { useSyncExternalStore } from "react";
 import {
   runWorkspaceMemberDevicesProofQuery,
   runWorkspaceMemberDevicesProofsQuery,
@@ -390,4 +391,32 @@ export const getWorkspaceMemberDevicesProofByHash = ({
       workspaceMemberDevicesProof;
   }
   return getWorkspaceMemberDevicesProofByHashCache[workspaceId];
+};
+
+const getLastWorkspaceMemberDevicesProofListeners: {
+  [id: string]: () => void;
+} = {};
+export const triggerGetLastWorkspaceChain = () => {
+  Object.values(getLastWorkspaceMemberDevicesProofListeners).forEach(
+    (listener) => listener()
+  );
+};
+
+export const useLocalLastWorkspaceMemberDevicesProof = ({
+  workspaceId,
+}: {
+  workspaceId: string;
+}) => {
+  const result = useSyncExternalStore(
+    (onStoreChange) => {
+      const id = generateId();
+      getLastWorkspaceMemberDevicesProofListeners[id] = onStoreChange;
+      return () => {
+        delete getLastWorkspaceMemberDevicesProofListeners[id];
+      };
+    },
+    () => getLastWorkspaceMemberDevicesProof({ workspaceId })
+  );
+
+  return result;
 };

@@ -108,7 +108,7 @@ export const loadRemoteDocumentChain = async ({
     after: lastEvent
       ? sodium.to_base64(
           lastEvent.position.toString(),
-          sodium.base64_variants.ORIGINAL
+          1 // sodium.base64_variants.ORIGINAL
         )
       : undefined,
   });

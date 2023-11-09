@@ -10,7 +10,9 @@ import { useSyncExternalStore } from "react";
 import { runWorkspacesQuery } from "../generated/graphql";
 import { showToast } from "../utils/toast/showToast";
 import * as sql from "./sql/sql";
+import { getLocalUsersByIds } from "./userStore";
 import { loadRemoteWorkspaceChain } from "./workspaceChainStore";
+import { useLocalLastWorkspaceMemberDevicesProof } from "./workspaceMemberDevicesProofStore";
 
 export const table = "workspace_v1";
 
@@ -179,4 +181,47 @@ export const loadRemoteWorkspaces = async ({
     });
     triggerGetWorkspaces();
   }
+};
+
+export const useWorkspaceMembers = ({
+  workspaceId,
+}: {
+  workspaceId: string;
+}) => {
+  const lastWorkspaceMemberDevicesProof =
+    useLocalLastWorkspaceMemberDevicesProof({ workspaceId });
+  if (!lastWorkspaceMemberDevicesProof) return [];
+  const userIds = Object.keys(
+    lastWorkspaceMemberDevicesProof.data.userChainHashes
+  );
+
+  return getLocalUsersByIds(userIds);
+};
+
+const useWorkspaceMemberDevicesToUsernamesCache: {
+  [workspaceId: string]: Record<string, string>;
+} = {};
+export const useWorkspaceMemberDevicesToUsernames = ({
+  workspaceId,
+}: {
+  workspaceId: string;
+}) => {
+  const devicesToUsernames: Record<string, string> = {};
+  const users = useWorkspaceMembers({ workspaceId });
+  users.map((user) => {
+    Object.keys(user.devices).map((deviceSigningPublicKey) => {
+      devicesToUsernames[deviceSigningPublicKey] = user.username;
+    });
+  });
+
+  if (
+    useWorkspaceMemberDevicesToUsernamesCache[workspaceId] &&
+    canonicalize(useWorkspaceMemberDevicesToUsernamesCache[workspaceId]) ===
+      canonicalize(devicesToUsernames)
+  ) {
+    return useWorkspaceMemberDevicesToUsernamesCache[workspaceId];
+  }
+
+  useWorkspaceMemberDevicesToUsernamesCache[workspaceId] = devicesToUsernames;
+  return devicesToUsernames;
 };

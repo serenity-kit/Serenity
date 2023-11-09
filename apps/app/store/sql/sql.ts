@@ -19,6 +19,11 @@ export const execute = (
   statement: string,
   params?: (string | number | null)[]
 ) => {
-  const { rows } = db.execute(statement, params);
-  return rows?._array || [];
+  try {
+    const { rows } = db.execute(statement, params);
+    return rows?._array || [];
+  } catch (e) {
+    console.error(e);
+    throw e;
+  }
 };

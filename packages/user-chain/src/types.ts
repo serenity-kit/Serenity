@@ -77,14 +77,17 @@ export const DeviceInfo = z.object({
 });
 export type DeviceInfo = z.infer<typeof DeviceInfo>;
 
+const Devices = z.record(z.string(), DeviceInfo);
+export type Devices = z.infer<typeof Devices>;
+
 export const UserChainState = z.object({
   id: z.string(),
   email: z.string().email(),
   mainDeviceSigningPublicKey: z.string(),
   mainDeviceEncryptionPublicKey: z.string(),
   mainDeviceEncryptionPublicKeySignature: z.string(),
-  devices: z.record(z.string(), DeviceInfo),
-  removedDevices: z.record(z.string(), DeviceInfo),
+  devices: Devices,
+  removedDevices: Devices,
   eventHash: z.string(),
   eventVersion: Version,
 });
