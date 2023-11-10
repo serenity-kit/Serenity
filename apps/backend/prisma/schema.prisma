@@ -356,7 +356,7 @@ model SnapshotKeyBox {
 }
 
 model Comment {
-  id                            String         @id @unique @default(uuid())
+  id                            String         @id @unique
   document                      Document       @relation(fields: [documentId], references: [id], onDelete: Cascade)
   documentId                    String
   createdAt                     DateTime       @default(now())
@@ -368,10 +368,11 @@ model Comment {
   snapshot                      Snapshot       @relation(fields: [snapshotId], references: [id], onDelete: Cascade)
   snapshotId                    String
   subkeyId                      Int
+  signature                     String
 }
 
 model CommentReply {
-  id                            String        @id @unique @default(uuid())
+  id                            String        @id @unique
   document                      Document      @relation(fields: [documentId], references: [id], onDelete: Cascade)
   documentId                    String
   comment                       Comment       @relation(fields: [commentId], references: [id], onDelete: Cascade)
@@ -384,6 +385,7 @@ model CommentReply {
   snapshot                      Snapshot      @relation(fields: [snapshotId], references: [id], onDelete: Cascade)
   snapshotId                    String
   subkeyId                      Int
+  signature                     String
 }
 
 model LoginAttempt {

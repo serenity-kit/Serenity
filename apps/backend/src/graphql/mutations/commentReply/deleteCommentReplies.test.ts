@@ -50,6 +50,7 @@ const setup = async () => {
     creatorDeviceSigningPrivateKey: userData1.webDevice.signingPrivateKey,
     creatorDeviceEncryptionPrivateKey: userData1.webDevice.encryptionPrivateKey,
     authorizationHeader: userData1.sessionKey,
+    documentId: userData1.document.id,
   });
   user1Comment = user1CommentResult.createComment.comment;
   const user2CommentResult = await createComment({
@@ -61,6 +62,7 @@ const setup = async () => {
     creatorDeviceSigningPrivateKey: userData2.webDevice.signingPrivateKey,
     creatorDeviceEncryptionPrivateKey: userData2.webDevice.encryptionPrivateKey,
     authorizationHeader: userData2.sessionKey,
+    documentId: userData1.document.id,
   });
   user2Comment = user2CommentResult.createComment.comment;
 };
@@ -81,6 +83,7 @@ test("commenter deletes own reply", async () => {
     creatorDeviceSigningPrivateKey: userData1.webDevice.signingPrivateKey,
     creatorDeviceEncryptionPrivateKey: userData1.webDevice.encryptionPrivateKey,
     authorizationHeader: userData1.sessionKey,
+    documentId: userData1.document.id,
   });
   const commentReply = commentReplyResult.createCommentReply.commentReply;
   const numCommentsBeforeDelete = await prisma.commentReply.count({
@@ -121,6 +124,7 @@ test("admin deletes reply", async () => {
     creatorDeviceSigningPrivateKey: userData2.webDevice.signingPrivateKey,
     creatorDeviceEncryptionPrivateKey: userData2.webDevice.encryptionPrivateKey,
     authorizationHeader: userData2.sessionKey,
+    documentId: userData1.document.id,
   });
   const commentReply = commentReplyResult.createCommentReply.commentReply;
   const numCommentsBeforeDelete = await prisma.commentReply.count({
@@ -161,6 +165,7 @@ test("editor deletes reply", async () => {
     creatorDeviceSigningPrivateKey: userData2.webDevice.signingPrivateKey,
     creatorDeviceEncryptionPrivateKey: userData2.webDevice.encryptionPrivateKey,
     authorizationHeader: userData2.sessionKey,
+    documentId: userData1.document.id,
   });
   const commentReply = commentReplyResult.createCommentReply.commentReply;
   const numCommentsBeforeDelete = await prisma.commentReply.count({
@@ -201,6 +206,7 @@ test("commentor tries to delete other reply", async () => {
     creatorDeviceSigningPrivateKey: userData2.webDevice.signingPrivateKey,
     creatorDeviceEncryptionPrivateKey: userData2.webDevice.encryptionPrivateKey,
     authorizationHeader: userData2.sessionKey,
+    documentId: userData1.document.id,
   });
   const commentReply = commentReplyResult.createCommentReply.commentReply;
   expect(
@@ -234,6 +240,7 @@ test("viewer tries to delete other reply", async () => {
     creatorDeviceSigningPrivateKey: userData2.webDevice.signingPrivateKey,
     creatorDeviceEncryptionPrivateKey: userData2.webDevice.encryptionPrivateKey,
     authorizationHeader: userData2.sessionKey,
+    documentId: userData1.document.id,
   });
   const commentReply = commentReplyResult.createCommentReply.commentReply;
   expect(
@@ -258,6 +265,7 @@ test("delete some replies", async () => {
     creatorDeviceSigningPrivateKey: userData2.webDevice.signingPrivateKey,
     creatorDeviceEncryptionPrivateKey: userData2.webDevice.encryptionPrivateKey,
     authorizationHeader: userData2.sessionKey,
+    documentId: userData1.document.id,
   });
   const commentReply = commentReplyResult.createCommentReply.commentReply;
   const numCommentsBeforeDelete = await prisma.commentReply.count({
@@ -290,6 +298,7 @@ test("cant delete replies on outside document", async () => {
     creatorDeviceSigningPrivateKey: userData2.webDevice.signingPrivateKey,
     creatorDeviceEncryptionPrivateKey: userData2.webDevice.encryptionPrivateKey,
     authorizationHeader: userData2.sessionKey,
+    documentId: userData1.document.id,
   });
   await prisma.usersToWorkspaces.deleteMany({
     where: {

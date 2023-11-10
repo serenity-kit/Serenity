@@ -17,6 +17,7 @@ query commentsByDocumentId(
       subkeyId
       contentCiphertext
       contentNonce
+      signature
       createdAt
       creatorDevice {
         signingPublicKey
@@ -29,6 +30,7 @@ query commentsByDocumentId(
         subkeyId
         contentCiphertext
         contentNonce
+        signature
         createdAt
         creatorDevice {
           signingPublicKey

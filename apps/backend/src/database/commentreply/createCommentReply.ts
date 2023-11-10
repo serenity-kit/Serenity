@@ -1,4 +1,3 @@
-import { generateId } from "@serenity-tools/common";
 import { ForbiddenError, UserInputError } from "apollo-server-express";
 import { Role, ShareDocumentRole } from "../../../prisma/generated/output";
 import { getOrCreateCreatorDevice } from "../../utils/device/getOrCreateCreatorDevice";
@@ -8,22 +7,26 @@ type Params = {
   userId: string;
   documentShareLinkToken?: string | null | undefined;
   creatorDeviceSigningPublicKey: string;
+  commentReplyId: string;
   commentId: string;
   snapshotId: string;
   subkeyId: number;
   contentCiphertext: string;
   contentNonce: string;
+  signature: string;
 };
 
 export async function createCommentReply({
   userId,
   documentShareLinkToken,
   creatorDeviceSigningPublicKey,
+  commentReplyId,
   commentId,
   snapshotId,
   subkeyId,
   contentCiphertext,
   contentNonce,
+  signature,
 }: Params) {
   // verify the document exists
   const document = await prisma.document.findFirst({
@@ -81,7 +84,7 @@ export async function createCommentReply({
   try {
     const commentReply = await prisma.commentReply.create({
       data: {
-        id: generateId(),
+        id: commentReplyId,
         commentId,
         documentId: document.id,
         snapshotId,
@@ -89,6 +92,7 @@ export async function createCommentReply({
         creatorDeviceSigningPublicKey: creatorDevice.signingPublicKey,
         contentCiphertext,
         contentNonce,
+        signature,
       },
     });
     return {

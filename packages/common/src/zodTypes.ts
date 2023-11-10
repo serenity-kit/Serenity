@@ -12,14 +12,6 @@ export const KeyDerivationContext = z.union([
 ]);
 export type KeyDerivationContext = z.infer<typeof KeyDerivationContext>;
 
-export const SigningDomainContext = z.union([
-  z.literal("user_device_encryption_public_key"),
-  z.literal("share_document_device_encryption_public_key"),
-  z.literal("folder_id"),
-  z.literal("login_session_key"),
-]);
-export type SigningDomainContext = z.infer<typeof SigningDomainContext>;
-
 export const KeyDerivationTraceEntry = z.object({
   entryId: z.string(), // didn't use id because it often GraphQL clients normalize by the id field
   subkeyId: z.number(),
@@ -95,3 +87,11 @@ export const ShareDocumentRole = z.union([
 ]);
 
 export type ShareDocumentRole = z.infer<typeof ShareDocumentRole>;
+
+export const Comment = z.object({
+  text: z.string(),
+  from: z.record(z.string(), z.any()),
+  to: z.record(z.string(), z.any()),
+});
+
+export type Comment = z.infer<typeof Comment>;

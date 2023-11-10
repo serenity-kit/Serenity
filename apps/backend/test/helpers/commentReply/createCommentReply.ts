@@ -1,7 +1,7 @@
 import {
+  LocalDevice,
   createCommentKey,
-  Device,
-  encryptComment,
+  encryptAndSignCommentReply,
 } from "@serenity-tools/common";
 import { gql } from "graphql-request";
 
@@ -9,11 +9,12 @@ type Params = {
   graphql: any;
   commentId: string;
   snapshotId: string;
+  documentId: string;
   documentShareLinkToken?: string | null | undefined;
   snapshotKey: string;
   comment: string;
   authorizationHeader: string;
-  creatorDevice: Device;
+  creatorDevice: LocalDevice;
   creatorDeviceEncryptionPrivateKey: string;
   creatorDeviceSigningPrivateKey: string;
 };
@@ -21,6 +22,7 @@ type Params = {
 export const createCommentReply = async ({
   graphql,
   commentId,
+  documentId,
   snapshotId,
   documentShareLinkToken,
   snapshotKey,
@@ -34,10 +36,16 @@ export const createCommentReply = async ({
     authorization: authorizationHeader,
   };
   const commentKey = createCommentKey({ snapshotKey });
-  const { ciphertext, publicNonce } = encryptComment({
-    comment,
-    key: commentKey.key,
-  });
+  const { ciphertext, nonce, commentReplyId, signature } =
+    encryptAndSignCommentReply({
+      text: comment,
+      commentId,
+      key: commentKey.key,
+      device: creatorDevice,
+      documentId,
+      snapshotId,
+      subkeyId: commentKey.subkeyId,
+    });
 
   const query = gql`
     mutation createCommentReply($input: CreateCommentReplyInput!) {
@@ -68,7 +76,9 @@ export const createCommentReply = async ({
         documentShareLinkToken,
         subkeyId: commentKey.subkeyId,
         contentCiphertext: ciphertext,
-        contentNonce: publicNonce,
+        contentNonce: nonce,
+        commentReplyId,
+        signature,
       },
     },
     authorizationHeaders

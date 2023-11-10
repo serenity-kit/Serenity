@@ -38,6 +38,7 @@ const setup = async () => {
     creatorDeviceEncryptionPrivateKey: userData1.webDevice.encryptionPrivateKey,
     creatorDeviceSigningPrivateKey: userData1.webDevice.signingrivateKey,
     authorizationHeader: userData1.sessionKey,
+    documentId: userData1.document.id,
   });
   comment = createCommentResult.createComment.comment;
 };
@@ -58,6 +59,7 @@ test("commenter responds to comment", async () => {
     creatorDeviceEncryptionPrivateKey: userData1.webDevice.encryptionPrivateKey,
     creatorDeviceSigningPrivateKey: userData1.webDevice.signingPrivateKey,
     authorizationHeader: userData1.sessionKey,
+    documentId: userData1.document.id,
   });
   const commentReply = createCommentReplyResult.createCommentReply.commentReply;
   expect(typeof commentReply.id).toBe("string");
@@ -100,6 +102,7 @@ test("shared editor responds to comment", async () => {
     creatorDeviceEncryptionPrivateKey: userData2.webDevice.encryptionPrivateKey,
     creatorDeviceSigningPrivateKey: userData2.webDevice.signingPrivateKey,
     authorizationHeader: userData2.sessionKey,
+    documentId: userData1.document.id,
   });
   const commentReply = createCommentReplyResult.createCommentReply.commentReply;
   expect(typeof commentReply.id).toBe("string");
@@ -142,6 +145,7 @@ test("shared commenter responds to comment", async () => {
     creatorDeviceEncryptionPrivateKey: userData2.webDevice.encryptionPrivateKey,
     creatorDeviceSigningPrivateKey: userData2.webDevice.signingPrivateKey,
     authorizationHeader: userData2.sessionKey,
+    documentId: userData1.document.id,
   });
   const commentReply = createCommentReplyResult.createCommentReply.commentReply;
   expect(typeof commentReply.id).toBe("string");
@@ -187,6 +191,7 @@ test("shared viewer cannot respond to comment", async () => {
           userData1.webDevice.encryptionPrivateKey,
         creatorDeviceSigningPrivateKey: userData1.webDevice.signingPrivateKey,
         authorizationHeader: userData1.sessionKey,
+        documentId: userData1.document.id,
       }))()
   ).rejects.toThrowError(/BAD_USER_INPUT/);
 });
@@ -211,6 +216,7 @@ test("admin replies to comment", async () => {
     creatorDeviceEncryptionPrivateKey: userData1.webDevice.encryptionPrivateKey,
     creatorDeviceSigningPrivateKey: userData1.webDevice.signingPrivateKey,
     authorizationHeader: userData1.sessionKey,
+    documentId: userData1.document.id,
   });
   const commentReply = createCommentReplyResult.createCommentReply.commentReply;
   expect(typeof commentReply.id).toBe("string");
@@ -247,6 +253,7 @@ test("editor replies to comment", async () => {
     creatorDeviceEncryptionPrivateKey: userData1.webDevice.encryptionPrivateKey,
     creatorDeviceSigningPrivateKey: userData1.webDevice.signingPrivateKey,
     authorizationHeader: userData1.sessionKey,
+    documentId: userData1.document.id,
   });
   const commentReply = createCommentReplyResult.createCommentReply.commentReply;
   expect(typeof commentReply.id).toBe("string");
@@ -283,6 +290,7 @@ test("commenter replies to comment", async () => {
     creatorDeviceEncryptionPrivateKey: userData1.webDevice.encryptionPrivateKey,
     creatorDeviceSigningPrivateKey: userData1.webDevice.signingPrivateKey,
     authorizationHeader: userData1.sessionKey,
+    documentId: userData1.document.id,
   });
   const commentReply = createCommentReplyResult.createCommentReply.commentReply;
   expect(typeof commentReply.id).toBe("string");
@@ -322,6 +330,7 @@ test("viewer tries to comment", async () => {
           userData1.webDevice.encryptionPrivateKey,
         creatorDeviceSigningPrivateKey: userData1.webDevice.signingPrivateKey,
         authorizationHeader: userData1.sessionKey,
+        documentId: userData1.document.id,
       }))()
   ).rejects.toThrowError("Unauthorized");
 });
@@ -339,10 +348,11 @@ test("unauthorized document", async () => {
         snapshotId: snapshotId1,
         snapshotKey: snapshotKey1,
         comment: "thanks",
-        creatorDevice: otherUser.device,
+        creatorDevice: otherUser.webDevice,
         creatorDeviceEncryptionPrivateKey: otherUser.deviceEncryptionPrivateKey,
         creatorDeviceSigningPrivateKey: otherUser.deviceSigningPrivateKey,
         authorizationHeader: otherUser.sessionKey,
+        documentId: userData1.document.id,
       }))()
   ).rejects.toThrowError("Unauthorized");
 });
@@ -362,6 +372,7 @@ test("invalid document", async () => {
           userData1.webDevice.encryptionPrivateKey,
         creatorDeviceSigningPrivateKey: userData1.webDevice.signingPrivateKey,
         authorizationHeader: userData1.sessionKey,
+        documentId: userData1.document.id,
       }))()
   ).rejects.toThrowError("Unauthorized");
 });
@@ -381,6 +392,7 @@ test("invalid commentId", async () => {
           userData1.webDevice.encryptionPrivateKey,
         creatorDeviceSigningPrivateKey: userData1.webDevice.signingPrivateKey,
         authorizationHeader: userData1.sessionKey,
+        documentId: userData1.document.id,
       }))()
   ).rejects.toThrowError(/BAD_USER_INPUT/);
 });
@@ -399,6 +411,7 @@ test("Unauthenticated", async () => {
           userData1.webDevice.encryptionPrivateKey,
         creatorDeviceSigningPrivateKey: userData1.webDevice.signingPrivateKey,
         authorizationHeader: "badauthkey",
+        documentId: userData1.document.id,
       }))()
   ).rejects.toThrowError(/UNAUTHENTICATED/);
 });

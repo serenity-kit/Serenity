@@ -55,7 +55,6 @@ export interface Typegen0 {
   };
   eventsCausingActions: {
     clearReplyText: "done.invoke.createReply";
-    decryptComments: "CommentsByDocumentIdQuery.UPDATE_RESULT";
     highlightComment:
       | "HIGHLIGHT_COMMENT_FROM_EDITOR"
       | "HIGHLIGHT_COMMENT_FROM_SIDEBAR";
@@ -82,6 +81,7 @@ export interface Typegen0 {
       | "done.invoke.deleteComment"
       | "done.invoke.deleteReply";
     updateReplyText: "UPDATE_REPLY_TEXT";
+    verifyAndDecryptComments: "CommentsByDocumentIdQuery.UPDATE_RESULT";
   };
   eventsCausingDelays: {};
   eventsCausingGuards: {

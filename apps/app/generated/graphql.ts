@@ -89,6 +89,7 @@ export type Comment = {
   creatorDevice: CreatorDevice;
   documentId: Scalars['String'];
   id: Scalars['String'];
+  signature: Scalars['String'];
   snapshotId: Scalars['String'];
   subkeyId: Scalars['Int'];
 };
@@ -120,23 +121,28 @@ export type CommentReply = {
   creatorDevice: CreatorDevice;
   documentId: Scalars['String'];
   id: Scalars['String'];
+  signature: Scalars['String'];
   snapshotId: Scalars['String'];
   subkeyId: Scalars['Int'];
 };
 
 export type CreateCommentInput = {
+  commentId: Scalars['String'];
   contentCiphertext: Scalars['String'];
   contentNonce: Scalars['String'];
   documentShareLinkToken?: InputMaybe<Scalars['String']>;
+  signature: Scalars['String'];
   snapshotId: Scalars['String'];
   subkeyId: Scalars['Int'];
 };
 
 export type CreateCommentReplyInput = {
   commentId: Scalars['String'];
+  commentReplyId: Scalars['String'];
   contentCiphertext: Scalars['String'];
   contentNonce: Scalars['String'];
   documentShareLinkToken?: InputMaybe<Scalars['String']>;
+  signature: Scalars['String'];
   snapshotId: Scalars['String'];
   subkeyId: Scalars['Int'];
 };
@@ -1704,7 +1710,7 @@ export type CommentsByDocumentIdQueryVariables = Exact<{
 }>;
 
 
-export type CommentsByDocumentIdQuery = { __typename?: 'Query', commentsByDocumentId?: { __typename?: 'CommentConnection', nodes?: Array<{ __typename?: 'Comment', id: string, documentId: string, snapshotId: string, subkeyId: number, contentCiphertext: string, contentNonce: string, createdAt: any, creatorDevice: { __typename?: 'CreatorDevice', signingPublicKey: string, encryptionPublicKey: string, encryptionPublicKeySignature: string }, commentReplies?: Array<{ __typename?: 'CommentReply', id: string, snapshotId: string, subkeyId: number, contentCiphertext: string, contentNonce: string, createdAt: any, creatorDevice: { __typename?: 'CreatorDevice', signingPublicKey: string, encryptionPublicKey: string, encryptionPublicKeySignature: string } } | null> | null } | null> | null, pageInfo: { __typename?: 'PageInfo', hasNextPage: boolean, hasPreviousPage: boolean, startCursor?: string | null, endCursor?: string | null } } | null };
+export type CommentsByDocumentIdQuery = { __typename?: 'Query', commentsByDocumentId?: { __typename?: 'CommentConnection', nodes?: Array<{ __typename?: 'Comment', id: string, documentId: string, snapshotId: string, subkeyId: number, contentCiphertext: string, contentNonce: string, signature: string, createdAt: any, creatorDevice: { __typename?: 'CreatorDevice', signingPublicKey: string, encryptionPublicKey: string, encryptionPublicKeySignature: string }, commentReplies?: Array<{ __typename?: 'CommentReply', id: string, snapshotId: string, subkeyId: number, contentCiphertext: string, contentNonce: string, signature: string, createdAt: any, creatorDevice: { __typename?: 'CreatorDevice', signingPublicKey: string, encryptionPublicKey: string, encryptionPublicKeySignature: string } } | null> | null } | null> | null, pageInfo: { __typename?: 'PageInfo', hasNextPage: boolean, hasPreviousPage: boolean, startCursor?: string | null, endCursor?: string | null } } | null };
 
 export type DevicesQueryVariables = Exact<{
   onlyNotExpired: Scalars['Boolean'];
@@ -2470,6 +2476,7 @@ export const CommentsByDocumentIdDocument = gql`
       subkeyId
       contentCiphertext
       contentNonce
+      signature
       createdAt
       creatorDevice {
         signingPublicKey
@@ -2482,6 +2489,7 @@ export const CommentsByDocumentIdDocument = gql`
         subkeyId
         contentCiphertext
         contentNonce
+        signature
         createdAt
         creatorDevice {
           signingPublicKey
