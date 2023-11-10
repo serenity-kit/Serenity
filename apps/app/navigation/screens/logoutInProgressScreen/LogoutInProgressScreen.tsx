@@ -11,7 +11,10 @@ import {
   runUserChainQuery,
 } from "../../../generated/graphql";
 import { createSqlTables } from "../../../store/createSqlTables";
-import { resetInMemoryDatabase } from "../../../store/sql/sql";
+import {
+  destroyPersistedDatabase,
+  resetInMemoryDatabase,
+} from "../../../store/sql/sql";
 import { getLastWorkspaceChainEvent } from "../../../store/workspaceChainStore";
 import { loadRemoteWorkspaceMemberDevicesProofsQuery } from "../../../store/workspaceMemberDevicesProofStore";
 import { RootStackScreenProps } from "../../../types/navigationProps";
@@ -133,6 +136,7 @@ export default function LogoutInProgress({
           {}
         );
         remoteCleanupSuccessful = logoutResult.data?.logout?.success || false;
+        await destroyPersistedDatabase();
         await clearDeviceAndSessionStorage();
         await updateAuthentication(null);
         localCleanupSuccessful = true;
