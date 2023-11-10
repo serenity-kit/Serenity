@@ -1,8 +1,8 @@
-// import { OPSQLiteConnection, open } from "@op-engineering/op-sqlite";
-import { QuickSQLiteConnection, open } from "react-native-quick-sqlite";
+import { OPSQLiteConnection, open } from "@op-engineering/op-sqlite";
+// import { QuickSQLiteConnection, open } from "react-native-quick-sqlite";
 
-// let db: OPSQLiteConnection;
-let db: QuickSQLiteConnection;
+let db: OPSQLiteConnection;
+// let db: QuickSQLiteConnection;
 
 export const ready = () => {
   if (db) {
