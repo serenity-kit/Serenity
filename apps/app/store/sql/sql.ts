@@ -15,6 +15,12 @@ export const resetInMemoryDatabase = () => {
   db = open({ name: ":memory:" });
 };
 
+export const triggerDebouncedDatabasePersisting = () => {};
+
+export const destroyPersistedDatabase = async () => {
+  return Promise.resolve();
+};
+
 export const execute = (
   statement: string,
   params?: (string | number | Uint8Array | null)[]

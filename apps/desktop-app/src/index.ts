@@ -2,15 +2,25 @@ const electron = require("electron");
 const path = require("path");
 const fs = require("fs");
 const { promisify } = require("util");
+const sodium = require("libsodium-wrappers");
 
-const sqliteDbPath = path.join(electron.app.getPath("userData"), "serenity.db");
+const userDataPath = electron.app.getPath("userData");
+const sqliteDbPath = path.join(userDataPath, "serenity.encrypted.db");
+const sqliteDbKeyAndNoncePath = path.join(
+  userDataPath,
+  "serenity.encrypted-key-and-nonce.txt"
+);
+
 console.log("Serenity sqlite DbPath:", sqliteDbPath);
+
 const isDevelopment = process.env.NODE_ENV === "development";
 
 // see https://cs.chromium.org/chromium/src/net/base/net_error_list.h
 const FILE_NOT_FOUND = -6;
 const { app, BrowserWindow, ipcMain } = electron;
 const fsStat = promisify(fs.stat);
+const fsWriteFile = promisify(fs.writeFile);
+const fsReadFile = promisify(fs.readFile);
 const scheme = "serenity-desktop";
 const root = "app";
 
@@ -95,14 +105,93 @@ const createWindow = async () => {
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs
 app.on("ready", () => {
-  ipcMain.handle("sqlite:setDatabase", (event, database) => {
-    // TODO store in the DB file
-    return true;
+  ipcMain.handle("sqlite:setPersistedDatabase", async (event, database) => {
+    try {
+      if (electron.safeStorage.isEncryptionAvailable()) {
+        await sodium.ready;
+        let key = new Uint8Array();
+        let nonce = new Uint8Array();
+        try {
+          await fs.unlink(sqliteDbPath);
+          const encryptedKeyAndNonce = await fsReadFile(
+            sqliteDbKeyAndNoncePath
+          );
+          if (!encryptedKeyAndNonce) throw new Error("No key and nonce");
+          const decryptedData = JSON.parse(
+            electron.safeStorage.decryptString(encryptedKeyAndNonce)
+          );
+          key = sodium.from_base64(decryptedData.key);
+          nonce = sodium.from_base64(decryptedData.nonce);
+        } catch (err) {
+          key = sodium.randombytes_buf(sodium.crypto_secretbox_KEYBYTES);
+          nonce = sodium.randombytes_buf(sodium.crypto_secretbox_NONCEBYTES);
+          const encryptedKeyAndNonce = electron.safeStorage.encryptString(
+            JSON.stringify({
+              key: sodium.to_base64(key),
+              nonce: sodium.to_base64(nonce),
+            })
+          );
+
+          await fsWriteFile(sqliteDbKeyAndNoncePath, encryptedKeyAndNonce);
+        }
+
+        const encryptedDatabase = sodium.crypto_secretbox_easy(
+          database,
+          nonce,
+          key
+        );
+
+        return fsWriteFile(sqliteDbPath, Buffer.from(encryptedDatabase));
+      }
+      return false;
+    } catch (err) {
+      console.error(err);
+      return false;
+    }
   });
 
-  ipcMain.handle("sqlite:getDatabase", (event) => {
-    // TODO get DB file and return it
-    return new Uint8Array();
+  ipcMain.handle("sqlite:getPersistedDatabase", async (event) => {
+    try {
+      await sodium.ready;
+      const encryptedKeyAndNonce = await fsReadFile(sqliteDbKeyAndNoncePath);
+      if (encryptedKeyAndNonce) {
+        const decryptedData = JSON.parse(
+          electron.safeStorage.decryptString(encryptedKeyAndNonce)
+        );
+        const key = sodium.from_base64(decryptedData.key);
+        const nonce = sodium.from_base64(decryptedData.nonce);
+        const data = await fsReadFile(sqliteDbPath);
+        const decryptedDatabase = sodium.crypto_secretbox_open_easy(
+          data,
+          nonce,
+          key
+        );
+        return new Uint8Array(
+          decryptedDatabase.buffer,
+          decryptedDatabase.byteOffset,
+          decryptedDatabase.byteLength
+        );
+      }
+    } catch (err) {
+      console.error(err);
+      return undefined;
+    }
+  });
+
+  ipcMain.handle("sqlite:deletePersistedDatabase", async (event) => {
+    try {
+      await Promise.all([
+        fs.unlink(sqliteDbKeyAndNoncePath),
+        fs.unlink(sqliteDbPath),
+      ]);
+      return true;
+    } catch (err) {
+      return false;
+    }
+  });
+
+  ipcMain.handle("safeStorage:isAvailable", async (event) => {
+    return electron.safeStorage.isEncryptionAvailable();
   });
 
   createWindow();

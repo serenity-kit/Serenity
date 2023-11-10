@@ -1,6 +1,8 @@
 export interface SerenityElectron {
-  setDatabase: (database: Uint8Array) => Promise<boolean>;
-  getDatabase: () => Promise<Uint8Array>;
+  setPersistedDatabase: (database: Uint8Array) => Promise<boolean>;
+  getPersistedDatabase: () => Promise<Uint8Array>;
+  deletePersistedDatabase: () => Promise<boolean>;
+  isSafeStorageAvailable: () => Promise<boolean>;
 }
 
 declare global {
@@ -10,11 +12,19 @@ declare global {
 }
 
 export const setPersistedDatabase = async (database: Uint8Array) => {
-  return await window.serenityElectron.setDatabase(database);
+  return await window.serenityElectron.setPersistedDatabase(database);
 };
 
 export const getPersistedDatabase = async (): Promise<
   Uint8Array | undefined
 > => {
-  return await window.serenityElectron.getDatabase();
+  return await window.serenityElectron.getPersistedDatabase();
+};
+
+export const deletePersistedDatabase = async () => {
+  return await window.serenityElectron.deletePersistedDatabase();
+};
+
+export const isSafeStorageAvailable = async () => {
+  return await window.serenityElectron.isSafeStorageAvailable();
 };

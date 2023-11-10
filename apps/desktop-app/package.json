@@ -16,7 +16,9 @@
     "ts:check": "yarn tsc --noEmit"
   },
   "dependencies": {
-    "electron-squirrel-startup": "^1.0.0"
+    "@types/libsodium-wrappers": "^0.7.13",
+    "electron-squirrel-startup": "^1.0.0",
+    "libsodium-wrappers": "^0.7.13"
   },
   "devDependencies": {
     "@electron-forge/cli": "^6.0.4",
