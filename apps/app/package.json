@@ -30,6 +30,7 @@
     "@expo/vector-icons": "^13.0.0",
     "@gorhom/bottom-sheet": "^4.4.5",
     "@mobily/stacks": "^2.2.2",
+    "@op-engineering/op-sqlite": "^1.0.5",
     "@react-native-async-storage/async-storage": "~1.17.3",
     "@react-navigation/drawer": "^6.5.6",
     "@react-navigation/native": "^6.1.1",

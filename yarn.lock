@@ -5833,6 +5833,11 @@
   resolved "https://registry.yarnpkg.com/@oclif/screen/-/screen-3.0.4.tgz#663db0ecaf23f3184e7f01886ed578060e4a7f1c"
   integrity sha512-IMsTN1dXEXaOSre27j/ywGbBjrzx0FNd1XmuhCWCB9NTPrhWI1Ifbz+YLSEcstfQfocYsrbrIessxXb2oon4lA==
 
+"@op-engineering/op-sqlite@^1.0.5":
+  version "1.0.5"
+  resolved "https://registry.yarnpkg.com/@op-engineering/op-sqlite/-/op-sqlite-1.0.5.tgz#5fea023e56b23b78040075b2fcb6a523f7281bd2"
+  integrity sha512-+fYENcJt6F8mWKLN0TXcmOceEKNJHlGg7QigDAZAGyuRKyN7MCZ+k6cBbUP8uf3ic63Z3Yt+kcvA2wGhGNvzrg==
+
 "@peculiar/asn1-schema@^2.1.6":
   version "2.3.0"
   resolved "https://registry.yarnpkg.com/@peculiar/asn1-schema/-/asn1-schema-2.3.0.tgz#5368416eb336138770c692ffc2bab119ee3ae917"
