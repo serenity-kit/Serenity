@@ -1,22 +1,18 @@
 import { OPSQLiteConnection, open } from "@op-engineering/op-sqlite";
-// import { QuickSQLiteConnection, open } from "react-native-quick-sqlite";
 
 let db: OPSQLiteConnection;
-// let db: QuickSQLiteConnection;
 
 export const ready = () => {
   if (db) {
     return Promise.resolve();
   }
-  // db = open({ name: ":memory:", inMemory: true });
-  db = open({ name: ":memory:" });
+  db = open({ name: ":memory:", inMemory: true });
   return Promise.resolve();
 };
 
 export const resetInMemoryDatabase = () => {
   db.close();
-  // db = open({ name: ":memory:", inMemory: true });
-  db = open({ name: ":memory:" });
+  db = open({ name: ":memory:", inMemory: true });
 };
 
 export const triggerDebouncedDatabasePersisting = () => {};
