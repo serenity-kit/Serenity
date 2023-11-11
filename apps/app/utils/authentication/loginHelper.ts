@@ -12,11 +12,11 @@ import {
   runLogoutMutation,
   runStartLoginMutation,
 } from "../../generated/graphql";
+import { setMainDevice } from "../../store/mainDeviceMemoryStore";
 import {
   getWorkspaceChainEventByHash,
   loadRemoteWorkspaceChain,
 } from "../../store/workspaceChainStore";
-import { setMainDevice } from "../device/mainDeviceMemoryStore";
 import { getOpaqueServerPublicKey } from "../getOpaqueServerPublicKey/getOpaqueServerPublicKey";
 import { createDeviceWithInfo } from "./createDeviceWithInfo";
 

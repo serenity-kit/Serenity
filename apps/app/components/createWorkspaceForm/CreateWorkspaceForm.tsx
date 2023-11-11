@@ -25,9 +25,9 @@ import { TextInput } from "react-native";
 import sodium from "react-native-libsodium";
 import { useAppContext } from "../../context/AppContext";
 import { useCreateInitialWorkspaceStructureMutation } from "../../generated/graphql";
+import { getMainDevice } from "../../store/mainDeviceMemoryStore";
 import * as workspaceStore from "../../store/workspaceStore";
 import { createWorkspaceKeyBoxesForDevices } from "../../utils/device/createWorkspaceKeyBoxesForDevices";
-import { getMainDevice } from "../../utils/device/mainDeviceMemoryStore";
 import { getAndVerifyUserDevices } from "../../utils/getAndVerifyUserDevices/getAndVerifyUserDevices";
 import { VerifyPasswordModal } from "../verifyPasswordModal/VerifyPasswordModal";
 

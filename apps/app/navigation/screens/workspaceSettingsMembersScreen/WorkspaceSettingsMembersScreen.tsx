@@ -30,6 +30,7 @@ import {
 } from "../../../generated/graphql";
 import { useAuthenticatedAppContext } from "../../../hooks/useAuthenticatedAppContext";
 import { workspaceSettingsLoadWorkspaceMachine } from "../../../machines/workspaceSettingsLoadWorkspaceMachine";
+import { getMainDevice } from "../../../store/mainDeviceMemoryStore";
 import { loadRemoteUserChainsForWorkspace } from "../../../store/userChainStore";
 import { getLocalUserByDeviceSigningPublicKey } from "../../../store/userStore";
 import {
@@ -38,7 +39,6 @@ import {
 } from "../../../store/workspaceChainStore";
 import { loadRemoteWorkspaceMemberDevicesProofQuery } from "../../../store/workspaceMemberDevicesProofStore";
 import { WorkspaceStackScreenProps } from "../../../types/navigationProps";
-import { getMainDevice } from "../../../utils/device/mainDeviceMemoryStore";
 import { showToast } from "../../../utils/toast/showToast";
 import { rotateWorkspaceKey } from "../../../utils/workspace/rotateWorkspaceKey";
 

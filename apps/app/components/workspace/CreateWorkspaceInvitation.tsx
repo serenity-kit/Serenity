@@ -20,12 +20,12 @@ import {
   runCreateWorkspaceInvitationMutation,
   useDeleteWorkspaceInvitationsMutation,
 } from "../../generated/graphql";
+import { getMainDevice } from "../../store/mainDeviceMemoryStore";
 import {
   loadRemoteWorkspaceChain,
   useLocalLastWorkspaceChainEvent,
 } from "../../store/workspaceChainStore";
 import { loadRemoteWorkspaceMemberDevicesProofQuery } from "../../store/workspaceMemberDevicesProofStore";
-import { getMainDevice } from "../../utils/device/mainDeviceMemoryStore";
 import { getEnvironmentUrls } from "../../utils/getEnvironmentUrls/getEnvironmentUrls";
 import { VerifyPasswordModal } from "../verifyPasswordModal/VerifyPasswordModal";
 import { WorkspaceInvitationList } from "./WorkspaceInvitationList";

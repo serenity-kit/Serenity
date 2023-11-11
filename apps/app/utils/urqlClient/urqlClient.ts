@@ -2,7 +2,7 @@ import { devtoolsExchange } from "@urql/devtools";
 import { authExchange } from "@urql/exchange-auth";
 import { cacheExchange } from "@urql/exchange-graphcache";
 import { Client, createClient, dedupExchange, fetchExchange } from "urql";
-import * as SessionKeyStore from "../authentication/sessionKeyStore";
+import * as SessionKeyStore from "../../store/sessionKeyStore/sessionKeyStore";
 import { getEnvironmentUrls } from "../getEnvironmentUrls/getEnvironmentUrls";
 
 type AuthState = {

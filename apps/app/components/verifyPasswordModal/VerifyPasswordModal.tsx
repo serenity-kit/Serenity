@@ -18,7 +18,7 @@ import {
   runMeQuery,
   useStartLoginMutation,
 } from "../../generated/graphql";
-import { setMainDevice } from "../../utils/device/mainDeviceMemoryStore";
+import { setMainDevice } from "../../store/mainDeviceMemoryStore";
 import { getOpaqueServerPublicKey } from "../../utils/getOpaqueServerPublicKey/getOpaqueServerPublicKey";
 
 export type Props = {

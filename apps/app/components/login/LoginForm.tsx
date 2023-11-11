@@ -10,13 +10,13 @@ import { useEffect, useState } from "react";
 import { Platform, useWindowDimensions } from "react-native";
 import { z } from "zod";
 import { useAppContext } from "../../context/AppContext";
-import { clearDeviceAndSessionStorage } from "../../utils/authentication/clearDeviceAndSessionStorage";
-import { login } from "../../utils/authentication/loginHelper";
-import { setDevice } from "../../utils/device/deviceStore";
+import { setDevice } from "../../store/deviceStore/deviceStore";
 import {
   persistWebDeviceAccess,
   removeWebDeviceAccess,
-} from "../../utils/device/webDeviceStore";
+} from "../../store/webDeviceStore";
+import { clearDeviceAndSessionStores } from "../../utils/authentication/clearDeviceAndSessionStores";
+import { login } from "../../utils/authentication/loginHelper";
 import { attachDeviceToWorkspaces } from "../../utils/workspace/attachDeviceToWorkspaces";
 
 type Props = {
@@ -65,7 +65,7 @@ export function LoginForm(props: Props) {
     try {
       setGqlErrorMessage("");
       setIsLoggingIn(true);
-      await clearDeviceAndSessionStorage();
+      await clearDeviceAndSessionStores();
       const loginResult = await login({
         username,
         password,

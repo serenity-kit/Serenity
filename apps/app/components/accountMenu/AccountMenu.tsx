@@ -25,8 +25,8 @@ import { useState } from "react";
 import { Platform } from "react-native";
 import { useAppContext } from "../../context/AppContext";
 import { initiateLogout } from "../../navigation/screens/logoutInProgressScreen/LogoutInProgressScreen";
+import { getMainDevice } from "../../store/mainDeviceMemoryStore";
 import * as workspaceStore from "../../store/workspaceStore";
-import { getMainDevice } from "../../utils/device/mainDeviceMemoryStore";
 import { VerifyPasswordModal } from "../verifyPasswordModal/VerifyPasswordModal";
 import { accountMenuMachine } from "./accountMenuMachine";
 

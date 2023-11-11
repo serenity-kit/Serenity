@@ -1,8 +1,8 @@
 import { LocalDevice } from "@serenity-tools/common";
 import { Platform } from "react-native";
-import { getDevice } from "./deviceStore";
-import { getMainDevice } from "./mainDeviceMemoryStore";
-import { getOrFetchWebDevice } from "./webDeviceStore";
+import { getDevice } from "../../store/deviceStore/deviceStore";
+import { getMainDevice } from "../../store/mainDeviceMemoryStore";
+import { getOrFetchWebDevice } from "../../store/webDeviceStore";
 
 export const getActiveDevice = async (): Promise<LocalDevice | null> => {
   let device: LocalDevice | null = null;

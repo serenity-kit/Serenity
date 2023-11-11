@@ -7,10 +7,10 @@ import {
   WorkspaceKeyBoxData,
   WorkspaceKeyDevicePair,
 } from "../../generated/graphql";
+import { getMainDevice } from "../../store/mainDeviceMemoryStore";
 import { getWorkspace } from "../workspace/getWorkspace";
 import { getWorkspaces } from "../workspace/getWorkspaces";
 import { getDevices } from "./getDevices";
-import { getMainDevice } from "./mainDeviceMemoryStore";
 
 export type Props = {
   activeDevice: LocalDevice;
