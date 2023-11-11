@@ -5,8 +5,8 @@ import { useCallback, useEffect, useState } from "react";
 import sodium from "react-native-libsodium";
 import { Client } from "urql";
 import { createSqlTables } from "../store/createSqlTables";
-import * as SessionKeyStore from "../utils/authentication/sessionKeyStore";
-import { getSessionKey } from "../utils/authentication/sessionKeyStore";
+import * as SessionKeyStore from "../store/sessionKeyStore/sessionKeyStore";
+import { getSessionKey } from "../store/sessionKeyStore/sessionKeyStore";
 import { getActiveDevice } from "../utils/device/getActiveDevice";
 import { getUrqlClient, recreateClient } from "../utils/urqlClient/urqlClient";
 

@@ -33,8 +33,8 @@ patchConsoleOutput();
 patchGlobalStyles();
 patchFileReader();
 
-// import { clearDeviceAndSessionStorage } from "./utils/authentication/clearDeviceAndSessionStorage";
-// clearDeviceAndSessionStorage();
+// import { clearDeviceAndSessionStores } from "./utils/authentication/clearDeviceAndSessionStores";
+// clearDeviceAndSessionStores();
 
 export default function App() {
   const {

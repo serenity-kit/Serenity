@@ -28,11 +28,11 @@ import {
 } from "../../../generated/graphql";
 import { useAuthenticatedAppContext } from "../../../hooks/useAuthenticatedAppContext";
 import { loadMeAndVerifyMachine } from "../../../machines/loadMeAndVerifyMachine";
+import { getMainDevice } from "../../../store/mainDeviceMemoryStore";
 import { getLastWorkspaceChainEvent } from "../../../store/workspaceChainStore";
 import { loadRemoteWorkspaceMemberDevicesProofsQuery } from "../../../store/workspaceMemberDevicesProofStore";
 import { RootStackScreenProps } from "../../../types/navigationProps";
 import { WorkspaceWithWorkspaceDevicesParing } from "../../../types/workspaceDevice";
-import { getMainDevice } from "../../../utils/device/mainDeviceMemoryStore";
 import { showToast } from "../../../utils/toast/showToast";
 import { getWorkspaces } from "../../../utils/workspace/getWorkspaces";
 import { rotateWorkspaceKey } from "../../../utils/workspace/rotateWorkspaceKey";

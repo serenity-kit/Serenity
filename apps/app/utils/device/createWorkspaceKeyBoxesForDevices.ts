@@ -5,7 +5,7 @@ import {
 } from "@serenity-tools/common";
 import sodium from "react-native-libsodium";
 import { DeviceWorkspaceKeyBoxInput } from "../../generated/graphql";
-import { getMainDevice } from "./mainDeviceMemoryStore";
+import { getMainDevice } from "../../store/mainDeviceMemoryStore";
 
 export type DeviceWorkspaceKeyBoxParams = {
   deviceSigningPublicKey: string;

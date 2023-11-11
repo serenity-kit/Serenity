@@ -1,7 +1,7 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { LocalDevice } from "@serenity-tools/common";
 import sodium from "react-native-libsodium";
-import { runEncryptedWebDeviceQuery } from "../../generated/graphql";
+import { runEncryptedWebDeviceQuery } from "../generated/graphql";
 
 export const webDeviceKeyId = "webDevice.key";
 export const webDeviceAccessTokenId = "webDevice.accessToken";

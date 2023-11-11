@@ -31,8 +31,8 @@ import {
   useDocumentShareLinksQuery,
 } from "../../generated/graphql";
 import { useAuthenticatedAppContext } from "../../hooks/useAuthenticatedAppContext";
+import { getMainDevice } from "../../store/mainDeviceMemoryStore";
 import { WorkspaceDrawerScreenProps } from "../../types/navigationProps";
-import { getMainDevice } from "../../utils/device/mainDeviceMemoryStore";
 import { createDocumentShareLink } from "../../utils/document/createDocumentShareLink";
 import { useEditorStore } from "../../utils/editorStore/editorStore";
 import { VerifyPasswordModal } from "../verifyPasswordModal/VerifyPasswordModal";

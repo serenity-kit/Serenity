@@ -26,8 +26,8 @@ import {
   useFinishRegistrationMutation,
   useStartRegistrationMutation,
 } from "../../generated/graphql";
+import { setMainDevice } from "../../store/mainDeviceMemoryStore";
 import { setRegistrationInfo } from "../../utils/authentication/registrationMemoryStore";
-import { setMainDevice } from "../../utils/device/mainDeviceMemoryStore";
 import { getOpaqueServerPublicKey } from "../../utils/getOpaqueServerPublicKey/getOpaqueServerPublicKey";
 
 // setup zxcvbn

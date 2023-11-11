@@ -25,8 +25,8 @@ import {
   runUserChainQuery,
   useWorkspaceInvitationQuery,
 } from "../../../generated/graphql";
+import { getMainDevice } from "../../../store/mainDeviceMemoryStore";
 import { RootStackScreenProps } from "../../../types/navigationProps";
-import { getMainDevice } from "../../../utils/device/mainDeviceMemoryStore";
 import { acceptWorkspaceInvitation } from "../../../utils/workspace/acceptWorkspaceInvitation";
 
 const Wrapper = ({ children }) => (

@@ -8,8 +8,13 @@ const userDataPath = electron.app.getPath("userData");
 const sqliteDbPath = path.join(userDataPath, "serenity.encrypted.db");
 const sqliteDbKeyAndNoncePath = path.join(
   userDataPath,
-  "serenity.encrypted-key-and-nonce.txt"
+  "serenity.db-key-and-nonce.txt"
 );
+const sessionKeyPath = path.join(
+  userDataPath,
+  "serenity.encrypted-session-key.txt"
+);
+const devicePath = path.join(userDataPath, "serenity.encrypted-device.txt");
 
 console.log("Serenity sqlite DbPath:", sqliteDbPath);
 
@@ -194,10 +199,74 @@ app.on("ready", () => {
     return electron.safeStorage.isEncryptionAvailable();
   });
 
+  ipcMain.handle("safeStorage:setSessionKey", async (event, keys) => {
+    try {
+      if (electron.safeStorage.isEncryptionAvailable()) {
+        const encryptedKey = electron.safeStorage.encryptString(keys);
+        await fsWriteFile(sessionKeyPath, encryptedKey);
+        return true;
+      }
+      return false;
+    } catch (err) {
+      return false;
+    }
+  });
+
+  ipcMain.handle("safeStorage:getSessionKey", async (event) => {
+    try {
+      const encryptedKey = await fsReadFile(sessionKeyPath);
+      if (!encryptedKey) throw new Error("No sessionKey");
+      return electron.safeStorage.decryptString(encryptedKey);
+    } catch (err) {
+      return undefined;
+    }
+  });
+
+  ipcMain.handle("safeStorage:deleteSessionKey", async (event) => {
+    try {
+      await fs.unlink(sessionKeyPath);
+      return true;
+    } catch (err) {
+      return false;
+    }
+  });
+
+  ipcMain.handle("safeStorage:setDevice", async (event, keys) => {
+    try {
+      if (electron.safeStorage.isEncryptionAvailable()) {
+        const encryptedDevice = electron.safeStorage.encryptString(keys);
+        await fsWriteFile(devicePath, encryptedDevice);
+        return true;
+      }
+      return false;
+    } catch (err) {
+      return false;
+    }
+  });
+
+  ipcMain.handle("safeStorage:getDevice", async (event) => {
+    try {
+      const encryptedDevice = await fsReadFile(devicePath);
+      if (!encryptedDevice) throw new Error("No Device");
+      return electron.safeStorage.decryptString(encryptedDevice);
+    } catch (err) {
+      return undefined;
+    }
+  });
+
+  ipcMain.handle("safeStorage:deleteDevice", async (event) => {
+    try {
+      await fs.unlink(devicePath);
+      return true;
+    } catch (err) {
+      return false;
+    }
+  });
+
   createWindow();
 });
 
-// wuit when all windows are closed, except on macOS. There, it's common
+// quit when all windows are closed, except on macOS. There, it's common
 // for applications and their menu bar to stay active until the user quits
 // explicitly with Cmd + Q
 app.on("window-all-closed", () => {

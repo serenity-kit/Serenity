@@ -18,6 +18,12 @@ import {
   runWorkspaceInvitationQuery,
   useVerifyRegistrationMutation,
 } from "../../../generated/graphql";
+import { setDevice } from "../../../store/deviceStore/deviceStore";
+import { getMainDevice } from "../../../store/mainDeviceMemoryStore";
+import {
+  persistWebDeviceAccess,
+  removeWebDeviceAccess,
+} from "../../../store/webDeviceStore";
 import { RootStackScreenProps } from "../../../types/navigationProps";
 import {
   login,
@@ -28,12 +34,6 @@ import {
   getRegistrationInfo,
   isRegistrationInfoStored,
 } from "../../../utils/authentication/registrationMemoryStore";
-import { setDevice } from "../../../utils/device/deviceStore";
-import { getMainDevice } from "../../../utils/device/mainDeviceMemoryStore";
-import {
-  persistWebDeviceAccess,
-  removeWebDeviceAccess,
-} from "../../../utils/device/webDeviceStore";
 import { acceptWorkspaceInvitation } from "../../../utils/workspace/acceptWorkspaceInvitation";
 import { attachDeviceToWorkspaces } from "../../../utils/workspace/attachDeviceToWorkspaces";
 import { getPendingWorkspaceInvitation } from "../../../utils/workspace/getPendingWorkspaceInvitation";
