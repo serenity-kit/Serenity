@@ -22,11 +22,11 @@ import {
 import { useMachine } from "@xstate/react";
 import { HStack } from "native-base";
 import { useState } from "react";
-import { Platform } from "react-native";
 import { useAppContext } from "../../context/AppContext";
 import { initiateLogout } from "../../navigation/screens/logoutInProgressScreen/LogoutInProgressScreen";
 import { getMainDevice } from "../../store/mainDeviceMemoryStore";
 import * as workspaceStore from "../../store/workspaceStore";
+import { OS } from "../../utils/platform/platform";
 import { VerifyPasswordModal } from "../verifyPasswordModal/VerifyPasswordModal";
 import { accountMenuMachine } from "./accountMenuMachine";
 
@@ -174,7 +174,7 @@ export default function AccountMenu({
           to={{ screen: "AccountSettings" }}
           onPress={(event) => {
             send("CLOSE");
-            if (Platform.OS === "ios") {
+            if (OS === "ios") {
               event.preventDefault();
               navigation.navigate("AccountSettings");
             }

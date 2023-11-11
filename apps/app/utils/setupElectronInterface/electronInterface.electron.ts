@@ -55,9 +55,16 @@ export const setDevice = async (device: LocalDevice) => {
 
 export const getDevice = async () => {
   const deviceString = await window.serenityElectron.getDevice();
+  if (!deviceString) {
+    return null;
+  }
   return JSON.parse(deviceString) as LocalDevice;
 };
 
 export const deleteDevice = async () => {
   return await window.serenityElectron.deleteDevice();
+};
+
+export const isElectron = () => {
+  return true;
 };

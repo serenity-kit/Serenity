@@ -1,6 +1,7 @@
 import { BoxShadow, tw, View } from "@serenity-tools/ui";
 import { useLayoutEffect, useRef } from "react";
-import { Platform, useWindowDimensions } from "react-native";
+import { useWindowDimensions } from "react-native";
+import { OS } from "../../utils/platform/platform";
 
 type Props = {
   navigation: any;
@@ -13,7 +14,7 @@ export default function NavigationDrawerModal(props: Props) {
   const contentRef = useRef<null>(null);
 
   useLayoutEffect(() => {
-    if (Platform.OS === "web") {
+    if (OS === "web" || OS === "electron") {
       const modalGroup =
         // @ts-ignore
         wrapperRef.current?.parentNode?.parentNode?.parentNode || null;
@@ -55,7 +56,7 @@ export default function NavigationDrawerModal(props: Props) {
     }
   });
 
-  if (Platform.OS === "web") {
+  if (OS === "web" || OS === "electron") {
     return (
       <View
         ref={wrapperRef}

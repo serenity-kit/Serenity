@@ -2,7 +2,6 @@ import * as userChain from "@serenity-kit/user-chain";
 import * as workspaceMemberDevicesProofUtil from "@serenity-kit/workspace-member-devices-proof";
 import { decryptMainDevice } from "@serenity-tools/common";
 import { addDays, addHours } from "date-fns";
-import { Platform } from "react-native";
 import sodium from "react-native-libsodium";
 import { client } from "react-native-opaque";
 import { UpdateAuthenticationFunction } from "../../context/AppContext";
@@ -18,16 +17,20 @@ import {
   loadRemoteWorkspaceChain,
 } from "../../store/workspaceChainStore";
 import { getOpaqueServerPublicKey } from "../getOpaqueServerPublicKey/getOpaqueServerPublicKey";
+import { OS } from "../platform/platform";
 import { createDeviceWithInfo } from "./createDeviceWithInfo";
 
 export const getDeviceType = (useExtendedLogin: boolean) => {
-  if (Platform.OS === "ios" || Platform.OS === "android") {
+  if (OS === "electron") {
+    return "desktop";
+  }
+  if (OS === "ios" || OS === "android") {
     return "mobile";
   }
-  if (Platform.OS === "web") {
+  if (OS === "web") {
     return useExtendedLogin ? "web" : "temporary-web";
   }
-  throw new Error(`Unsupported platform: ${Platform.OS}`);
+  throw new Error(`Unsupported platform: ${OS}`);
 };
 
 export type LoginParams = {
@@ -218,6 +221,8 @@ export const login = async ({
       serializedWorkspaceMemberDevicesProof: JSON.stringify(newProof),
     });
   }
+
+  console.log("WWWWOOO", result.sessionKey);
 
   const addDeviceResult = await runAddDeviceMutation(
     {

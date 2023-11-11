@@ -7,7 +7,7 @@ import {
   Text,
 } from "@serenity-tools/ui";
 import { useEffect, useState } from "react";
-import { Platform, useWindowDimensions } from "react-native";
+import { useWindowDimensions } from "react-native";
 import { z } from "zod";
 import { useAppContext } from "../../context/AppContext";
 import { setDevice } from "../../store/deviceStore/deviceStore";
@@ -17,6 +17,7 @@ import {
 } from "../../store/webDeviceStore";
 import { clearDeviceAndSessionStores } from "../../utils/authentication/clearDeviceAndSessionStores";
 import { login } from "../../utils/authentication/loginHelper";
+import { OS } from "../../utils/platform/platform";
 import { attachDeviceToWorkspaces } from "../../utils/workspace/attachDeviceToWorkspaces";
 
 type Props = {
@@ -74,7 +75,7 @@ export function LoginForm(props: Props) {
       });
       const unsavedDevice = loginResult.device;
       // reset the password in case the user ends up on this screen again
-      if (Platform.OS === "web") {
+      if (OS === "web") {
         await removeWebDeviceAccess();
         // should always be available in this case
         if (loginResult.webDeviceAccessToken && loginResult.webDeviceKey) {
@@ -84,7 +85,7 @@ export function LoginForm(props: Props) {
           });
         }
         await updateActiveDevice();
-      } else if (Platform.OS === "ios") {
+      } else if (OS === "ios" || OS === "electron") {
         if (useExtendedLogin) {
           await setDevice(unsavedDevice);
           await updateActiveDevice();
@@ -140,7 +141,7 @@ export function LoginForm(props: Props) {
         }}
         placeholder="Enter your password …"
       />
-      {Platform.OS === "web" && (
+      {OS === "web" && (
         <Checkbox
           value={"useExtendedLogin"}
           isChecked={useExtendedLogin}

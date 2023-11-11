@@ -5,7 +5,6 @@ import { runEncryptedWebDeviceQuery } from "../generated/graphql";
 
 export const webDeviceKeyId = "webDevice.key";
 export const webDeviceAccessTokenId = "webDevice.accessToken";
-export const webDeviceExpirationId = "webDevice.refreshToken";
 
 type Params = {
   key: string;

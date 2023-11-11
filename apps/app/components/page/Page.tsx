@@ -22,7 +22,6 @@ import {
   useHasEditorSidebar,
 } from "@serenity-tools/ui";
 import { useEffect, useRef, useState } from "react";
-import { Platform } from "react-native";
 import sodium, { KeyPair } from "react-native-libsodium";
 import { Awareness } from "y-protocols/awareness";
 import * as Yjs from "yjs";
@@ -54,6 +53,7 @@ import { getDocument } from "../../utils/document/getDocument";
 import { updateDocumentName } from "../../utils/document/updateDocumentName";
 import { useEditorStore } from "../../utils/editorStore/editorStore";
 import { getEnvironmentUrls } from "../../utils/getEnvironmentUrls/getEnvironmentUrls";
+import { OS } from "../../utils/platform/platform";
 import { showToast } from "../../utils/toast/showToast";
 import { getWorkspace } from "../../utils/workspace/getWorkspace";
 import { PageLoadingError } from "./PageLoadingError";
@@ -426,8 +426,7 @@ export default function Page({
       (state.matches("connecting") && state.context._websocketRetries > 1)
     ) {
       if (syncState.variant === "online") {
-        // TODO check for desktop app since there changes will also be stored locally
-        if (Platform.OS === "web") {
+        if (OS === "web") {
           showToast(
             "You went offline. Your pending changes will be lost unless you reconnect.",
             "error",

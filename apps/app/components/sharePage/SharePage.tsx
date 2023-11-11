@@ -18,7 +18,6 @@ import {
   useHasEditorSidebar,
 } from "@serenity-tools/ui";
 import { useEffect, useRef, useState } from "react";
-import { Platform } from "react-native";
 import sodium, { KeyPair } from "react-native-libsodium";
 import { Awareness } from "y-protocols/awareness";
 import * as Yjs from "yjs";
@@ -29,6 +28,7 @@ import { DocumentState } from "../../types/documentState";
 import { SharePageDrawerScreenProps } from "../../types/navigationProps";
 import { useEditorStore } from "../../utils/editorStore/editorStore";
 import { getEnvironmentUrls } from "../../utils/getEnvironmentUrls/getEnvironmentUrls";
+import { OS } from "../../utils/platform/platform";
 import { showToast } from "../../utils/toast/showToast";
 import { PageLoadingError } from "../page/PageLoadingError";
 import { PageNoAccessError } from "../page/PageNoAccessError";
@@ -194,8 +194,7 @@ export const SharePage: React.FC<Props> = ({
       (state.matches("connecting") && state.context._websocketRetries > 1)
     ) {
       if (syncState.variant === "online") {
-        // TODO check for desktop app since there changes will also be stored locally
-        if (Platform.OS === "web") {
+        if (OS === "web") {
           showToast(
             "You went offline. Your pending changes will be lost unless you reconnect.",
             "error",

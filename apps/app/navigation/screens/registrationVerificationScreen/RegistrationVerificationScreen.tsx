@@ -11,7 +11,6 @@ import {
   View,
 } from "@serenity-tools/ui";
 import { useState } from "react";
-import { Platform } from "react-native";
 import { OnboardingScreenWrapper } from "../../../components/onboardingScreenWrapper/OnboardingScreenWrapper";
 import { useAppContext } from "../../../context/AppContext";
 import {
@@ -34,6 +33,7 @@ import {
   getRegistrationInfo,
   isRegistrationInfoStored,
 } from "../../../utils/authentication/registrationMemoryStore";
+import { OS } from "../../../utils/platform/platform";
 import { acceptWorkspaceInvitation } from "../../../utils/workspace/acceptWorkspaceInvitation";
 import { attachDeviceToWorkspaces } from "../../../utils/workspace/attachDeviceToWorkspaces";
 import { getPendingWorkspaceInvitation } from "../../../utils/workspace/getPendingWorkspaceInvitation";
@@ -136,7 +136,7 @@ export default function RegistrationVerificationScreen(
         useExtendedLogin,
       });
 
-      if (Platform.OS === "web") {
+      if (OS === "web") {
         await removeWebDeviceAccess();
         // should always be available in this case
         if (loginResult.webDeviceAccessToken && loginResult.webDeviceKey) {
@@ -146,7 +146,7 @@ export default function RegistrationVerificationScreen(
           });
         }
         await updateActiveDevice();
-      } else if (Platform.OS === "ios") {
+      } else if (OS === "ios" || OS === "electron") {
         if (useExtendedLogin) {
           await setDevice(loginResult.device);
           await updateActiveDevice();

@@ -31,7 +31,7 @@ import {
 } from "@serenity-tools/ui";
 import { HStack } from "native-base";
 import { useEffect, useState } from "react";
-import { ActivityIndicator, Platform, StyleSheet } from "react-native";
+import { ActivityIndicator, StyleSheet } from "react-native";
 import sodium, { KeyPair } from "react-native-libsodium";
 import {
   runCreateDocumentMutation,
@@ -52,6 +52,7 @@ import { useDocumentTitleStore } from "../../utils/document/documentTitleStore";
 import { createFolderKeyDerivationTrace } from "../../utils/folder/createFolderKeyDerivationTrace";
 import { useFolderKeyStore } from "../../utils/folder/folderKeyStore";
 import { useOpenFolderStore } from "../../utils/folder/openFolderStore";
+import { OS } from "../../utils/platform/platform";
 import { getWorkspace } from "../../utils/workspace/getWorkspace";
 import { retrieveWorkspaceKey } from "../../utils/workspace/retrieveWorkspaceKey";
 import SidebarFolderMenu from "../sidebarFolderMenu/SidebarFolderMenu";
@@ -522,7 +523,8 @@ export default function SidebarFolder(props: Props) {
   const styles = StyleSheet.create({
     folder: tw``,
     hover: tw`bg-gray-200`,
-    focusVisible: Platform.OS === "web" ? tw`se-inset-focus-mini` : {},
+    focusVisible:
+      OS === "web" || OS === "electron" ? tw`se-inset-focus-mini` : {},
   });
 
   const maxWidthBase = isDesktopDevice ? 32 : 42;
