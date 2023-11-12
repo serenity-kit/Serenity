@@ -34,6 +34,7 @@ const setup = async () => {
     creatorDeviceSigningPrivateKey: userData1.webDevice.signingPrivateKey,
     creatorDeviceEncryptionPrivateKey: userData1.webDevice.encryptionPrivateKey,
     authorizationHeader: userData1.sessionKey,
+    documentId: userData1.document.id,
   });
   comment1 = comment1Result.createComment.comment;
   const comment2Result = await createComment({
@@ -45,6 +46,7 @@ const setup = async () => {
     creatorDeviceSigningPrivateKey: userData1.webDevice.signingPrivateKey,
     creatorDeviceEncryptionPrivateKey: userData1.webDevice.encryptionPrivateKey,
     authorizationHeader: userData1.sessionKey,
+    documentId: userData1.document.id,
   });
   comment2 = comment2Result.createComment.comment;
 };

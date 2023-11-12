@@ -57,6 +57,7 @@ test("commenter deletes own comment", async () => {
     creatorDeviceSigningPrivateKey: userData1.webDevice.signingPrivateKey,
     creatorDeviceEncryptionPrivateKey: userData1.webDevice.encryptionPrivateKey,
     authorizationHeader: userData1.sessionKey,
+    documentId: userData1.document.id,
   });
   const comment = commentResult.createComment.comment;
   const numCommentsBeforeDelete = await prisma.comment.count({
@@ -94,6 +95,7 @@ test("admin deletes comment", async () => {
     creatorDeviceSigningPrivateKey: userData2.webDevice.signingPrivateKey,
     creatorDeviceEncryptionPrivateKey: userData2.webDevice.encryptionPrivateKey,
     authorizationHeader: userData2.sessionKey,
+    documentId: userData1.document.id,
   });
   const comment = commentResult.createComment.comment;
   const numCommentsBeforeDelete = await prisma.comment.count({
@@ -131,6 +133,7 @@ test("editor deletes comment", async () => {
     creatorDeviceSigningPrivateKey: userData2.webDevice.signingPrivateKey,
     creatorDeviceEncryptionPrivateKey: userData2.webDevice.encryptionPrivateKey,
     authorizationHeader: userData2.sessionKey,
+    documentId: userData1.document.id,
   });
   const comment = commentResult.createComment.comment;
   const numCommentsBeforeDelete = await prisma.comment.count({
@@ -168,6 +171,7 @@ test("commentor tries to delete other comment", async () => {
     creatorDeviceSigningPrivateKey: userData2.webDevice.signingPrivateKey,
     creatorDeviceEncryptionPrivateKey: userData2.webDevice.encryptionPrivateKey,
     authorizationHeader: userData2.sessionKey,
+    documentId: userData1.document.id,
   });
   const comment = commentResult.createComment.comment;
   await expect(
@@ -199,6 +203,7 @@ test("viewer tries to delete other comment", async () => {
     creatorDeviceSigningPrivateKey: userData2.webDevice.signingPrivateKey,
     creatorDeviceEncryptionPrivateKey: userData2.webDevice.encryptionPrivateKey,
     authorizationHeader: userData2.sessionKey,
+    documentId: userData1.document.id,
   });
   const comment = commentResult.createComment.comment;
   await expect(
@@ -231,6 +236,7 @@ test("delete some comments", async () => {
     creatorDeviceSigningPrivateKey: userData2.webDevice.signingPrivateKey,
     creatorDeviceEncryptionPrivateKey: userData2.webDevice.encryptionPrivateKey,
     authorizationHeader: userData2.sessionKey,
+    documentId: userData1.document.id,
   });
   const comment = commentResult.createComment.comment;
   const numCommentsBeforeDelete = await prisma.comment.count({
@@ -260,6 +266,7 @@ test("editor share token", async () => {
     creatorDeviceSigningPrivateKey: userData1.webDevice.signingPrivateKey,
     creatorDeviceEncryptionPrivateKey: userData1.webDevice.encryptionPrivateKey,
     authorizationHeader: userData1.sessionKey,
+    documentId: userData1.document.id,
   });
   const comment = commentResult.createComment.comment;
   const userData2 = await createUserWithWorkspace({
@@ -303,6 +310,7 @@ test("commenter share token", async () => {
     creatorDeviceSigningPrivateKey: userData1.webDevice.signingPrivateKey,
     creatorDeviceEncryptionPrivateKey: userData1.webDevice.encryptionPrivateKey,
     authorizationHeader: userData1.sessionKey,
+    documentId: userData1.document.id,
   });
   const comment = commentResult.createComment.comment;
   const userData2 = await createUserWithWorkspace({
@@ -342,6 +350,7 @@ test("viewer share token can't delete", async () => {
     creatorDeviceSigningPrivateKey: userData1.webDevice.signingPrivateKey,
     creatorDeviceEncryptionPrivateKey: userData1.webDevice.encryptionPrivateKey,
     authorizationHeader: userData1.sessionKey,
+    documentId: userData1.document.id,
   });
   const comment = commentResult.createComment.comment;
   const userData2 = await createUserWithWorkspace({
@@ -381,6 +390,7 @@ test("can't delete comments on outside document", async () => {
     creatorDeviceSigningPrivateKey: userData2.webDevice.signingPrivateKey,
     creatorDeviceEncryptionPrivateKey: userData2.webDevice.encryptionPrivateKey,
     authorizationHeader: userData2.sessionKey,
+    documentId: userData1.document.id,
   });
   await prisma.usersToWorkspaces.deleteMany({
     where: {

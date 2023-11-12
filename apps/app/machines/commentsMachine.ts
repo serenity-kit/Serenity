@@ -1,17 +1,20 @@
 import {
-  createCommentKey,
-  decryptComment,
   Device,
-  encryptComment,
   LocalDevice,
+  createCommentKey,
+  encryptAndSignComment,
+  encryptAndSignCommentReply,
+  notNull,
   recreateCommentKey,
+  verifyAndDecryptComment,
+  verifyAndDecryptCommentReply,
 } from "@serenity-tools/common";
 import { AnyActorRef, assign, createMachine, spawn } from "xstate";
 import {
   CommentsByDocumentIdQueryResult,
-  commentsByDocumentIdQueryService,
   CommentsByDocumentIdQueryServiceEvent,
   CommentsByDocumentIdQueryUpdateResultEvent,
+  commentsByDocumentIdQueryService,
   runCreateCommentMutation,
   runCreateCommentReplyMutation,
   runDeleteCommentRepliesMutation,
@@ -36,8 +39,8 @@ export type DecryptedReply = {
 export type DecryptedComment = {
   id: string;
   text: string;
-  from: number;
-  to: number;
+  from: any;
+  to: any;
   replies: DecryptedReply[];
   createdAt: string;
   creatorDevice: Device;
@@ -125,7 +128,7 @@ export const commentsMachine =
                 commentsByDocumentIdQueryResult: event.result,
               };
             }),
-            "decryptComments",
+            "verifyAndDecryptComments",
           ],
         },
         "CommentsByDocumentIdQuery.ERROR": {
@@ -341,6 +344,7 @@ export const commentsMachine =
           };
         }),
         clearReplyText: assign((context, event: any) => {
+          console.log(event.data.data);
           if (event.data.data.createCommentReply.commentReply.commentId) {
             return {
               replyTexts: {
@@ -358,55 +362,80 @@ export const commentsMachine =
             commentKeys: event.commentKeys,
           };
         }),
-        decryptComments: assign((context, event) => {
+        verifyAndDecryptComments: assign((context, event) => {
           const activeSnapshot = context.activeSnapshot;
           if (!activeSnapshot) return {};
 
+          if (
+            !context.commentsByDocumentIdQueryResult?.data?.commentsByDocumentId
+              ?.nodes
+          )
+            return {
+              decryptedComments: [],
+            };
+
           const decryptedComments =
-            context.commentsByDocumentIdQueryResult?.data?.commentsByDocumentId?.nodes?.map(
-              (encryptedComment) => {
+            context.commentsByDocumentIdQueryResult.data.commentsByDocumentId.nodes
+              .filter(notNull)
+              .map((encryptedComment) => {
                 const commentKey = recreateCommentKey({
                   snapshotKey: activeSnapshot.key,
-                  subkeyId: encryptedComment?.subkeyId!,
+                  subkeyId: encryptedComment.subkeyId,
                 });
 
-                const decryptedComment = decryptComment({
+                const decryptedComment = verifyAndDecryptComment({
+                  commentId: encryptedComment.id,
                   key: commentKey.key,
-                  ciphertext: encryptedComment!.contentCiphertext,
-                  publicNonce: encryptedComment!.contentNonce,
+                  ciphertext: encryptedComment.contentCiphertext,
+                  nonce: encryptedComment.contentNonce,
+                  authorSigningPublicKey:
+                    encryptedComment.creatorDevice.signingPublicKey,
+                  documentId: context.params.pageId,
+                  signature: encryptedComment.signature,
+                  snapshotId: encryptedComment.snapshotId,
+                  subkeyId: encryptedComment.subkeyId,
                 });
 
-                const replies = encryptedComment?.commentReplies?.map(
-                  (encryptedReply) => {
-                    const replyKey = recreateCommentKey({
-                      snapshotKey: activeSnapshot.key,
-                      subkeyId: encryptedReply?.subkeyId!,
-                    });
+                const replies = encryptedComment.commentReplies
+                  ? encryptedComment.commentReplies
+                      .filter(notNull)
+                      .map((encryptedReply) => {
+                        const replyKey = recreateCommentKey({
+                          snapshotKey: activeSnapshot.key,
+                          subkeyId: encryptedReply.subkeyId,
+                        });
 
-                    const decryptedReply = decryptComment({
-                      key: replyKey.key,
-                      ciphertext: encryptedReply!.contentCiphertext,
-                      publicNonce: encryptedReply!.contentNonce,
-                    });
+                        const decryptedReply = verifyAndDecryptCommentReply({
+                          key: replyKey.key,
+                          ciphertext: encryptedReply.contentCiphertext,
+                          nonce: encryptedReply.contentNonce,
+                          commentId: encryptedComment.id,
+                          commentReplyId: encryptedReply.id,
+                          authorSigningPublicKey:
+                            encryptedReply.creatorDevice.signingPublicKey,
+                          documentId: context.params.pageId,
+                          signature: encryptedReply.signature,
+                          snapshotId: encryptedReply.snapshotId,
+                          subkeyId: encryptedReply.subkeyId,
+                        });
 
-                    return {
-                      ...JSON.parse(decryptedReply),
-                      id: encryptedReply!.id,
-                      createdAt: encryptedReply!.createdAt,
-                      creatorDevice: encryptedReply!.creatorDevice,
-                    };
-                  }
-                );
+                        return {
+                          ...decryptedReply,
+                          id: encryptedReply.id,
+                          createdAt: encryptedReply.createdAt,
+                          creatorDevice: encryptedReply.creatorDevice,
+                        };
+                      })
+                  : [];
 
                 return {
-                  ...JSON.parse(decryptedComment),
-                  id: encryptedComment!.id,
-                  createdAt: encryptedComment!.createdAt,
+                  ...decryptedComment,
+                  id: encryptedComment.id,
+                  createdAt: encryptedComment.createdAt,
                   replies,
-                  creatorDevice: encryptedComment!.creatorDevice,
+                  creatorDevice: encryptedComment.creatorDevice,
                 };
-              }
-            );
+              });
 
           return {
             decryptedComments,
@@ -417,42 +446,57 @@ export const commentsMachine =
         createComment: async (context, event) => {
           const activeSnapshot = context.activeSnapshot;
           if (!activeSnapshot) return undefined;
+          const activeDevice = context.params.activeDevice;
+          if (!activeDevice) {
+            throw new Error("No active device.");
+          }
 
           const commentKey = createCommentKey({
             snapshotKey: activeSnapshot.key,
           });
 
-          const result = encryptComment({
+          const result = encryptAndSignComment({
             key: commentKey.key,
-            comment: JSON.stringify({
-              text: event.text,
-              from: event.from,
-              to: event.to,
-            }),
+            text: event.text,
+            from: event.from,
+            to: event.to,
+            device: activeDevice,
+            documentId: context.params.pageId,
+            snapshotId: activeSnapshot.id,
+            subkeyId: commentKey.subkeyId,
           });
 
           return await runCreateCommentMutation({
             input: {
+              commentId: result.commentId,
               snapshotId: activeSnapshot.id,
               subkeyId: commentKey.subkeyId,
               contentCiphertext: result.ciphertext,
-              contentNonce: result.publicNonce,
+              contentNonce: result.nonce,
+              signature: result.signature,
             },
           });
         },
         createReply: async (context, event) => {
           const activeSnapshot = context.activeSnapshot;
           if (!activeSnapshot) return undefined;
+          const activeDevice = context.params.activeDevice;
+          if (!activeDevice) {
+            throw new Error("No active device.");
+          }
 
           const replyKey = createCommentKey({
             snapshotKey: activeSnapshot.key,
           });
 
-          const result = encryptComment({
+          const result = encryptAndSignCommentReply({
             key: replyKey.key,
-            comment: JSON.stringify({
-              text: context.replyTexts[event.commentId],
-            }),
+            commentId: event.commentId,
+            text: context.replyTexts[event.commentId],
+            device: activeDevice,
+            documentId: context.params.pageId,
+            snapshotId: activeSnapshot.id,
+            subkeyId: replyKey.subkeyId,
           });
           return await runCreateCommentReplyMutation({
             input: {
@@ -460,7 +504,9 @@ export const commentsMachine =
               subkeyId: replyKey.subkeyId,
               commentId: event.commentId,
               contentCiphertext: result.ciphertext,
-              contentNonce: result.publicNonce,
+              contentNonce: result.nonce,
+              commentReplyId: result.commentReplyId,
+              signature: result.signature,
             },
           });
         },
