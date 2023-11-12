@@ -13,11 +13,12 @@ import {
 } from "@serenity-tools/ui";
 import { HStack } from "native-base";
 import { useEffect, useState } from "react";
-import { Platform, StyleSheet } from "react-native";
+import { StyleSheet } from "react-native";
 import { runSnapshotQuery, useDocumentQuery } from "../../generated/graphql";
 import { useAuthenticatedAppContext } from "../../hooks/useAuthenticatedAppContext";
 import { useDocumentTitleStore } from "../../utils/document/documentTitleStore";
 import { updateDocumentName } from "../../utils/document/updateDocumentName";
+import { OS } from "../../utils/platform/platform";
 import { getWorkspace } from "../../utils/workspace/getWorkspace";
 import SidebarPageMenu from "../sidebarPageMenu/SidebarPageMenu";
 
@@ -168,7 +169,8 @@ export default function SidebarPage(props: Props) {
   const styles = StyleSheet.create({
     page: tw``,
     hover: tw`bg-gray-200`,
-    focusVisible: Platform.OS === "web" ? tw`se-inset-focus-mini` : {},
+    focusVisible:
+      OS === "web" || OS === "electron" ? tw`se-inset-focus-mini` : {},
   });
 
   const maxWidthBase = isDesktopDevice ? 32 : 44;

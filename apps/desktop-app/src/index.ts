@@ -26,6 +26,7 @@ const { app, BrowserWindow, ipcMain } = electron;
 const fsStat = promisify(fs.stat);
 const fsWriteFile = promisify(fs.writeFile);
 const fsReadFile = promisify(fs.readFile);
+const fsUnlink = promisify(fs.unlink);
 const scheme = "serenity-desktop";
 const root = "app";
 
@@ -117,7 +118,7 @@ app.on("ready", () => {
         let key = new Uint8Array();
         let nonce = new Uint8Array();
         try {
-          await fs.unlink(sqliteDbPath);
+          await fsUnlink(sqliteDbPath);
           const encryptedKeyAndNonce = await fsReadFile(
             sqliteDbKeyAndNoncePath
           );
@@ -186,8 +187,8 @@ app.on("ready", () => {
   ipcMain.handle("sqlite:deletePersistedDatabase", async (event) => {
     try {
       await Promise.all([
-        fs.unlink(sqliteDbKeyAndNoncePath),
-        fs.unlink(sqliteDbPath),
+        fsUnlink(sqliteDbKeyAndNoncePath),
+        fsUnlink(sqliteDbPath),
       ]);
       return true;
     } catch (err) {
@@ -224,7 +225,7 @@ app.on("ready", () => {
 
   ipcMain.handle("safeStorage:deleteSessionKey", async (event) => {
     try {
-      await fs.unlink(sessionKeyPath);
+      await fsUnlink(sessionKeyPath);
       return true;
     } catch (err) {
       return false;
@@ -256,7 +257,7 @@ app.on("ready", () => {
 
   ipcMain.handle("safeStorage:deleteDevice", async (event) => {
     try {
-      await fs.unlink(devicePath);
+      await fsUnlink(devicePath);
       return true;
     } catch (err) {
       return false;

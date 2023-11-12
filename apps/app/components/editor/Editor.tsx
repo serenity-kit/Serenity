@@ -233,7 +233,7 @@ export default function Editor({
 
   // useEffect(() => {
   //   const initEditor = async () => {
-  //     if (Platform.OS === "android") {
+  //     if (OS === "android") {
   //       editorSource = await loadEditorSourceForAndroid();
   //     }
   //   };

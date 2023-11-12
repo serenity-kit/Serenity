@@ -1,12 +1,13 @@
 import { LocalDevice } from "@serenity-tools/common";
-import * as electronInterface from "../../utils/setupElectronInterface/setupElectronInterface.electron";
+import * as electronInterface from "../../utils/setupElectronInterface/electronInterface.electron";
 
 export const setDevice = async (device: LocalDevice) => {
   return electronInterface.setDevice(device);
 };
 
 export const getDevice = async (): Promise<LocalDevice | null> => {
-  return electronInterface.getDevice();
+  const device = await electronInterface.getDevice();
+  return device;
 };
 
 export const removeDevice = async (): Promise<void> => {

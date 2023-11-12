@@ -8,6 +8,10 @@ import { createSqlTables } from "../store/createSqlTables";
 import * as SessionKeyStore from "../store/sessionKeyStore/sessionKeyStore";
 import { getSessionKey } from "../store/sessionKeyStore/sessionKeyStore";
 import { getActiveDevice } from "../utils/device/getActiveDevice";
+import {
+  isElectron,
+  isSafeStorageAvailable,
+} from "../utils/setupElectronInterface/electronInterface";
 import { getUrqlClient, recreateClient } from "../utils/urqlClient/urqlClient";
 
 export default function useCachedResources() {
@@ -19,6 +23,8 @@ export default function useCachedResources() {
   // Load any resources or data that we need prior to rendering the app
   useEffect(() => {
     async function loadResourcesAndDataAsync() {
+      let isElectronAndHasNoSafeStorage = false;
+
       try {
         SplashScreen.preventAutoHideAsync();
         const result = await Promise.all([
@@ -29,16 +35,28 @@ export default function useCachedResources() {
             "space-mono": require("../assets/fonts/SpaceMono-Regular.ttf"),
           }),
           createSqlTables(),
+          isSafeStorageAvailable(),
         ]);
         setActiveDevice(result[0]);
+
+        if (isElectron() && !result[4]) {
+          isElectronAndHasNoSafeStorage = true;
+        }
+
         const sessionKey = await getSessionKey();
         setSessionKey(sessionKey);
       } catch (e) {
         // We might want to provide this error information to an error reporting service
         console.warn(e);
       } finally {
-        setLoadingComplete(true);
-        SplashScreen.hideAsync();
+        if (!isElectronAndHasNoSafeStorage) {
+          setLoadingComplete(true);
+          SplashScreen.hideAsync();
+        } else {
+          alert(
+            "Encrypted storage is not available on your operating system.\n\nPlease contact support or try a different OS."
+          );
+        }
       }
     }
 

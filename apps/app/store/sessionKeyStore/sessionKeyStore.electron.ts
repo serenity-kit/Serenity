@@ -1,11 +1,12 @@
-import * as electronInterface from "../../utils/setupElectronInterface/setupElectronInterface.electron";
+import * as electronInterface from "../../utils/setupElectronInterface/electronInterface.electron";
 
 export const setSessionKey = async (sessionKey: string) => {
   return electronInterface.setSessionKey(sessionKey);
 };
 
 export const getSessionKey = async (): Promise<string | null> => {
-  return electronInterface.getSessionKey();
+  const sessionKey = await electronInterface.getSessionKey();
+  return sessionKey;
 };
 
 export const deleteSessionKey = async () => {

@@ -14,6 +14,7 @@ export const DeviceType = z.union([
   z.literal("temporary-web"),
   z.literal("web"),
   z.literal("mobile"),
+  z.literal("desktop"),
 ]);
 
 export type DeviceType = z.infer<typeof DeviceType>;

@@ -1,5 +1,5 @@
 import { debounce } from "@serenity-tools/common";
-import * as electronInterface from "../../utils/setupElectronInterface/setupElectronInterface.electron";
+import * as electronInterface from "../../utils/setupElectronInterface/electronInterface.electron";
 import * as sqlWeb from "./sql.web";
 
 export const ready = async () => {
@@ -8,7 +8,6 @@ export const ready = async () => {
 
   const isSafeStorageAvailable =
     await electronInterface.isSafeStorageAvailable();
-  console.log("isSafeStorageAvailable", isSafeStorageAvailable);
   if (!isSafeStorageAvailable) {
     return;
   }
