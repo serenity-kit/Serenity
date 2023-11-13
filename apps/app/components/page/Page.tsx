@@ -115,6 +115,11 @@ export default function Page({
   let activeSnapshotWorkspaceMemberDevicesProofEntryRef =
     useRef<WorkspaceMemberDevicesProofLocalDbEntry>();
 
+  const cachedSnapshotKeyDataRef = useRef<{
+    snapshotId: string;
+    key: Uint8Array;
+  } | null>(null);
+
   const { websocketOrigin } = getEnvironmentUrls();
 
   const [state, , , yAwareness] = useYjsSync({
@@ -239,6 +244,14 @@ export default function Page({
           "SnapshotProofInfo not provided when trying to derive a new key"
         );
       }
+      // return cached result to avoid performance hit
+      if (
+        cachedSnapshotKeyDataRef.current &&
+        cachedSnapshotKeyDataRef.current.snapshotId ===
+          snapshotProofInfo.snapshotId
+      ) {
+        return cachedSnapshotKeyDataRef.current.key;
+      }
 
       activeSnapshotWorkspaceMemberDevicesProofEntryRef.current =
         await getLocalOrLoadRemoteWorkspaceMemberDevicesProofQueryByHash({
@@ -293,6 +306,10 @@ export default function Page({
         {}
       );
 
+      cachedSnapshotKeyDataRef.current = {
+        snapshotId: snapshotProofInfo.snapshotId,
+        key,
+      };
       return key;
     },
     shouldSendSnapshot: ({ snapshotUpdatesCount }) => {

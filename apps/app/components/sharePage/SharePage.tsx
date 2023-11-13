@@ -75,6 +75,11 @@ export const SharePage: React.FC<Props> = ({
   let activeSnapshotDocumentChainStateRef =
     useRef<documentChain.DocumentChainState>();
 
+  const cachedSnapshotKeyDataRef = useRef<{
+    snapshotId: string;
+    key: Uint8Array;
+  } | null>(null);
+
   const { websocketOrigin } = getEnvironmentUrls();
 
   const [state, , , yAwareness] = useYjsSync({
@@ -92,6 +97,14 @@ export const SharePage: React.FC<Props> = ({
         throw new Error(
           "SnapshotProofInfo not provided when trying to derive a new key"
         );
+      }
+      // return cached result to avoid performance hit
+      if (
+        cachedSnapshotKeyDataRef.current &&
+        cachedSnapshotKeyDataRef.current.snapshotId ===
+          snapshotProofInfo.snapshotId
+      ) {
+        return cachedSnapshotKeyDataRef.current.key;
       }
 
       const runDocumentShareLinkSnapshotKeyBoxQueryResult =
@@ -127,6 +140,11 @@ export const SharePage: React.FC<Props> = ({
         },
         {}
       );
+
+      cachedSnapshotKeyDataRef.current = {
+        snapshotId: snapshotProofInfo.snapshotId,
+        key: sodium.from_base64(snapshotKey),
+      };
 
       return sodium.from_base64(snapshotKey);
     },
