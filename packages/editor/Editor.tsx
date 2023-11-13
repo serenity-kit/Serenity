@@ -207,7 +207,7 @@ export const Editor = (props: EditorProps) => {
         }
         // makes sure the editor is scrolled up when the user jumps to
         // the next line (return or long line) while editing
-        // unfortionatly only works when triggered with a timeout of 0 or more
+        // unfortunately only works when triggered with a timeout of 0 or more
         setTimeout(() => {
           params.editor.chain().scrollIntoViewWhileEditMode().run();
         }, 0);

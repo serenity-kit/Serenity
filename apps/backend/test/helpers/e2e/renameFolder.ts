@@ -34,7 +34,7 @@ export const renameFolder = async (
   );
   const renamedFolderMenuText1 = await waitForElementTextChange({
     element: renamedFolderMenu1,
-    initialText: "decrypting...",
+    initialText: "loading…",
   });
   expect(renamedFolderMenuText1).toBe(newName);
 };

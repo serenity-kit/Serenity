@@ -48,7 +48,7 @@ import { DocumentState } from "../../types/documentState";
 import { WorkspaceDrawerScreenProps } from "../../types/navigationProps";
 import { createNewSnapshotKey } from "../../utils/createNewSnapshotKey/createNewSnapshotKey";
 import { deriveExistingSnapshotKey } from "../../utils/deriveExistingSnapshotKey/deriveExistingSnapshotKey";
-import { useDocumentTitleStore } from "../../utils/document/documentTitleStore";
+import { useActiveDocumentStore } from "../../utils/document/activeDocumentStore";
 import { getDocument } from "../../utils/document/getDocument";
 import { updateDocumentName } from "../../utils/document/updateDocumentName";
 import { useEditorStore } from "../../utils/editorStore/editorStore";
@@ -64,6 +64,7 @@ type Props = WorkspaceDrawerScreenProps<"Page"> & {
   workspaceId: string;
   reloadPage: () => void;
   latestDocumentChainState: documentChain.DocumentChainState;
+  isNew: boolean;
 };
 
 export default function Page({
@@ -73,9 +74,9 @@ export default function Page({
   workspaceId,
   reloadPage,
   latestDocumentChainState,
+  isNew,
 }: Props) {
   const { pageId: docId, setActiveSnapshotAndCommentKeys } = usePage();
-  const isNew = route.params?.isNew ?? false;
   const { activeDevice, sessionKey } = useAuthenticatedAppContext();
   const yDocRef = useRef<Yjs.Doc>(new Yjs.Doc());
   const snapshotKeyRef = useRef<{
@@ -99,7 +100,7 @@ export default function Page({
   const syncState = useEditorStore((state) => state.syncState);
   const setSyncState = useEditorStore((state) => state.setSyncState);
   const setDocumentState = useEditorStore((state) => state.setDocumentState);
-  const setActiveDocumentId = useDocumentTitleStore(
+  const setActiveDocumentId = useActiveDocumentStore(
     (state) => state.setActiveDocumentId
   );
   const setSnapshotKey = useEditorStore((state) => state.setSnapshotKey);
@@ -107,9 +108,6 @@ export default function Page({
   const [isClosedErrorModal, setIsClosedErrorModal] = useState(false);
   const ephemeralUpdateErrorsChangedAt = useRef<Date | null>(null);
   const hasEditorSidebar = useHasEditorSidebar();
-  const updateDocumentTitleInStore = useDocumentTitleStore(
-    (state) => state.updateDocumentTitle
-  );
   let activeSnapshotDocumentChainStateRef =
     useRef<documentChain.DocumentChainState>();
   let activeSnapshotWorkspaceMemberDevicesProofEntryRef =
@@ -490,19 +488,13 @@ export default function Page({
   }, [documentState, setDocumentState]);
 
   const updateTitle = async (title: string) => {
-    const document = await getDocument({
-      documentId: docId,
-    });
-    // this is necessary to propagate document name update to the sidebar and header
-    updateDocumentTitleInStore({
-      documentId: docId,
-      title,
-    });
-    if (document?.id !== docId) {
-      console.error("document ID doesn't match page ID");
-      return;
-    }
     try {
+      console.log("UPDATE TITLE");
+      // this is necessary to propagate document name update to the sidebar and header
+      createOrReplaceDocument({
+        documentId: docId,
+        name: title,
+      });
       await updateDocumentName({
         documentId: docId,
         workspaceId,

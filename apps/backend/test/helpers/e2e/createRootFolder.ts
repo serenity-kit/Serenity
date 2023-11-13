@@ -36,7 +36,7 @@ export const createRootFolder = async (
   const folderItem1 = page.locator(`data-testid=sidebar-folder--${folder?.id}`);
   const folderItemText1 = await waitForElementTextChange({
     element: folderItem1,
-    initialText: "decrypting...",
+    initialText: "loading…",
   });
   expect(folderItemText1).toBe(name);
   return formatFolder(folder);

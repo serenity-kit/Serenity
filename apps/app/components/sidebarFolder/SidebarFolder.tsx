@@ -44,11 +44,11 @@ import {
 import { useAuthenticatedAppContext } from "../../hooks/useAuthenticatedAppContext";
 import { loadRemoteWorkspaceMemberDevicesProofQuery } from "../../store/workspaceMemberDevicesProofStore";
 import { RootStackScreenProps } from "../../types/navigationProps";
+import { useActiveDocumentStore } from "../../utils/document/activeDocumentStore";
 import {
   getDocumentPath,
   useDocumentPathStore,
 } from "../../utils/document/documentPathStore";
-import { useDocumentTitleStore } from "../../utils/document/documentTitleStore";
 import { createFolderKeyDerivationTrace } from "../../utils/folder/createFolderKeyDerivationTrace";
 import { useFolderKeyStore } from "../../utils/folder/folderKeyStore";
 import { useOpenFolderStore } from "../../utils/folder/openFolderStore";
@@ -100,9 +100,11 @@ export default function SidebarFolder(props: Props) {
   const { depth = 0 } = props;
   const { activeDevice } = useAuthenticatedAppContext();
   const documentPathStore = useDocumentPathStore();
-  const documentTitleStore = useDocumentTitleStore();
+  const activeDocumentId = useActiveDocumentStore(
+    (state) => state.activeDocumentId
+  );
   const documentPathIds = useDocumentPathStore((state) => state.folderIds);
-  const [folderName, setFolderName] = useState("decrypting…");
+  const [folderName, setFolderName] = useState("loading…");
   const getFolderKey = useFolderKeyStore((state) => state.getFolderKey);
 
   useEffect(() => {
@@ -487,13 +489,8 @@ export default function SidebarFolder(props: Props) {
       setFolderName(newFolderName);
       // refetch the document path
       // TODO: Optimize by checking if the current folder is in the document path
-      if (
-        documentTitleStore?.activeDocumentId &&
-        documentPathIds.includes(props.folderId)
-      ) {
-        const documentPath = await getDocumentPath(
-          documentTitleStore.activeDocumentId
-        );
+      if (activeDocumentId && documentPathIds.includes(props.folderId)) {
+        const documentPath = await getDocumentPath(activeDocumentId);
         documentPathStore.update(documentPath, activeDevice, getFolderKey);
       }
     } else {

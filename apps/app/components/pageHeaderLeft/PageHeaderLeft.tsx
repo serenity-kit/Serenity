@@ -13,8 +13,9 @@ import { useSelector } from "@xstate/react";
 import { HStack } from "native-base";
 import { useWindowDimensions } from "react-native";
 import { editorToolbarService } from "../../machines/editorToolbarMachine";
+import { useLocalDocumentName } from "../../store/documentStore";
+import { useActiveDocumentStore } from "../../utils/document/activeDocumentStore";
 import { useDocumentPathStore } from "../../utils/document/documentPathStore";
-import { useDocumentTitleStore } from "../../utils/document/documentTitleStore";
 import { useEditorStore } from "../../utils/editorStore/editorStore";
 
 const selectCanUndo = (state) => state.context.toolbarState.canUndo;
@@ -24,9 +25,12 @@ export function PageHeaderLeft(props: any) {
   useWindowDimensions(); // needed to ensure tw-breakpoints are triggered when resizing
   const documentPathList = useDocumentPathStore((state) => state.folders);
   const { getName } = useDocumentPathStore();
-  const activeDocumentTitle = useDocumentTitleStore(
-    (state) => state.activeDocumentTitle
+  const activeDocumentId = useActiveDocumentStore(
+    (state) => state.activeDocumentId
   );
+  const activeDocumentTitle = useLocalDocumentName({
+    documentId: activeDocumentId || "",
+  });
   const isPermanentLeftSidebar = useIsPermanentLeftSidebar();
   const hasEditorSidebar = useHasEditorSidebar();
   const isDesktopDevice = useIsDesktopDevice();

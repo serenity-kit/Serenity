@@ -47,7 +47,7 @@ export const createDocument = async (
   );
   const newDocumentName1 = await waitForElementTextChange({
     element: newDocumentItem1,
-    initialText: "decrypting...",
+    initialText: "loading…",
   });
   expect(newDocumentName1).toBe("Untitled");
   return document;
