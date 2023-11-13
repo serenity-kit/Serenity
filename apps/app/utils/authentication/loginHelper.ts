@@ -222,8 +222,6 @@ export const login = async ({
     });
   }
 
-  console.log("WWWWOOO", result.sessionKey);
-
   const addDeviceResult = await runAddDeviceMutation(
     {
       input: {
