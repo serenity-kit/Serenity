@@ -50,6 +50,7 @@ const ActualPageScreen = (
   let [latestDocumentChainState, setLatestDocumentChainState] = useState<
     documentChain.DocumentChainState | undefined
   >(undefined);
+  const [isNew] = useState(props.route.params.isNew || false);
 
   const [state] = useMachine(loadPageMachine, {
     context: {
@@ -191,6 +192,7 @@ const ActualPageScreen = (
             signatureKeyPair={signatureKeyPair}
             workspaceId={workspaceId}
             latestDocumentChainState={latestDocumentChainState}
+            isNew={isNew}
           />
         </Drawer>
       </PageProvider>

@@ -44,7 +44,7 @@ export const renameDocument = async (
   );
   const renamedDocumentMenuText1 = await waitForElementTextChange({
     element: renamedDocumentMenu1,
-    initialText: "decrypting...",
+    initialText: "loading…",
   });
   expect(renamedDocumentMenuText1).toBe(newName);
 };

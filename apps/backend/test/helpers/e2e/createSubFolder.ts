@@ -46,7 +46,7 @@ export const createSubFolder = async (
   );
   const newFolderName1 = await waitForElementTextChange({
     element: newFolderMenu1,
-    initialText: "decrypting...",
+    initialText: "loading…",
   });
   expect(newFolderName1).toBe("Untitled");
   return formatFolder(folder);

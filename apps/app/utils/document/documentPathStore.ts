@@ -75,7 +75,7 @@ export const useDocumentPathStore = create<DocumentPathState>((set, get) => ({
     const workspaceKey = workspaceKeyData.workspaceKey;
     for (let folder of folders) {
       folderIds.push(folder.id);
-      let folderName = "decrypting…";
+      let folderName = "loading…";
       try {
         const parentKeyTrace = deriveKeysFromKeyDerivationTrace({
           keyDerivationTrace: folder.keyDerivationTrace,

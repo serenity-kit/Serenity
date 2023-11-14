@@ -1,6 +1,5 @@
 import { useFocusRing } from "@react-native-aria/focus";
 import { useLinkProps } from "@react-navigation/native";
-import { decryptDocumentTitle } from "@serenity-tools/common";
 import {
   Icon,
   InlineInput,
@@ -14,12 +13,16 @@ import {
 import { HStack } from "native-base";
 import { useEffect, useState } from "react";
 import { StyleSheet } from "react-native";
-import { runSnapshotQuery, useDocumentQuery } from "../../generated/graphql";
 import { useAuthenticatedAppContext } from "../../hooks/useAuthenticatedAppContext";
-import { useDocumentTitleStore } from "../../utils/document/documentTitleStore";
+import {
+  createOrReplaceDocument,
+  loadRemoteDocumentName,
+  useLocalDocumentName,
+} from "../../store/documentStore";
+import { useActiveDocumentStore } from "../../utils/document/activeDocumentStore";
 import { updateDocumentName } from "../../utils/document/updateDocumentName";
 import { OS } from "../../utils/platform/platform";
-import { getWorkspace } from "../../utils/workspace/getWorkspace";
+import { showToast } from "../../utils/toast/showToast";
 import SidebarPageMenu from "../sidebarPageMenu/SidebarPageMenu";
 
 type Props = ViewProps & {
@@ -36,17 +39,11 @@ export default function SidebarPage(props: Props) {
   const [isEditing, setIsEditing] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
   const { isFocusVisible, focusProps: focusRingProps }: any = useFocusRing();
-  const documentTitleStore = useDocumentTitleStore();
-  const updateDocumentTitleInStore = useDocumentTitleStore(
-    (state) => state.updateDocumentTitle
+  const activeDocumentId = useActiveDocumentStore(
+    (state) => state.activeDocumentId
   );
-  const documentTitle =
-    useDocumentTitleStore((state) => state.documentTitles[props.documentId]) ||
-    "";
 
-  const [documentResult] = useDocumentQuery({
-    variables: { id: props.documentId },
-  });
+  const documentName = useLocalDocumentName({ documentId: props.documentId });
 
   const linkProps = useLinkProps({
     to: {
@@ -67,101 +64,34 @@ export default function SidebarPage(props: Props) {
   const { depth = 0 } = props;
 
   useEffect(() => {
-    const decryptTitle = async () => {
-      try {
-        const document = documentResult.data?.document;
-        if (!document) {
-          throw new Error("Unable to retrieve document!");
-        }
-        const snapshotResult = await runSnapshotQuery({
-          documentId: document.id,
-        });
-        if (!snapshotResult.data?.snapshot) {
-          throw new Error(
-            snapshotResult.error?.message || "Unable to retrieve snapshot!"
-          );
-        }
-        const snapshot = snapshotResult.data.snapshot;
-        if (!snapshotResult.data?.snapshot) {
-          throw new Error(
-            snapshotResult.error?.message || "Unable to retrieve snapshot!"
-          );
-        }
-        const workspace = await getWorkspace({
-          workspaceId: props.workspaceId,
-          deviceSigningPublicKey: activeDevice.signingPublicKey,
-        });
-        if (!workspace?.workspaceKeys) {
-          throw new Error("No workspace key for this workspace and device");
-        }
-        let documentWorkspaceKey: any = undefined;
-        for (const workspaceKey of workspace.workspaceKeys!) {
-          if (workspaceKey.id === snapshot.keyDerivationTrace.workspaceKeyId) {
-            documentWorkspaceKey = workspaceKey;
-          }
-        }
-        if (!documentWorkspaceKey?.workspaceKeyBox) {
-          throw new Error("Document workspace key not found");
-        }
-
-        const documentTitle = decryptDocumentTitle({
-          ciphertext: document.nameCiphertext,
-          nonce: document.nameNonce,
-          activeDevice,
-          subkeyId: document.subkeyId,
-          snapshot: {
-            keyDerivationTrace: snapshot.keyDerivationTrace,
-          },
-          workspaceKeyBox: documentWorkspaceKey.workspaceKeyBox!,
-          workspaceId: props.workspaceId,
-          workspaceKeyId: documentWorkspaceKey.id,
-        });
-        updateDocumentTitleInStore({
-          documentId: props.documentId,
-          title: documentTitle,
-        });
-      } catch (error) {
-        console.error(error);
-        updateDocumentTitleInStore({
-          documentId: props.documentId,
-          title: "decryption error",
-        });
-      }
-    };
-
-    if (
-      documentResult.data?.document?.id &&
-      documentTitle !== "decryption error"
-    ) {
-      decryptTitle();
-    }
-  }, [
-    documentResult.data?.document,
-    props.documentId,
-    props.workspaceId,
-    activeDevice,
-    documentTitle,
-  ]);
+    loadRemoteDocumentName({
+      documentId: props.documentId,
+      workspaceId: props.workspaceId,
+      activeDevice,
+    });
+  }, [props.documentId, props.workspaceId, activeDevice]);
 
   const updateDocumentTitle = async (name: string) => {
-    const document = documentResult.data?.document;
-    if (!document) {
-      console.error("Document not loaded");
-      return;
-    }
     try {
-      updateDocumentTitleInStore({
+      createOrReplaceDocument({
         documentId: props.documentId,
-        title: documentTitle,
+        name,
       });
       await updateDocumentName({
-        documentId: document.id,
-        workspaceId: document.workspaceId,
+        documentId: props.documentId,
+        workspaceId: props.workspaceId,
         name,
         activeDevice,
       });
     } catch (error) {
       console.error(error);
+      showToast("Failed to update the document name", "error");
+      // revert to old name
+      loadRemoteDocumentName({
+        documentId: props.documentId,
+        workspaceId: props.workspaceId,
+        activeDevice,
+      });
     }
     setIsEditing(false);
   };
@@ -217,7 +147,7 @@ export default function SidebarPage(props: Props) {
                     setIsEditing(false);
                   }}
                   onSubmit={updateDocumentTitle}
-                  value={documentTitle}
+                  value={documentName}
                   style={tw`ml-0.5 w-${maxWidth}`}
                   testID={`sidebar-document--${props.documentId}__edit-name`}
                 />
@@ -226,14 +156,10 @@ export default function SidebarPage(props: Props) {
                   style={[tw`pl-2 md:pl-1.5 max-w-${maxWidth}`]}
                   numberOfLines={1}
                   ellipsizeMode="tail"
-                  bold={
-                    documentTitleStore?.activeDocumentId === props.documentId
-                  }
+                  bold={activeDocumentId === props.documentId}
                   testID={`sidebar-document--${props.documentId}`}
                 >
-                  {documentTitleStore?.activeDocumentId === props.documentId
-                    ? documentTitleStore.activeDocumentTitle ?? "Untitled"
-                    : documentTitle}
+                  {documentName}
                 </SidebarText>
               )}
             </HStack>
@@ -251,7 +177,7 @@ export default function SidebarPage(props: Props) {
           <SidebarPageMenu
             workspaceId={props.workspaceId}
             documentId={props.documentId}
-            documentTitle={documentTitle}
+            documentTitle={documentName}
             refetchDocuments={props.onRefetchDocumentsPress}
             onUpdateNamePress={() => {
               setIsEditing(true);
