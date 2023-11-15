@@ -88,11 +88,11 @@ const SharePageContainer: React.FC<SharePageContainerProps> = ({
       value={{
         pageId: route.params.pageId,
         commentsService,
-        setActiveSnapshotAndCommentKeys: (activeSnapshot, commentKeys) => {
+        setActiveSnapshotAndCommentKeys: (params) => {
           send({
+            ...params,
             type: "SET_ACTIVE_SNAPSHOT_AND_COMMENT_KEYS",
-            activeSnapshot,
-            commentKeys,
+            activeSnapshot: params.snapshot,
           });
         },
       }}
