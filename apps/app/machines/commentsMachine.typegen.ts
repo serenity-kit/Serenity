@@ -58,7 +58,7 @@ export interface Typegen0 {
     highlightComment:
       | "HIGHLIGHT_COMMENT_FROM_EDITOR"
       | "HIGHLIGHT_COMMENT_FROM_SIDEBAR";
-    setActiveSnapshotAndCommentKeys: "SET_ACTIVE_SNAPSHOT_AND_COMMENT_KEYS";
+    setActiveSnapshotAndCommentAndReplyKeys: "SET_ACTIVE_SNAPSHOT_AND_COMMENT_KEYS";
     showCreateErrorReplyToast: "error.platform.createReply";
     showCreateErrorToast: "error.platform.createComment";
     showDeleteErrorToast:

@@ -2,17 +2,19 @@ import React, { useContext } from "react";
 import { InterpreterFrom } from "xstate";
 import {
   ActiveSnapshot,
-  CommentKeys,
+  YCommentKeys,
+  YCommentReplyKeys,
   commentsMachine,
 } from "../machines/commentsMachine";
 
 type PageContext = {
   pageId: string;
   commentsService: InterpreterFrom<typeof commentsMachine>;
-  setActiveSnapshotAndCommentKeys: (
-    snapshot: ActiveSnapshot,
-    commentKeys: CommentKeys
-  ) => void;
+  setActiveSnapshotAndCommentKeys: (params: {
+    snapshot: ActiveSnapshot;
+    yCommentKeys: YCommentKeys;
+    yCommentReplyKeys: YCommentReplyKeys;
+  }) => void;
 };
 
 const pageContext = React.createContext<PageContext>({

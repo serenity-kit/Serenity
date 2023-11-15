@@ -137,13 +137,19 @@ export default function Page({
           setSnapshotKey(snapshotKeyRef.current.key);
           setSnapshotId(knownSnapshotInfo.snapshotId);
 
-          setActiveSnapshotAndCommentKeys(
-            {
+          const yCommentKeys =
+            yDocRef.current.getMap<Uint8Array>("commentKeys");
+          const yCommentReplyKeys =
+            yDocRef.current.getMap<Uint8Array>("commentReplyKeys");
+
+          setActiveSnapshotAndCommentKeys({
+            snapshot: {
               id: knownSnapshotInfo.snapshotId,
               key: sodium.to_base64(snapshotKeyRef.current.key),
             },
-            {}
-          );
+            yCommentKeys,
+            yCommentReplyKeys,
+          });
         }
         snapshotInFlightDataRef.current = null;
       }
@@ -221,6 +227,18 @@ export default function Page({
         return documentShareLinkDeviceBox;
       });
 
+      // iterate over all comments and write the key into the map
+      // existing ones should not be overwritten by this
+      // pass to additional data all the commentIds
+
+      // delete a comment should remove the comment key
+
+      // to the commentsMachine pass in the yDoc so the yCommentAndReplyKeys can be extract
+      // use the entry from the snapshotKey first and if not fallback to yCommentAndReplyKeys
+      // if a key exists for a comment that wasn't returned show a warning!
+
+      // improve comment fetching to only fetch newer comments
+
       return {
         id: snapshotId,
         data: Yjs.encodeStateAsUpdateV2(yDocRef.current),
@@ -296,13 +314,19 @@ export default function Page({
         setSnapshotKey(snapshotKeyRef.current.key);
         setSnapshotId(snapshotProofInfo.snapshotId);
       }
-      setActiveSnapshotAndCommentKeys(
-        {
+
+      const yCommentKeys = yDocRef.current.getMap<Uint8Array>("commentKeys");
+      const yCommentReplyKeys =
+        yDocRef.current.getMap<Uint8Array>("commentReplyKeys");
+
+      setActiveSnapshotAndCommentKeys({
+        snapshot: {
           id: snapshotProofInfo.snapshotId,
           key: snapshotKeyData.key,
         },
-        {}
-      );
+        yCommentKeys,
+        yCommentReplyKeys,
+      });
 
       cachedSnapshotKeyDataRef.current = {
         snapshotId: snapshotProofInfo.snapshotId,

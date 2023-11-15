@@ -133,13 +133,18 @@ export const SharePage: React.FC<Props> = ({
 
       setSnapshotId(snapshotProofInfo.snapshotId);
       setSnapshotKey(sodium.from_base64(snapshotKey));
-      setActiveSnapshotAndCommentKeys(
-        {
+
+      const yCommentKeys = yDocRef.current.getMap<Uint8Array>("commentKeys");
+      const yCommentReplyKeys =
+        yDocRef.current.getMap<Uint8Array>("commentReplyKeys");
+      setActiveSnapshotAndCommentKeys({
+        snapshot: {
           id: snapshotProofInfo.snapshotId,
           key: snapshotKey,
         },
-        {}
-      );
+        yCommentKeys,
+        yCommentReplyKeys,
+      });
 
       cachedSnapshotKeyDataRef.current = {
         snapshotId: snapshotProofInfo.snapshotId,
