@@ -50,6 +50,9 @@ export const useDocumentPathStore = create<DocumentPathState>((set, get) => ({
     const folderIds: string[] = [];
     const folderNames: { [id: string]: string } = {};
     const workspaceId = folders[0].workspaceId;
+    if (!workspaceId) {
+      throw new Error("No workspaceId for this folder");
+    }
     const workspaceKeyId = folders[0].keyDerivationTrace.workspaceKeyId;
     const workspace = await getWorkspace({
       workspaceId: workspaceId!,
@@ -105,7 +108,10 @@ export const useDocumentPathStore = create<DocumentPathState>((set, get) => ({
           parentKey: parentKey,
           subkeyId: folderSubkeyId,
           ciphertext: folder.nameCiphertext,
-          publicNonce: folder.nameNonce,
+          nonce: folder.nameNonce,
+          folderId: folder.id,
+          workspaceId,
+          keyDerivationTrace: folder.keyDerivationTrace,
         });
       } catch (error) {
         console.error(error);

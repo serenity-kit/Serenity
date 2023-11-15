@@ -17,6 +17,7 @@ import {
   generateId,
   snapshotDerivedKeyContext,
 } from "@serenity-tools/common";
+import { createSubkeyId } from "@serenity-tools/common/src/kdfDeriveFromKey/kdfDeriveFromKey";
 import sodium from "react-native-libsodium";
 import { Prisma } from "../../../prisma/generated/output";
 import { createInitialWorkspaceStructure } from "../../database/workspace/createInitialWorkspaceStructure";
@@ -145,9 +146,25 @@ export default async function createUserWithWorkspace({
       sodium.from_base64(mainDevice.signingPrivateKey)
     )
   );
+
+  const folderSubkeyId = createSubkeyId();
   const encryptedFolderResult = encryptFolderName({
     name: folderName,
     parentKey: workspaceKey,
+    folderId,
+    subkeyId: folderSubkeyId,
+    workspaceId: createWorkspaceChainEvent.transaction.id,
+    keyDerivationTrace: {
+      workspaceKeyId,
+      trace: [
+        {
+          entryId: folderId,
+          parentId: null,
+          subkeyId: folderSubkeyId,
+          context: folderDerivedKeyContext,
+        },
+      ],
+    },
   });
   const folderKey = encryptedFolderResult.folderSubkey;
   const snapshotKey = createSnapshotKey({
@@ -242,7 +259,7 @@ export default async function createUserWithWorkspace({
       id: folderId,
       idSignature: folderIdSignature,
       nameCiphertext: encryptedFolderResult.ciphertext,
-      nameNonce: encryptedFolderResult.publicNonce,
+      nameNonce: encryptedFolderResult.nonce,
       keyDerivationTrace: {
         workspaceKeyId,
         trace: [

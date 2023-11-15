@@ -2,6 +2,7 @@ import {
   encryptFolderName,
   folderDerivedKeyContext,
 } from "@serenity-tools/common";
+import { createSubkeyId } from "@serenity-tools/common/src/kdfDeriveFromKey/kdfDeriveFromKey";
 import { gql } from "graphql-request";
 import { TestContext } from "../setupGraphql";
 import { createFolderKeyDerivationTrace } from "./createFolderKeyDerivationTrace";
@@ -30,24 +31,28 @@ export const createFolder = async ({
   const authorizationHeaders = {
     authorization: authorizationHeader,
   };
-  const encryptedFolderResult = encryptFolderName({
-    name,
-    parentKey,
-  });
-  const subkeyId = encryptedFolderResult.folderSubkeyId;
-  const nameCiphertext = encryptedFolderResult.ciphertext;
-  const nameNonce = encryptedFolderResult.publicNonce;
-
+  const folderSubkeyId = createSubkeyId();
   const keyDerivationTrace = await createFolderKeyDerivationTrace({
     workspaceKeyId,
     parentFolderId,
   });
   keyDerivationTrace.trace.push({
     entryId: id,
-    subkeyId,
+    subkeyId: folderSubkeyId,
     parentId: parentFolderId,
     context: folderDerivedKeyContext,
   });
+
+  const encryptedFolderResult = encryptFolderName({
+    name,
+    parentKey,
+    folderId: id,
+    keyDerivationTrace,
+    subkeyId: folderSubkeyId,
+    workspaceId,
+  });
+  const nameCiphertext = encryptedFolderResult.ciphertext;
+  const nameNonce = encryptedFolderResult.nonce;
 
   const query = gql`
     mutation createFolder($input: CreateFolderInput!) {
@@ -81,7 +86,7 @@ export const createFolder = async ({
         nameNonce,
         parentFolderId,
         workspaceKeyId,
-        subkeyId,
+        subkeyId: folderSubkeyId,
         workspaceId,
         keyDerivationTrace,
       },

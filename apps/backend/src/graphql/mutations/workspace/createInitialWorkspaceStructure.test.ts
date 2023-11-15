@@ -86,7 +86,10 @@ test("create initial workspace structure", async () => {
     parentKey: workspaceKey,
     subkeyId: folder.keyDerivationTrace.trace[0].subkeyId,
     ciphertext: folder.nameCiphertext,
-    publicNonce: folder.nameNonce,
+    nonce: folder.nameNonce,
+    folderId: folder.id,
+    keyDerivationTrace: folder.keyDerivationTrace,
+    workspaceId: workspace.id,
   });
   // TODO: derive document key from trace
   expect(decryptedFolderName).toBe("Getting Started");

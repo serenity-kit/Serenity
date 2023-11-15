@@ -18,9 +18,13 @@ type Params = {
 // While 2 ** 32 - 1 should be a valid uint32_t it failed
 const upperBound = 2 ** 31 - 1;
 
+export const createSubkeyId = () => {
+  return randombytes_uniform(upperBound);
+};
+
 export const kdfDeriveFromKey = (params: Params) => {
   const context = KeyDerivationContext.parse(params.context);
-  const subkeyId = params.subkeyId || randombytes_uniform(upperBound);
+  const subkeyId = params.subkeyId || createSubkeyId();
   const derivedKey = crypto_kdf_derive_from_key(
     crypto_aead_xchacha20poly1305_ietf_KEYBYTES,
     subkeyId,

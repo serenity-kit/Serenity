@@ -3,7 +3,10 @@ import {
   folderDerivedKeyContext,
   generateId,
 } from "@serenity-tools/common";
-import { kdfDeriveFromKey } from "@serenity-tools/common/src/kdfDeriveFromKey/kdfDeriveFromKey";
+import {
+  createSubkeyId,
+  kdfDeriveFromKey,
+} from "@serenity-tools/common/src/kdfDeriveFromKey/kdfDeriveFromKey";
 import { gql } from "graphql-request";
 import { Role } from "../../../../prisma/generated/output";
 import { registerUser } from "../../../../test/helpers/authentication/registerUser";
@@ -188,14 +191,29 @@ test("duplicate ID throws an error", async () => {
 test("Throw error on duplicate subkeyId, workspaceId", async () => {
   const authorizationHeaders = { authorization: sessionKey };
   const name = "subkey test";
+  const workspaceId = userData1.workspace.id;
+  const existingSubkeyId = userData1.folder.subkeyId;
   const encryptedFolderResult = encryptFolderName({
     name,
     parentKey: workspaceKey,
+    subkeyId: existingSubkeyId,
+    folderId: userData1.folder.id,
+    workspaceId,
+    keyDerivationTrace: {
+      workspaceKeyId: userData1.workspace.currentWorkspaceKey.id,
+      trace: [
+        {
+          entryId: userData1.folder.id,
+          parentId: null,
+          subkeyId: existingSubkeyId,
+          context: folderDerivedKeyContext,
+        },
+      ],
+    },
   });
-  const workspaceId = userData1.workspace.id;
-  const existingSubkeyId = userData1.folder.subkeyId;
+
   const nameCiphertext = encryptedFolderResult.ciphertext;
-  const nameNonce = encryptedFolderResult.publicNonce;
+  const nameNonce = encryptedFolderResult.nonce;
   const query = gql`
     mutation createFolder($input: CreateFolderInput!) {
       createFolder(input: $input) {
@@ -367,13 +385,27 @@ describe("Input errors", () => {
   `;
   test("Invalid id", async () => {
     const name = "test";
+    const subkeyId = createSubkeyId();
     const encryptedFolderResult = encryptFolderName({
       name,
       parentKey: workspaceKey,
+      subkeyId,
+      folderId: userData1.folder.id,
+      workspaceId: addedWorkspace.id,
+      keyDerivationTrace: {
+        workspaceKeyId: userData1.workspace.currentWorkspaceKey.id,
+        trace: [
+          {
+            entryId: userData1.folder.id,
+            parentId: null,
+            subkeyId,
+            context: folderDerivedKeyContext,
+          },
+        ],
+      },
     });
     const nameCiphertext = encryptedFolderResult.ciphertext;
-    const nameNonce = encryptedFolderResult.publicNonce;
-    const subkeyId = encryptedFolderResult.folderSubkeyId;
+    const nameNonce = encryptedFolderResult.nonce;
     await expect(
       (async () =>
         await graphql.client.request(
@@ -395,13 +427,27 @@ describe("Input errors", () => {
   });
   test("Invalid workspaceId", async () => {
     const name = "test";
+    const subkeyId = createSubkeyId();
     const encryptedFolderResult = encryptFolderName({
       name,
       parentKey: workspaceKey,
+      subkeyId,
+      folderId: userData1.folder.id,
+      workspaceId: addedWorkspace.id,
+      keyDerivationTrace: {
+        workspaceKeyId: userData1.workspace.currentWorkspaceKey.id,
+        trace: [
+          {
+            entryId: userData1.folder.id,
+            parentId: null,
+            subkeyId,
+            context: folderDerivedKeyContext,
+          },
+        ],
+      },
     });
     const nameCiphertext = encryptedFolderResult.ciphertext;
-    const nameNonce = encryptedFolderResult.publicNonce;
-    const subkeyId = encryptedFolderResult.folderSubkeyId;
+    const nameNonce = encryptedFolderResult.nonce;
     await expect(
       (async () =>
         await graphql.client.request(

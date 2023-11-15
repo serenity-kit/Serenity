@@ -13,6 +13,7 @@ import {
   generateId,
   snapshotDerivedKeyContext,
 } from "@serenity-tools/common";
+import { createSubkeyId } from "@serenity-tools/common/src/kdfDeriveFromKey/kdfDeriveFromKey";
 import {
   SnapshotPublicData,
   createInitialSnapshot,
@@ -178,7 +179,10 @@ export default function SidebarFolder(props: Props) {
         parentKey,
         subkeyId: folderSubkeyId,
         ciphertext: props.nameCiphertext,
-        publicNonce: props.nameNonce,
+        nonce: props.nameNonce,
+        folderId: props.folderId,
+        workspaceId: props.workspaceId,
+        keyDerivationTrace: props.keyDerivationTrace,
       });
       setFolderName(folderName);
     } catch (error) {
@@ -216,19 +220,26 @@ export default function SidebarFolder(props: Props) {
     });
     const parentChainItem =
       parentFolderKeyChainData.trace[parentFolderKeyChainData.trace.length - 1];
-    const encryptedFolderResult = encryptFolderName({
-      name,
-      parentKey: parentChainItem.key,
-    });
+
+    const folderSubkeyId = createSubkeyId();
     const keyDerivationTrace = await createFolderKeyDerivationTrace({
       workspaceKeyId: workspace?.currentWorkspaceKey?.id!,
       folderId: props.folderId,
     });
     keyDerivationTrace.trace.push({
       entryId: id,
-      subkeyId: encryptedFolderResult.folderSubkeyId,
+      subkeyId: folderSubkeyId,
       parentId: props.folderId,
       context: folderDerivedKeyContext,
+    });
+
+    const encryptedFolderResult = encryptFolderName({
+      name,
+      parentKey: parentChainItem.key,
+      folderId: id,
+      keyDerivationTrace,
+      subkeyId: folderSubkeyId,
+      workspaceId: props.workspaceId,
     });
 
     let didCreateFolderSucceed = false;
@@ -243,7 +254,7 @@ export default function SidebarFolder(props: Props) {
             id,
             workspaceId: props.workspaceId,
             nameCiphertext: encryptedFolderResult.ciphertext,
-            nameNonce: encryptedFolderResult.publicNonce,
+            nameNonce: encryptedFolderResult.nonce,
             workspaceKeyId: workspace?.currentWorkspaceKey?.id!,
             subkeyId: encryptedFolderResult.folderSubkeyId,
             parentFolderId: props.folderId,
@@ -440,6 +451,7 @@ export default function SidebarFolder(props: Props) {
       workspaceKeyId: workspace.currentWorkspaceKey!.id,
       activeDevice,
     });
+    const folderSubkeyId = createSubkeyId();
     const workspaceKey = workspaceKeyData.workspaceKey;
     const folderKeyTrace = deriveKeysFromKeyDerivationTrace({
       keyDerivationTrace: props.keyDerivationTrace,
@@ -460,23 +472,29 @@ export default function SidebarFolder(props: Props) {
     if (folderKeyTrace.trace.length > 1) {
       parentKey = folderKeyTrace.trace[folderKeyTrace.trace.length - 2].key;
     }
-    const encryptedFolderResult = encryptFolderName({
-      name: newFolderName,
-      parentKey,
-    });
     const keyDerivationTrace = await createFolderKeyDerivationTrace({
       folderId: props.folderId,
       workspaceKeyId: workspace?.currentWorkspaceKey?.id!,
     });
     // update the new subkey for this folder name encryption
     keyDerivationTrace.trace[keyDerivationTrace.trace.length - 1].subkeyId =
-      encryptedFolderResult.folderSubkeyId;
+      folderSubkeyId;
+
+    const encryptedFolderResult = encryptFolderName({
+      name: newFolderName,
+      parentKey,
+      subkeyId: folderSubkeyId,
+      workspaceId: props.workspaceId,
+      keyDerivationTrace,
+      folderId: props.folderId,
+    });
+
     const updateFolderNameResult = await runUpdateFolderNameMutation(
       {
         input: {
           id: props.folderId,
           nameCiphertext: encryptedFolderResult.ciphertext,
-          nameNonce: encryptedFolderResult.publicNonce,
+          nameNonce: encryptedFolderResult.nonce,
           workspaceKeyId: workspace?.currentWorkspaceKey?.id!,
           subkeyId: encryptedFolderResult.folderSubkeyId!,
           keyDerivationTrace,

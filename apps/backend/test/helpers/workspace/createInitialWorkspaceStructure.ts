@@ -14,6 +14,7 @@ import {
   generateId,
   snapshotDerivedKeyContext,
 } from "@serenity-tools/common";
+import { createSubkeyId } from "@serenity-tools/common/src/kdfDeriveFromKey/kdfDeriveFromKey";
 import { gql } from "graphql-request";
 import sodium from "react-native-libsodium";
 import { DeviceWorkspaceKeyBoxParams } from "../../../src/database/workspace/createWorkspace";
@@ -150,13 +151,29 @@ export const createInitialWorkspaceStructure = async ({
   };
 
   // prepare the folder
+
+  const folderSubkeyId = createSubkeyId();
   const encryptedFolderResult = encryptFolderName({
     name: folderName,
     parentKey: workspaceKey,
+    folderId,
+    subkeyId: folderSubkeyId,
+    workspaceId: event.transaction.id,
+    keyDerivationTrace: {
+      workspaceKeyId,
+      trace: [
+        {
+          entryId: folderId,
+          parentId: null,
+          subkeyId: folderSubkeyId,
+          context: folderDerivedKeyContext,
+        },
+      ],
+    },
   });
+
   const encryptedFolderName = encryptedFolderResult.ciphertext;
-  const encryptedFolderNameNonce = encryptedFolderResult.publicNonce;
-  const folderSubkeyId = encryptedFolderResult.folderSubkeyId;
+  const encryptedFolderNameNonce = encryptedFolderResult.nonce;
   const folderKey = encryptedFolderResult.folderSubkey;
   const folderIdSignature = sodium.to_base64(
     sodium.crypto_sign_detached(
