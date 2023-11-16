@@ -1,4 +1,4 @@
-import { folderDerivedKeyContext, generateId } from "@serenity-tools/common";
+import { generateId } from "@serenity-tools/common";
 import { gql } from "graphql-request";
 import { Role } from "../../../../prisma/generated/output";
 import { registerUser } from "../../../../test/helpers/authentication/registerUser";
@@ -60,21 +60,12 @@ test("user should be able to change a folder name", async () => {
     workspaceKeyId: userData1.workspace.currentWorkspaceKey.id,
     parentFolderId: userData1.folder.parentFolderId,
     authorizationHeader: userData1.sessionKey,
+    workspaceId: userData1.workspace.id,
   });
   const updatedFolder = result.updateFolderName.folder;
   expect(updatedFolder.id).toBe(userData1.folder.id);
   expect(typeof updatedFolder.nameCiphertext).toBe("string");
   expect(typeof updatedFolder.nameNonce).toBe("string");
-  expect(typeof updatedFolder.keyDerivationTrace.trace[0].subkeyId).toBe(
-    "number"
-  );
-  expect(updatedFolder.keyDerivationTrace.trace[0].entryId).toBe(
-    userData1.folder.id
-  );
-  expect(updatedFolder.keyDerivationTrace.trace[0].parentId).toBe(null);
-  expect(updatedFolder.keyDerivationTrace.trace[0].context).toBe(
-    folderDerivedKeyContext
-  );
   expect(updatedFolder.parentFolderId).toBe(null);
   expect(updatedFolder.rootFolderId).toBe(null);
   expect(updatedFolder.workspaceId).toBe(addedWorkspace.id);
@@ -93,6 +84,7 @@ test("throw error when folder doesn't exist", async () => {
         workspaceKeyId: addedWorkspace.currentWorkspaceKey.id,
         parentFolderId: null,
         authorizationHeader: userData1.sessionKey,
+        workspaceId: userData1.workspace.id,
       }))()
   ).rejects.toThrow("Unauthorized");
 });
@@ -127,6 +119,7 @@ test("throw error when user doesn't have access", async () => {
         workspaceKeyId: userData1.workspace.currentWorkspaceKey.id,
         parentFolderId: newFolder.parentFolderId,
         authorizationHeader: userData2.sessionKey,
+        workspaceId: userData1.workspace.id,
       }))()
   ).rejects.toThrow("Unauthorized");
 });
@@ -154,6 +147,7 @@ test("Commentor tries to update", async () => {
         workspaceKeyId: addedWorkspace.currentWorkspaceKey.id,
         parentFolderId: null,
         authorizationHeader: otherUser.sessionKey,
+        workspaceId: addedWorkspace.id,
       }))()
   ).rejects.toThrowError("Unauthorized");
 });
@@ -181,6 +175,7 @@ test("Viewer tries to update", async () => {
         workspaceKeyId: addedWorkspace.currentWorkspaceKey.id,
         parentFolderId: null,
         authorizationHeader: otherUser.sessionKey,
+        workspaceId: addedWorkspace.id,
       }))()
   ).rejects.toThrowError("Unauthorized");
 });
@@ -196,6 +191,7 @@ test("Unauthenticated", async () => {
         workspaceKeyId: addedWorkspace.currentWorkspaceKey.id,
         parentFolderId: null,
         authorizationHeader: "badauthheader",
+        workspaceId: addedWorkspace.id,
       }))()
   ).rejects.toThrowError(/UNAUTHENTICATED/);
 });

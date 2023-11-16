@@ -12,6 +12,7 @@ import {
   generateId,
   snapshotDerivedKeyContext,
 } from "@serenity-tools/common";
+import { createSubkeyId } from "@serenity-tools/common/src/kdfDeriveFromKey/kdfDeriveFromKey";
 import {
   Button,
   FormWrapper,
@@ -98,25 +99,30 @@ export function CreateWorkspaceForm(props: CreateWorkspaceFormProps) {
         throw new Error("Could not retrieve workspaceKey!");
       }
 
-      const encryptedFolderResult = encryptFolderName({
-        name: folderName,
-        parentKey: workspaceKey,
-      });
-      const folderIdSignature = sodium.crypto_sign_detached(
-        "folder_id" + folderId,
-        sodium.from_base64(activeDevice.signingPrivateKey!)
-      );
+      const folderSubkeyId = createSubkeyId();
       const folderKeyDerivationTrace = {
         workspaceKeyId,
         trace: [
           {
             entryId: folderId,
-            subkeyId: encryptedFolderResult.folderSubkeyId,
+            subkeyId: folderSubkeyId,
             parentId: null,
             context: folderDerivedKeyContext,
           },
         ],
       };
+      const encryptedFolderResult = encryptFolderName({
+        name: folderName,
+        parentKey: workspaceKey,
+        folderId,
+        workspaceId: event.transaction.id,
+        keyDerivationTrace: folderKeyDerivationTrace,
+        subkeyId: folderSubkeyId,
+      });
+      const folderIdSignature = sodium.crypto_sign_detached(
+        "folder_id" + folderId,
+        sodium.from_base64(activeDevice.signingPrivateKey!)
+      );
 
       // prepare document snapshot
       const snapshotKey = createSnapshotKey({
@@ -215,7 +221,7 @@ export function CreateWorkspaceForm(props: CreateWorkspaceFormProps) {
               id: folderId,
               idSignature: sodium.to_base64(folderIdSignature),
               nameCiphertext: encryptedFolderResult.ciphertext,
-              nameNonce: encryptedFolderResult.publicNonce,
+              nameNonce: encryptedFolderResult.nonce,
               keyDerivationTrace: folderKeyDerivationTrace,
             },
             document: {

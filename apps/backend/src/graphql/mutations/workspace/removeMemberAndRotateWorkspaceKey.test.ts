@@ -411,7 +411,10 @@ test("user can remove another user", async () => {
     parentKey: parentKey,
     subkeyId: folderSubkeyId,
     ciphertext: firstFolder.nameCiphertext,
-    publicNonce: firstFolder.nameNonce,
+    nonce: firstFolder.nameNonce,
+    folderId: firstFolder.id,
+    workspaceId: workspace.id,
+    keyDerivationTrace: firstFolder.keyDerivationTrace,
   });
   expect(decryptedFolderName).toBe("Getting Started");
 });

@@ -7,6 +7,7 @@ import {
   folderDerivedKeyContext,
   generateId,
 } from "@serenity-tools/common";
+import { createSubkeyId } from "@serenity-tools/common/src/kdfDeriveFromKey/kdfDeriveFromKey";
 import {
   Heading,
   HorizontalDivider,
@@ -33,7 +34,7 @@ import { useAuthenticatedAppContext } from "../../hooks/useAuthenticatedAppConte
 import { createFolderKeyDerivationTrace } from "../../utils/folder/createFolderKeyDerivationTrace";
 import { retrieveCurrentWorkspaceKey } from "../../utils/workspace/retrieveCurrentWorkspaceKey";
 import AccountMenu from "../accountMenu/AccountMenu";
-import Folder from "../sidebarFolder/SidebarFolder";
+import SidebarFolder from "../sidebarFolder/SidebarFolder";
 import { CreateWorkspaceModal } from "../workspace/CreateWorkspaceModal";
 
 export default function Sidebar(props: DrawerContentComponentProps) {
@@ -62,7 +63,7 @@ export default function Sidebar(props: DrawerContentComponentProps) {
     useState(false);
 
   const createFolder = async (name: string) => {
-    const id = generateId();
+    const folderId = generateId();
     let workspaceKey: string | undefined = undefined;
     let workspaceKeyId: string | undefined = undefined;
     try {
@@ -82,49 +83,47 @@ export default function Sidebar(props: DrawerContentComponentProps) {
       console.error("Could not get workspace key!");
       return;
     }
-    const encryptedFolderResult = encryptFolderName({
-      name,
-      parentKey: workspaceKey,
-    });
-    let didCreateFolderSucceed = false;
-    let numCreateFolderAttempts = 0;
-    let folderId: string | undefined = undefined;
-    let result: any = undefined;
     const keyDerivationTrace = await createFolderKeyDerivationTrace({
       workspaceKeyId,
       folderId: null,
     });
+
+    const folderSubkeyId = createSubkeyId();
     keyDerivationTrace.trace.push({
-      entryId: id,
-      subkeyId: encryptedFolderResult.folderSubkeyId,
+      entryId: folderId,
+      subkeyId: folderSubkeyId,
       parentId: null,
       context: folderDerivedKeyContext,
     });
-    do {
-      numCreateFolderAttempts += 1;
-      result = await runCreateFolderMutation(
-        {
-          input: {
-            id,
-            workspaceId,
-            nameCiphertext: encryptedFolderResult.ciphertext,
-            nameNonce: encryptedFolderResult.publicNonce,
-            workspaceKeyId,
-            subkeyId: encryptedFolderResult.folderSubkeyId,
-            keyDerivationTrace,
-          },
+    const encryptedFolderResult = encryptFolderName({
+      name,
+      parentKey: workspaceKey,
+      folderId,
+      keyDerivationTrace,
+      subkeyId: folderSubkeyId,
+      workspaceId,
+    });
+
+    const createFolderMutationResult = await runCreateFolderMutation(
+      {
+        input: {
+          id: folderId,
+          workspaceId,
+          nameCiphertext: encryptedFolderResult.ciphertext,
+          nameNonce: encryptedFolderResult.nonce,
+          workspaceKeyId,
+          subkeyId: encryptedFolderResult.folderSubkeyId,
+          keyDerivationTrace,
         },
-        {}
-      );
-      if (result.data?.createFolder?.folder?.id) {
-        didCreateFolderSucceed = true;
-        folderId = result.data?.createFolder?.folder?.id;
-      }
-    } while (!didCreateFolderSucceed && numCreateFolderAttempts < 5);
-    if (!folderId) {
-      console.error(result.error);
+      },
+      {}
+    );
+    if (createFolderMutationResult.data?.createFolder?.folder?.id) {
+    } else {
+      console.error(createFolderMutationResult.error);
       alert("Failed to create a folder. Please try again.");
     }
+
     setIsCreatingNewFolder(false);
     refetchRootFolders();
   };
@@ -231,7 +230,7 @@ export default function Sidebar(props: DrawerContentComponentProps) {
                 return null;
               }
               return (
-                <Folder
+                <SidebarFolder
                   key={folder.id}
                   folderId={folder.id}
                   parentFolderId={folder.parentFolderId}
