@@ -36,6 +36,7 @@ export const createEncryptAndUploadFileFunction = ({
     const response = await fetch(uploadUrl, {
       method: "PUT",
       body: fileCiphertext,
+      // mode: "cors",
     });
     if (!response || response.status !== 200) {
       throw new Error("Failed to upload the file");
