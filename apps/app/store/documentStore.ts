@@ -60,9 +60,18 @@ export const getLocalDocument = ({ documentId }: { documentId: string }) => {
     `SELECT * FROM ${table} WHERE documentId = ?`,
     [documentId]
   ) as any;
-  return documentResult.length > 0
-    ? (documentResult[0] as DocumentEntry)
-    : undefined;
+  const document =
+    documentResult.length > 0
+      ? ({
+          ...documentResult[0],
+          content:
+            documentResult[0].content instanceof Uint8Array
+              ? documentResult[0].content
+              : new Uint8Array(documentResult[0].content),
+        } as DocumentEntry)
+      : undefined;
+
+  return document;
 };
 
 export const getLocalDocumentName = ({
