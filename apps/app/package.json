@@ -53,7 +53,7 @@
     "canonicalize": "^2.0.0",
     "date-fns": "^2.29.3",
     "detect-browser": "^5.3.0",
-    "expo": "^47.0.0",
+    "expo": "^49.0.19",
     "expo-asset": "~8.7.0",
     "expo-clipboard": "~4.0.1",
     "expo-constants": "~14.0.2",
