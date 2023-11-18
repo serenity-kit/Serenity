@@ -31,6 +31,9 @@ module.exports = async function (env, argv) {
   );
   config.resolve.symlinks = true;
 
+  // needed since NativeBase uses API referencing normalize-css-color
+  config.resolve.alias["normalize-css-color"] = "@react-native/normalize-color";
+
   if (process.env.EXPO_ELECTRON_MODE) {
     config.resolve.extensions.unshift(".electron.tsx");
     config.resolve.extensions.unshift(".electron.ts");
