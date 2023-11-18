@@ -513,7 +513,6 @@ export default function Page({
 
   const updateTitle = async (title: string) => {
     try {
-      console.log("UPDATE TITLE");
       // this is necessary to propagate document name update to the sidebar and header
       createOrReplaceDocument({
         documentId: docId,

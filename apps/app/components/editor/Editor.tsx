@@ -320,7 +320,6 @@ export default function Editor({
             const update = new Uint8Array(message.content);
             if (yDocRef.current) {
               Y.applyUpdateV2(yDocRef.current, update, "mobile-webview");
-              console.log("apply update");
             }
           }
           if (message.type === "updateYAwareness") {
