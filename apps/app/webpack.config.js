@@ -31,6 +31,12 @@ module.exports = async function (env, argv) {
   );
   config.resolve.symlinks = true;
 
+  // needed for sql.js to not throw an errors and warnings
+  config.resolve.fallback = {
+    fs: false,
+    path: false,
+  };
+
   // needed since NativeBase uses API referencing normalize-css-color
   config.resolve.alias["normalize-css-color"] = "@react-native/normalize-color";
 

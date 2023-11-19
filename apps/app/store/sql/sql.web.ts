@@ -1,4 +1,4 @@
-import { Database, SqlJsStatic } from "sql.js";
+import type { Database, SqlJsStatic } from "sql.js";
 
 let db: Database;
 let SQL: SqlJsStatic;
