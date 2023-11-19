@@ -25,12 +25,12 @@ import { AppContextProvider } from "./context/AppContext";
 import useCachedResources from "./hooks/useCachedResources";
 import Navigation from "./navigation/Navigation";
 import { SqliteDebugger } from "./store/sql/SqliteDebugger";
-import { patchConsoleOutput } from "./utils/patchConsoleOutput/patchConsoleOutput";
+// import { patchConsoleOutput } from "./utils/patchConsoleOutput/patchConsoleOutput";
 import { patchFileReader } from "./utils/patchFileReader/patchFileReader";
 import { patchGlobalStyles } from "./utils/patchGlobalStyles/patchGlobalStyles";
 import "./utils/setupElectronInterface/electronInterface";
 
-patchConsoleOutput();
+// patchConsoleOutput();
 patchGlobalStyles();
 patchFileReader();
 
