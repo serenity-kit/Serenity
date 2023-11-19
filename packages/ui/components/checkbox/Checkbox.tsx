@@ -1,8 +1,7 @@
+import { ICheckboxProps, Checkbox as NativeBaseCheckbox } from "native-base";
 import React from "react";
 import { StyleSheet } from "react-native";
-import { Text } from "../text/Text";
 import { tw } from "../../tailwind";
-import { Checkbox as NativeBaseCheckbox, ICheckboxProps } from "native-base";
 
 type CheckboxProps = ICheckboxProps & {};
 

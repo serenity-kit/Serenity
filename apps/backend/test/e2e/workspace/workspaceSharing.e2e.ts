@@ -148,7 +148,7 @@ test.describe("Workspace Sharing", () => {
     await delayForSeconds(2);
 
     // click "accept"
-    await page.locator('div[role="button"]:has-text("Accept")').click();
+    await page.locator('button:has-text("Accept")').click();
     await verifyPassword({
       page,
       password,

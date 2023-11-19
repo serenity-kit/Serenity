@@ -11,9 +11,9 @@ export const fillRegisterForm = async ({ page, username, password }: Props) => {
   await page.locator('[placeholder="Enter your email …"]').fill(username);
   await page.locator('[placeholder="Enter your password …"]').fill(password);
   await page
-    .locator('[aria-label="This is the terms and condition checkbox"] >> nth=1')
+    .locator('[aria-label="This is the terms and condition checkbox"]')
     .click();
-  await page.locator('div[role="button"]:has-text("Register")').click();
+  await page.locator('button:has-text("Register")').click();
 
   await delayForSeconds(3);
   // unverified user should have been created

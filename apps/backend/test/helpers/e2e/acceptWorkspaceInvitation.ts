@@ -17,7 +17,7 @@ export const acceptWorkspaceInvitation = async ({
   await page.goto(workspaceInvitationUrl);
   await delayForSeconds(2);
   // click "accept"
-  await page.locator('div[role="button"]:has-text("Accept")').click();
+  await page.locator('button:has-text("Accept")').click();
   await verifyPassword({
     page,
     password,

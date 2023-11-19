@@ -21,7 +21,7 @@ export const createWorkspaceOnOnboarding = async ({
   // Fill in the new workspace name
   await page
     .locator(
-      'text=Workspace NameThis is the name of your organization, team or private notes. You  >> input[type="text"]'
+      "text=Workspace NameThis is the name of your organization, team or private notes. You  >> input"
     )
     .fill(workspaceName);
   await verifyPassword({
@@ -30,7 +30,7 @@ export const createWorkspaceOnOnboarding = async ({
     throwIfNotOpen: throwIfVerifyPasswordNotOpen,
   });
   // Click the "create" button
-  await page.locator('div[role="button"]:has-text("Create")').click();
+  await page.locator('button:has-text("Create")').click();
 
   await delayForSeconds(5);
 

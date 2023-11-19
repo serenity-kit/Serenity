@@ -26,7 +26,7 @@ export const deleteDocument = async (
   await page
     .locator(`[data-testid=sidebar-document-menu--${documentId}__delete]`)
     .click();
-  await page.locator('div[role="button"]:has-text("Delete page")').click();
+  await page.locator('button:has-text("Delete page")').click();
   await delayForSeconds(2);
   const numDocumentsAfterDelete = await prisma.document.count({
     where: { workspaceId },

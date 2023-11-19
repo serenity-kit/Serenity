@@ -37,6 +37,6 @@ export const e2eLoginUser = async ({
   }
 
   // Click "Log in" button
-  await page.locator('div[role="button"]:has-text("Log in")').click();
+  await page.locator('button:has-text("Log in")').click();
   await delayForSeconds(2);
 };
