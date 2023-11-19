@@ -177,6 +177,7 @@ const ActualPageScreen = (
             display: "none",
           }}
           drawerStyle={{
+            right: 0,
             width: commentsDrawerWidth,
             marginLeft: isPermanentLeftSidebar
               ? -commentsDrawerWidth

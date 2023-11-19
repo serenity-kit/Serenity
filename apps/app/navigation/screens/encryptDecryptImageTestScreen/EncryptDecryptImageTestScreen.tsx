@@ -29,9 +29,12 @@ export default function EncryptDecryptImageTestScreen(
       quality: 1,
       base64: true,
     });
-    if (!result.cancelled && result.base64) {
-      setBase64ImageData(result.base64);
+    if (result.canceled || !result.assets || !result.assets[0]) {
+      console.error("Failed to select an image");
+      return;
     }
+
+    setBase64ImageData(result.assets[0].base64!);
   };
 
   const getImage = (base64ImageData: string): string => {

@@ -634,23 +634,20 @@ export default function DesignSystemScreen(
           Basic
         </Heading>
         <DSExampleArea>
+          <Checkbox value="test" aria-label="This is a dummy checkbox" />
           <Checkbox
             value="test"
-            accessibilityLabel="This is a dummy checkbox"
-          />
-          <Checkbox
-            value="test"
-            accessibilityLabel="This is a dummy checkbox"
+            aria-label="This is a dummy checkbox"
             defaultIsChecked
           />
           <Checkbox
             value="test"
-            accessibilityLabel="This is a dummy checkbox"
+            aria-label="This is a dummy checkbox"
             isDisabled
           />
           <Checkbox
             value="test"
-            accessibilityLabel="This is a dummy checkbox"
+            aria-label="This is a dummy checkbox"
             isDisabled
             isChecked
           />
@@ -664,7 +661,7 @@ export default function DesignSystemScreen(
         <DSExampleArea>
           <Checkbox
             value="test"
-            accessibilityLabel="This is a dummy checkbox"
+            aria-label="This is a dummy checkbox"
             defaultIsChecked
           >
             <Text variant="sm">
@@ -728,7 +725,7 @@ export default function DesignSystemScreen(
             />
             <Checkbox
               value={"hasAcceptedTerms"}
-              accessibilityLabel="This is the terms and condition checkbox"
+              aria-label="This is the terms and condition checkbox"
             >
               <Text variant="xs" muted>
                 Yes, I do agree to Serenity's{" "}
@@ -1678,7 +1675,7 @@ export default function DesignSystemScreen(
             onChange={setIsOpenPopover}
             trigger={
               <IconButton
-                accessibilityLabel="More options menu"
+                aria-label="More options menu"
                 name="more-line"
                 color="gray-600"
                 style={tw`p-2 md:p-0`}

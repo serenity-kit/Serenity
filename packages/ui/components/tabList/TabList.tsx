@@ -5,16 +5,8 @@ import {
   EditorSidebarHeaderProps,
 } from "../editorSidebarHeader/EditorSidebarHeader";
 
-export type TabListProps = EditorSidebarHeaderProps & {
-  accessibilityLabel: string;
-};
+export type TabListProps = EditorSidebarHeaderProps;
 
 export function TabList(props: TabListProps) {
-  return (
-    <EditorSidebarHeader
-      {...props}
-      accessibilityRole="tablist"
-      style={tw`px-2`}
-    />
-  );
+  return <EditorSidebarHeader {...props} role="tablist" style={tw`px-2`} />;
 }

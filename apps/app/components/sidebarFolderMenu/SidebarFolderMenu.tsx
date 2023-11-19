@@ -26,7 +26,7 @@ export default function SidebarFolderMenu(props: Props) {
       onChange={setIsOpenMenu}
       trigger={
         <IconButton
-          accessibilityLabel="More options menu"
+          aria-label="More options menu"
           name="more-line"
           color="gray-600"
           style={tw`p-2 md:p-0`}

@@ -146,7 +146,7 @@ export function LoginForm(props: Props) {
           value={"useExtendedLogin"}
           isChecked={useExtendedLogin}
           onChange={setUseExtendedLogin}
-          accessibilityLabel="This is a remember-my login checkbox"
+          aria-label="This is a remember-my login checkbox"
         >
           <Text variant="xs" muted>
             Stay logged in for 30 days

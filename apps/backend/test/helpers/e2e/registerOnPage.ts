@@ -23,11 +23,11 @@ export const registerOnPage = async ({
 
   // Click "i agree" checkbox
   await page
-    .locator('[aria-label="This is the terms and condition checkbox"] >> nth=1')
+    .locator('[aria-label="This is the terms and condition checkbox"]')
     .click();
 
   // Click "register button"
-  await page.locator('div[role="button"]:has-text("Register")').click();
+  await page.locator('button:has-text("Register")').click();
 
   await delayForSeconds(2);
   // unverified user should have been created

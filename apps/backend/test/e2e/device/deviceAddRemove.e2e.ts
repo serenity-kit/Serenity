@@ -30,7 +30,7 @@ test.describe("Devices", () => {
     expect(numDevices1BeforeLogin).toBe(3); // header, main, and one other
 
     const deletablesBeforeSecondLogin = page.locator(
-      `//div[@data-testid="devices-list"]/div//div[@role="button"]`
+      `//div[@data-testid="devices-list"]/div//button`
     );
     const numDeletablesBeforeSecondLogin =
       await deletablesBeforeSecondLogin.count();
@@ -57,7 +57,7 @@ test.describe("Devices", () => {
     // check that two of the devices (main and one other) are not removable
 
     const deletablesBeforeDeleting = page.locator(
-      `//div[@data-testid="devices-list"]/div//div[@role="button"]`
+      `//div[@data-testid="devices-list"]/div//button`
     );
     const numDeletablesBeforeDeleting = await deletablesBeforeDeleting.count();
     expect(numDeletablesBeforeDeleting).toBe(1);
@@ -66,7 +66,7 @@ test.describe("Devices", () => {
     // delete a device from page1 and reload page2
     await devices1
       .nth(numDevices1 - 1)
-      .locator('//div[@role="button"]')
+      .locator("//button")
       .click();
 
     await verifyPassword({ page, password, throwIfNotOpen: false });
@@ -77,7 +77,7 @@ test.describe("Devices", () => {
     await expect(page2).toHaveURL(`http://localhost:19006/login`);
 
     const deletablesAfterDeleting = page.locator(
-      `//div[@data-testid="devices-list"]/div//div[@role="button"]`
+      `//div[@data-testid="devices-list"]/div//button`
     );
     const numDeletablesAfterDeleting = await deletablesAfterDeleting.count();
     expect(numDeletablesAfterDeleting).toBe(0);

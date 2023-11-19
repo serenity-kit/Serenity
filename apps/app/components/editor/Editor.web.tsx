@@ -177,6 +177,7 @@ export default function Editor({
               "nodeType" in params.event.relatedTarget &&
               // check if click was not inside the editor bottom bar
               (editorBottombarRef.current?.contains(
+                // @ts-expect-error
                 params.event.relatedTarget
               ) ||
                 // check if click was not inside editor buttons e.g. undo/redo

@@ -13,6 +13,7 @@ import {
 import "expo-dev-client";
 import { StatusBar } from "expo-status-bar";
 import { NativeBaseProvider, extendTheme } from "native-base";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { OverlayProvider } from "react-native-popper";
 import { RootSiblingParent } from "react-native-root-siblings";
 import { SafeAreaProvider } from "react-native-safe-area-context";
@@ -153,28 +154,30 @@ export default function App() {
   } else {
     return (
       <ErrorBoundary>
-        <RootSiblingParent>
-          <AppContextProvider
-            value={{
-              updateAuthentication,
-              updateActiveDevice,
-              sessionKey,
-              activeDevice,
-            }}
-          >
-            <UrqlProvider value={urqlClient}>
-              <SafeAreaProvider>
-                <NativeBaseProvider theme={rnTheme}>
-                  <OverlayProvider>
-                    <Navigation colorScheme={colorScheme} />
-                    <StatusBar />
-                    <SqliteDebugger />
-                  </OverlayProvider>
-                </NativeBaseProvider>
-              </SafeAreaProvider>
-            </UrqlProvider>
-          </AppContextProvider>
-        </RootSiblingParent>
+        <GestureHandlerRootView style={{ flex: 1 }}>
+          <RootSiblingParent>
+            <AppContextProvider
+              value={{
+                updateAuthentication,
+                updateActiveDevice,
+                sessionKey,
+                activeDevice,
+              }}
+            >
+              <UrqlProvider value={urqlClient}>
+                <SafeAreaProvider>
+                  <NativeBaseProvider theme={rnTheme}>
+                    <OverlayProvider>
+                      <Navigation colorScheme={colorScheme} />
+                      <StatusBar />
+                      <SqliteDebugger />
+                    </OverlayProvider>
+                  </NativeBaseProvider>
+                </SafeAreaProvider>
+              </UrqlProvider>
+            </AppContextProvider>
+          </RootSiblingParent>
+        </GestureHandlerRootView>
       </ErrorBoundary>
     );
   }

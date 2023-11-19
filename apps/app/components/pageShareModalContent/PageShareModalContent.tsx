@@ -242,7 +242,7 @@ export function PageShareModalContent() {
                       setSharingRole(newSharingRole);
                     }}
                     testID={`document-share-modal__select-role-menu`}
-                    accessibilityLabel="Set sharing access level"
+                    aria-label="Set sharing access level"
                     defaultValue="VIEWER"
                   >
                     <SelectItem label="Editor" value="EDITOR" />

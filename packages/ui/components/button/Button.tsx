@@ -3,7 +3,7 @@
 import { useFocusRing } from "@react-native-aria/focus";
 import { Pressable } from "native-base";
 import React, { forwardRef } from "react";
-import { PressableProps, StyleSheet, View as RnView } from "react-native";
+import { PressableProps, View as RnView, StyleSheet } from "react-native";
 import { useIsEqualOrLargerThanBreakpoint } from "../../hooks/useIsEqualOrLargerThanBreakpoint/useIsEqualOrLargerThanBreakpoint";
 import { tw } from "../../tailwind";
 import { Spinner } from "../spinner/Spinner";
@@ -151,7 +151,7 @@ export const Button = forwardRef((props: ButtonProps, ref) => {
       disabled={disabled}
       style={style}
       {...rest}
-      accessibilityRole={props.accessibilityRole ?? "button"}
+      role={props.role ?? "button"}
       // @ts-expect-error - web only
       onFocus={focusRingProps.onFocus}
       // @ts-expect-error - web only

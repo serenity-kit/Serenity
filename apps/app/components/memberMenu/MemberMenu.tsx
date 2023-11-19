@@ -35,7 +35,7 @@ export default function MemberMenu(props: Props) {
       trigger={
         <IconButton
           testID={`member-menu--${memberId}__open`}
-          accessibilityLabel="More options menu"
+          aria-label="More options menu"
           name="more-line"
           color="gray-700"
           style={tw`p-2 md:p-0`}

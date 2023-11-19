@@ -140,7 +140,7 @@ export default function AccountMenu({
         }}
         trigger={
           <Pressable
-            accessibilityLabel="More options menu"
+            aria-label="More options menu"
             {...focusRingProps}
             // disable default outline styles
             // @ts-expect-error - web only

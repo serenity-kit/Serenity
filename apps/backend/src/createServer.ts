@@ -128,6 +128,7 @@ export default async function createServer() {
   const corsOptions = { credentials: true, origin: allowedOrigin };
   const app = express();
   app.use(cors(corsOptions));
+  // @ts-expect-error
   apolloServer.applyMiddleware({ app, cors: corsOptions });
 
   const server = httpCreateServer(app);
