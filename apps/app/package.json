@@ -26,7 +26,7 @@
     "preset": "jest-expo/web"
   },
   "dependencies": {
-    "@expo-google-fonts/inter": "^0.2.2",
+    "@expo-google-fonts/inter": "^0.2.3",
     "@expo/vector-icons": "^13.0.0",
     "@gorhom/bottom-sheet": "^4.4.5",
     "@mobily/stacks": "^2.2.2",
