@@ -25,7 +25,7 @@ export default function PageHeaderRightMenu(props: Props) {
       onChange={setIsOpenMenu}
       trigger={
         <IconButton
-          accessibilityLabel="More options menu"
+          aria-label="More options menu"
           size={"xl"}
           name="more-line"
           color="gray-700"

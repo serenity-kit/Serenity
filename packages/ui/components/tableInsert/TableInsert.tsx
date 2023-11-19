@@ -20,7 +20,7 @@ export const TableInsert = React.forwardRef(
       <Pressable
         ref={ref}
         {...props}
-        accessibilityRole={props.accessibilityRole ?? "button"}
+        role={props.role ?? "button"}
         style={[styles.pressable]}
       >
         {({ isPressed, isHovered, isFocused }) => {

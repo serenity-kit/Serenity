@@ -53,7 +53,7 @@ export default function EditorSidebar({
 
   return (
     <>
-      <TabList accessibilityLabel="Editor sidebar Tabs">
+      <TabList aria-label="Editor sidebar Tabs">
         <Tab
           tabId="editing"
           isActive={activeTab === "editing"}

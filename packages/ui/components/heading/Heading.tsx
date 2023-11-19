@@ -1,5 +1,5 @@
 import React from "react";
-import { Platform, StyleSheet, Text as RNText } from "react-native";
+import { Platform, Text as RNText, StyleSheet } from "react-native";
 import { tw } from "../../tailwind";
 
 export type HeadingProps = RNText["props"] & {
@@ -63,9 +63,8 @@ export const Heading = (props: HeadingProps) => {
         muted && styles.muted,
         props.style,
       ]}
-      // @ts-expect-error react-native-web needs react-native unsupported values here
-      accessibilityRole={Platform.OS === "web" ? "heading" : undefined}
-      accessibilityLevel={lvl}
+      role={Platform.OS === "web" ? "heading" : undefined}
+      aria-level={lvl}
     >
       {props.children}
     </RNText>

@@ -1,12 +1,12 @@
+import { useFocusRing } from "@react-native-aria/focus";
 import * as Linking from "expo-linking";
+import { HStack } from "native-base";
 import * as React from "react";
 import { Platform } from "react-native";
-import { useFocusRing } from "@react-native-aria/focus";
-import { Text, TextProps } from "../text/Text";
-import { createLinkStyles } from "../link/Link";
-import { Icon } from "../icon/Icon";
 import { tw } from "../../tailwind";
-import { HStack } from "native-base";
+import { Icon } from "../icon/Icon";
+import { createLinkStyles } from "../link/Link";
+import { Text, TextProps } from "../text/Text";
 import { View } from "../view/View";
 
 export type LinkExternalProps = TextProps & {
@@ -34,7 +34,7 @@ export function LinkExternal(props: LinkExternalProps) {
       <Text
         {...props}
         {...focusRingProps} // sets onFocus and onBlur
-        accessibilityRole="link"
+        role="link"
         // @ts-expect-error
         href={props.href}
         hrefAttrs={{

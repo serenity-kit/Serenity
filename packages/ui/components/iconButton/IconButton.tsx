@@ -82,7 +82,7 @@ export const IconButton = forwardRef((props: IconButtonProps, ref) => {
     <Pressable
       ref={ref}
       {...rest}
-      accessibilityRole={props.accessibilityRole ?? "button"}
+      role={props.role ?? "button"}
       // @ts-expect-error - web only
       onFocus={focusRingProps.onFocus}
       // @ts-expect-error - web only

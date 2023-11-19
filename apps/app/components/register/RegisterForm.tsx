@@ -269,7 +269,7 @@ export default function RegisterForm(props: Props) {
         value={"hasAcceptedTerms"}
         isChecked={hasAcceptedTerms}
         onChange={setHasAcceptedTerms}
-        accessibilityLabel="This is the terms and condition checkbox"
+        aria-label="This is the terms and condition checkbox"
       >
         <Text variant="xs" muted>
           Yes, I do agree to Serenity's{" "}

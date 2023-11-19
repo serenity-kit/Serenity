@@ -30,7 +30,7 @@ export default function CommentsMenu(props: Props) {
       onChange={setIsOpenMenu}
       trigger={
         <IconButton
-          accessibilityLabel="Comments options menu"
+          aria-label="Comments options menu"
           name="more-line"
           color="gray-700"
           style={tw`p-2 md:p-0`}

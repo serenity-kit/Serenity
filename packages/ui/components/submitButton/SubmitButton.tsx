@@ -62,7 +62,7 @@ export const SubmitButton = forwardRef((props: SubmitButtonProps, ref) => {
       ref={ref}
       disabled={disabled}
       {...rest}
-      accessibilityRole={props.accessibilityRole ?? "button"}
+      role={props.role ?? "button"}
       // @ts-expect-error - web only
       onFocus={focusRingProps.onFocus}
       // @ts-expect-error - web only

@@ -37,7 +37,7 @@ export const ToggleButton = forwardRef((props: ToggleButtonProps, ref) => {
     <Pressable
       ref={ref}
       {...rest}
-      accessibilityRole={props.accessibilityRole ?? "button"}
+      role={props.role ?? "button"}
       // @ts-expect-error - web only
       onFocus={focusRingProps.onFocus}
       // @ts-expect-error - web only
@@ -51,7 +51,7 @@ export const ToggleButton = forwardRef((props: ToggleButtonProps, ref) => {
       }}
       // @ts-expect-error - native base style mismatch
       style={[styles.pressable, rest.style]}
-      accessibilityPressed={isActive}
+      aria-pressed={isActive}
     >
       {({ isPressed, isHovered, isFocused }) => {
         return (

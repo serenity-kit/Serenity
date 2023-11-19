@@ -25,7 +25,7 @@ export const TableHandle = React.forwardRef(
       <Pressable
         ref={ref}
         {...rest}
-        accessibilityRole={props.accessibilityRole ?? "button"}
+        role={props.role ?? "button"}
         style={[
           styles.pressable,
           styles[variant],

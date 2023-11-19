@@ -10,10 +10,9 @@ export type TabPanelProps = ViewProps & {
 export function TabPanel(props: TabPanelProps) {
   return (
     <View
-      // @ts-expect-error tabpanel is needed for web accessibility
-      accessibilityRole={Platform.OS === "web" ? "tabpanel" : undefined}
-      accessibilityLabelledBy={`${props.tabId}-tab`}
-      nativeID={`${props.tabId}-panel`}
+      role={Platform.OS === "web" ? "tabpanel" : undefined}
+      aria-labelledby={`${props.tabId}-tab`}
+      id={`${props.tabId}-panel`}
       style={tw`py-4`}
       {...props}
     />

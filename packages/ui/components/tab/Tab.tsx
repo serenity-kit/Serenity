@@ -27,11 +27,11 @@ export function Tab({ isActive, tabId, children, ...otherProps }: TabProps) {
   return (
     <Pressable
       {...focusRingProps} // sets onFocus and onBlur
-      accessibilityRole="tab"
+      role="tab"
       // exists in the docs, but not in the types https://necolas.github.io/react-native-web/docs/accessibility/
-      accessibilityControls={`${tabId}-panel`}
-      accessibilitySelected={isActive}
-      nativeID={`${tabId}-tab`}
+      aria-controls={`${tabId}-panel`}
+      aria-selected={isActive}
+      id={`${tabId}-tab`}
       style={[
         pressableStyles,
         // @ts-expect-error - native base style mismatch
