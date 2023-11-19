@@ -9026,29 +9026,13 @@
     "@graphql-typed-document-node/core" "^3.1.1"
     wonka "^6.0.0"
 
-"@urql/core@>=3.0.0":
-  version "3.0.2"
-  resolved "https://registry.yarnpkg.com/@urql/core/-/core-3.0.2.tgz#91008bc112000dd42c5260142e4eed7901def6bd"
-  integrity sha512-TRpQOdt1Mtpt/EgPlFCx9Aqc3TbHtzH3yj8pJ9yjSUKT4slRyy+ofMQ8yx50oZzZjAOswF02zBRwnxsZANb35A==
-  dependencies:
-    "@graphql-typed-document-node/core" "^3.1.1"
-    wonka "^6.0.0"
-
-"@urql/core@>=4.0.0":
+"@urql/core@>=4.0.0", "@urql/core@>=4.1.0", "@urql/core@^4.2.0":
   version "4.2.0"
   resolved "https://registry.yarnpkg.com/@urql/core/-/core-4.2.0.tgz#7715491bc07e4af8b5d5039a19ea562cd109ae2f"
   integrity sha512-GRkZ4kECR9UohWAjiSk2UYUetco6/PqSrvyC4AH6g16tyqEShA63M232cfbE1J9XJPaGNjia14Gi+oOqzp144w==
   dependencies:
     "@0no-co/graphql.web" "^1.0.1"
     wonka "^6.3.2"
-
-"@urql/core@^3.0.3":
-  version "3.0.3"
-  resolved "https://registry.yarnpkg.com/@urql/core/-/core-3.0.3.tgz#da054babb4d4aed26dc4503806b310ba6dd6eea1"
-  integrity sha512-raQP51ERNtg5BvlN8x8mHVRvk4K0ugWQ69n53BdkjKpXVV5kuWp7trnwriGv1fQKa8HuiGNSCfyslUucc0OVQg==
-  dependencies:
-    "@graphql-typed-document-node/core" "^3.1.1"
-    wonka "^6.0.0"
 
 "@urql/devtools@^2.0.3":
   version "2.0.3"
@@ -9057,21 +9041,22 @@
   dependencies:
     wonka ">= 4.0.9"
 
-"@urql/exchange-auth@^1.0.0":
-  version "1.0.0"
-  resolved "https://registry.yarnpkg.com/@urql/exchange-auth/-/exchange-auth-1.0.0.tgz#cf846189632662330b616704387b1cf762561638"
-  integrity sha512-79hqPQab+ifeINOxvQykvqub4ixWHBEIagN4U67ijcHGMfp3c4yEWRk4IJMPwF+OMT7LrRFuv+jRIZTQn/9VwQ==
+"@urql/exchange-auth@^2.1.6":
+  version "2.1.6"
+  resolved "https://registry.yarnpkg.com/@urql/exchange-auth/-/exchange-auth-2.1.6.tgz#8197dab76ac8109ad23c9cde57f834153055d024"
+  integrity sha512-snOlt7p5kYq0KnPDuXkKe2qW3/BucQZOElvTeo3svLQuk9JiNJVnm6ffQ6QGiGO+G3AtMrctnno1+X44fLtDuQ==
   dependencies:
-    "@urql/core" ">=3.0.0"
-    wonka "^6.0.0"
+    "@urql/core" ">=4.1.0"
+    wonka "^6.3.2"
 
-"@urql/exchange-graphcache@^5.0.1":
-  version "5.0.1"
-  resolved "https://registry.yarnpkg.com/@urql/exchange-graphcache/-/exchange-graphcache-5.0.1.tgz#3c051d971ba79cccf4aadc2cf87b413c6682cbd3"
-  integrity sha512-sbornx6SaAADycfEex0+npdJwhImSKa+76DAnOjF48wls5bYlG+ewDe0ipWdmV+gQ+t9SDFPLAHBzFURTlQacQ==
+"@urql/exchange-graphcache@^6.3.3":
+  version "6.3.3"
+  resolved "https://registry.yarnpkg.com/@urql/exchange-graphcache/-/exchange-graphcache-6.3.3.tgz#6baa66cebb0329a2008d955d5ded3379472ad1e4"
+  integrity sha512-uD8zzNIrxQHYCSgfIwYxzEmU1Ml4nJ6NTKwrDlpKmTLJa3aYuG3AoiO138HZBK1XGJ2QzV5yQPfcZsmbVFH8Yg==
   dependencies:
-    "@urql/core" ">=3.0.0"
-    wonka "^6.0.0"
+    "@0no-co/graphql.web" "^1.0.1"
+    "@urql/core" ">=4.1.0"
+    wonka "^6.3.2"
 
 "@urql/exchange-retry@0.3.0":
   version "0.3.0"
@@ -21900,13 +21885,13 @@ urlpattern-polyfill@^6.0.2:
   dependencies:
     braces "^3.0.2"
 
-urql@^3.0.3:
-  version "3.0.3"
-  resolved "https://registry.yarnpkg.com/urql/-/urql-3.0.3.tgz#275631f487558354e090d9ffc4ea2030bd56c34a"
-  integrity sha512-aVUAMRLdc5AOk239DxgXt6ZxTl/fEmjr7oyU5OGo8uvpqu42FkeJErzd2qBzhAQ3DyusoZIbqbBLPlnKo/yy2A==
+urql@^4.0.6:
+  version "4.0.6"
+  resolved "https://registry.yarnpkg.com/urql/-/urql-4.0.6.tgz#2a2442da7ca63689559b0eff763b17ed4213928e"
+  integrity sha512-meXJ2puOd64uCGKh7Fse2R7gPa8+ZpBOoA62jN7CPXXUt7SVZSdeXWSpB3HvlfzLUkEqsWbvshwrgeWRYNNGaQ==
   dependencies:
-    "@urql/core" "^3.0.3"
-    wonka "^6.0.0"
+    "@urql/core" "^4.2.0"
+    wonka "^6.3.2"
 
 use-isomorphic-layout-effect@^1.0.0:
   version "1.1.2"
