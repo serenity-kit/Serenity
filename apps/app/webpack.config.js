@@ -35,6 +35,7 @@ module.exports = async function (env, argv) {
   config.resolve.fallback = {
     fs: false,
     path: false,
+    crypto: false,
   };
 
   // needed since NativeBase uses API referencing normalize-css-color
