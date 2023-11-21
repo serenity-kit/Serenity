@@ -40,7 +40,7 @@ export const createUserChainEvent = ({
   position: number;
   triggerRerender?: boolean;
 }) => {
-  sql.execute(`INSERT INTO ${table} VALUES (?, ?, ?, ?, ?);`, [
+  sql.execute(`INSERT OR IGNORE INTO ${table} VALUES (?, ?, ?, ?, ?);`, [
     position,
     JSON.stringify(event),
     JSON.stringify(state),
