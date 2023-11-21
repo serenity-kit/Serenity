@@ -17,7 +17,7 @@ export const showToast = (
       variant === "info" ? tw.color("gray-900") : tw.color("error-500"),
     opacity: 1,
     containerStyle: tw`py-3 px-8 `,
-    textStyle: tw`text-xs inter-regular`,
+    textStyle: tw`text-xs font-inter-regular`,
     ...options,
   });
 };
