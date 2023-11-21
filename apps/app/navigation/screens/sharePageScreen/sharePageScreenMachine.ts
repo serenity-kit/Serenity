@@ -29,6 +29,7 @@ export const sharePageScreenMachine =
       context: { navigation: null } as Context,
       id: "sharePageScreenMachine",
       initial: "idle",
+      predictableActionArguments: true,
       states: {
         loading: {
           invoke: {
