@@ -1,7 +1,9 @@
 import {
   LocalDevice,
+  VerifiedUserFromUserChain,
   constructUserFromSerializedUserChain,
   encryptWorkspaceKeyForDevice,
+  equalArrayContent,
   generateId,
   notNull,
 } from "@serenity-tools/common";
@@ -45,20 +47,33 @@ export const rotateWorkspaceKey = async ({
     throw new Error("No users found for workspace");
   }
 
-  const userDevicesInfoArray =
+  const validMainDeviceSigningPublicKeys = Object.keys(
+    workspaceChainState.members
+  );
+
+  const verifiedUsers: VerifiedUserFromUserChain[] =
     workspaceMembersResult.data.workspaceMembers.nodes
       .filter(notNull)
       .map((member) => {
         return constructUserFromSerializedUserChain({
           serializedUserChain: member.user.chain,
-          validMainDeviceSigningPublicKeys: Object.keys(
-            workspaceChainState.members
-          ),
+          validMainDeviceSigningPublicKeys,
         });
       });
 
+  if (
+    !equalArrayContent(
+      validMainDeviceSigningPublicKeys,
+      verifiedUsers.map((user) => user.mainDeviceSigningPublicKey)
+    )
+  ) {
+    throw new Error(
+      "WorkspaceMembersQuery does not match up with Workspace Chain."
+    );
+  }
+
   const deviceWorkspaceKeyBoxes: WorkspaceDeviceParing[] = [];
-  userDevicesInfoArray.forEach((userDevicesInfo) => {
+  verifiedUsers.forEach((userDevicesInfo) => {
     if (userDevicesInfo.userId === userToRemoveId) return;
     userDevicesInfo.nonExpiredDevices.forEach((device) => {
       if (device.signingPublicKey === deviceToRemoveSigningPublicKey) return;
