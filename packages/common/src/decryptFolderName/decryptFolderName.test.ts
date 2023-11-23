@@ -63,7 +63,7 @@ test("decryptFolderName with publicData fails for wrong key", () => {
         trace: [],
       },
     })
-  ).toThrowError(/ciphertext cannot be decrypted using that key/);
+  ).toThrowError(/Invalid robustness tag/);
 });
 
 test("decryptFolderName with publicData fails for wrong public data", () => {
@@ -92,5 +92,5 @@ test("decryptFolderName with publicData fails for wrong public data", () => {
         trace: [],
       },
     })
-  ).toThrowError(/ciphertext cannot be decrypted using that key/);
+  ).toThrowError(/Invalid robustness tag/);
 });

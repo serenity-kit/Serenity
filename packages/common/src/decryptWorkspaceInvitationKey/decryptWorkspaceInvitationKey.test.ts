@@ -37,5 +37,5 @@ test("decryptFolderName with publicData fails for wrong key", () => {
       publicNonce: encryptedData.publicNonce,
       subkeyId: encryptedData.subkeyId,
     })
-  ).toThrowError(/ciphertext cannot be decrypted using that key/);
+  ).toThrowError(/Invalid robustness tag/);
 });
