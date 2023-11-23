@@ -85,7 +85,9 @@ export function CreateWorkspaceForm(props: CreateWorkspaceFormProps) {
       const documentName = "Introduction";
 
       const { nonExpiredDevices, userId, userChainState } =
-        await getAndVerifyUserDevices();
+        await getAndVerifyUserDevices({
+          mainDeviceSigningPublicKey: mainDevice.signingPublicKey,
+        });
 
       // build workspace key boxes for workspace
       const { deviceWorkspaceKeyBoxes, workspaceKey } =
