@@ -13,6 +13,7 @@ export const getAndConstructUserFromUserChainTestHelper = async ({
   });
 
   return constructUserFromSerializedUserChain({
+    validMainDeviceSigningPublicKeys: [mainDeviceSigningPublicKey],
     serializedUserChain: chainEntriesFromDb.map((chainEntry) => {
       return {
         ...chainEntry,

@@ -7,6 +7,7 @@ import {
 } from "@serenity-tools/common";
 import sodium from "react-native-libsodium";
 import { runWorkspaceMembersQuery } from "../../generated/graphql";
+import { loadRemoteWorkspaceChain } from "../../store/workspaceChainStore";
 import { WorkspaceDeviceParing } from "../../types/workspaceDevice";
 
 export type Props = {
@@ -27,6 +28,10 @@ export const rotateWorkspaceKey = async ({
     workspaceKey: workspaceKeyString,
   };
 
+  const { state: workspaceChainState } = await loadRemoteWorkspaceChain({
+    workspaceId,
+  });
+
   // TODO here we should take already loaded devices into account and
   // load all of them again from the server
   let workspaceMembersResult = await runWorkspaceMembersQuery(
@@ -46,6 +51,9 @@ export const rotateWorkspaceKey = async ({
       .map((member) => {
         return constructUserFromSerializedUserChain({
           serializedUserChain: member.user.chain,
+          validMainDeviceSigningPublicKeys: Object.keys(
+            workspaceChainState.members
+          ),
         });
       });
 

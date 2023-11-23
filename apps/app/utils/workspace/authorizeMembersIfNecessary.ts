@@ -39,7 +39,7 @@ export const authorizeMembersIfNecessary = async ({
         )
       ) {
         // could be that the chain is not up to date
-        // possibly should be improved by warning the user after the chain was updated
+        // possibly could be improved by refetching the newest chain and try again
         return;
       }
 
@@ -61,14 +61,8 @@ export const authorizeMembersIfNecessary = async ({
             workspaceMembersByMainDeviceSigningPublicKeyQueryResult.data
               .workspaceMembersByMainDeviceSigningPublicKey.workspaceMembers[0]
               .user.chain,
+          validMainDeviceSigningPublicKeys: [userMainDeviceSigningPublicKey],
         });
-
-        if (
-          user.mainDeviceSigningPublicKey !== userMainDeviceSigningPublicKey
-        ) {
-          // the server returned the wrong chain!
-          return;
-        }
 
         const workspaceResult = await runWorkspaceQuery({
           deviceSigningPublicKey: activeDevice.signingPublicKey,
