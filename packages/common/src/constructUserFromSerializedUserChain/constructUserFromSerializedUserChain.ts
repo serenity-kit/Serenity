@@ -10,6 +10,7 @@ type SerializedUserChain = Array<{
 
 type Params = {
   serializedUserChain: SerializedUserChain;
+  validMainDeviceSigningPublicKeys: string[];
 };
 
 export type VerifiedUserFromUserChain = {
@@ -24,6 +25,7 @@ export type VerifiedUserFromUserChain = {
 
 export const constructUserFromSerializedUserChain = ({
   serializedUserChain,
+  validMainDeviceSigningPublicKeys,
 }: Params): VerifiedUserFromUserChain => {
   if (serializedUserChain.length === 0) {
     throw new Error("Empty user-chains are not valid");
@@ -43,6 +45,16 @@ export const constructUserFromSerializedUserChain = ({
     knownVersion: userChain.version,
   });
   userChainState = userChainResult.currentState;
+
+  if (
+    !validMainDeviceSigningPublicKeys.includes(
+      userChainState.mainDeviceSigningPublicKey
+    )
+  ) {
+    throw new Error(
+      "The main device signing public key does not match the one in the user chain."
+    );
+  }
 
   const nonExpiredDevices: VerifiedDevice[] = [];
   const expiredDevices: VerifiedDevice[] = [];
