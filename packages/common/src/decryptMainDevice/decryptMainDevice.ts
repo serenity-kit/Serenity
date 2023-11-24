@@ -12,7 +12,7 @@ export const decryptMainDevice = ({
       sodium.from_base64(exportKey).subarray(0, sodium.crypto_kdf_KEYBYTES)
     ),
     context: "m_device",
-    subkeyId: 1111,
+    subkeyId: "AAAAAAAAAAAAAAAAAAAAAA",
   });
   const decryptedCiphertextBase64 = sodium.crypto_secretbox_open_easy(
     sodium.from_base64(ciphertext),

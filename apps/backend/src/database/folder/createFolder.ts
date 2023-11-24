@@ -10,7 +10,7 @@ type Params = {
   nameCiphertext: string;
   nameNonce: string;
   workspaceKeyId: string;
-  subkeyId: number;
+  subkeyId: string;
   parentFolderId?: string;
   workspaceId: string;
   keyDerivationTrace: KeyDerivationTrace;

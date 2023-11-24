@@ -10,7 +10,7 @@ type Params = {
   commentReplyId: string;
   commentId: string;
   snapshotId: string;
-  subkeyId: number;
+  subkeyId: string;
   contentCiphertext: string;
   contentNonce: string;
   signature: string;

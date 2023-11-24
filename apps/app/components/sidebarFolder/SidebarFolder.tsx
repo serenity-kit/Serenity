@@ -66,7 +66,7 @@ type Props = ViewProps & {
   folderName?: string;
   nameCiphertext: string;
   nameNonce: string;
-  subkeyId: number;
+  subkeyId: string;
   keyDerivationTrace: KeyDerivationTrace;
   depth?: number;
   onStructureChange: () => void;

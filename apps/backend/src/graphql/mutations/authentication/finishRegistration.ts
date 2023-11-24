@@ -24,7 +24,7 @@ export const FinishRegistrationInput = inputObjectType({
       type: FinishRegistrationEncryptedDeviceInput,
     });
     t.string("pendingWorkspaceInvitationId");
-    t.int("pendingWorkspaceInvitationKeySubkeyId");
+    t.string("pendingWorkspaceInvitationKeySubkeyId");
     t.string("pendingWorkspaceInvitationKeyCiphertext");
     t.string("pendingWorkspaceInvitationKeyPublicNonce");
     t.nonNull.string("serializedUserChainEvent");

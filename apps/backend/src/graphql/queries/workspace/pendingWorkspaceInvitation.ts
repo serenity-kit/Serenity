@@ -7,7 +7,7 @@ export const PendingWorkspaceInvitationResult = objectType({
     t.string("id");
     t.string("ciphertext");
     t.string("publicNonce");
-    t.int("subkeyId");
+    t.string("subkeyId");
   },
 });
 

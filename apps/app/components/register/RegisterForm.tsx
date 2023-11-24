@@ -146,7 +146,7 @@ export default function RegisterForm(props: Props) {
           info: JSON.stringify({ type: "main" }),
         });
 
-        let pendingWorkspaceInvitationKeySubkeyId: number | null = null;
+        let pendingWorkspaceInvitationKeySubkeyId: string | null = null;
         let pendingWorkspaceInvitationKeyCiphertext: string | null = null;
         let pendingWorkspaceInvitationKeyPublicNonce: string | null = null;
         if (props.workspaceInvitationKey) {

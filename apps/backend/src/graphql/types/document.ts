@@ -9,7 +9,7 @@ export const Document = objectType({
     t.nonNull.string("id");
     t.nonNull.string("nameCiphertext");
     t.nonNull.string("nameNonce");
-    t.nonNull.int("subkeyId");
+    t.nonNull.string("subkeyId");
     t.string("parentFolderId");
     t.string("rootFolderId");
     t.nonNull.string("workspaceId");

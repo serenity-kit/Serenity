@@ -16,7 +16,7 @@ export const CreateDocumentInput = inputObjectType({
   definition(t) {
     t.nonNull.string("nameCiphertext");
     t.nonNull.string("nameNonce");
-    t.nonNull.int("subkeyId");
+    t.nonNull.string("subkeyId");
     t.nonNull.string("parentFolderId");
     t.nonNull.string("workspaceId");
     t.nonNull.field("snapshot", { type: DocumentSnapshotInput });

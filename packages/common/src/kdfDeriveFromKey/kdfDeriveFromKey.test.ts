@@ -9,7 +9,7 @@ test("create new subkey", () => {
   const kdfKey = "3NmUk0ywlom5Re-ShkR_nE3lKLxq5FSJxm56YdbOJto";
   const result = kdfDeriveFromKey({ key: kdfKey, context: "doctitle" });
   const { subkeyId, key } = result;
-  expect(typeof subkeyId).toBe("number");
+  expect(typeof subkeyId).toBe("string");
   expect(typeof key).toBe("string");
   expect(key.length).toBe(43);
 });
@@ -19,11 +19,11 @@ test("reconstruct subkey based on the existing subkeyId", () => {
   const result = kdfDeriveFromKey({
     key: kdfKey,
     context: "comment_",
-    subkeyId: 5200022,
+    subkeyId: "Am3wrVyg7xJC8X2Ky2OIyQ",
   });
   const { subkeyId, key } = result;
-  expect(subkeyId).toBe(5200022);
-  expect(key).toBe("iHr1pnaBwT889NrLdpD6KQBGP4fNTpqxetSb17UFGts");
+  expect(subkeyId).toBe("Am3wrVyg7xJC8X2Ky2OIyQ");
+  expect(key).toBe("64J_DluGLx9QAGhRgaTO3NM8GHxEcaI7rHTkpYD7fMo");
 });
 
 test("to throw in case of an unknown context", () => {
@@ -34,7 +34,7 @@ test("to throw in case of an unknown context", () => {
       key: kdfKey,
       // @ts-expect-error
       context: "12345678",
-      subkeyId: 5200022,
+      subkeyId: "Am3wrVyg7xJC8X2Ky2OIyQ",
     });
   }).toThrow();
 });

@@ -13,7 +13,7 @@ type Params = {
   snapshotId: string;
   signature: string;
   authorSigningPublicKey: string;
-  subkeyId: number;
+  subkeyId: string;
 };
 
 export const verifyAndDecryptCommentReply = ({

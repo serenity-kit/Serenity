@@ -32,7 +32,7 @@ export type FolderParams = {
 export type DocumentParams = {
   nameCiphertext: string;
   nameNonce: string;
-  subkeyId: number;
+  subkeyId: string;
   snapshot: SerenitySnapshotWithClientData;
 };
 
@@ -79,7 +79,7 @@ export async function createInitialWorkspaceStructure({
     nameCiphertext: folder.nameCiphertext,
     nameNonce: folder.nameNonce,
     workspaceKeyId: workspaceKey?.id!,
-    subkeyId: 123, // TODO: remove
+    subkeyId: "yoW4QaCRujrMdml7q39EqQ", // TODO: remove
     parentFolderId: undefined,
     workspaceId: createdWorkspace.id,
     keyDerivationTrace: folder.keyDerivationTrace,

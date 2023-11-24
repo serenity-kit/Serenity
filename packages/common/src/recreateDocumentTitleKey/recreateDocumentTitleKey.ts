@@ -3,7 +3,7 @@ import { kdfDeriveFromKey } from "../kdfDeriveFromKey/kdfDeriveFromKey";
 
 type Params = {
   snapshotKey: string;
-  subkeyId: number;
+  subkeyId: string;
 };
 
 export const recreateDocumentTitleKey = (params: Params) => {

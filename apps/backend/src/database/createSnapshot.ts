@@ -19,7 +19,7 @@ export type CreateSnapshotDocumentTitleData = {
   ciphertext: string;
   nonce: string;
   workspaceKeyId: string;
-  subkeyId: number;
+  subkeyId: string;
 };
 
 type Params = {

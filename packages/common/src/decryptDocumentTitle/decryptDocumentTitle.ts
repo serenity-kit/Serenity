@@ -11,7 +11,7 @@ type Params = {
   snapshot: {
     keyDerivationTrace: KeyDerivationTrace;
   };
-  subkeyId: number;
+  subkeyId: string;
   workspaceKeyBox: {
     ciphertext: string;
     nonce: string;

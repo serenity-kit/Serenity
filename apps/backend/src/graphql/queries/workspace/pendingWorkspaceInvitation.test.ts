@@ -59,7 +59,7 @@ test("user should be be able to get their pending workspace invitation", async (
         "ciphertext": "${registerUser1Result.pendingWorkspaceInvitationKeyCiphertext}",
         "id": "${pendingWorkspaceInvitation2}",
         "publicNonce": "${registerUser1Result.pendingWorkspaceInvitationKeyPublicNonce}",
-        "subkeyId": ${registerUser1Result.pendingWorkspaceInvitationKeySubkeyId},
+        "subkeyId": "${registerUser1Result.pendingWorkspaceInvitationKeySubkeyId}",
       }
     `);
 });

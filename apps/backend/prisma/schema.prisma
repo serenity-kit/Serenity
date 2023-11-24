@@ -38,7 +38,7 @@ model Document {
   parentFolderId     String
   nameCiphertext     String
   nameNonce          String
-  subkeyId           Int
+  subkeyId           String
   documentShareLinks DocumentShareLink[]
   requiresSnapshot   Boolean              @default(false)
   comments           Comment[]
@@ -95,7 +95,7 @@ model UnverifiedUser {
   mainDeviceEncryptionPublicKey            String  @unique
   mainDeviceEncryptionPublicKeySignature   String  @unique
   pendingWorkspaceInvitationId             String?
-  pendingWorkspaceInvitationKeySubkeyId    Int?
+  pendingWorkspaceInvitationKeySubkeyId    String?
   pendingWorkspaceInvitationKeyCiphertext  String?
   pendingWorkspaceInvitationKeyPublicNonce String?
   createChainEvent                         Json
@@ -118,7 +118,7 @@ model User {
   workspaceInvitations                     WorkspaceInvitations[]
   sessions                                 Session[]
   pendingWorkspaceInvitationId             String?
-  pendingWorkspaceInvitationKeySubkeyId    Int?
+  pendingWorkspaceInvitationKeySubkeyId    String?
   pendingWorkspaceInvitationKeyCiphertext  String?
   pendingWorkspaceInvitationKeyPublicNonce String?
   creatorDevices                           CreatorDevice[]
@@ -305,7 +305,7 @@ model Folder {
   idSignature        String
   nameCiphertext     String
   nameNonce          String
-  subkeyId           Int
+  subkeyId           String
   workspace          Workspace    @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
   workspaceId        String
   workspaceKey       WorkspaceKey @relation(fields: [workspaceKeyId], references: [id], onDelete: SetDefault)
@@ -367,7 +367,7 @@ model Comment {
   commentReplies                CommentReply[]
   snapshot                      Snapshot       @relation(fields: [snapshotId], references: [id], onDelete: Cascade)
   snapshotId                    String
-  subkeyId                      Int
+  subkeyId                      String
   signature                     String
 }
 
@@ -384,7 +384,7 @@ model CommentReply {
   creatorDeviceSigningPublicKey String
   snapshot                      Snapshot      @relation(fields: [snapshotId], references: [id], onDelete: Cascade)
   snapshotId                    String
-  subkeyId                      Int
+  subkeyId                      String
   signature                     String
 }
 

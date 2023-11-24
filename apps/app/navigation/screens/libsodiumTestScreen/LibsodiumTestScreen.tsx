@@ -91,7 +91,7 @@ export default function LibsodiumTestScreen(
       const kdfDerivedKey = kdfDeriveFromKey({
         key: kdfKey,
         context: "doctitle",
-        subkeyId: 5200022,
+        subkeyId: "Am3wrVyg7xJC8X2Ky2OIyQ",
       });
 
       const generatedKdfKey = sodium.crypto_kdf_keygen();

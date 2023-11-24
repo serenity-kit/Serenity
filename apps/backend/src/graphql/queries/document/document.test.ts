@@ -80,7 +80,7 @@ test("user should be retrieve a document", async () => {
   expect(retrievedDocument.parentFolderId).toBe(userData1.folder.id);
   expect(typeof retrievedDocument.nameCiphertext).toBe("string");
   expect(typeof retrievedDocument.nameNonce).toBe("string");
-  expect(typeof retrievedDocument.subkeyId).toBe("number");
+  expect(typeof retrievedDocument.subkeyId).toBe("string");
 
   const snapshotResult = await getSnapshot({
     graphql,

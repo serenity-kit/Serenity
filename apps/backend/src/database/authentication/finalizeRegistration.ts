@@ -23,7 +23,7 @@ type Props = {
   registrationRecord: string;
   encryptedMainDevice: DeviceInput;
   pendingWorkspaceInvitationId: string | null | undefined;
-  pendingWorkspaceInvitationKeySubkeyId: number | null | undefined;
+  pendingWorkspaceInvitationKeySubkeyId: string | null | undefined;
   pendingWorkspaceInvitationKeyCiphertext: string | null | undefined;
   pendingWorkspaceInvitationKeyPublicNonce: string | null | undefined;
   createChainEvent: userChain.CreateUserChainEvent;

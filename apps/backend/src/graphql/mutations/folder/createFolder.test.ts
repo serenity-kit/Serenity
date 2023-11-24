@@ -70,7 +70,7 @@ test("user should be able to create a root folder", async () => {
     userData1.workspace.currentWorkspaceKey.id
   );
   expect(folder.keyDerivationTrace.trace.length).toBe(1);
-  expect(typeof folder.keyDerivationTrace.trace[0].subkeyId).toBe("number");
+  expect(typeof folder.keyDerivationTrace.trace[0].subkeyId).toBe("string");
   expect(folder.keyDerivationTrace.trace[0].entryId).toBe(id);
   expect(folder.keyDerivationTrace.trace[0].parentId).toBe(null);
   expect(folder.keyDerivationTrace.trace[0].context).toBe(
@@ -103,7 +103,7 @@ test("user should be able to create a root folder with a name", async () => {
     userData1.workspace.currentWorkspaceKey.id
   );
   expect(folder.keyDerivationTrace.trace.length).toBe(1);
-  expect(typeof folder.keyDerivationTrace.trace[0].subkeyId).toBe("number");
+  expect(typeof folder.keyDerivationTrace.trace[0].subkeyId).toBe("string");
   expect(folder.keyDerivationTrace.trace[0].entryId).toBe(id);
   expect(folder.keyDerivationTrace.trace[0].parentId).toBe(null);
   expect(folder.keyDerivationTrace.trace[0].context).toBe(
@@ -144,13 +144,13 @@ test("user should be able to create a child folder", async () => {
     userData1.workspace.currentWorkspaceKey.id
   );
   expect(folder.keyDerivationTrace.trace.length).toBe(2);
-  expect(typeof folder.keyDerivationTrace.trace[0].subkeyId).toBe("number");
+  expect(typeof folder.keyDerivationTrace.trace[0].subkeyId).toBe("string");
   expect(folder.keyDerivationTrace.trace[0].entryId).toBe(parentFolderId);
   expect(folder.keyDerivationTrace.trace[0].parentId).toBe(null);
   expect(folder.keyDerivationTrace.trace[0].context).toBe(
     folderDerivedKeyContext
   );
-  expect(typeof folder.keyDerivationTrace.trace[1].subkeyId).toBe("number");
+  expect(typeof folder.keyDerivationTrace.trace[1].subkeyId).toBe("string");
   expect(folder.keyDerivationTrace.trace[1].entryId).toBe(id);
   expect(folder.keyDerivationTrace.trace[1].parentId).toBe(parentFolderId);
   expect(folder.keyDerivationTrace.trace[1].context).toBe(

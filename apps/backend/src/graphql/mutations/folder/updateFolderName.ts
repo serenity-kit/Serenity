@@ -18,7 +18,7 @@ export const UpdateFolderNameInput = inputObjectType({
     t.nonNull.string("nameCiphertext");
     t.nonNull.string("nameNonce");
     t.nonNull.string("workspaceKeyId");
-    t.nonNull.int("subkeyId");
+    t.nonNull.string("subkeyId");
     t.nonNull.field("keyDerivationTrace", { type: KeyDerivationTraceInput });
   },
 });

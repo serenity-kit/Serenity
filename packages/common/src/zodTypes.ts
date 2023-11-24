@@ -14,7 +14,7 @@ export type KeyDerivationContext = z.infer<typeof KeyDerivationContext>;
 
 export const KeyDerivationTraceEntry = z.object({
   entryId: z.string(), // didn't use id because it often GraphQL clients normalize by the id field
-  subkeyId: z.number(),
+  subkeyId: z.string(),
   parentId: z.union([z.string(), z.null(), z.undefined()]), // the first entry has no parent
   // should be, but causes too many issues with GraphQL KeyDerivationContext,
   context: z.string(), // kdf context
@@ -73,7 +73,7 @@ export type SerenitySnapshotWithClientData = SnapshotWithClientData & {
     documentTitleData: {
       ciphertext: string;
       nonce: string;
-      subkeyId: number;
+      subkeyId: string;
       workspaceKeyId: string;
     };
     documentShareLinkDeviceBoxes: DocumentShareLinkDeviceBox[];

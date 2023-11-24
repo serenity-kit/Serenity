@@ -10,7 +10,7 @@ type Params = {
   key: string;
   documentId: string;
   snapshotId: string;
-  subkeyId: number;
+  subkeyId: string;
   device: LocalDevice;
 };
 

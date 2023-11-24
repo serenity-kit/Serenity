@@ -19,7 +19,7 @@ export const CreateCommentInput = inputObjectType({
     t.nonNull.string("signature");
     t.nonNull.string("snapshotId");
     t.string("documentShareLinkToken");
-    t.nonNull.int("subkeyId");
+    t.nonNull.string("subkeyId");
   },
 });
 

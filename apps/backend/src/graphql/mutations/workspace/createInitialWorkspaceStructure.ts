@@ -54,7 +54,7 @@ export const CreateInitialDocumentInput = inputObjectType({
   definition(t) {
     t.nonNull.string("nameCiphertext");
     t.nonNull.string("nameNonce");
-    t.nonNull.int("subkeyId");
+    t.nonNull.string("subkeyId");
     t.nonNull.field("snapshot", { type: DocumentSnapshotInput });
     t.nonNull.string("serializedDocumentChainEvent");
   },

@@ -18,7 +18,7 @@ export const CreateCommentReplyInput = inputObjectType({
     t.nonNull.string("snapshotId");
     t.nonNull.string("signature");
     t.string("documentShareLinkToken");
-    t.nonNull.int("subkeyId");
+    t.nonNull.string("subkeyId");
     t.nonNull.string("contentCiphertext");
     t.nonNull.string("contentNonce");
   },

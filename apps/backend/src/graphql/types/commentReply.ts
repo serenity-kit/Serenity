@@ -9,7 +9,7 @@ export const CommentReply = objectType({
     t.nonNull.string("documentId");
     t.nonNull.string("snapshotId");
     t.nonNull.string("signature");
-    t.nonNull.int("subkeyId");
+    t.nonNull.string("subkeyId");
     t.nonNull.string("contentCiphertext");
     t.nonNull.string("contentNonce");
     t.nonNull.field("createdAt", { type: "Date" });

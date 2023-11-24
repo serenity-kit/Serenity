@@ -4,7 +4,7 @@ export const KeyDerivationTraceEntry = objectType({
   name: "KeyDerivationTraceEntry",
   definition(t) {
     t.nonNull.string("entryId");
-    t.nonNull.int("subkeyId");
+    t.nonNull.string("subkeyId");
     t.nonNull.string("context");
     t.string("parentId");
   },
@@ -24,7 +24,7 @@ export const KeyDerivationTraceEntryInput = inputObjectType({
   name: "KeyDerivationTraceEntryInput",
   definition(t) {
     t.nonNull.string("entryId");
-    t.nonNull.int("subkeyId");
+    t.nonNull.string("subkeyId");
     t.nonNull.string("context");
     t.string("parentId");
   },

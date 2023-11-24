@@ -8,7 +8,7 @@ export const createAndEncryptMainDevice = (exportKey: string) => {
       sodium.from_base64(exportKey).subarray(0, sodium.crypto_kdf_KEYBYTES)
     ),
     context: "m_device",
-    subkeyId: 1111,
+    subkeyId: "AAAAAAAAAAAAAAAAAAAAAA",
   });
   const {
     signingPublicKey,
