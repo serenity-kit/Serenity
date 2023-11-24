@@ -9,7 +9,7 @@ type Params = {
   documentShareLinkToken?: string | null | undefined;
   creatorDeviceSigningPublicKey: string;
   snapshotId: string;
-  subkeyId: number;
+  subkeyId: string;
   contentCiphertext: string;
   contentNonce: string;
   signature: string;

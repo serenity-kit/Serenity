@@ -13,7 +13,7 @@ type RunUpdateDocumentNameMutationParams = {
   id: string;
   nameCiphertext: string;
   nameNonce: string;
-  subkeyId: number;
+  subkeyId: string;
   workspaceKeyId: string;
   authorizationHeader: string;
 };
@@ -85,7 +85,7 @@ export const updateDocumentName = async ({
       id,
       nameCiphertext: "",
       nameNonce: "",
-      subkeyId: 123,
+      subkeyId: "AAAAAAAAAAAAAAAAAAAAAA",
       workspaceKeyId,
       authorizationHeader,
     });
@@ -114,7 +114,7 @@ export const updateDocumentName = async ({
       id,
       nameCiphertext: "",
       nameNonce: "",
-      subkeyId: 123,
+      subkeyId: "AAAAAAAAAAAAAAAAAAAAAA",
       workspaceKeyId,
       authorizationHeader,
     });
@@ -134,7 +134,7 @@ export const updateDocumentName = async ({
       id,
       nameCiphertext: "",
       nameNonce: "",
-      subkeyId: 123,
+      subkeyId: "AAAAAAAAAAAAAAAAAAAAAA",
       workspaceKeyId,
       authorizationHeader,
     });

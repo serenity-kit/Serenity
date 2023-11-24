@@ -58,7 +58,7 @@ test("create initial workspace structure", async () => {
   expect(typeof folder.nameNonce).toBe("string");
   expect(typeof folder.keyDerivationTrace).toBe("object");
   expect(typeof folder.keyDerivationTrace.workspaceKeyId).toBe("string");
-  expect(typeof folder.keyDerivationTrace.trace[0].subkeyId).toBe("number");
+  expect(typeof folder.keyDerivationTrace.trace[0].subkeyId).toBe("string");
   expect(folder.keyDerivationTrace.trace[0].parentId).toBe(
     folder.parentFolderId
   );
@@ -70,7 +70,7 @@ test("create initial workspace structure", async () => {
   expect(document.id).not.toBeUndefined();
   expect(typeof document.nameCiphertext).toBe("string");
   expect(typeof document.nameNonce).toBe("string");
-  expect(typeof document.subkeyId).toBe("number");
+  expect(typeof document.subkeyId).toBe("string");
   // attempt to decrypt the folder and document names
   const workspaceKeyBox = workspace.currentWorkspaceKey.workspaceKeyBox;
   const workspaceKey = decryptWorkspaceKey({

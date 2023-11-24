@@ -5,7 +5,7 @@ import { recreateDocumentTitleKey } from "../recreateDocumentTitleKey/recreateDo
 
 type Params = {
   snapshotKey: string;
-  subkeyId: number;
+  subkeyId: string;
   ciphertext: string;
   nonce: string;
   publicData?: any;

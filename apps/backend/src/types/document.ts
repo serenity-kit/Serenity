@@ -9,5 +9,5 @@ export type Document = {
   workspaceId: string;
   createdAt?: Date;
   updatedAt?: Date;
-  subkeyId: number;
+  subkeyId: string;
 };

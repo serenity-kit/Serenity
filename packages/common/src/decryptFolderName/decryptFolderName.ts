@@ -8,7 +8,7 @@ import { KeyDerivationTrace } from "../zodTypes";
 type Params = {
   // parentKey is the master key for the workspace or the key of the parent folder
   parentKey: string;
-  subkeyId: number;
+  subkeyId: string;
   ciphertext: string;
   nonce: string;
   folderId: string;

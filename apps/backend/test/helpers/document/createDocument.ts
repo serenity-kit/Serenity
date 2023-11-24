@@ -26,7 +26,7 @@ type RunCreateDocumentMutationParams = {
   graphql: any;
   nameCiphertext: string;
   nameNonce: string;
-  subkeyId: number;
+  subkeyId: string;
   parentFolderId: string | null;
   workspaceId: string;
   snapshot?: Snapshot | null | undefined;
@@ -126,7 +126,7 @@ export const createDocument = async ({
       graphql,
       nameCiphertext: "",
       nameNonce: "",
-      subkeyId: 1,
+      subkeyId: "AAAAAAAAAAAAAAAAAAAAAA",
       parentFolderId,
       workspaceId,
       snapshot: null,
@@ -148,7 +148,7 @@ export const createDocument = async ({
       graphql,
       nameCiphertext: "",
       nameNonce: "",
-      subkeyId: 1,
+      subkeyId: "AAAAAAAAAAAAAAAAAAAAAA",
       parentFolderId,
       workspaceId,
       snapshot: null,

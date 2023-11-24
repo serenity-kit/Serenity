@@ -3,7 +3,7 @@ import { kdfDeriveFromKey } from "../kdfDeriveFromKey/kdfDeriveFromKey";
 
 type Params = {
   folderKey: string;
-  subkeyId: number;
+  subkeyId: string;
 };
 
 export const recreateSnapshotKey = ({ folderKey, subkeyId }: Params) => {

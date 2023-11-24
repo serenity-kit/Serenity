@@ -11,7 +11,7 @@ type Params = {
   folderId: string;
   workspaceId: string;
   keyDerivationTrace: KeyDerivationTrace;
-  subkeyId: number;
+  subkeyId: string;
 };
 
 // Having a specific "folder__" context allows us to use have the same subkeyId

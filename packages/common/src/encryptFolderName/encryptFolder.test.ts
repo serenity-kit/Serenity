@@ -23,7 +23,7 @@ test("encryptFolderName", () => {
   });
   expect(typeof result.folderSubkey).toBe("string");
   expect(result.folderSubkey.length).toBe(43);
-  expect(typeof result.folderSubkeyId).toBe("number");
+  expect(typeof result.folderSubkeyId).toBe("string");
   expect(typeof result.ciphertext).toBe("string");
   expect(typeof result.nonce).toBe("string");
 });

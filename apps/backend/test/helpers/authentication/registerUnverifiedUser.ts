@@ -52,7 +52,7 @@ export const registerUnverifiedUser = async ({
 
   let pendingWorkspaceInvitationKeyCiphertext: string | null = null;
   let pendingWorkspaceInvitationKeyPublicNonce: string | null = null;
-  let pendingWorkspaceInvitationKeySubkeyId: number | null = null;
+  let pendingWorkspaceInvitationKeySubkeyId: string | null = null;
   if (pendingWorkspaceInvitationId) {
     const signingKeyPair = sodium.crypto_sign_keypair();
     const workspaceInvitationKeyData = encryptWorkspaceInvitationPrivateKey({

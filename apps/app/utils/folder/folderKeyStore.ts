@@ -30,7 +30,7 @@ export type GetFolderKeyProps = {
   workspaceId: string;
   workspaceKeyId: string | undefined | null;
   folderId: string;
-  folderSubkeyId?: number | undefined | null;
+  folderSubkeyId?: string | undefined | null;
   activeDevice: LocalDevice;
 };
 // export type SetFolderKeyProps = {

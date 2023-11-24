@@ -10,7 +10,7 @@ type Params = {
   nameCiphertext: string;
   nameNonce: string;
   workspaceKeyId?: string | null;
-  subkeyId: number; // name/title subkey id
+  subkeyId: string; // name/title subkey id
   parentFolderId: string;
   workspaceId: string;
   snapshot: SerenitySnapshotWithClientData;

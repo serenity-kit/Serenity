@@ -4,7 +4,7 @@ import { kdfDeriveFromKey } from "../kdfDeriveFromKey/kdfDeriveFromKey";
 
 type Params = {
   exportKey: string;
-  subkeyId: number;
+  subkeyId: string;
   ciphertext: string;
   publicNonce: string;
 };

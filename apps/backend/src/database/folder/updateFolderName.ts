@@ -8,7 +8,7 @@ type Params = {
   nameCiphertext: string;
   nameNonce: string;
   workspaceKeyId: string;
-  subkeyId: number;
+  subkeyId: string;
   userId: string;
   keyDerivationTrace: KeyDerivationTrace;
 };

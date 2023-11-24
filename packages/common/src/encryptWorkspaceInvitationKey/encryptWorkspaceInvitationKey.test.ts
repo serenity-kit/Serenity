@@ -16,7 +16,7 @@ test("encryptFolderName", async () => {
   });
   expect(typeof result.key).toBe("string");
   expect(result.key.length).toBe(43);
-  expect(typeof result.subkeyId).toBe("number");
+  expect(typeof result.subkeyId).toBe("string");
   expect(typeof result.ciphertext).toBe("string");
   expect(typeof result.publicNonce).toBe("string");
 });

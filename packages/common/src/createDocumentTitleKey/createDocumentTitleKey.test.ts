@@ -11,7 +11,7 @@ test("create new documentTitleKey", () => {
     snapshotKey: kdfKey,
   });
   const { subkeyId, key } = result;
-  expect(typeof subkeyId).toBe("number");
+  expect(typeof subkeyId).toBe("string");
   expect(typeof key).toBe("string");
   expect(key.length).toBe(43);
 });

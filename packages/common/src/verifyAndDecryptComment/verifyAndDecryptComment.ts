@@ -11,7 +11,7 @@ type Params = {
   documentId: string;
   commentId: string;
   snapshotId: string;
-  subkeyId: number;
+  subkeyId: string;
   signature: string;
   authorSigningPublicKey: string;
 };
