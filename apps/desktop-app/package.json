@@ -4,6 +4,7 @@
   "productName": "Serenity",
   "version": "0.0.1",
   "description": "End-to-end encrypted workspaces for teams",
+  "author": "Naisho GmbH",
   "main": "src/index.ts",
   "scripts": {
     "build": "cd ../app && yarn build:electron-web && cd -",

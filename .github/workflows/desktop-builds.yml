@@ -3,28 +3,55 @@ name: Desktop Builds
 on: [push]
 
 jobs:
+  build-electron-web-build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3 # needed until 18 becomes the default
+        with:
+          node-version: 18
+          cache: yarn
+      - name: Install node-gyp # needed for apollo server
+        run: yarn global add node-gyp
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+      - name: Build Electron Web bundle
+        working-directory: apps/desktop-app
+        run: yarn build
+      - name: Upload build
+        uses: actions/upload-artifact@v3
+        with:
+          name: electron-web-build
+          path: apps/desktop-app/src/web-build
+      - name: ls
+        run: ls -al apps/desktop-app/src/web-build
   build:
-    # runs-on: ubuntu-latest
+    needs: build-electron-web-build
     name: Build (${{ matrix.os }} - ${{ matrix.arch }})
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
         # build for supported platforms
         # https://github.com/electron/electron-packager/blob/ebcbd439ff3e0f6f92fa880ff28a8670a9bcf2ab/src/targets.js#L9
-        # os: [macOS-latest, ubuntu-latest, windows-latest]
-        os: [macOS-latest, ubuntu-latest]
+        os: [macOS-latest, ubuntu-latest, windows-latest]
+        # os: [macOS-latest, ubuntu-latest]
         arch: [x64, arm64]
         # include:
         #   - os: ubuntu-latest
         #     arch: armv7l
-        # # publishing artifacts for multiple Windows architectures has
-        # # a bug which can cause the wrong architecture to be downloaded
-        # # for an update, so until that is fixed, only build Windows x64
-        # exclude:
-        #   - os: windows-latest
-        #     arch: arm64
+        # publishing artifacts for multiple Windows architectures has
+        # a bug which can cause the wrong architecture to be downloaded
+        # for an update, so until that is fixed, only build Windows x64
+        exclude:
+          - os: windows-latest
+            arch: arm64
     steps:
       - uses: actions/checkout@v3
+      - name: Download the electron-web-build
+        uses: actions/download-artifact@v3
+        with:
+          name: electron-web-build
+          path: apps/desktop-app/src/web-build
       - uses: actions/setup-node@v3 # needed until 18 becomes the default
         with:
           node-version: 18
@@ -34,9 +61,6 @@ jobs:
         run: yarn global add node-gyp
       - name: Install dependencies
         run: yarn install --frozen-lockfile
-      - name: Build Electron Web bundle
-        working-directory: apps/desktop-app
-        run: yarn build
       - name: Set MacOS signing certs
         if: matrix.os == 'macOS-latest'
         env:
