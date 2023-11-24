@@ -23,6 +23,8 @@ jobs:
         with:
           name: electron-web-build
           path: apps/desktop-app/src/web-build
+      - name: ls
+        run: ls -al apps/desktop-app/src/web-build
   build:
     needs: build-electron-web-build
     name: Build (${{ matrix.os }} - ${{ matrix.arch }})
@@ -49,6 +51,7 @@ jobs:
         uses: actions/download-artifact@v3
         with:
           name: electron-web-build
+          path: apps/desktop-app/src/web-build
       - uses: actions/setup-node@v3 # needed until 18 becomes the default
         with:
           node-version: 18
