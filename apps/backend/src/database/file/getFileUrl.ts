@@ -13,7 +13,7 @@ if (
   throw new Error("Missing environment variables for file storage");
 }
 
-const bucketUrl = `https://${process.env.FILE_STORAGE_ACCOUNT_ID}.r2.cloudflarestorage.com`;
+const bucketUrl = `https://${process.env.FILE_STORAGE_ACCOUNT_ID}.eu.r2.cloudflarestorage.com`;
 const s3Client = new S3Client({
   region: "auto",
   endpoint: bucketUrl,

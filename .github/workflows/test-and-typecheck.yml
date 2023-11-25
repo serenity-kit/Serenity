@@ -70,7 +70,7 @@ jobs:
         run: yarn prettier:check
   e2e-test:
     runs-on: ubuntu-latest
-    environment: staging
+    environment: e2e-tests
     env:
       FILE_STORAGE_ACCOUNT_ID: ${{ secrets.FILE_STORAGE_ACCOUNT_ID }}
       FILE_STORAGE_ACCESS_KEY_ID: ${{ secrets.FILE_STORAGE_ACCESS_KEY_ID }}
