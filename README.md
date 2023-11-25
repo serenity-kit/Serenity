@@ -9,10 +9,18 @@ yarn
 cp apps/backend/.env.example apps/backend/.env
 ```
 
-In addition fill out the FILE_STORAGE related secrets in the .env file. In case it's a new bucket you also need to enable CORS by running.
+In addition fill out the FILE_STORAGE related secrets in the .env file. In case it's a new bucket you also need to setup CORS rules in Cloudflare. Replace `AllowedOrigins` with your domain:
 
-```sh
-yarn workspace backend r2:enable-cor
+```json
+[
+  {
+    "AllowedOrigins": ["https://www.serenity.li"],
+    "AllowedMethods": ["GET", "PUT", "HEAD"],
+    "AllowedHeaders": ["*"],
+    "ExposeHeaders": [],
+    "MaxAgeSeconds": 3000
+  }
+]
 ```
 
 You can create a new OPAQUE_SERVER_SETUP value, but make sure to update it in your `.env` and `.e2e-tests.env` files.
