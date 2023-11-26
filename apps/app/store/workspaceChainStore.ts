@@ -135,6 +135,32 @@ export const useLocalLastWorkspaceChainEvent = ({
   return result;
 };
 
+export const useWorkspacePermission = ({
+  workspaceId,
+  mainDeviceSigningPublicKey,
+}: {
+  workspaceId: string;
+  mainDeviceSigningPublicKey: string;
+}) => {
+  const result = useLocalLastWorkspaceChainEvent({ workspaceId });
+  const member = result.state.members[mainDeviceSigningPublicKey];
+  return member?.role;
+};
+
+export const useCanEditWorkspace = ({
+  workspaceId,
+  mainDeviceSigningPublicKey,
+}: {
+  workspaceId: string;
+  mainDeviceSigningPublicKey: string;
+}) => {
+  const result = useWorkspacePermission({
+    workspaceId,
+    mainDeviceSigningPublicKey,
+  });
+  return result === "EDITOR" || result === "ADMIN";
+};
+
 export const loadRemoteWorkspaceChain = async ({
   workspaceId,
   sessionKey,
