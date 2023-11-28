@@ -1,5 +1,5 @@
 import canonicalize from "canonicalize";
-import sodium from "react-native-libsodium";
+import sodium, { KeyPair } from "react-native-libsodium";
 import { workspaceChainDomainContext } from "./constants";
 import {
   RemoveInvitationsTransaction,
@@ -9,7 +9,7 @@ import { hashTransaction } from "./utils";
 
 type RemoveInvitationsParam = {
   prevHash: string;
-  authorKeyPair: sodium.KeyPair;
+  authorKeyPair: KeyPair;
   invitationIds: string[];
 };
 

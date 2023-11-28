@@ -1,5 +1,5 @@
 import canonicalize from "canonicalize";
-import sodium from "react-native-libsodium";
+import sodium, { KeyPair } from "react-native-libsodium";
 import { workspaceChainDomainContext } from "./constants";
 import {
   RemoveMemberTransaction,
@@ -9,7 +9,7 @@ import { hashTransaction } from "./utils";
 
 export const removeMember = (
   prevHash: string,
-  authorKeyPair: sodium.KeyPair,
+  authorKeyPair: KeyPair,
   memberMainDeviceSigningPublicKey: string
 ): RemoveMemberWorkspaceChainEvent => {
   const transaction: RemoveMemberTransaction = {

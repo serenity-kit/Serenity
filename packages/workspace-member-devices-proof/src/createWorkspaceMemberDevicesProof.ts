@@ -1,11 +1,11 @@
 import canonicalize from "canonicalize";
-import sodium from "react-native-libsodium";
+import sodium, { KeyPair } from "react-native-libsodium";
 import { version, workspaceMemberDevicesProofDomainContext } from "./constants";
 import { WorkspaceMemberDevicesProofData } from "./types";
 
 type Params = {
   workspaceMemberDevicesProofData: WorkspaceMemberDevicesProofData;
-  authorKeyPair: sodium.KeyPair;
+  authorKeyPair: KeyPair;
 };
 
 export const createWorkspaceMemberDevicesProof = ({
