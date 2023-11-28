@@ -134,6 +134,16 @@ export default function Editor({
   return (
     // overflow-hidden needed so hidden elements with borders don't trigger scrolling behaviour
     <View style={tw`h-full overflow-hidden`}>
+      <div
+        id="pdf-export-container"
+        style={{
+          width: 794 /* ~210mm */,
+          position: "absolute" /* To avoid affecting layout */,
+          left: -10000 /* Move off-screen */,
+          paddingLeft: 40,
+          paddingRight: 40,
+        }}
+      ></div>
       <SerenityEditor
         editable={editable}
         documentId={documentId}
