@@ -6192,11 +6192,6 @@
   resolved "https://registry.yarnpkg.com/@op-engineering/op-sqlcipher/-/op-sqlcipher-1.0.15.tgz#b40ed2cc3fc16d17592ce81dceaee15c7d61b492"
   integrity sha512-Uvjuk1/wjgOeIGacEOfpopAneacz/ITqUmQMhx7cAtT02YAzeSuIJsZtXTWwYlcG7cnERsbZWwYp2ieLqOBj4A==
 
-"@op-engineering/op-sqlite@^1.0.8":
-  version "1.0.8"
-  resolved "https://registry.yarnpkg.com/@op-engineering/op-sqlite/-/op-sqlite-1.0.8.tgz#8861dcae3f8a8ad3dbfca84f125a7f11e61ea076"
-  integrity sha512-O6eImKerLrh8dBphcWFbzeNzZeNm1fqmwo+sYlPgRcfHHowoPhR7awxz48cJ7dZ/jkUsO+6D6NBKAIJHrhGXFg==
-
 "@peculiar/asn1-schema@^2.1.6":
   version "2.3.0"
   resolved "https://registry.yarnpkg.com/@peculiar/asn1-schema/-/asn1-schema-2.3.0.tgz#5368416eb336138770c692ffc2bab119ee3ae917"
