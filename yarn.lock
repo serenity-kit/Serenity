@@ -19453,10 +19453,10 @@ react-native-get-random-values@~1.9.0:
   dependencies:
     fast-base64-decode "^1.0.0"
 
-react-native-libsodium@^1.2.0:
-  version "1.2.0"
-  resolved "https://registry.yarnpkg.com/react-native-libsodium/-/react-native-libsodium-1.2.0.tgz#0f0336f309b08820e1281f639df600fdd07d938a"
-  integrity sha512-QRhpWZ5mpITw5k6XGX63IltrVYp04wp/rbpM12wHMWpB3hn3ZCN6sLuObL/iB2y3iEb+WvkGlo66QN8FNtdGAw==
+react-native-libsodium@^1.2.4:
+  version "1.2.4"
+  resolved "https://registry.yarnpkg.com/react-native-libsodium/-/react-native-libsodium-1.2.4.tgz#fe6647a57e6b8de91c5c6df07cb7f22725036b73"
+  integrity sha512-Tbt6OOrinCAA/TJXD5kW8yxV3OMoQvUmJBdY3l2meTWzlRxLtgEIWlhu/9XWsQcOgTxXsyRggkaHU3fvTdaNnA==
   dependencies:
     "@noble/hashes" "^1.3.2"
     "@types/libsodium-wrappers" "^0.7.13"
