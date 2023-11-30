@@ -1,5 +1,5 @@
 import canonicalize from "canonicalize";
-import sodium from "react-native-libsodium";
+import sodium, { KeyPair } from "react-native-libsodium";
 import { workspaceChainDomainContext } from "./constants";
 import {
   AddMemberTransaction,
@@ -10,7 +10,7 @@ import { hashTransaction } from "./utils";
 
 export const addMember = (
   prevHash: string,
-  authorKeyPair: sodium.KeyPair,
+  authorKeyPair: KeyPair,
   memberMainDeviceSigningPublicKey: string,
   memberRole: Role
 ): AddMemberWorkspaceChainEvent => {

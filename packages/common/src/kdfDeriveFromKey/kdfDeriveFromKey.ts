@@ -1,6 +1,6 @@
-import { hkdf } from "@noble/hashes/hkdf";
-import { sha256 } from "@noble/hashes/sha256";
 import {
+  _unstable_crypto_kdf_hkdf_sha256_expand,
+  _unstable_crypto_kdf_hkdf_sha256_extract,
   crypto_aead_xchacha20poly1305_ietf_KEYBYTES,
   from_base64,
   randombytes_buf,
@@ -21,10 +21,13 @@ export const createSubkeyId = () => {
 export const kdfDeriveFromKey = (params: Params) => {
   const context = KeyDerivationContext.parse(params.context);
   const subkeyId = params.subkeyId || createSubkeyId();
-  const derivedKey = hkdf(
-    sha256,
+
+  const prk = _unstable_crypto_kdf_hkdf_sha256_extract(
     from_base64(params.key),
-    subkeyId,
+    from_base64(subkeyId)
+  );
+  const derivedKey = _unstable_crypto_kdf_hkdf_sha256_expand(
+    prk,
     context,
     crypto_aead_xchacha20poly1305_ietf_KEYBYTES
   );

@@ -23,7 +23,7 @@ test("reconstruct subkey based on the existing subkeyId", () => {
   });
   const { subkeyId, key } = result;
   expect(subkeyId).toBe("Am3wrVyg7xJC8X2Ky2OIyQ");
-  expect(key).toBe("64J_DluGLx9QAGhRgaTO3NM8GHxEcaI7rHTkpYD7fMo");
+  expect(key).toBe("njOi5EjQ_W-64CX3-ugw8APgKq21pjgTs7QXeDJbpX8");
 });
 
 test("to throw in case of an unknown context", () => {

@@ -1,5 +1,5 @@
 import canonicalize from "canonicalize";
-import sodium from "react-native-libsodium";
+import sodium, { KeyPair } from "react-native-libsodium";
 import {
   workspaceChainAcceptInvitationDomainContext,
   workspaceChainDomainContext,
@@ -14,7 +14,7 @@ import { hashTransaction } from "./utils";
 
 type AcceptInvitationParams = {
   prevHash: string;
-  authorKeyPair: sodium.KeyPair;
+  authorKeyPair: KeyPair;
   role: Role;
   invitationSigningPublicKey: string;
   invitationId: string;
