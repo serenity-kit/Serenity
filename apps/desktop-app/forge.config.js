@@ -20,17 +20,7 @@ module.exports = {
     },
   },
   rebuildConfig: {},
-  hooks: {
-    packageAfterPrune: async (forgeConfig, buildPath) => {
-      const sqliteBuildPath = path.join(buildPath, "node_modules", "build");
-      // console.log("Sqlite BuildPath: ", sqliteBuildPath);
-      // needs to be deleted otherwise macos codesign will fail
-      fs.rmSync(sqliteBuildPath, {
-        recursive: true,
-        force: true,
-      });
-    },
-  },
+  hooks: {},
   makers: [
     {
       name: "@electron-forge/maker-squirrel",
