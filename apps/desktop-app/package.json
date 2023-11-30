@@ -17,7 +17,6 @@
     "ts:check": "yarn tsc --noEmit"
   },
   "dependencies": {
-    "@types/libsodium-wrappers": "^0.7.13",
     "electron-squirrel-startup": "^1.0.0",
     "libsodium-wrappers": "^0.7.13"
   },
@@ -27,6 +26,7 @@
     "@electron-forge/maker-rpm": "^6.0.4",
     "@electron-forge/maker-squirrel": "^6.0.4",
     "@electron-forge/maker-zip": "^6.0.4",
+    "@types/libsodium-wrappers": "^0.7.13",
     "electron": "^22.0.0"
   }
 }
