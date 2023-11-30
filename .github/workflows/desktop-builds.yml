@@ -59,6 +59,8 @@ jobs:
           architecture: ${{ matrix.architecture }}
       - name: Install node-gyp # needed for apollo server
         run: yarn global add node-gyp
+      - name: Set yarn timeout # otherwise fails on windows
+        run: yarn config set network-timeout 600000
       - name: Install dependencies
         run: yarn install --frozen-lockfile
       - name: Set MacOS signing certs
