@@ -27,9 +27,10 @@ export default function useCachedResources() {
 
       try {
         SplashScreen.preventAutoHideAsync();
+        await sodium.ready; // sodium must be ready before we load any devices or similar
+
         const result = await Promise.all([
           getActiveDevice(),
-          sodium.ready,
           // Load fonts
           Font.loadAsync({
             "space-mono": require("../assets/fonts/SpaceMono-Regular.ttf"),
@@ -39,7 +40,7 @@ export default function useCachedResources() {
         ]);
         setActiveDevice(result[0]);
 
-        if (isElectron() && !result[4]) {
+        if (isElectron() && !result[3]) {
           isElectronAndHasNoSafeStorage = true;
         }
 
