@@ -3,6 +3,7 @@ import * as documentChain from "@serenity-kit/document-chain";
 import * as workspaceChain from "@serenity-kit/workspace-chain";
 import * as workspaceMemberDevicesProofUtil from "@serenity-kit/workspace-member-devices-proof";
 import {
+  VerifiedDevice,
   createIntroductionDocumentSnapshot,
   createSnapshotKey,
   encryptDocumentTitle,
@@ -27,9 +28,9 @@ import sodium from "react-native-libsodium";
 import { useAppContext } from "../../context/AppContext";
 import { useCreateInitialWorkspaceStructureMutation } from "../../generated/graphql";
 import { getMainDevice } from "../../store/mainDeviceMemoryStore";
+import { loadRemoteCurrentUser } from "../../store/userChainStore";
 import * as workspaceStore from "../../store/workspaceStore";
 import { createWorkspaceKeyBoxesForDevices } from "../../utils/device/createWorkspaceKeyBoxesForDevices";
-import { getAndVerifyUserDevices } from "../../utils/getAndVerifyUserDevices/getAndVerifyUserDevices";
 import { VerifyPasswordModal } from "../verifyPasswordModal/VerifyPasswordModal";
 
 export type CreateWorkspaceFormProps = {
@@ -84,10 +85,30 @@ export function CreateWorkspaceForm(props: CreateWorkspaceFormProps) {
       const folderName = "Getting started";
       const documentName = "Introduction";
 
-      const { nonExpiredDevices, userId, userChainState } =
-        await getAndVerifyUserDevices({
-          mainDeviceSigningPublicKey: mainDevice.signingPublicKey,
-        });
+      const { state: userChainState } = await loadRemoteCurrentUser();
+      const nonExpiredDevices: VerifiedDevice[] = [];
+      Object.entries(userChainState.devices).forEach(
+        ([signingPublicKey, { expiresAt, encryptionPublicKey }]) => {
+          if (signingPublicKey === userChainState.mainDeviceSigningPublicKey) {
+            nonExpiredDevices.unshift({
+              signingPublicKey,
+              encryptionPublicKey,
+              expiresAt: expiresAt ? new Date(expiresAt) : undefined,
+            });
+          } else {
+            if (
+              expiresAt === undefined ||
+              (expiresAt && new Date(expiresAt) > new Date())
+            ) {
+              nonExpiredDevices.push({
+                signingPublicKey,
+                encryptionPublicKey,
+                expiresAt: expiresAt ? new Date(expiresAt) : undefined,
+              });
+            }
+          }
+        }
+      );
 
       // build workspace key boxes for workspace
       const { deviceWorkspaceKeyBoxes, workspaceKey } =
@@ -151,7 +172,7 @@ export function CreateWorkspaceForm(props: CreateWorkspaceFormProps) {
           },
           workspaceMemberDevicesProofData: {
             clock: 0,
-            userChainHashes: { [userId]: userChainState.eventHash },
+            userChainHashes: { [userChainState.id]: userChainState.eventHash },
             workspaceChainHash: workspaceChainState.lastEventHash,
           },
         });

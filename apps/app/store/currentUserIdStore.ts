@@ -22,7 +22,7 @@ export const setCurrentUserId = (userId: string) => {
   );
 };
 
-export const getCurrentUserId = (userId: string) => {
+export const getCurrentUserId = () => {
   const currentUser = sql.execute(
     `SELECT * FROM ${table} WHERE id = "currentUser"`
   );
