@@ -16,6 +16,7 @@ export const initialize = () => {
     `CREATE TABLE IF NOT EXISTS "${table}" (
       "id"	TEXT NOT NULL,
       "username"	TEXT NOT NULL,
+      "mainDeviceSigningPublicKey"	TEXT NOT NULL UNIQUE,
       "devices"	TEXT NOT NULL,
       "removedDevices"	TEXT NOT NULL,
       PRIMARY KEY("id")
@@ -26,15 +27,17 @@ export const initialize = () => {
 export type User = {
   id: string;
   username: string;
+  mainDeviceSigningPublicKey: string;
   devices: userChain.Devices;
   removedDevices: userChain.Devices;
 };
 
 // TODO this should probably overwrite the existing user
 export const createUser = (params: User) => {
-  sql.execute(`INSERT OR IGNORE INTO ${table} VALUES (?, ?, ?, ?);`, [
+  sql.execute(`INSERT OR IGNORE INTO ${table} VALUES (?, ?, ?, ?, ?);`, [
     params.id,
     params.username,
+    params.mainDeviceSigningPublicKey,
     JSON.stringify(params.devices),
     JSON.stringify(params.removedDevices),
   ]);
@@ -44,6 +47,7 @@ const internalConvertUserResultToUser = (userResult: any) => {
   return {
     id: userResult.id,
     username: userResult.username,
+    mainDeviceSigningPublicKey: userResult.mainDeviceSigningPublicKey,
     devices: JSON.parse(userResult.devices),
     removedDevices: JSON.parse(userResult.removedDevices),
   } as User;
@@ -183,6 +187,7 @@ export const getLocalOrLoadRemoteUserByUserChainHash = async ({
   createUser({
     id: state.id,
     username: state.email,
+    mainDeviceSigningPublicKey: state.mainDeviceSigningPublicKey,
     devices: state.devices,
     removedDevices: state.removedDevices,
   });
