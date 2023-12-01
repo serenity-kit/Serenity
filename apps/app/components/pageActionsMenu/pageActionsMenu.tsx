@@ -63,6 +63,51 @@ export const PageActionsMenu: React.FC<Props> = () => {
       >
         Export to PDF
       </MenuButton>
+      <MenuButton
+        iconName={"printer-line"}
+        onPress={() => {
+          const contentElement = document.querySelector(".ProseMirror");
+          if (contentElement === null) {
+            showToast("Content not ready for export", "error");
+            return;
+          }
+
+          document.head.insertAdjacentHTML(
+            "beforeend",
+            `<style id="print-style">
+              #print-container {
+                display: none;
+              }
+
+              @media print {
+                body > div:not(#print-container) {
+                  display: none;
+                }
+                #print-container {
+                  display: block;
+                  padding: 20px;
+                }
+              }
+            </style>`
+          );
+
+          var printContainer = document.createElement("div");
+
+          printContainer.id = "print-container";
+          printContainer.innerHTML = contentElement.innerHTML;
+          document.body.appendChild(printContainer);
+
+          window.print();
+
+          printContainer.parentNode?.removeChild(printContainer);
+          const printStyleTag = document.getElementById("myPrintStyle");
+          printStyleTag?.parentNode?.removeChild(printStyleTag);
+
+          setIsOpenMenu(false);
+        }}
+      >
+        Print
+      </MenuButton>
     </Menu>
   );
 };
