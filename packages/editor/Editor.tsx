@@ -270,7 +270,10 @@ export const Editor = (props: EditorProps) => {
   return (
     <div className="flex h-full flex-auto flex-row">
       {/* z-index needed so BubbleMenu overlaps with Sidebar */}
-      <View style={tw`flex-auto text-gray-900 dark:text-white z-10`}>
+      <View
+        id="editor-print-wrapper"
+        style={tw`flex-auto text-gray-900 dark:text-white z-10`}
+      >
         <div className="flex-auto overflow-y-auto overflow-x-hidden">
           <EditorContent
             style={{
