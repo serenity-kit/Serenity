@@ -1,7 +1,11 @@
 import * as userChain from "@serenity-kit/user-chain";
-import { notNull } from "@serenity-tools/common";
+import { decryptMainDevice, notNull } from "@serenity-tools/common";
 import canonicalize from "canonicalize";
-import { runWorkspaceMembersQuery } from "../generated/graphql";
+import {
+  runFinishLoginMutation,
+  runWorkspaceMembersQuery,
+} from "../generated/graphql";
+import { setCurrentUserId } from "./currentUserIdStore";
 import * as sql from "./sql/sql";
 import * as userStore from "./userStore";
 
@@ -113,6 +117,8 @@ export const loadRemoteUserChainsForWorkspace = async ({
   const workspaceMembersQueryResult = await runWorkspaceMembersQuery({
     workspaceId,
   });
+  // TODO instead of relying on this query result we should first fetch the latest workspace chain event
+  // and then compare of this query returns all the users that are in the workspace chain
   if (workspaceMembersQueryResult.data?.workspaceMembers?.nodes) {
     const member =
       workspaceMembersQueryResult.data.workspaceMembers.nodes.filter(notNull);
@@ -170,9 +176,103 @@ export const loadRemoteUserChainsForWorkspace = async ({
       userStore.createUser({
         id: state.id,
         username: state.email,
+        mainDeviceSigningPublicKey: state.mainDeviceSigningPublicKey,
         devices: state.devices,
         removedDevices: state.removedDevices,
       });
     });
   }
+};
+
+export const loadRemoteCurrentUserWithFinishLoginMutation = async ({
+  loginId,
+  finishLoginRequest,
+  exportKey,
+}: {
+  loginId: string;
+  finishLoginRequest: string;
+  exportKey: string;
+}) => {
+  const finishLoginResult = await runFinishLoginMutation({
+    input: {
+      loginId,
+      message: finishLoginRequest,
+    },
+  });
+  if (!finishLoginResult.data?.finishLogin) {
+    throw new Error("Failed to finish login");
+  }
+
+  const mainDevice = decryptMainDevice({
+    ciphertext: finishLoginResult.data.finishLogin.mainDevice.ciphertext,
+    nonce: finishLoginResult.data.finishLogin.mainDevice.nonce,
+    exportKey,
+  });
+
+  let chain = finishLoginResult.data.finishLogin.userChain;
+  let otherRawEvents = chain;
+  let state: userChain.UserChainState;
+
+  const [firstRawEvent, ...rest] = chain;
+  otherRawEvents = rest;
+  const firstEvent = userChain.CreateUserChainEvent.parse(
+    JSON.parse(firstRawEvent.serializedContent)
+  );
+  state = userChain.applyCreateUserChainEvent({
+    event: firstEvent,
+    knownVersion: userChain.version,
+  });
+
+  if (mainDevice.signingPublicKey !== state.mainDeviceSigningPublicKey) {
+    throw new Error(
+      "Invalid user chain. mainDeviceSigningPublicKeys do not match"
+    );
+  }
+
+  createUserChainEvent({
+    event: firstEvent,
+    userId: state.id,
+    state,
+    triggerRerender: false,
+    position: firstRawEvent.position,
+  });
+
+  otherRawEvents.map((rawEvent) => {
+    const event = userChain.UpdateChainEvent.parse(
+      JSON.parse(rawEvent.serializedContent)
+    );
+    state = userChain.applyEvent({
+      state,
+      event,
+      knownVersion: userChain.version,
+    });
+    createUserChainEvent({
+      event,
+      userId: state.id,
+      state,
+      triggerRerender: false,
+      position: rawEvent.position,
+    });
+  });
+
+  userStore.createUser({
+    id: state.id,
+    username: state.email,
+    mainDeviceSigningPublicKey: state.mainDeviceSigningPublicKey,
+    devices: state.devices,
+    removedDevices: state.removedDevices,
+  });
+
+  setCurrentUserId(state.id);
+
+  // TODO store workspaceMemberDevicesProofs in the workspaceMemberDevicesProofsStore
+
+  const lastUserChainEvent = getLastUserChainEvent({ userId: state.id });
+  return {
+    workspaceMemberDevicesProofs:
+      finishLoginResult.data.finishLogin.workspaceMemberDevicesProofs,
+    lastUserChainEvent: lastUserChainEvent.event,
+    currentUserChainState: state,
+    mainDevice,
+  };
 };

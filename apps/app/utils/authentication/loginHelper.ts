@@ -1,17 +1,16 @@
 import * as userChain from "@serenity-kit/user-chain";
 import * as workspaceMemberDevicesProofUtil from "@serenity-kit/workspace-member-devices-proof";
-import { decryptMainDevice } from "@serenity-tools/common";
 import { addDays, addHours } from "date-fns";
 import sodium from "react-native-libsodium";
 import { client } from "react-native-opaque";
 import { UpdateAuthenticationFunction } from "../../context/AppContext";
 import {
   runAddDeviceMutation,
-  runFinishLoginMutation,
   runLogoutMutation,
   runStartLoginMutation,
 } from "../../generated/graphql";
 import { setMainDevice } from "../../store/mainDeviceMemoryStore";
+import { loadRemoteCurrentUserWithFinishLoginMutation } from "../../store/userChainStore";
 import {
   getWorkspaceChainEventByHash,
   loadRemoteWorkspaceChain,
@@ -75,36 +74,16 @@ export const login = async ({
     throw new Error("Failed to login. Please contact our support.");
   }
 
-  const finishLoginResult = await runFinishLoginMutation({
-    input: {
-      loginId: startLoginResult.data.startLogin.loginId,
-      message: result.finishLoginRequest,
-    },
-  });
-  if (!finishLoginResult.data?.finishLogin) {
-    throw new Error("Failed to finish login");
-  }
-
-  const mainDevice = decryptMainDevice({
-    ciphertext: finishLoginResult.data.finishLogin.mainDevice.ciphertext,
-    nonce: finishLoginResult.data.finishLogin.mainDevice.nonce,
+  const {
+    mainDevice,
+    currentUserChainState,
+    lastUserChainEvent,
+    workspaceMemberDevicesProofs,
+  } = await loadRemoteCurrentUserWithFinishLoginMutation({
+    loginId: startLoginResult.data.startLogin.loginId,
+    finishLoginRequest: result.finishLoginRequest,
     exportKey: result.exportKey,
   });
-
-  const userChainEvents = finishLoginResult.data.finishLogin.userChain.map(
-    (userChainEvent) => JSON.parse(userChainEvent.serializedContent)
-  );
-  const userChainState = userChain.resolveState({
-    events: userChainEvents,
-    knownVersion: userChain.version,
-  });
-  if (
-    mainDevice.signingPublicKey !==
-    userChainState.currentState.mainDeviceSigningPublicKey
-  ) {
-    throw new Error("Invalid user chain");
-  }
-  const lastUserChainEvent = userChainEvents[userChainEvents.length - 1];
 
   const device = createDeviceWithInfo();
   if (!device.info) {
@@ -149,7 +128,7 @@ export const login = async ({
     expiresAt,
   });
   const newUserChainState = userChain.applyEvent({
-    state: userChainState.currentState,
+    state: currentUserChainState,
     event: addDeviceEvent,
     knownVersion: userChain.version,
   });
@@ -165,8 +144,7 @@ export const login = async ({
     workspaceId: string;
     serializedWorkspaceMemberDevicesProof: string;
   }[] = [];
-  for (const entry of finishLoginResult.data.finishLogin
-    .workspaceMemberDevicesProofs) {
+  for (const entry of workspaceMemberDevicesProofs) {
     const data =
       workspaceMemberDevicesProofUtil.WorkspaceMemberDevicesProofData.parse(
         JSON.parse(entry.serializedData)

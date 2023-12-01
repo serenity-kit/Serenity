@@ -1,4 +1,5 @@
 import * as appStateStore from "../store/appStateStore";
+import * as currentUserIdStore from "../store/currentUserIdStore";
 import * as documentChainStore from "../store/documentChainStore";
 import * as documentStore from "../store/documentStore";
 import * as userChainStore from "../store/userChainStore";
@@ -17,6 +18,7 @@ export const createSqlTables = async () => {
   workspaceMemberDevicesProofStore.initialize();
   userStore.initialize();
   userChainStore.initialize();
+  currentUserIdStore.initialize();
   documentStore.initialize();
   documentChainStore.initialize();
 };
