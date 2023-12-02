@@ -2,6 +2,7 @@ import * as userChain from "@serenity-kit/user-chain";
 import { notNull } from "@serenity-tools/common";
 import { runUserChainQuery } from "../generated/graphql";
 import { showToast } from "../utils/toast/showToast";
+import { getCurrentUserInfo } from "./currentUserInfoStore";
 import * as sql from "./sql/sql";
 import {
   createUserChainEvent,
@@ -208,4 +209,21 @@ export const getLocalUsersByIds = (userIds: string[]) => {
     userIds
   );
   return result.map(internalConvertUserResultToUser);
+};
+
+let getLocalCurrentUserCache: User | undefined;
+export const getLocalCurrentUser = () => {
+  if (getLocalCurrentUserCache) return getLocalCurrentUserCache;
+  const currentUserInfo = getCurrentUserInfo();
+  if (!currentUserInfo) return undefined;
+  const result = sql.execute(`SELECT * FROM ${table} WHERE id = ?`, [
+    currentUserInfo.userId,
+  ]);
+  const user = internalGetSingleUser(result);
+  getLocalCurrentUserCache = user;
+  return user;
+};
+
+export const useGetLocalCurrentUser = () => {
+  return getLocalCurrentUser();
 };

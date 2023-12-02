@@ -109,7 +109,11 @@ export const login = async ({
     );
     webDeviceCiphertext = sodium.to_base64(
       sodium.crypto_secretbox_easy(
-        JSON.stringify(device),
+        JSON.stringify({
+          device,
+          mainDeviceSigningPublicKey: mainDevice.signingPublicKey,
+          userId: currentUserChainState.id,
+        }),
         sodium.from_base64(webDeviceNonce),
         sodium.from_base64(webDeviceKey)
       )

@@ -7,6 +7,7 @@ import { Client } from "urql";
 import { createSqlTables } from "../store/createSqlTables";
 import * as SessionKeyStore from "../store/sessionKeyStore/sessionKeyStore";
 import { getSessionKey } from "../store/sessionKeyStore/sessionKeyStore";
+import { loadRemoteCurrentUser } from "../store/userChainStore";
 import { getActiveDevice } from "../utils/device/getActiveDevice";
 import {
   isElectron,
@@ -28,6 +29,7 @@ export default function useCachedResources() {
       try {
         SplashScreen.preventAutoHideAsync();
         await sodium.ready; // sodium must be ready before we load any devices or similar
+        await createSqlTables();
 
         const result = await Promise.all([
           getActiveDevice(),
@@ -35,17 +37,19 @@ export default function useCachedResources() {
           Font.loadAsync({
             "space-mono": require("../assets/fonts/SpaceMono-Regular.ttf"),
           }),
-          createSqlTables(),
           isSafeStorageAvailable(),
         ]);
         setActiveDevice(result[0]);
 
-        if (isElectron() && !result[3]) {
+        if (isElectron() && !result[2]) {
           isElectronAndHasNoSafeStorage = true;
         }
 
         const sessionKey = await getSessionKey();
         setSessionKey(sessionKey);
+        if (sessionKey) {
+          await loadRemoteCurrentUser();
+        }
       } catch (e) {
         // We might want to provide this error information to an error reporting service
         console.warn(e);

@@ -6,8 +6,9 @@ import {
   runUserChainQuery,
   runWorkspaceMembersQuery,
 } from "../generated/graphql";
+import { getActiveDevice } from "../utils/device/getActiveDevice";
 import { showToast } from "../utils/toast/showToast";
-import { getCurrentUserId, setCurrentUserId } from "./currentUserIdStore";
+import { getCurrentUserInfo, setCurrentUserInfo } from "./currentUserInfoStore";
 import * as sql from "./sql/sql";
 import * as userStore from "./userStore";
 
@@ -265,7 +266,10 @@ export const loadRemoteCurrentUserWithFinishLoginMutation = async ({
     removedDevices: state.removedDevices,
   });
 
-  setCurrentUserId(state.id);
+  setCurrentUserInfo({
+    userId: state.id,
+    mainDeviceSigningPublicKey: state.mainDeviceSigningPublicKey,
+  });
 
   // TODO store workspaceMemberDevicesProofs in the workspaceMemberDevicesProofsStore
 
@@ -279,13 +283,20 @@ export const loadRemoteCurrentUserWithFinishLoginMutation = async ({
   };
 };
 
+// Here the latest user chain data from the server is fetched.
+// To ensure the server doesn't sent a malicious user chain the following checks are done:
+// 1. Check that the userId and mainDeviceSigningPublicKey match the chain results
+// 2. Check that the current device is part of the chain (to avoid that the server sends an outdated chain for webDevices)
 export const loadRemoteCurrentUser = async () => {
-  const currentUserId = getCurrentUserId();
-  if (!currentUserId) {
-    throw new Error("Not logged in");
+  const activeDevice = await getActiveDevice(true);
+  if (!activeDevice) {
+    throw new Error("Not logged in, device not found");
   }
-
-  const lastEvent = getLastUserChainEvent({ userId: currentUserId });
+  const currentUserInfo = getCurrentUserInfo();
+  if (!currentUserInfo) {
+    throw new Error("Not logged in, currentUserInfo not found");
+  }
+  const lastEvent = getLastUserChainEvent({ userId: currentUserInfo.userId });
   if (!lastEvent) {
     throw new Error("User chain data not found");
   }
@@ -303,9 +314,41 @@ export const loadRemoteCurrentUser = async () => {
   let otherRawEvents = chain;
   let state: userChain.UserChainState;
 
-  state = lastEvent.state;
-  chain = chain.filter((rawEvent) => rawEvent.position > lastEvent.position);
-  otherRawEvents = chain;
+  if (lastEvent) {
+    state = lastEvent.state;
+    chain = chain.filter((rawEvent) => rawEvent.position > lastEvent.position);
+    otherRawEvents = chain;
+  } else {
+    const [firstRawEvent, ...rest] = chain;
+    otherRawEvents = rest;
+    const firstEvent = userChain.CreateUserChainEvent.parse(
+      JSON.parse(firstRawEvent.serializedContent)
+    );
+    state = userChain.applyCreateUserChainEvent({
+      event: firstEvent,
+      knownVersion: userChain.version,
+    });
+
+    if (
+      currentUserInfo.mainDeviceSigningPublicKey !==
+      state.mainDeviceSigningPublicKey
+    ) {
+      throw new Error(
+        "Invalid user chain. mainDeviceSigningPublicKeys do not match"
+      );
+    }
+    if (currentUserInfo.userId !== state.id) {
+      throw new Error("Invalid user chain. userId do not match");
+    }
+
+    createUserChainEvent({
+      event: firstEvent,
+      userId: state.id,
+      state,
+      triggerRerender: false,
+      position: firstRawEvent.position,
+    });
+  }
 
   otherRawEvents.map((rawEvent) => {
     const event = userChain.UpdateChainEvent.parse(
@@ -318,12 +361,16 @@ export const loadRemoteCurrentUser = async () => {
     });
     createUserChainEvent({
       event,
-      userId: currentUserId,
+      userId: currentUserInfo.userId,
       state,
       triggerRerender: false,
       position: rawEvent.position,
     });
   });
 
-  return getLastUserChainEvent({ userId: currentUserId });
+  if (!state.devices[activeDevice.signingPublicKey]) {
+    throw new Error("Invalid user chain. device not found");
+  }
+
+  return getLastUserChainEvent({ userId: currentUserInfo.userId });
 };
