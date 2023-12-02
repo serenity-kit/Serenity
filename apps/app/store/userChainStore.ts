@@ -3,9 +3,11 @@ import { decryptMainDevice, notNull } from "@serenity-tools/common";
 import canonicalize from "canonicalize";
 import {
   runFinishLoginMutation,
+  runUserChainQuery,
   runWorkspaceMembersQuery,
 } from "../generated/graphql";
-import { setCurrentUserId } from "./currentUserIdStore";
+import { showToast } from "../utils/toast/showToast";
+import { getCurrentUserId, setCurrentUserId } from "./currentUserIdStore";
 import * as sql from "./sql/sql";
 import * as userStore from "./userStore";
 
@@ -275,4 +277,53 @@ export const loadRemoteCurrentUserWithFinishLoginMutation = async ({
     currentUserChainState: state,
     mainDevice,
   };
+};
+
+export const loadRemoteCurrentUser = async () => {
+  const currentUserId = getCurrentUserId();
+  if (!currentUserId) {
+    throw new Error("Not logged in");
+  }
+
+  const lastEvent = getLastUserChainEvent({ userId: currentUserId });
+  if (!lastEvent) {
+    throw new Error("User chain data not found");
+  }
+
+  const userChainQueryResult = await runUserChainQuery({});
+  if (
+    userChainQueryResult.error ||
+    !userChainQueryResult.data?.userChain?.nodes
+  ) {
+    showToast("Failed to load latest user data.", "error");
+    throw new Error("Failed to load latest user data.");
+  }
+
+  let chain = userChainQueryResult.data.userChain.nodes.filter(notNull);
+  let otherRawEvents = chain;
+  let state: userChain.UserChainState;
+
+  state = lastEvent.state;
+  chain = chain.filter((rawEvent) => rawEvent.position > lastEvent.position);
+  otherRawEvents = chain;
+
+  otherRawEvents.map((rawEvent) => {
+    const event = userChain.UpdateChainEvent.parse(
+      JSON.parse(rawEvent.serializedContent)
+    );
+    state = userChain.applyEvent({
+      state,
+      event,
+      knownVersion: userChain.version,
+    });
+    createUserChainEvent({
+      event,
+      userId: currentUserId,
+      state,
+      triggerRerender: false,
+      position: rawEvent.position,
+    });
+  });
+
+  return getLastUserChainEvent({ userId: currentUserId });
 };
