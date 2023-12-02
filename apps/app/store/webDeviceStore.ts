@@ -2,6 +2,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { LocalDevice } from "@serenity-tools/common";
 import sodium from "react-native-libsodium";
 import { runEncryptedWebDeviceQuery } from "../generated/graphql";
+import { setCurrentUserInfo } from "./currentUserInfoStore";
 
 export const webDeviceKeyId = "webDevice.key";
 export const webDeviceAccessTokenId = "webDevice.accessToken";
@@ -23,11 +24,14 @@ export const removeWebDeviceAccess = async () => {
   AsyncStorage.removeItem(webDeviceAccessTokenId);
 };
 
-export const getOrFetchWebDevice = async (): Promise<LocalDevice | null> => {
+export const getLocalWebDevice = () => device;
+
+export const fetchWebDevice = async (): Promise<{
+  device: LocalDevice;
+  mainDeviceSigningPublicKey: string;
+  userId: string;
+} | null> => {
   try {
-    if (device) {
-      return device;
-    }
     const accessToken = await AsyncStorage.getItem(webDeviceAccessTokenId);
     if (!accessToken) return null;
     const result = await runEncryptedWebDeviceQuery({ accessToken });
@@ -35,12 +39,24 @@ export const getOrFetchWebDevice = async (): Promise<LocalDevice | null> => {
       const { ciphertext, nonce } = result.data.encryptedWebDevice;
       const key = await AsyncStorage.getItem(webDeviceKeyId);
       if (!key) return null;
-      const serializedDevice = sodium.crypto_secretbox_open_easy(
-        sodium.from_base64(ciphertext),
-        sodium.from_base64(nonce),
-        sodium.from_base64(key)
-      );
-      return JSON.parse(sodium.to_string(serializedDevice)) as LocalDevice;
+      const serializedDeviceAndMainDeviceSigningPublicKey =
+        sodium.crypto_secretbox_open_easy(
+          sodium.from_base64(ciphertext),
+          sodium.from_base64(nonce),
+          sodium.from_base64(key)
+        );
+      const decryptedData = JSON.parse(
+        sodium.to_string(serializedDeviceAndMainDeviceSigningPublicKey)
+      ) as {
+        device: LocalDevice;
+        mainDeviceSigningPublicKey: string;
+        userId: string;
+      };
+      setCurrentUserInfo({
+        userId: decryptedData.userId,
+        mainDeviceSigningPublicKey: decryptedData.mainDeviceSigningPublicKey,
+      });
+      return decryptedData;
     }
     return null;
   } catch (e) {
