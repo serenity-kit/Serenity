@@ -23,7 +23,8 @@ import {
 } from "../../../generated/graphql";
 import { useAuthenticatedAppContext } from "../../../hooks/useAuthenticatedAppContext";
 import { workspaceSettingsLoadWorkspaceMachine } from "../../../machines/workspaceSettingsLoadWorkspaceMachine";
-import { useLocalLastWorkspaceChainEvent } from "../../../store/workspaceChainStore";
+import { getCurrentUserInfo } from "../../../store/currentUserInfoStore";
+import { useCanEditWorkspace } from "../../../store/workspaceChainStore";
 import { WorkspaceStackScreenProps } from "../../../types/navigationProps";
 import { showToast } from "../../../utils/toast/showToast";
 
@@ -33,9 +34,6 @@ export default function WorkspaceSettingsGeneralScreen(
   }
 ) {
   const { workspaceId } = useWorkspace();
-  const lastWorkspaceChainEvent = useLocalLastWorkspaceChainEvent({
-    workspaceId,
-  });
   const { activeDevice } = useAuthenticatedAppContext();
   const [state] = useMachine(workspaceSettingsLoadWorkspaceMachine, {
     context: {
@@ -116,21 +114,12 @@ export default function WorkspaceSettingsGeneralScreen(
     setIsLoadingWorkspaceData(false);
   };
 
-  let currentUserIsAdmin = false;
-  if (state.value === "loadWorkspaceSuccess" && lastWorkspaceChainEvent) {
-    Object.entries(lastWorkspaceChainEvent.state.members).forEach(
-      ([mainDeviceSigningPublicKey, memberInfo]) => {
-        if (
-          memberInfo.role === "ADMIN" &&
-          mainDeviceSigningPublicKey ===
-            state.context.meWithWorkspaceLoadingInfoQueryResult?.data?.me
-              ?.mainDeviceSigningPublicKey
-        ) {
-          currentUserIsAdmin = true;
-        }
-      }
-    );
-  }
+  const currentUserInfo = getCurrentUserInfo();
+  if (!currentUserInfo) throw new Error("No current user");
+  const canEditWorkspace = useCanEditWorkspace({
+    workspaceId,
+    mainDeviceSigningPublicKey: currentUserInfo.mainDeviceSigningPublicKey,
+  });
 
   return (
     <>
@@ -159,10 +148,10 @@ export default function WorkspaceSettingsGeneralScreen(
               placeholder="New name"
               value={workspaceName}
               onChangeText={setWorkspaceName}
-              editable={currentUserIsAdmin && !isLoadingWorkspaceData}
+              isDisabled={!(canEditWorkspace && !isLoadingWorkspaceData)}
               label={"Workspace name"}
             />
-            {currentUserIsAdmin && (
+            {canEditWorkspace && (
               <Button
                 onPress={updateWorkspaceName}
                 disabled={isLoadingWorkspaceData}
@@ -170,12 +159,12 @@ export default function WorkspaceSettingsGeneralScreen(
                 Update
               </Button>
             )}
-            {currentUserIsAdmin && (
+            {canEditWorkspace && (
               <Button onPress={() => setShowDeleteWorkspaceModal(true)}>
                 Delete workspace
               </Button>
             )}
-            {currentUserIsAdmin && (
+            {canEditWorkspace && (
               <Modal
                 isVisible={showDeleteWorkspaceModal}
                 onBackdropPress={() => setShowDeleteWorkspaceModal(false)}

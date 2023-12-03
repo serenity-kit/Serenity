@@ -5,19 +5,12 @@ import {
 
 import { Heading, SidebarLink, tw } from "@serenity-tools/ui";
 import { useWorkspace } from "../../context/WorkspaceContext";
-import { useGetLocalCurrentUser } from "../../store/userStore";
 
 export default function WorkspaceSettingsSidebar(
   props: DrawerContentComponentProps
 ) {
   const currentRouteName = props.state.routeNames[props.state.index];
   const { workspaceId } = useWorkspace();
-  const currentUser = useGetLocalCurrentUser();
-  console.log({ currentUser });
-  // const canEditWorkspace = useCanEditWorkspace({
-  //   workspaceId,
-  //   mainDeviceSigningPublicKey: currentUser?.mainDeviceSigningPublicKey,
-  // });
 
   return (
     <DrawerContentScrollView {...props} style={tw`bg-gray-100 py-4`}>

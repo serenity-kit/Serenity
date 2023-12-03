@@ -30,11 +30,13 @@ import {
 } from "../../../generated/graphql";
 import { useAuthenticatedAppContext } from "../../../hooks/useAuthenticatedAppContext";
 import { workspaceSettingsLoadWorkspaceMachine } from "../../../machines/workspaceSettingsLoadWorkspaceMachine";
+import { getCurrentUserInfo } from "../../../store/currentUserInfoStore";
 import { getMainDevice } from "../../../store/mainDeviceMemoryStore";
 import { loadRemoteUserChainsForWorkspace } from "../../../store/userChainStore";
 import { getLocalUserByDeviceSigningPublicKey } from "../../../store/userStore";
 import {
   loadRemoteWorkspaceChain,
+  useCanEditWorkspace,
   useLocalLastWorkspaceChainEvent,
 } from "../../../store/workspaceChainStore";
 import { loadRemoteWorkspaceMemberDevicesProofQuery } from "../../../store/workspaceMemberDevicesProofStore";
@@ -235,22 +237,6 @@ export default function WorkspaceSettingsMembersScreen(
     setIsPasswordModalVisible(true);
   };
 
-  let currentUserIsAdmin = false;
-  if (state.value === "loadWorkspaceSuccess" && lastWorkspaceChainEvent) {
-    Object.entries(lastWorkspaceChainEvent.state.members).forEach(
-      ([mainDeviceSigningPublicKey, memberInfo]) => {
-        if (
-          memberInfo.role === "ADMIN" &&
-          mainDeviceSigningPublicKey ===
-            state.context.meWithWorkspaceLoadingInfoQueryResult?.data?.me
-              ?.mainDeviceSigningPublicKey
-        ) {
-          currentUserIsAdmin = true;
-        }
-      }
-    );
-  }
-
   useEffect(() => {
     // TODO better to build a hook for this
     const fetchMembers = async () => {
@@ -259,6 +245,13 @@ export default function WorkspaceSettingsMembersScreen(
     };
     fetchMembers();
   }, []);
+
+  const currentUserInfo = getCurrentUserInfo();
+  if (!currentUserInfo) throw new Error("No current user");
+  const canEditWorkspace = useCanEditWorkspace({
+    workspaceId,
+    mainDeviceSigningPublicKey: currentUserInfo.mainDeviceSigningPublicKey,
+  });
 
   const activeWorkspaceMembers = lastWorkspaceChainEvent?.state.members
     ? Object.entries(lastWorkspaceChainEvent.state.members).map(
@@ -300,7 +293,7 @@ export default function WorkspaceSettingsMembersScreen(
           </CenterContent>
         ) : (
           <>
-            {currentUserIsAdmin && (
+            {canEditWorkspace && (
               <>
                 <View>
                   <Heading lvl={3} padded>
@@ -345,7 +338,7 @@ export default function WorkspaceSettingsMembersScreen(
                   const username = member.username;
 
                   const allowEditing =
-                    currentUserIsAdmin && member.id !== adminUserId;
+                    canEditWorkspace && member.id !== adminUserId;
 
                   // capitalize by css doesn't work here as it will only affect the first letter
                   const roleName =
