@@ -78,6 +78,7 @@ type EditorProps = {
   editable: boolean;
   documentState: DocumentState;
   workspaceDevicesToUsernames: Record<string, string>;
+  canComment: boolean;
 };
 
 const headingLevels: Level[] = [1, 2, 3];
@@ -95,6 +96,7 @@ export const Editor = (props: EditorProps) => {
   const scrollIntoViewOnEditModeDelay =
     props.scrollIntoViewOnEditModeDelay ?? 150; // 150ms works well on iOS Safari
   const bubbleMenuRef = useRef<HTMLDivElement>(null);
+  const canComment = props.canComment;
 
   const editor = useEditor(
     {
@@ -442,20 +444,22 @@ export const Editor = (props: EditorProps) => {
 
                   <VerticalDivider />
 
-                  <Tooltip
-                    label={"Add comment"}
-                    placement={"top"}
-                    hasArrow={false}
-                  >
-                    <ToggleButton
-                      onPress={() => {
-                        setHasCreateCommentBubble(true);
-                      }}
-                      name="chat-4-line"
-                      isActive={false}
-                      testID="bubble-menu__initiate-comment-button"
-                    />
-                  </Tooltip>
+                  {canComment && (
+                    <Tooltip
+                      label={"Add comment"}
+                      placement={"top"}
+                      hasArrow={false}
+                    >
+                      <ToggleButton
+                        onPress={() => {
+                          setHasCreateCommentBubble(true);
+                        }}
+                        name="chat-4-line"
+                        isActive={false}
+                        testID="bubble-menu__initiate-comment-button"
+                      />
+                    </Tooltip>
+                  )}
                 </>
               )}
             </BubbleMenuContentWrapper>

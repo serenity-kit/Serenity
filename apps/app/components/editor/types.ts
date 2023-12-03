@@ -13,4 +13,5 @@ export type EditorProps = {
   updateTitle: (title: string) => void;
   editable: boolean;
   documentState: DocumentState;
+  canComment: boolean;
 };

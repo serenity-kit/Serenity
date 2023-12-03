@@ -135,6 +135,7 @@ const renderEditor = () => {
         // TODO currently set to active all the time, would need a proper
         // setup for the error case on mobile
         documentState="active"
+        canComment={true}
         editable={window.editorEditable}
         scrollIntoViewOnEditModeDelay={50}
         documentId={"dummyDocumentId"}

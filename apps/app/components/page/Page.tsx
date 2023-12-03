@@ -39,7 +39,10 @@ import {
   getLocalDocument,
 } from "../../store/documentStore";
 import { getLocalOrLoadRemoteUserByUserChainHash } from "../../store/userStore";
-import { useCanEditDocumentsAndFolders } from "../../store/workspaceChainStore";
+import {
+  useCanComment,
+  useCanEditDocumentsAndFolders,
+} from "../../store/workspaceChainStore";
 import {
   WorkspaceMemberDevicesProofLocalDbEntry,
   getLastWorkspaceMemberDevicesProof,
@@ -537,6 +540,10 @@ export default function Page({
     workspaceId,
     mainDeviceSigningPublicKey: currentUserInfo.mainDeviceSigningPublicKey,
   });
+  const canComment = useCanComment({
+    workspaceId,
+    mainDeviceSigningPublicKey: currentUserInfo.mainDeviceSigningPublicKey,
+  });
 
   if (state.matches("noAccess")) {
     return <PageNoAccessError />;
@@ -608,6 +615,7 @@ export default function Page({
       ) : null}
       <Editor
         editable={!state.matches("failed") && canEditDocumentsAndFolders}
+        canComment={canComment}
         documentId={docId}
         workspaceId={workspaceId}
         yDocRef={yDocRef}
