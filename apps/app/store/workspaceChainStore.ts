@@ -164,7 +164,7 @@ export const useCanEditWorkspace = ({
   return result === "ADMIN";
 };
 
-export const useCanEditAndDocumentsFolders = ({
+export const useCanEditDocumentsAndFolders = ({
   workspaceId,
   mainDeviceSigningPublicKey,
 }: {

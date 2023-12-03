@@ -20,7 +20,7 @@ import {
   loadRemoteDocumentName,
   useLocalDocumentName,
 } from "../../store/documentStore";
-import { useCanEditAndDocumentsFolders } from "../../store/workspaceChainStore";
+import { useCanEditDocumentsAndFolders } from "../../store/workspaceChainStore";
 import { useActiveDocumentStore } from "../../utils/document/activeDocumentStore";
 import { updateDocumentName } from "../../utils/document/updateDocumentName";
 import { OS } from "../../utils/platform/platform";
@@ -49,7 +49,7 @@ export default function SidebarPage(props: Props) {
 
   const currentUserInfo = getCurrentUserInfo();
   if (!currentUserInfo) throw new Error("No current user");
-  const canEditAndDocumentsFolders = useCanEditAndDocumentsFolders({
+  const canEditAndDocumentsFolders = useCanEditDocumentsAndFolders({
     workspaceId: props.workspaceId,
     mainDeviceSigningPublicKey: currentUserInfo.mainDeviceSigningPublicKey,
   });
