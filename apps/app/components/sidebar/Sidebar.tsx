@@ -31,6 +31,8 @@ import {
   useRootFoldersQuery,
 } from "../../generated/graphql";
 import { useAuthenticatedAppContext } from "../../hooks/useAuthenticatedAppContext";
+import { getCurrentUserInfo } from "../../store/currentUserInfoStore";
+import { useCanEditAndDocumentsFolders } from "../../store/workspaceChainStore";
 import { createFolderKeyDerivationTrace } from "../../utils/folder/createFolderKeyDerivationTrace";
 import { retrieveCurrentWorkspaceKey } from "../../utils/workspace/retrieveCurrentWorkspaceKey";
 import AccountMenu from "../accountMenu/AccountMenu";
@@ -128,6 +130,13 @@ export default function Sidebar(props: DrawerContentComponentProps) {
     refetchRootFolders();
   };
 
+  const currentUserInfo = getCurrentUserInfo();
+  if (!currentUserInfo) throw new Error("No current user");
+  const canEditAndDocumentsFolders = useCanEditAndDocumentsFolders({
+    workspaceId,
+    mainDeviceSigningPublicKey: currentUserInfo.mainDeviceSigningPublicKey,
+  });
+
   return (
     // TODO override for now until we find out where the pt-1 comes from
     <DrawerContentScrollView
@@ -189,18 +198,22 @@ export default function Sidebar(props: DrawerContentComponentProps) {
             style={tw`ml-5 md:ml-4 mb-3 md:mb-2 mr-4.5 md:mr-2`}
           >
             <Heading lvl={4}>Folders</Heading>
-            {/* offset not working yet as NB has a no-no in their component */}
-            <Tooltip label="Create folder" placement="right" offset={8}>
-              <IconButton
-                onPress={() => {
-                  setIsCreatingNewFolder(true);
-                }}
-                name="plus"
-                size={isDesktopDevice ? "md" : "lg"}
-                testID="root-create-folder"
-                color={isDesktopDevice ? "gray-400" : "gray-600"}
-              ></IconButton>
-            </Tooltip>
+            {canEditAndDocumentsFolders && (
+              <>
+                {/* offset not working yet as NB has a no-no in their component */}
+                <Tooltip label="Create folder" placement="right" offset={8}>
+                  <IconButton
+                    onPress={() => {
+                      setIsCreatingNewFolder(true);
+                    }}
+                    name="plus"
+                    size={isDesktopDevice ? "md" : "lg"}
+                    testID="root-create-folder"
+                    color={isDesktopDevice ? "gray-400" : "gray-600"}
+                  ></IconButton>
+                </Tooltip>
+              </>
+            )}
           </HStack>
           {isCreatingNewFolder && (
             <HStack alignItems="center" style={tw`py-1.5 pl-2.5`}>

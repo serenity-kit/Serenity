@@ -43,6 +43,8 @@ import {
   useFoldersQuery,
 } from "../../generated/graphql";
 import { useAuthenticatedAppContext } from "../../hooks/useAuthenticatedAppContext";
+import { getCurrentUserInfo } from "../../store/currentUserInfoStore";
+import { useCanEditAndDocumentsFolders } from "../../store/workspaceChainStore";
 import { loadRemoteWorkspaceMemberDevicesProofQuery } from "../../store/workspaceMemberDevicesProofStore";
 import { RootStackScreenProps } from "../../types/navigationProps";
 import { useActiveDocumentStore } from "../../utils/document/activeDocumentStore";
@@ -123,6 +125,13 @@ export default function SidebarFolder(props: Props) {
     props.keyDerivationTrace.trace[props.keyDerivationTrace.trace.length - 1]
       .subkeyId,
   ]);
+
+  const currentUserInfo = getCurrentUserInfo();
+  if (!currentUserInfo) throw new Error("No current user");
+  const canEditAndDocumentsFolders = useCanEditAndDocumentsFolders({
+    workspaceId: props.workspaceId,
+    mainDeviceSigningPublicKey: currentUserInfo.mainDeviceSigningPublicKey,
+  });
 
   const decryptName = async () => {
     const folderSubkeyId =
@@ -638,38 +647,40 @@ export default function SidebarFolder(props: Props) {
             />
           )}
 
-          <HStack
-            alignItems="center"
-            space={1}
-            style={[
-              tw`pr-4 md:pr-2  ${
-                isHovered || !isDesktopDevice ? "" : "hidden"
-              }`,
-              !isDesktopDevice && tw`border-b border-gray-200`,
-            ]}
-          >
-            <SidebarFolderMenu
-              folderId={props.folderId}
-              refetchFolders={refetchFolders}
-              onUpdateNamePress={editFolderName}
-              onDeletePressed={() => deleteFolder(props.folderId)}
-              onCreateFolderPress={() => {
-                createFolder(defaultFolderName);
-              }}
-            />
-            {/* offset not working yet as NB has a no-no in their component */}
-            <Tooltip label="New page" placement="right" offset={8}>
-              <IconButton
-                onPress={createDocument}
-                name="file-add-line"
-                color="gray-600"
-                style={tw`p-2 md:p-0`}
-                testID={`sidebar-folder--${props.folderId}__create-document`}
-              ></IconButton>
-            </Tooltip>
-            {documentsResult.fetching ||
-              (foldersResult.fetching && <ActivityIndicator />)}
-          </HStack>
+          {canEditAndDocumentsFolders && (
+            <HStack
+              alignItems="center"
+              space={1}
+              style={[
+                tw`pr-4 md:pr-2  ${
+                  isHovered || !isDesktopDevice ? "" : "hidden"
+                }`,
+                !isDesktopDevice && tw`border-b border-gray-200`,
+              ]}
+            >
+              <SidebarFolderMenu
+                folderId={props.folderId}
+                refetchFolders={refetchFolders}
+                onUpdateNamePress={editFolderName}
+                onDeletePressed={() => deleteFolder(props.folderId)}
+                onCreateFolderPress={() => {
+                  createFolder(defaultFolderName);
+                }}
+              />
+              {/* offset not working yet as NB has a no-no in their component */}
+              <Tooltip label="New page" placement="right" offset={8}>
+                <IconButton
+                  onPress={createDocument}
+                  name="file-add-line"
+                  color="gray-600"
+                  style={tw`p-2 md:p-0`}
+                  testID={`sidebar-folder--${props.folderId}__create-document`}
+                ></IconButton>
+              </Tooltip>
+              {documentsResult.fetching ||
+                (foldersResult.fetching && <ActivityIndicator />)}
+            </HStack>
+          )}
         </HStack>
       </View>
 

@@ -161,6 +161,34 @@ export const useCanEditWorkspace = ({
     workspaceId,
     mainDeviceSigningPublicKey,
   });
+  return result === "ADMIN";
+};
+
+export const useCanEditAndDocumentsFolders = ({
+  workspaceId,
+  mainDeviceSigningPublicKey,
+}: {
+  workspaceId: string;
+  mainDeviceSigningPublicKey: string;
+}) => {
+  const result = useWorkspacePermission({
+    workspaceId,
+    mainDeviceSigningPublicKey,
+  });
+  return result === "EDITOR" || result === "ADMIN";
+};
+
+export const useWorkspace = ({
+  workspaceId,
+  mainDeviceSigningPublicKey,
+}: {
+  workspaceId: string;
+  mainDeviceSigningPublicKey: string;
+}) => {
+  const result = useWorkspacePermission({
+    workspaceId,
+    mainDeviceSigningPublicKey,
+  });
   return result === "EDITOR" || result === "ADMIN";
 };
 

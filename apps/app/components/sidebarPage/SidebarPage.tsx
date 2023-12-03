@@ -14,11 +14,13 @@ import { HStack } from "native-base";
 import { useEffect, useState } from "react";
 import { StyleSheet } from "react-native";
 import { useAuthenticatedAppContext } from "../../hooks/useAuthenticatedAppContext";
+import { getCurrentUserInfo } from "../../store/currentUserInfoStore";
 import {
   createOrReplaceDocument,
   loadRemoteDocumentName,
   useLocalDocumentName,
 } from "../../store/documentStore";
+import { useCanEditAndDocumentsFolders } from "../../store/workspaceChainStore";
 import { useActiveDocumentStore } from "../../utils/document/activeDocumentStore";
 import { updateDocumentName } from "../../utils/document/updateDocumentName";
 import { OS } from "../../utils/platform/platform";
@@ -44,6 +46,13 @@ export default function SidebarPage(props: Props) {
   );
 
   const documentName = useLocalDocumentName({ documentId: props.documentId });
+
+  const currentUserInfo = getCurrentUserInfo();
+  if (!currentUserInfo) throw new Error("No current user");
+  const canEditAndDocumentsFolders = useCanEditAndDocumentsFolders({
+    workspaceId: props.workspaceId,
+    mainDeviceSigningPublicKey: currentUserInfo.mainDeviceSigningPublicKey,
+  });
 
   const linkProps = useLinkProps({
     to: {
@@ -166,24 +175,26 @@ export default function SidebarPage(props: Props) {
           </View>
         </Pressable>
 
-        <HStack
-          alignItems="center"
-          space={1}
-          style={[
-            tw`pr-4 md:pr-2 ${isHovered || !isDesktopDevice ? "" : "hidden"}`,
-            !isDesktopDevice && tw`border-b border-gray-200`,
-          ]}
-        >
-          <SidebarPageMenu
-            workspaceId={props.workspaceId}
-            documentId={props.documentId}
-            documentTitle={documentName}
-            refetchDocuments={props.onRefetchDocumentsPress}
-            onUpdateNamePress={() => {
-              setIsEditing(true);
-            }}
-          />
-        </HStack>
+        {canEditAndDocumentsFolders && (
+          <HStack
+            alignItems="center"
+            space={1}
+            style={[
+              tw`pr-4 md:pr-2 ${isHovered || !isDesktopDevice ? "" : "hidden"}`,
+              !isDesktopDevice && tw`border-b border-gray-200`,
+            ]}
+          >
+            <SidebarPageMenu
+              workspaceId={props.workspaceId}
+              documentId={props.documentId}
+              documentTitle={documentName}
+              refetchDocuments={props.onRefetchDocumentsPress}
+              onUpdateNamePress={() => {
+                setIsEditing(true);
+              }}
+            />
+          </HStack>
+        )}
       </HStack>
     </View>
   );
