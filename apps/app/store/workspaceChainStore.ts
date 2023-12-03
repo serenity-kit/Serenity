@@ -178,7 +178,7 @@ export const useCanEditAndDocumentsFolders = ({
   return result === "EDITOR" || result === "ADMIN";
 };
 
-export const useWorkspace = ({
+export const useCanComment = ({
   workspaceId,
   mainDeviceSigningPublicKey,
 }: {
@@ -189,7 +189,7 @@ export const useWorkspace = ({
     workspaceId,
     mainDeviceSigningPublicKey,
   });
-  return result === "EDITOR" || result === "ADMIN";
+  return result === "EDITOR" || result === "ADMIN" || result === "COMMENTER";
 };
 
 export const loadRemoteWorkspaceChain = async ({
