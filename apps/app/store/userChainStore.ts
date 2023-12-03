@@ -297,10 +297,6 @@ export const loadRemoteCurrentUser = async () => {
     throw new Error("Not logged in, currentUserInfo not found");
   }
   const lastEvent = getLastUserChainEvent({ userId: currentUserInfo.userId });
-  if (!lastEvent) {
-    throw new Error("User chain data not found");
-  }
-
   const userChainQueryResult = await runUserChainQuery({});
   if (
     userChainQueryResult.error ||
