@@ -25,7 +25,9 @@ import { PageHeaderRight } from "../../../components/pageHeaderRight/PageHeaderR
 import { commentsDrawerWidth } from "../../../constants";
 import { PageProvider } from "../../../context/PageContext";
 import { commentsMachine } from "../../../machines/commentsMachine";
+import { getCurrentUserInfo } from "../../../store/currentUserInfoStore";
 import { loadRemoteDocumentChain } from "../../../store/documentChainStore";
+import { useCanEditAndDocumentsFolders } from "../../../store/workspaceChainStore";
 import { updateLastOpenDocumentId } from "../../../store/workspaceStore";
 import {
   getDocumentPath,
@@ -71,6 +73,13 @@ const ActualPageScreen = (
   const [commentsState, send] = useActor(commentsService);
   const isPermanentLeftSidebar = useIsPermanentLeftSidebar();
 
+  const currentUserInfo = getCurrentUserInfo();
+  if (!currentUserInfo) throw new Error("No current user");
+  const canEditAndDocumentsFolders = useCanEditAndDocumentsFolders({
+    workspaceId,
+    mainDeviceSigningPublicKey: currentUserInfo.mainDeviceSigningPublicKey,
+  });
+
   useLayoutEffect(() => {
     props.navigation.setOptions({
       headerRight: () => (
@@ -78,7 +87,7 @@ const ActualPageScreen = (
           toggleCommentsDrawer={() => {
             send({ type: "TOGGLE_SIDEBAR" });
           }}
-          hasShareButton={true} // TODO only true for ADMIN and EDITOR
+          hasShareButton={canEditAndDocumentsFolders}
         />
       ),
       headerTitle: () => (
