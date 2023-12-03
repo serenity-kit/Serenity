@@ -143,6 +143,9 @@ export const useWorkspacePermission = ({
   mainDeviceSigningPublicKey: string;
 }) => {
   const result = useLocalLastWorkspaceChainEvent({ workspaceId });
+  if (!result) {
+    return undefined;
+  }
   const member = result.state.members[mainDeviceSigningPublicKey];
   return member?.role;
 };
