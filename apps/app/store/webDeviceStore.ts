@@ -20,6 +20,7 @@ export const persistWebDeviceAccess = async ({ key, accessToken }: Params) => {
 };
 
 export const removeWebDeviceAccess = async () => {
+  device = null;
   AsyncStorage.removeItem(webDeviceKeyId);
   AsyncStorage.removeItem(webDeviceAccessTokenId);
 };
@@ -52,6 +53,7 @@ export const fetchWebDevice = async (): Promise<{
         mainDeviceSigningPublicKey: string;
         userId: string;
       };
+      device = decryptedData.device; // add to local cache
       setCurrentUserInfo({
         userId: decryptedData.userId,
         mainDeviceSigningPublicKey: decryptedData.mainDeviceSigningPublicKey,
