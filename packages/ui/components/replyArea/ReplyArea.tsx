@@ -1,8 +1,8 @@
 import React, { useState } from "react";
 import { StyleSheet } from "react-native";
-import { TextArea, TextAreaProps } from "../textArea/TextArea";
 import { tw } from "../../tailwind";
 import { SubmitButton } from "../submitButton/SubmitButton";
+import { TextArea, TextAreaProps } from "../textArea/TextArea";
 import { View } from "../view/View";
 
 export type ReplyAreaProps = TextAreaProps & {
@@ -33,7 +33,7 @@ export const ReplyArea = (props: ReplyAreaProps) => {
     <View style={tw`relative`}>
       <TextArea
         {...props}
-        placeholder={"Reply..."}
+        placeholder={"Reply…"}
         placeholderTextColor={
           isHovered || isFocused ? tw.color("gray-600") : tw.color("gray-500")
         }
