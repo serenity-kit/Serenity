@@ -32,7 +32,7 @@ import {
 } from "../../generated/graphql";
 import { useAuthenticatedAppContext } from "../../hooks/useAuthenticatedAppContext";
 import { getCurrentUserInfo } from "../../store/currentUserInfoStore";
-import { useCanEditAndDocumentsFolders } from "../../store/workspaceChainStore";
+import { useCanEditDocumentsAndFolders } from "../../store/workspaceChainStore";
 import { createFolderKeyDerivationTrace } from "../../utils/folder/createFolderKeyDerivationTrace";
 import { retrieveCurrentWorkspaceKey } from "../../utils/workspace/retrieveCurrentWorkspaceKey";
 import AccountMenu from "../accountMenu/AccountMenu";
@@ -132,7 +132,7 @@ export default function Sidebar(props: DrawerContentComponentProps) {
 
   const currentUserInfo = getCurrentUserInfo();
   if (!currentUserInfo) throw new Error("No current user");
-  const canEditAndDocumentsFolders = useCanEditAndDocumentsFolders({
+  const canEditAndDocumentsFolders = useCanEditDocumentsAndFolders({
     workspaceId,
     mainDeviceSigningPublicKey: currentUserInfo.mainDeviceSigningPublicKey,
   });

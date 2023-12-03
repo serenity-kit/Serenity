@@ -29,7 +29,7 @@ import { getCurrentUserInfo } from "../../../store/currentUserInfoStore";
 import { loadRemoteDocumentChain } from "../../../store/documentChainStore";
 import {
   useCanComment,
-  useCanEditAndDocumentsFolders,
+  useCanEditDocumentsAndFolders,
 } from "../../../store/workspaceChainStore";
 import { updateLastOpenDocumentId } from "../../../store/workspaceStore";
 import {
@@ -78,7 +78,7 @@ const ActualPageScreen = (
 
   const currentUserInfo = getCurrentUserInfo();
   if (!currentUserInfo) throw new Error("No current user");
-  const canEditAndDocumentsFolders = useCanEditAndDocumentsFolders({
+  const canEditAndDocumentsFolders = useCanEditDocumentsAndFolders({
     workspaceId,
     mainDeviceSigningPublicKey: currentUserInfo.mainDeviceSigningPublicKey,
   });

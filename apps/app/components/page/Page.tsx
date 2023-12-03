@@ -29,6 +29,7 @@ import Editor from "../../components/editor/Editor";
 import { usePage } from "../../context/PageContext";
 import { Document, runDocumentQuery } from "../../generated/graphql";
 import { useAuthenticatedAppContext } from "../../hooks/useAuthenticatedAppContext";
+import { getCurrentUserInfo } from "../../store/currentUserInfoStore";
 import {
   getDocumentChainEventByHash,
   loadRemoteDocumentChain,
@@ -38,6 +39,7 @@ import {
   getLocalDocument,
 } from "../../store/documentStore";
 import { getLocalOrLoadRemoteUserByUserChainHash } from "../../store/userStore";
+import { useCanEditDocumentsAndFolders } from "../../store/workspaceChainStore";
 import {
   WorkspaceMemberDevicesProofLocalDbEntry,
   getLastWorkspaceMemberDevicesProof,
@@ -529,6 +531,13 @@ export default function Page({
     }
   };
 
+  const currentUserInfo = getCurrentUserInfo();
+  if (!currentUserInfo) throw new Error("No current user");
+  const canEditDocumentsAndFolders = useCanEditDocumentsAndFolders({
+    workspaceId,
+    mainDeviceSigningPublicKey: currentUserInfo.mainDeviceSigningPublicKey,
+  });
+
   if (state.matches("noAccess")) {
     return <PageNoAccessError />;
   }
@@ -598,7 +607,7 @@ export default function Page({
         </View>
       ) : null}
       <Editor
-        editable={!state.matches("failed")}
+        editable={!state.matches("failed") && canEditDocumentsAndFolders}
         documentId={docId}
         workspaceId={workspaceId}
         yDocRef={yDocRef}
