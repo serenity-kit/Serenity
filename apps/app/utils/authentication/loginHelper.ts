@@ -1,5 +1,6 @@
 import * as userChain from "@serenity-kit/user-chain";
 import * as workspaceMemberDevicesProofUtil from "@serenity-kit/workspace-member-devices-proof";
+import { deriveSessionAuthorization } from "@serenity-tools/common";
 import { addDays, addHours } from "date-fns";
 import sodium from "react-native-libsodium";
 import { client } from "react-native-opaque";
@@ -221,7 +222,13 @@ export const login = async ({
       },
     },
     {
-      fetchOptions: { headers: { Authorization: result.sessionKey } },
+      fetchOptions: {
+        headers: {
+          Authorization: deriveSessionAuthorization({
+            sessionKey: result.sessionKey,
+          }).authorization,
+        },
+      },
     }
   );
   if (!addDeviceResult.data?.addDevice) {

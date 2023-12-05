@@ -1,3 +1,4 @@
+import { deriveSessionAuthorization } from "@serenity-tools/common";
 import { devtoolsExchange } from "@urql/devtools";
 import { authExchange } from "@urql/exchange-auth";
 import { cacheExchange } from "@urql/exchange-graphcache";
@@ -72,8 +73,11 @@ const exchanges = [
       refreshAuth: async () => {},
       addAuthToOperation: (operation) => {
         if (sessionKey) {
+          const sessionAuthorization = deriveSessionAuthorization({
+            sessionKey,
+          }).authorization;
           return utils.appendHeaders(operation, {
-            Authorization: sessionKey,
+            Authorization: sessionAuthorization,
           });
         }
         return operation;
