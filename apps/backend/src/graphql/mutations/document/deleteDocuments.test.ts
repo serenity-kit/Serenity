@@ -42,7 +42,9 @@ beforeAll(async () => {
 });
 
 test("user should be able to delete a document", async () => {
-  const authorizationHeader = sessionKey;
+  const authorizationHeader = deriveSessionAuthorization({
+    sessionKey,
+  }).authorization;
   const ids = [addedDocumentId];
   const result = await deleteDocuments({
     graphql,
@@ -58,7 +60,9 @@ test("user should be able to delete a document", async () => {
 });
 
 test("Deleting nonexistent document does nothing", async () => {
-  const authorizationHeader = sessionKey;
+  const authorizationHeader = deriveSessionAuthorization({
+    sessionKey,
+  }).authorization;
   const ids = ["badthing"];
   const result = await deleteDocuments({
     graphql,

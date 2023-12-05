@@ -47,7 +47,9 @@ beforeAll(async () => {
 });
 
 test("user should be retrieve a folder", async () => {
-  const authorizationHeader = sessionKey;
+  const authorizationHeader = deriveSessionAuthorization({
+    sessionKey,
+  }).authorization;
   const folderId = generateId();
   const folderName = "New folder";
   await createFolder({

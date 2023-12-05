@@ -86,7 +86,9 @@ beforeAll(async () => {
 });
 
 test("user should be able to change a document name", async () => {
-  const authorizationHeader = sessionKey;
+  const authorizationHeader = deriveSessionAuthorization({
+    sessionKey,
+  }).authorization;
   const id = addedDocumentId;
   const name = "Updated Name";
   const result = await updateDocumentName({
@@ -112,7 +114,9 @@ test("user should be able to change a document name", async () => {
 });
 
 test("Throw error when document doesn't exist", async () => {
-  const authorizationHeader = sessionKey;
+  const authorizationHeader = deriveSessionAuthorization({
+    sessionKey,
+  }).authorization;
   const id = "badthing";
   const name = "Doesn't Exist Name";
   await expect(

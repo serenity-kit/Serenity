@@ -47,7 +47,9 @@ test("logout doesn't invalidate second session", async () => {
   const numDevicesBeforeLogout = await prisma.device.count({
     where: { userId: userData1.user.id },
   });
-  const authorizationHeader = loginResult1.session.sessionKey;
+  const authorizationHeader = deriveSessionAuthorization({
+    sessionKey: loginResult1.session.sessionKey,
+  }).authorization;
   const logoutResponse = await logout({
     graphql,
     authorizationHeader,
@@ -86,7 +88,9 @@ test("logout", async () => {
   const numDevicesBeforeLogout = await prisma.device.count({
     where: { userId: userData1.user.id },
   });
-  const authorizationHeader = loginResult2.sessionKey;
+  const authorizationHeader = deriveSessionAuthorization({
+    sessionKey: loginResult2.sessionKey,
+  }).authorization;
   const logoutResponse = await logout({
     graphql,
     authorizationHeader,

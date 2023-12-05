@@ -154,7 +154,9 @@ test("Invalid ownership", async () => {
     password,
   });
   const documentId = userData1.document.id;
-  const authorizationHeader = otherUser.sessionKey;
+  const authorizationHeader = deriveSessionAuthorization({
+    sessionKey: otherUser.sessionKey,
+  }).authorization;
   const folderKeyTrace = deriveKeysFromKeyDerivationTrace({
     keyDerivationTrace: userData1.folder.keyDerivationTrace,
     activeDevice: userData1.webDevice,

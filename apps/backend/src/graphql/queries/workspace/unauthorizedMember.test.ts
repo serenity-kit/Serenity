@@ -75,7 +75,7 @@ test("Unauthenticated", async () => {
       await getUnauthorizedMember({
         graphql,
         input: { workspaceIds: [workspace1Id] },
-        sessionKey: "badauthheader",
+        sessionKey: "AAAAAAAAAAAAAA",
       }))()
   ).rejects.toThrowError(/UNAUTHENTICATED/);
 });

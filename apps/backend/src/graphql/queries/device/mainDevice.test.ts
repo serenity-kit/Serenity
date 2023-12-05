@@ -1,3 +1,4 @@
+import { deriveSessionAuthorization } from "@serenity-tools/common";
 import { loginUser } from "../../../../test/helpers/authentication/loginUser";
 import deleteAllRecords from "../../../../test/helpers/deleteAllRecords";
 import { getMainDevice } from "../../../../test/helpers/device/getMainDevice";
@@ -22,7 +23,9 @@ test("user should be retrieve the mainDevice", async () => {
     password: "12345689",
     mainDevice: userAndDevice.mainDevice,
   });
-  const authorizationHeader = sessionKey;
+  const authorizationHeader = deriveSessionAuthorization({
+    sessionKey,
+  }).authorization;
   const result = await getMainDevice({
     graphql,
     authorizationHeader,

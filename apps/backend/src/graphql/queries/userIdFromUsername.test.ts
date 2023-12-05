@@ -1,3 +1,4 @@
+import { deriveSessionAuthorization } from "@serenity-tools/common";
 import { gql } from "graphql-request";
 import { registerUser } from "../../../test/helpers/authentication/registerUser";
 import deleteAllRecords from "../../../test/helpers/deleteAllRecords";

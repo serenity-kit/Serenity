@@ -25,7 +25,9 @@ beforeAll(async () => {
 });
 
 test("all user devices", async () => {
-  const authorizationHeader = sessionKey;
+  const authorizationHeader = deriveSessionAuthorization({
+    sessionKey,
+  }).authorization;
   const result = await getDevices({
     graphql,
     onlyNotExpired: true,
@@ -36,7 +38,9 @@ test("all user devices", async () => {
 });
 
 test("only active sessions", async () => {
-  const authorizationHeader = sessionKey;
+  const authorizationHeader = deriveSessionAuthorization({
+    sessionKey,
+  }).authorization;
   const result = await getDevices({
     graphql,
     onlyNotExpired: false,

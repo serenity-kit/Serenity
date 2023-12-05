@@ -395,4 +395,5 @@ model LoginAttempt {
   startLoginServerData String
   createdAt            DateTime @default(now())
   sessionKey           String?  @unique
+  sessionToken         String?  @unique
 }

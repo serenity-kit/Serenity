@@ -30,7 +30,9 @@ test("attach the same device does nothing", async () => {
       deviceSigningPublicKey: userAndDevice1.webDevice.signingPublicKey,
     },
   });
-  const authorizationHeader = userAndDevice1.sessionKey;
+  const authorizationHeader = deriveSessionAuthorization({
+    sessionKey: userAndDevice1.sessionKey,
+  }).authorization;
   const deviceSigningPublicKey = userAndDevice1.webDevice.signingPublicKey;
   const deviceEncryptionPublicKey = userAndDevice1.device.encryptionPublicKey;
   const workspaceKeyId = userAndDevice1.workspace.currentWorkspaceKey.id;
@@ -90,7 +92,9 @@ test("attach a device to a workspace", async () => {
     userId: userAndDevice1.user.id,
   });
   const newDevice = createDeviceResult.localDevice;
-  const authorizationHeader = userAndDevice1.sessionKey;
+  const authorizationHeader = deriveSessionAuthorization({
+    sessionKey: userAndDevice1.sessionKey,
+  }).authorization;
   const workspaceId = userAndDevice1.workspace.id;
   const workspaceKeyId = userAndDevice1.workspace.currentWorkspaceKey.id;
   const { nonce, ciphertext } = createAndEncryptWorkspaceKeyForDevice({
@@ -394,7 +398,9 @@ describe("Input errors", () => {
   });
 
   test("Invalid creatorDeviceSigningPublicKey", async () => {
-    const authorizationHeader = userAndDevice1.sessionKey;
+    const authorizationHeader = deriveSessionAuthorization({
+      sessionKey: userAndDevice1.sessionKey,
+    }).authorization;
     const deviceSigningPublicKey = userAndDevice1.webDevice.signingPublicKey;
     const deviceEncryptionPublicKey =
       userAndDevice1.webDevice.encryptionPublicKey;

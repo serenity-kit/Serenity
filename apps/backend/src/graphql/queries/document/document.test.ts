@@ -49,7 +49,9 @@ beforeAll(async () => {
 });
 
 test("user should be retrieve a document", async () => {
-  const authorizationHeader = userData1.sessionKey;
+  const authorizationHeader = deriveSessionAuthorization({
+    sessionKey: userData1.sessionKey,
+  }).authorization;
   const documentName = "Test document";
   const createDocumentResponse = await createDocument({
     graphql,

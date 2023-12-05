@@ -99,7 +99,11 @@ test("successfully creates a snapshot", async () => {
 
   const { client, messages } = await createSocketClient(
     graphql.port,
-    `/${documentId}?sessionKey=${sessionKey}`,
+    `/${documentId}?sessionKey=${
+      deriveSessionAuthorization({
+        sessionKey,
+      }).authorization
+    }`,
     2
   );
 
@@ -170,7 +174,11 @@ test("successfully creates a snapshot", async () => {
 test("successfully creates an update", async () => {
   const { client, messages } = await createSocketClient(
     graphql.port,
-    `/${documentId}?sessionKey=${sessionKey}`,
+    `/${documentId}?sessionKey=${
+      deriveSessionAuthorization({
+        sessionKey,
+      }).authorization
+    }`,
     2
   );
 
@@ -212,7 +220,11 @@ test("if document is set to requiresSnapshot updates will fail", async () => {
 
   const { client, messages } = await createSocketClient(
     graphql.port,
-    `/${documentId}?sessionKey=${sessionKey}`,
+    `/${documentId}?sessionKey=${
+      deriveSessionAuthorization({
+        sessionKey,
+      }).authorization
+    }`,
     2
   );
 
@@ -250,7 +262,11 @@ test("if document is set to requiresSnapshot updates will fail", async () => {
 test("successfully creates a snapshot", async () => {
   const { client, messages } = await createSocketClient(
     graphql.port,
-    `/${documentId}?sessionKey=${sessionKey}`,
+    `/${documentId}?sessionKey=${
+      deriveSessionAuthorization({
+        sessionKey,
+      }).authorization
+    }`,
     2
   );
 
@@ -354,7 +370,11 @@ test("successfully creates a snapshot", async () => {
 test("successfully creates an update", async () => {
   const { client, messages } = await createSocketClient(
     graphql.port,
-    `/${documentId}?sessionKey=${sessionKey}`,
+    `/${documentId}?sessionKey=${
+      deriveSessionAuthorization({
+        sessionKey,
+      }).authorization
+    }`,
     2
   );
 

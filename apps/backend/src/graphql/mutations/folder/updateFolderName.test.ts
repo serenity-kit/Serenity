@@ -114,7 +114,9 @@ test("throw error when user doesn't have access", async () => {
       sessionKey: userData1.sessionKey,
     }).authorization,
   });
-  const authorizationHeader = sessionKey;
+  const authorizationHeader = deriveSessionAuthorization({
+    sessionKey,
+  }).authorization;
   const id = otherUserFolderResult.createFolder.folder.id;
   const name = "Unauthorized Name";
   await expect(

@@ -274,7 +274,7 @@ test("Unauthenticated", async () => {
         graphql,
         workspaceId: userData1.workspace.id,
         deviceSigningPublicKey: userData1.device.signingPublicKey,
-        sessionKey: "badauthheader",
+        sessionKey: "AAAAAAAAAAAAAAAA",
       }))()
   ).rejects.toThrowError(/UNAUTHENTICATED/);
 });

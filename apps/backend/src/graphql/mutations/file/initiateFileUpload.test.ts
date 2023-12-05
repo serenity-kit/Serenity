@@ -1,4 +1,4 @@
-import { generateId } from "@serenity-tools/common";
+import { deriveSessionAuthorization, generateId } from "@serenity-tools/common";
 import { gql } from "graphql-request";
 import { Role } from "../../../../prisma/generated/output";
 import { registerUser } from "../../../../test/helpers/authentication/registerUser";
@@ -57,7 +57,9 @@ test("initiate file upload", async () => {
     graphql,
     documentId: userData.document.id,
     workspaceId: userData.workspace.id,
-    authorization: userData.sessionKey,
+    authorization: deriveSessionAuthorization({
+      sessionKey: userData.sessionKey,
+    }).authorization,
   });
   const fileUpdoadData = result.initiateFileUpload;
   expect(typeof fileUpdoadData.fileId).toBe("string");
@@ -77,7 +79,9 @@ test("Invalid access", async () => {
         graphql,
         documentId: userData.document.id,
         workspaceId: userData.workspace.id,
-        authorization: otherUser.sessionKey,
+        authorization: deriveSessionAuthorization({
+          sessionKey: otherUser.sessionKey,
+        }).authorization,
       }))()
   ).rejects.toThrow("Unauthorized");
 });
@@ -101,7 +105,9 @@ test("Commenter tries to upload", async () => {
         graphql,
         documentId: userData.document.id,
         workspaceId: userData.workspace.id,
-        authorization: otherUser.sessionKey,
+        authorization: deriveSessionAuthorization({
+          sessionKey: otherUser.sessionKey,
+        }).authorization,
       }))()
   ).rejects.toThrow("Unauthorized");
 });
@@ -125,7 +131,9 @@ test("Viewer tries to upload", async () => {
         graphql,
         documentId: userData.document.id,
         workspaceId: userData.workspace.id,
-        authorization: otherUser.sessionKey,
+        authorization: deriveSessionAuthorization({
+          sessionKey: otherUser.sessionKey,
+        }).authorization,
       }))()
   ).rejects.toThrow("Unauthorized");
 });
@@ -166,7 +174,11 @@ describe("Input errors", () => {
               workspaceId: userData.workspace.id,
             },
           },
-          { authorization: userData.sessionKey }
+          {
+            authorization: deriveSessionAuthorization({
+              sessionKey: userData.sessionKey,
+            }).authorization,
+          }
         ))()
     ).rejects.toThrowError();
   });
@@ -185,7 +197,11 @@ describe("Input errors", () => {
               workspaceId: null,
             },
           },
-          { authorization: userData.sessionKey }
+          {
+            authorization: deriveSessionAuthorization({
+              sessionKey: userData.sessionKey,
+            }).authorization,
+          }
         ))()
     ).rejects.toThrowError();
   });
@@ -197,7 +213,9 @@ describe("Input errors", () => {
     await expect(
       (async () =>
         await graphql.client.request(query, null, {
-          authorization: userData.sessionKey,
+          authorization: deriveSessionAuthorization({
+            sessionKey: userData.sessionKey,
+          }).authorization,
         }))()
     ).rejects.toThrowError();
   });

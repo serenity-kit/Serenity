@@ -58,7 +58,9 @@ test("user can change workspace name", async () => {
 
 test("user should not be able to update a workspace they don't own", async () => {
   // generate a challenge code
-  const authorizationHeader = sessionKey2;
+  const authorizationHeader = deriveSessionAuthorization({
+    sessionKey: sessionKey2,
+  }).authorization;
   const id = "abc";
   const name = "unauthorized workspace";
   await expect(
@@ -76,7 +78,9 @@ test("user should not be able to update a workspace they don't own", async () =>
 
 test("user should not be able to update a workspace for a workspace that doesn't exist", async () => {
   // generate a challenge code
-  const authorizationHeader = sessionKey1;
+  const authorizationHeader = deriveSessionAuthorization({
+    sessionKey: sessionKey1,
+  }).authorization;
   const id = "hahahaha";
   const name = "nonexistent workspace";
   await expect(

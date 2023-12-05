@@ -132,7 +132,11 @@ describe("Input errors", () => {
           {
             documentId: null,
           },
-          { authorization: userData1.sessionKey }
+          {
+            authorization: deriveSessionAuthorization({
+              sessionKey: userData1.sessionKey,
+            }).authorization,
+          }
         ))()
     ).rejects.toThrowError(/BAD_USER_INPUT/);
   });
@@ -146,7 +150,11 @@ describe("Input errors", () => {
             documentId: userData1.document.id,
             first: 51,
           },
-          { authorization: userData1.sessionKey }
+          {
+            authorization: deriveSessionAuthorization({
+              sessionKey: userData1.sessionKey,
+            }).authorization,
+          }
         ))()
     ).rejects.toThrowError(/BAD_USER_INPUT/);
   });

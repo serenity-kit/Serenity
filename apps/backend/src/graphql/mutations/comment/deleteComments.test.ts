@@ -47,7 +47,7 @@ beforeAll(async () => {
   await setup();
 });
 
-test.only("commenter deletes own comment", async () => {
+test("commenter deletes own comment", async () => {
   const commentResult = await createComment({
     graphql,
     snapshotId: userData1.snapshot.publicData.snapshotId,

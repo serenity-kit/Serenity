@@ -86,7 +86,9 @@ test("delete and keep devices mismatch", async () => {
 });
 
 test("delete a device", async () => {
-  const authorizationHeader = userData1.sessionKey;
+  const authorizationHeader = deriveSessionAuthorization({
+    sessionKey: userData1.sessionKey,
+  }).authorization;
   const numDevicesAfterCreate = await getDevices({
     graphql,
     onlyNotExpired: true,
@@ -169,7 +171,9 @@ test("delete a device", async () => {
 });
 
 test("delete login device clears session", async () => {
-  const authorizationHeader = userData1.sessionKey;
+  const authorizationHeader = deriveSessionAuthorization({
+    sessionKey: userData1.sessionKey,
+  }).authorization;
   const numDevicesAfterCreate = await getDevices({
     graphql,
     onlyNotExpired: true,
