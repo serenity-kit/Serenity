@@ -225,6 +225,7 @@ export default function RegisterForm(props: Props) {
         );
       }
     } catch (error) {
+      console.log(error);
       setErrorMessage(error.message);
     } finally {
       setIsRegistering(false);
