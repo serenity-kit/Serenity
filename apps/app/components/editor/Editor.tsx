@@ -93,6 +93,7 @@ export default function Editor({
   workspaceId,
   editable,
   documentState,
+  canComment,
 }: EditorProps) {
   const webViewRef = useRef<WebView>(null);
   // leveraging a ref here since the injectedJavaScriptBeforeContentLoaded

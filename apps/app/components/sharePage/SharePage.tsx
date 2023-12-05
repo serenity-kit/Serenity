@@ -332,6 +332,7 @@ export const SharePage: React.FC<Props> = ({
       <Editor
         editable={false} // until we add EDITOR sharing
         // editable={!state.matches("failed")}
+        canComment={false} // until we add COMMENT link sharing
         documentId={docId}
         workspaceId={workspaceId}
         yDocRef={yDocRef}

@@ -35,6 +35,7 @@ export default function Editor({
   updateTitle,
   editable,
   documentState,
+  canComment,
 }: EditorProps) {
   const [editorBottombarState, setEditorBottombarState] =
     useState<EditorBottombarState>(initialEditorBottombarState);
@@ -146,6 +147,7 @@ export default function Editor({
       ></div>
       <SerenityEditor
         editable={editable}
+        canComment={canComment}
         documentId={documentId}
         yDocRef={yDocRef}
         yAwarenessRef={yAwarenessRef}
