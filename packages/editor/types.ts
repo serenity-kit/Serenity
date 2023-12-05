@@ -120,6 +120,7 @@ declare global {
     ydoc: any;
     editor: any;
     editorEditable: boolean;
+    canComment: boolean;
     isNew: boolean;
     initialContent: any;
     updateEditor: (paramsString: string) => void;
@@ -131,6 +132,7 @@ declare global {
     updateUsername: (username: string) => void;
     updateHasOpenCommentsSidebar: (hasOpenCommentsSidebar: boolean) => void;
     setEditorEditable(editable: boolean): void;
+    setCanComment(canComment: boolean): void;
     workspaceDevicesToUsernames: { [deviceId: string]: string };
     setWorkspaceDevicesToUsernames: (
       serializedWorkspaceDevicesToUsernames: string

@@ -97,6 +97,11 @@ window.setEditorEditable = (editable: boolean) => {
   renderEditor();
 };
 
+window.setCanComment = (canComment: boolean) => {
+  window.canComment = canComment;
+  renderEditor();
+};
+
 window.setWorkspaceDevicesToUsernames = (
   serializedWorkspaceDevicesToUsernames: string
 ) => {
@@ -135,7 +140,7 @@ const renderEditor = () => {
         // TODO currently set to active all the time, would need a proper
         // setup for the error case on mobile
         documentState="active"
-        canComment={true}
+        canComment={window.canComment}
         editable={window.editorEditable}
         scrollIntoViewOnEditModeDelay={50}
         documentId={"dummyDocumentId"}

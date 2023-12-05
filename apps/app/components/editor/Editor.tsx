@@ -222,12 +222,18 @@ export default function Editor({
   }, [webviewLoaded]);
 
   useEffect(() => {
-    console.log("editable: ", editable);
     webViewRef.current?.injectJavaScript(`
       window.setEditorEditable(${editable});
       true;
     `);
   }, [editable]);
+
+  useEffect(() => {
+    webViewRef.current?.injectJavaScript(`
+      window.setCanComment(${canComment});
+      true;
+    `);
+  }, [canComment]);
 
   const [editorBottombarState, setEditorBottombarState] =
     useState<EditorBottombarState>(initialEditorBottombarState);
