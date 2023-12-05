@@ -8,9 +8,7 @@ export const decryptMainDevice = ({
   exportKey,
 }): LocalDevice => {
   const { key: encryptionKey } = kdfDeriveFromKey({
-    key: sodium.to_base64(
-      sodium.from_base64(exportKey).subarray(0, sodium.crypto_kdf_KEYBYTES)
-    ),
+    key: exportKey,
     context: "m_device",
     subkeyId: "AAAAAAAAAAAAAAAAAAAAAA",
   });
