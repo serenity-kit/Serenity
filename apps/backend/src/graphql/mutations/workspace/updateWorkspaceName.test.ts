@@ -1,4 +1,8 @@
-import { decryptWorkspaceInfo, generateId } from "@serenity-tools/common";
+import {
+  decryptWorkspaceInfo,
+  deriveSessionAuthorization,
+  generateId,
+} from "@serenity-tools/common";
 import { gql } from "graphql-request";
 import deleteAllRecords from "../../../../test/helpers/deleteAllRecords";
 import setupGraphql from "../../../../test/helpers/setupGraphql";
@@ -39,7 +43,9 @@ test("user can change workspace name", async () => {
     name,
     workspaceKey: userData1.workspaceKey,
     workspaceKeyId: userData1.workspaceKeyId,
-    authorizationHeader: userData1.sessionKey,
+    authorizationHeader: deriveSessionAuthorization({
+      sessionKey: userData1.sessionKey,
+    }).authorization,
   });
   const workspace = result.updateWorkspaceName.workspace;
   const decryptedWorkspaceInfo = decryptWorkspaceInfo({

@@ -1,4 +1,4 @@
-import { generateId } from "@serenity-tools/common";
+import { deriveSessionAuthorization, generateId } from "@serenity-tools/common";
 import { gql } from "graphql-request";
 import { Role } from "../../../../prisma/generated/output";
 import { registerUser } from "../../../../test/helpers/authentication/registerUser";
@@ -45,7 +45,8 @@ const setup = async () => {
     name: "Untitled",
     parentKey: workspaceKey,
     parentFolderId: null,
-    authorizationHeader: sessionKey,
+    authorizationHeader: deriveSessionAuthorization({ sessionKey })
+      .authorization,
     workspaceKeyId: addedWorkspace.currentWorkspaceKey.id,
     workspaceId: addedWorkspace.id,
   });
@@ -79,7 +80,8 @@ test("user can delete a folder", async () => {
     name: "Untitled",
     parentKey: workspaceKey,
     parentFolderId: null,
-    authorizationHeader: sessionKey,
+    authorizationHeader: deriveSessionAuthorization({ sessionKey })
+      .authorization,
     workspaceKeyId: addedWorkspace.currentWorkspaceKey.id,
     workspaceId: addedWorkspace.id,
   });
@@ -89,7 +91,8 @@ test("user can delete a folder", async () => {
     graphql,
     ids: folderIds,
     workspaceId: addedWorkspace.id,
-    authorizationHeader: sessionKey,
+    authorizationHeader: deriveSessionAuthorization({ sessionKey })
+      .authorization,
   });
   // try to retrieve the folder. It should come back as null
   const folder = await prisma.folder.findFirst({
@@ -109,7 +112,8 @@ test("deleting a parent folder will cascade to children", async () => {
     name: "Parent folder",
     parentFolderId: null,
     parentKey: workspaceKey,
-    authorizationHeader: sessionKey,
+    authorizationHeader: deriveSessionAuthorization({ sessionKey })
+      .authorization,
     workspaceKeyId: addedWorkspace.currentWorkspaceKey.id,
     workspaceId: addedWorkspace.id,
   });
@@ -119,7 +123,8 @@ test("deleting a parent folder will cascade to children", async () => {
     name: "Child folder",
     parentFolderId: parentFolderId,
     parentKey: workspaceKey,
-    authorizationHeader: sessionKey,
+    authorizationHeader: deriveSessionAuthorization({ sessionKey })
+      .authorization,
     workspaceKeyId: addedWorkspace.currentWorkspaceKey.id,
     workspaceId: addedWorkspace.id,
   });
@@ -133,7 +138,8 @@ test("deleting a parent folder will cascade to children", async () => {
     graphql,
     ids: folderIds,
     workspaceId: addedWorkspace.id,
-    authorizationHeader: sessionKey,
+    authorizationHeader: deriveSessionAuthorization({ sessionKey })
+      .authorization,
   });
   // try to retrieve the folder.  It should come back as null
   const folder = await prisma.folder.findFirst({
@@ -155,7 +161,8 @@ test("user can delete multiple folders", async () => {
     name: "folder 1",
     parentFolderId: null,
     parentKey: workspaceKey,
-    authorizationHeader: sessionKey,
+    authorizationHeader: deriveSessionAuthorization({ sessionKey })
+      .authorization,
     workspaceKeyId: addedWorkspace.currentWorkspaceKey.id,
     workspaceId: addedWorkspace.id,
   });
@@ -165,7 +172,8 @@ test("user can delete multiple folders", async () => {
     name: "folder 2",
     parentFolderId: null,
     parentKey: workspaceKey,
-    authorizationHeader: sessionKey,
+    authorizationHeader: deriveSessionAuthorization({ sessionKey })
+      .authorization,
     workspaceKeyId: addedWorkspace.currentWorkspaceKey.id,
     workspaceId: addedWorkspace.id,
   });
@@ -176,7 +184,8 @@ test("user can delete multiple folders", async () => {
     graphql,
     ids: folderIds,
     workspaceId: addedWorkspace.id,
-    authorizationHeader: sessionKey,
+    authorizationHeader: deriveSessionAuthorization({ sessionKey })
+      .authorization,
   });
   // try to retrieve the folder.  It should come back as null
   const folders = await prisma.folder.findMany({
@@ -202,7 +211,8 @@ test("user can delete multiple folders", async () => {
     name: "parent folder",
     parentFolderId: null,
     parentKey: workspaceKey,
-    authorizationHeader: sessionKey,
+    authorizationHeader: deriveSessionAuthorization({ sessionKey })
+      .authorization,
     workspaceId: addedWorkspace.id,
     workspaceKeyId: addedWorkspace.currentWorkspaceKey.id,
   });
@@ -212,7 +222,8 @@ test("user can delete multiple folders", async () => {
     name: "parent folder 2",
     parentFolderId: null,
     parentKey: workspaceKey,
-    authorizationHeader: sessionKey,
+    authorizationHeader: deriveSessionAuthorization({ sessionKey })
+      .authorization,
     workspaceKeyId: addedWorkspace.currentWorkspaceKey.id,
     workspaceId: addedWorkspace.id,
   });
@@ -222,7 +233,8 @@ test("user can delete multiple folders", async () => {
     name: "child folder",
     parentKey: workspaceKey,
     parentFolderId: parentFolderId1,
-    authorizationHeader: sessionKey,
+    authorizationHeader: deriveSessionAuthorization({ sessionKey })
+      .authorization,
     workspaceKeyId: addedWorkspace.currentWorkspaceKey.id,
     workspaceId: addedWorkspace.id,
   });
@@ -232,7 +244,8 @@ test("user can delete multiple folders", async () => {
     name: "child folder 2",
     parentKey: workspaceKey,
     parentFolderId: parentFolderId2,
-    authorizationHeader: sessionKey,
+    authorizationHeader: deriveSessionAuthorization({ sessionKey })
+      .authorization,
     workspaceKeyId: addedWorkspace.currentWorkspaceKey.id,
     workspaceId: addedWorkspace.id,
   });
@@ -249,7 +262,8 @@ test("user can delete multiple folders", async () => {
     graphql,
     ids: folderIds,
     workspaceId: addedWorkspace.id,
-    authorizationHeader: sessionKey,
+    authorizationHeader: deriveSessionAuthorization({ sessionKey })
+      .authorization,
   });
   // try to retrieve the folder.  It should come back as null
   const folders = await prisma.folder.findMany({
@@ -272,7 +286,8 @@ test("user can't delete folders they don't own", async () => {
     name: "folder name",
     parentKey: workspaceKey,
     parentFolderId: null,
-    authorizationHeader: sessionKey2,
+    authorizationHeader: deriveSessionAuthorization({ sessionKey: sessionKey2 })
+      .authorization,
     workspaceKeyId: addedWorkspace.currentWorkspaceKey.id,
     workspaceId: otherUserWorkspaceId,
   });
@@ -282,7 +297,8 @@ test("user can't delete folders they don't own", async () => {
     graphql,
     ids: folderIds,
     workspaceId: addedWorkspace.id,
-    authorizationHeader: sessionKey,
+    authorizationHeader: deriveSessionAuthorization({ sessionKey })
+      .authorization,
   });
   // try to retrieve the folder.  It should come back as null
   const folder = await prisma.folder.findFirst({
@@ -301,7 +317,8 @@ test("user can't delete folders that don't exist", async () => {
     graphql,
     ids: folderIds,
     workspaceId: addedWorkspace.id,
-    authorizationHeader: sessionKey,
+    authorizationHeader: deriveSessionAuthorization({ sessionKey })
+      .authorization,
   });
   // try to retrieve the folder.  It should come back as null
   const folder = await prisma.folder.findFirst({
@@ -331,7 +348,9 @@ test("Commentor tries to delete", async () => {
         graphql,
         ids: folderIds,
         workspaceId: addedWorkspace.id,
-        authorizationHeader: otherUser.sessionKey,
+        authorizationHeader: deriveSessionAuthorization({
+          sessionKey: otherUser.sessionKey,
+        }).authorization,
       }))()
   ).rejects.toThrowError("Unauthorized");
 });
@@ -357,7 +376,9 @@ test("Viewer tries to delete", async () => {
         graphql,
         ids: folderIds,
         workspaceId: addedWorkspace.id,
-        authorizationHeader: otherUser.sessionKey,
+        authorizationHeader: deriveSessionAuthorization({
+          sessionKey: otherUser.sessionKey,
+        }).authorization,
       }))()
   ).rejects.toThrowError("Unauthorized");
 });
@@ -378,7 +399,7 @@ test("Unauthenticated", async () => {
 
 describe("Input errors", () => {
   const authorizationHeaders = {
-    authorization: sessionKey,
+    authorization: deriveSessionAuthorization({ sessionKey }).authorization,
   };
   test("Invalid ids", async () => {
     const query = gql`

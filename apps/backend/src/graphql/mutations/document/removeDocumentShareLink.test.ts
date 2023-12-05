@@ -1,4 +1,4 @@
-import { generateId } from "@serenity-tools/common";
+import { deriveSessionAuthorization, generateId } from "@serenity-tools/common";
 import sodium from "react-native-libsodium";
 import { Role } from "../../../../prisma/generated/output";
 import deleteAllRecords from "../../../../test/helpers/deleteAllRecords";
@@ -26,7 +26,9 @@ const setup = async () => {
     sharingRole: Role.EDITOR,
     mainDevice: userData1.mainDevice,
     snapshotKey,
-    authorizationHeader: userData1.sessionKey,
+    authorizationHeader: deriveSessionAuthorization({
+      sessionKey: userData1.sessionKey,
+    }).authorization,
   });
   shareLinkDeviceSigningPublicKey = signingPublicKey;
 };
@@ -47,7 +49,9 @@ test("Invalid document ownership", async () => {
         graphql,
         deviceSigningPublicKey: shareLinkDeviceSigningPublicKey,
         mainDevice: otherUser.mainDevice,
-        authorizationHeader: otherUser.sessionKey,
+        authorizationHeader: deriveSessionAuthorization({
+          sessionKey: otherUser.sessionKey,
+        }).authorization,
         documentId: userData1.document.id,
       }))()
   ).rejects.toThrowError("Unauthorized");
@@ -60,7 +64,9 @@ test("Not the main device", async () => {
         graphql,
         deviceSigningPublicKey: shareLinkDeviceSigningPublicKey,
         mainDevice: userData1.webDevice,
-        authorizationHeader: userData1.sessionKey,
+        authorizationHeader: deriveSessionAuthorization({
+          sessionKey: userData1.sessionKey,
+        }).authorization,
         documentId: userData1.document.id,
       }))()
   ).rejects.toThrowError("Not the user's main device");
@@ -71,7 +77,9 @@ test("remove share link", async () => {
     graphql,
     deviceSigningPublicKey: shareLinkDeviceSigningPublicKey,
     mainDevice: userData1.mainDevice,
-    authorizationHeader: userData1.sessionKey,
+    authorizationHeader: deriveSessionAuthorization({
+      sessionKey: userData1.sessionKey,
+    }).authorization,
     documentId: userData1.document.id,
   });
   expect(response).toMatchInlineSnapshot(`

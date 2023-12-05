@@ -1,4 +1,7 @@
-import { createAndEncryptWorkspaceKeyForDevice } from "@serenity-tools/common";
+import {
+  createAndEncryptWorkspaceKeyForDevice,
+  deriveSessionAuthorization,
+} from "@serenity-tools/common";
 import { gql } from "graphql-request";
 import deleteAllRecords from "../../../../test/helpers/deleteAllRecords";
 import { attachDeviceToWorkspaces } from "../../../../test/helpers/device/attachDeviceToWorkspaces";
@@ -227,7 +230,11 @@ describe("Input errors", () => {
               ],
             },
           },
-          { authorization: userAndDevice1.sessionKey }
+          {
+            authorization: deriveSessionAuthorization({
+              sessionKey: userAndDevice1.sessionKey,
+            }).authorization,
+          }
         ))()
     ).rejects.toThrowError(/BAD_USER_INPUT/);
   });
@@ -256,7 +263,11 @@ describe("Input errors", () => {
               ],
             },
           },
-          { authorization: userAndDevice1.sessionKey }
+          {
+            authorization: deriveSessionAuthorization({
+              sessionKey: userAndDevice1.sessionKey,
+            }).authorization,
+          }
         ))()
     ).rejects.toThrowError(/BAD_USER_INPUT/);
   });
@@ -285,7 +296,11 @@ describe("Input errors", () => {
               ],
             },
           },
-          { authorization: userAndDevice1.sessionKey }
+          {
+            authorization: deriveSessionAuthorization({
+              sessionKey: userAndDevice1.sessionKey,
+            }).authorization,
+          }
         ))()
     ).rejects.toThrowError(/BAD_USER_INPUT/);
   });
@@ -301,7 +316,11 @@ describe("Input errors", () => {
               receiverDeviceSigningPublicKey: undefined,
             },
           },
-          { authorization: userAndDevice1.sessionKey }
+          {
+            authorization: deriveSessionAuthorization({
+              sessionKey: userAndDevice1.sessionKey,
+            }).authorization,
+          }
         ))()
     ).rejects.toThrowError(/BAD_USER_INPUT/);
   });
@@ -331,7 +350,11 @@ describe("Input errors", () => {
               ],
             },
           },
-          { authorization: userAndDevice1.sessionKey }
+          {
+            authorization: deriveSessionAuthorization({
+              sessionKey: userAndDevice1.sessionKey,
+            }).authorization,
+          }
         ))()
     ).rejects.toThrowError(/BAD_USER_INPUT/);
   });
@@ -361,7 +384,11 @@ describe("Input errors", () => {
               ],
             },
           },
-          { authorization: userAndDevice1.sessionKey }
+          {
+            authorization: deriveSessionAuthorization({
+              sessionKey: userAndDevice1.sessionKey,
+            }).authorization,
+          }
         ))()
     ).rejects.toThrowError(/BAD_USER_INPUT/);
   });

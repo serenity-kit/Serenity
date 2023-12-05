@@ -1,3 +1,4 @@
+import { deriveSessionAuthorization } from "@serenity-tools/common";
 import { gql } from "graphql-request";
 import deleteAllRecords from "../../../../test/helpers/deleteAllRecords";
 import { createDevice } from "../../../../test/helpers/device/createDevice";
@@ -58,7 +59,7 @@ test("Unauthenticated", async () => {
 
 test("Input Errors", async () => {
   const authorizationHeaders = {
-    authorization: sessionKey,
+    authorization: deriveSessionAuthorization({ sessionKey }).authorization,
   };
 
   // get root folders from graphql

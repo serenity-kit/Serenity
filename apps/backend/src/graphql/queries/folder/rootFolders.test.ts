@@ -1,4 +1,4 @@
-import { generateId } from "@serenity-tools/common";
+import { deriveSessionAuthorization, generateId } from "@serenity-tools/common";
 import deleteAllRecords from "../../../../test/helpers/deleteAllRecords";
 import { getWorkspaceKeyForWorkspaceAndDevice } from "../../../../test/helpers/device/getWorkspaceKeyForWorkspaceAndDevice";
 import { createFolder } from "../../../../test/helpers/folder/createFolder";
@@ -51,7 +51,9 @@ const setup = async () => {
     id: otherFolderId,
     parentKey: workspaceKey2,
     parentFolderId: null,
-    authorizationHeader: userData2.sessionKey,
+    authorizationHeader: deriveSessionAuthorization({
+      sessionKey: userData2.sessionKey,
+    }).authorization,
     workspaceId: userData2.workspace.id,
     workspaceKeyId: userData2.workspace.currentWorkspaceKey.id,
   });
@@ -67,7 +69,9 @@ test("list folders in a workspace when preloaded with initial workspace", async 
     graphql,
     workspaceId: userData1.workspace.id,
     first: 50,
-    authorizationHeader: userData1.sessionKey,
+    authorizationHeader: deriveSessionAuthorization({
+      sessionKey: userData1.sessionKey,
+    }).authorization,
   });
   expect(result.rootFolders.edges.length).toBe(1);
 });
@@ -83,14 +87,18 @@ test("user should be able to list folders in a workspace with one item", async (
     parentFolderId: null,
     workspaceId: userData1.workspace.id,
     workspaceKeyId: userData1.workspace.currentWorkspaceKey.id,
-    authorizationHeader: userData1.sessionKey,
+    authorizationHeader: deriveSessionAuthorization({
+      sessionKey: userData1.sessionKey,
+    }).authorization,
   });
 
   const result = await getRootFolders({
     graphql,
     workspaceId: userData1.workspace.id,
     first: 50,
-    authorizationHeader: userData1.sessionKey,
+    authorizationHeader: deriveSessionAuthorization({
+      sessionKey: userData1.sessionKey,
+    }).authorization,
   });
   expect(result.rootFolders.edges.length).toBe(2);
   result.rootFolders.edges.forEach(
@@ -111,14 +119,18 @@ test("user should be able to list folders in a workspace with multiple items", a
     parentFolderId: null,
     workspaceId: userData1.workspace.id,
     workspaceKeyId: userData1.workspace.currentWorkspaceKey.id,
-    authorizationHeader: userData1.sessionKey,
+    authorizationHeader: deriveSessionAuthorization({
+      sessionKey: userData1.sessionKey,
+    }).authorization,
   });
 
   const result = await getRootFolders({
     graphql,
     workspaceId: userData1.workspace.id,
     first: 50,
-    authorizationHeader: userData1.sessionKey,
+    authorizationHeader: deriveSessionAuthorization({
+      sessionKey: userData1.sessionKey,
+    }).authorization,
   });
   expect(result.rootFolders.edges.length).toBe(3);
   result.rootFolders.edges.forEach(
@@ -139,13 +151,17 @@ test("user should be able to list without showing subfolders", async () => {
     parentFolderId: parentFolderId,
     workspaceId: userData1.workspace.id,
     workspaceKeyId: userData1.workspace.currentWorkspaceKey.id,
-    authorizationHeader: userData1.sessionKey,
+    authorizationHeader: deriveSessionAuthorization({
+      sessionKey: userData1.sessionKey,
+    }).authorization,
   });
   const result = await getRootFolders({
     graphql,
     workspaceId: userData1.workspace.id,
     first: 50,
-    authorizationHeader: userData1.sessionKey,
+    authorizationHeader: deriveSessionAuthorization({
+      sessionKey: userData1.sessionKey,
+    }).authorization,
   });
   expect(result.rootFolders.edges.length).toBe(3);
 });
@@ -157,7 +173,9 @@ test("retrieving a workspace that doesn't exist throws an error", async () => {
         graphql,
         workspaceId: generateId(),
         first: 50,
-        authorizationHeader: userData1.sessionKey,
+        authorizationHeader: deriveSessionAuthorization({
+          sessionKey: userData1.sessionKey,
+        }).authorization,
       }))()
   ).rejects.toThrow("Unauthorized");
 });
@@ -169,7 +187,9 @@ test("listing folders that the user doesn't own throws an error", async () => {
         graphql,
         workspaceId: userData2.workspace.id,
         first: 50,
-        authorizationHeader: userData1.sessionKey,
+        authorizationHeader: deriveSessionAuthorization({
+          sessionKey: userData1.sessionKey,
+        }).authorization,
       }))()
   ).rejects.toThrow("Unauthorized");
 });

@@ -1,6 +1,7 @@
 import {
   createSnapshotKey,
   decryptWorkspaceKey,
+  deriveSessionAuthorization,
   folderDerivedKeyContext,
   LocalDevice,
   SerenitySnapshotPublicData,
@@ -81,7 +82,8 @@ const setup = async () => {
     parentFolderId: addedFolder.id,
     workspaceId,
     activeDevice: result.webDevice,
-    authorizationHeader: sessionKey,
+    authorizationHeader: deriveSessionAuthorization({ sessionKey })
+      .authorization,
   });
   documentId = createDocumentResult.createDocument.id;
 };
@@ -257,7 +259,8 @@ test("successfully creates a snapshot", async () => {
   const workspaceResult = await getWorkspace({
     graphql,
     workspaceId,
-    authorizationHeader: sessionKey,
+    authorizationHeader: deriveSessionAuthorization({ sessionKey })
+      .authorization,
     deviceSigningPublicKey: device!.signingPublicKey,
   });
 

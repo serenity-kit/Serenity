@@ -1,5 +1,5 @@
 import * as workspaceChain from "@serenity-kit/workspace-chain";
-import { generateId } from "@serenity-tools/common";
+import { deriveSessionAuthorization, generateId } from "@serenity-tools/common";
 import { gql } from "graphql-request";
 import sodium from "libsodium-wrappers";
 import { Role } from "../../../../prisma/generated/output";
@@ -30,7 +30,9 @@ beforeEach(async () => {
     graphql,
     role: Role.VIEWER,
     workspaceId: userData1.workspace.id,
-    authorizationHeader: userData1.sessionKey,
+    authorizationHeader: deriveSessionAuthorization({
+      sessionKey: userData1.sessionKey,
+    }).authorization,
     mainDevice: userData1.mainDevice,
   });
   const invitationId =
@@ -41,7 +43,9 @@ beforeEach(async () => {
     inviteeMainDevice: userData2.mainDevice,
     invitationSigningKeyPairSeed:
       workspaceInvitationResult.invitationSigningKeyPairSeed,
-    authorizationHeader: userData2.sessionKey,
+    authorizationHeader: deriveSessionAuthorization({
+      sessionKey: userData2.sessionKey,
+    }).authorization,
   });
 });
 
@@ -63,7 +67,9 @@ test("update a workspace member role", async () => {
   const result = await updateWorkspaceMemberRole({
     graphql,
     workspaceId: userData1.workspace.id,
-    authorizationHeader: userData1.sessionKey,
+    authorizationHeader: deriveSessionAuthorization({
+      sessionKey: userData1.sessionKey,
+    }).authorization,
     workspaceChainEvent: updateMemberEvent,
     mainDevice: userData1.mainDevice,
   });
@@ -90,7 +96,9 @@ test("update my own workspace member role", async () => {
     workspaceId: userData1.workspace.id,
     workspaceChainEvent: updateMemberEvent,
     mainDevice: userData1.mainDevice,
-    authorizationHeader: userData1.sessionKey,
+    authorizationHeader: deriveSessionAuthorization({
+      sessionKey: userData1.sessionKey,
+    }).authorization,
   });
 
   const { lastChainEntry: lastChainEntry2 } = await getLastWorkspaceChainEvent({
@@ -111,7 +119,9 @@ test("update my own workspace member role", async () => {
     workspaceId: userData1.workspace.id,
     workspaceChainEvent: updateMemberEvent2,
     mainDevice: userData1.mainDevice,
-    authorizationHeader: userData1.sessionKey,
+    authorizationHeader: deriveSessionAuthorization({
+      sessionKey: userData1.sessionKey,
+    }).authorization,
   });
 
   // TODO improve by checking actual role instead of relying on success here
@@ -140,7 +150,9 @@ test("user should not be able to update a workspace they don't own", async () =>
         workspaceId: userData2.workspace.id,
         workspaceChainEvent: updateMemberEvent,
         mainDevice: userData1.mainDevice,
-        authorizationHeader: userData1.sessionKey,
+        authorizationHeader: deriveSessionAuthorization({
+          sessionKey: userData1.sessionKey,
+        }).authorization,
       }))()
   ).rejects.toThrow("Unauthorized");
 });

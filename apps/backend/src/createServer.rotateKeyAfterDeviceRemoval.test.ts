@@ -1,6 +1,7 @@
 import {
   createSnapshotKey,
   decryptWorkspaceKey,
+  deriveSessionAuthorization,
   encryptWorkspaceKeyForDevice,
   folderDerivedKeyContext,
   LocalDevice,
@@ -92,7 +93,8 @@ const setup = async () => {
     parentFolderId: addedFolder.id,
     workspaceId,
     activeDevice: userAndWorkspaceData.webDevice,
-    authorizationHeader: sessionKey,
+    authorizationHeader: deriveSessionAuthorization({ sessionKey })
+      .authorization,
   });
   documentId = createDocumentResult.createDocument.id;
 
@@ -388,7 +390,8 @@ test("successfully creates a snapshot", async () => {
   const workspaceResult = await getWorkspace({
     graphql,
     workspaceId,
-    authorizationHeader: sessionKey,
+    authorizationHeader: deriveSessionAuthorization({ sessionKey })
+      .authorization,
     deviceSigningPublicKey: device!.signingPublicKey,
   });
 

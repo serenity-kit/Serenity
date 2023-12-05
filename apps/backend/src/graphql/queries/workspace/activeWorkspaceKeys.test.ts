@@ -1,5 +1,6 @@
 import {
   createAndEncryptWorkspaceKeyForDevice,
+  deriveSessionAuthorization,
   encryptWorkspaceKeyForDevice,
   generateId,
 } from "@serenity-tools/common";
@@ -91,7 +92,9 @@ test("add device", async () => {
         ],
       },
     ],
-    authorizationHeader: userData1.sessionKey,
+    authorizationHeader: deriveSessionAuthorization({
+      sessionKey: userData1.sessionKey,
+    }).authorization,
   });
 
   const result = await getActiveWorkspaceKeys({
@@ -184,7 +187,9 @@ test("delete device", async () => {
     creatorSigningPublicKey: userData1.device.signingPublicKey,
     newDeviceWorkspaceKeyBoxes,
     deviceSigningPublicKeyToBeDeleted: user1Device3.signingPublicKey,
-    authorizationHeader: userData1.sessionKey,
+    authorizationHeader: deriveSessionAuthorization({
+      sessionKey: userData1.sessionKey,
+    }).authorization,
     mainDevice: userData1.mainDevice,
   });
   const result = await getActiveWorkspaceKeys({

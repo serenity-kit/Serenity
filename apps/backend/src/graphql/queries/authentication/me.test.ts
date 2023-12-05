@@ -1,4 +1,4 @@
-import { generateId } from "@serenity-tools/common";
+import { deriveSessionAuthorization, generateId } from "@serenity-tools/common";
 import { gql } from "graphql-request";
 import deleteAllRecords from "../../../../test/helpers/deleteAllRecords";
 import setupGraphql from "../../../../test/helpers/setupGraphql";
@@ -61,7 +61,9 @@ const setup = async () => {
     },
     mainDevice: userData1.mainDevice,
     devices: [userData1.device, userData1.webDevice],
-    authorizationHeader: userData1.sessionKey,
+    authorizationHeader: deriveSessionAuthorization({
+      sessionKey: userData1.sessionKey,
+    }).authorization,
   });
   otherWorkspaceStructure =
     createWorkspaceResult.createInitialWorkspaceStructure;

@@ -1,4 +1,4 @@
-import { generateId } from "@serenity-tools/common";
+import { deriveSessionAuthorization, generateId } from "@serenity-tools/common";
 import { Role } from "../../../../prisma/generated/output";
 import deleteAllRecords from "../../../../test/helpers/deleteAllRecords";
 import setupGraphql from "../../../../test/helpers/setupGraphql";
@@ -42,7 +42,9 @@ test("unauthorized members when workspace added", async () => {
     graphql,
     role: Role.VIEWER,
     workspaceId: workspace1Id,
-    authorizationHeader: userAndDevice.sessionKey,
+    authorizationHeader: deriveSessionAuthorization({
+      sessionKey: userAndDevice.sessionKey,
+    }).authorization,
     mainDevice: userAndDevice.mainDevice,
   });
   const invitationId =
@@ -54,7 +56,9 @@ test("unauthorized members when workspace added", async () => {
     inviteeMainDevice: otherUserAndDevice.mainDevice,
     invitationSigningKeyPairSeed:
       workspaceInvitationResult.invitationSigningKeyPairSeed,
-    authorizationHeader: otherUserAndDevice.sessionKey,
+    authorizationHeader: deriveSessionAuthorization({
+      sessionKey: otherUserAndDevice.sessionKey,
+    }).authorization,
   });
   const result = await getUnauthorizedMember({
     graphql,

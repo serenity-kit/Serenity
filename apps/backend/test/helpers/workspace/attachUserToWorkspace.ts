@@ -1,5 +1,6 @@
 import {
   decryptWorkspaceKey,
+  deriveSessionAuthorization,
   Device,
   encryptWorkspaceKeyForDevice,
 } from "@serenity-tools/common";
@@ -46,7 +47,9 @@ export const attachUserToWorkspace = async ({
     graphql,
     role,
     workspaceId,
-    authorizationHeader: hostSessionKey,
+    authorizationHeader: deriveSessionAuthorization({
+      sessionKey: hostSessionKey,
+    }).authorization,
     mainDevice: hostMainDevice,
   });
   const workspaceInvitation =
@@ -55,7 +58,9 @@ export const attachUserToWorkspace = async ({
     graphql,
     invitationId: workspaceInvitation.id,
     inviteeMainDevice: guestMainDevice,
-    authorizationHeader: guestSessionKey,
+    authorizationHeader: deriveSessionAuthorization({
+      sessionKey: guestSessionKey,
+    }).authorization,
     invitationSigningKeyPairSeed:
       workspaceInvitationResult.invitationSigningKeyPairSeed,
   });
@@ -63,7 +68,9 @@ export const attachUserToWorkspace = async ({
     graphql,
     workspaceId,
     deviceSigningPublicKey: hostWebDevice.signingPublicKey,
-    authorizationHeader: hostSessionKey,
+    authorizationHeader: deriveSessionAuthorization({
+      sessionKey: hostSessionKey,
+    }).authorization,
   });
   const workspace = workspaceResult.workspace;
   const currentWorkspaceKey = workspace.currentWorkspaceKey;
@@ -119,6 +126,8 @@ export const attachUserToWorkspace = async ({
     workspaceId: workspace.id,
     creatorDeviceSigningPublicKey: hostWebDevice.signingPublicKey,
     workspaceKeys,
-    authorizationHeader: hostSessionKey,
+    authorizationHeader: deriveSessionAuthorization({
+      sessionKey: hostSessionKey,
+    }).authorization,
   });
 };

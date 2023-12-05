@@ -3,6 +3,7 @@ import {
   SerenitySnapshotPublicData,
   createSnapshotKey,
   decryptWorkspaceKey,
+  deriveSessionAuthorization,
   folderDerivedKeyContext,
   snapshotDerivedKeyContext,
 } from "@serenity-tools/common";
@@ -71,7 +72,8 @@ const setup = async () => {
     parentFolderId: addedFolder.id,
     workspaceId,
     activeDevice: result.webDevice,
-    authorizationHeader: sessionKey,
+    authorizationHeader: deriveSessionAuthorization({ sessionKey })
+      .authorization,
   });
   documentId = createDocumentResult.createDocument.id;
 };

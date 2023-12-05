@@ -13,7 +13,9 @@ export const getActiveWorkspaceKeys = async ({
   deviceSigningPublicKey,
   sessionKey,
 }: Props) => {
-  const authorizationHeader = { authorization: sessionKey };
+  const authorizationHeader = {
+    authorization: deriveSessionAuthorization({ sessionKey }).authorization,
+  };
   const query = gql`
     query activeWorkspaceKeys(
       $workspaceId: ID!

@@ -1,4 +1,4 @@
-import { generateId } from "@serenity-tools/common";
+import { deriveSessionAuthorization, generateId } from "@serenity-tools/common";
 import { gql } from "graphql-request";
 import deleteAllRecords from "../../../../test/helpers/deleteAllRecords";
 import { getWorkspaceKeyForWorkspaceAndDevice } from "../../../../test/helpers/device/getWorkspaceKeyForWorkspaceAndDevice";
@@ -50,7 +50,9 @@ const setup = async () => {
     name: parentFolderName,
     parentFolderId: null,
     parentKey: workspaceKey,
-    authorizationHeader: userData1.sessionKey,
+    authorizationHeader: deriveSessionAuthorization({
+      sessionKey: userData1.sessionKey,
+    }).authorization,
     workspaceId: userData1.workspace.id,
     workspaceKeyId: userData1.workspace.currentWorkspaceKey.id,
   });
@@ -62,7 +64,9 @@ const setup = async () => {
     parentKey: workspaceKey,
     workspaceId: userData1.workspace.id,
     workspaceKeyId: userData1.workspace.currentWorkspaceKey.id,
-    authorizationHeader: userData1.sessionKey,
+    authorizationHeader: deriveSessionAuthorization({
+      sessionKey: userData1.sessionKey,
+    }).authorization,
   });
   const createChildFolderResult = await createFolder({
     graphql,
@@ -72,14 +76,18 @@ const setup = async () => {
     parentKey: workspaceKey,
     workspaceId: userData1.workspace.id,
     workspaceKeyId: userData1.workspace.currentWorkspaceKey.id,
-    authorizationHeader: userData1.sessionKey,
+    authorizationHeader: deriveSessionAuthorization({
+      sessionKey: userData1.sessionKey,
+    }).authorization,
   });
   const createDocumentResult = await createDocument({
     graphql,
     parentFolderId: parentFolderId,
     workspaceId: userData1.workspace.id,
     activeDevice: userData1.webDevice,
-    authorizationHeader: userData1.sessionKey,
+    authorizationHeader: deriveSessionAuthorization({
+      sessionKey: userData1.sessionKey,
+    }).authorization,
   });
   parentDocumentId = createDocumentResult.createDocument.id;
 
@@ -88,7 +96,9 @@ const setup = async () => {
     parentFolderId: folderId,
     workspaceId: userData1.workspace.id,
     activeDevice: userData1.webDevice,
-    authorizationHeader: userData1.sessionKey,
+    authorizationHeader: deriveSessionAuthorization({
+      sessionKey: userData1.sessionKey,
+    }).authorization,
   });
   documentId = createDocumentResult2.createDocument.id;
 
@@ -112,14 +122,18 @@ const setup = async () => {
     parentKey: workspaceKey2,
     workspaceId: userData2.workspace.id,
     workspaceKeyId: userData2.workspace.currentWorkspaceKey.id,
-    authorizationHeader: userData2.sessionKey,
+    authorizationHeader: deriveSessionAuthorization({
+      sessionKey: userData2.sessionKey,
+    }).authorization,
   });
   const createDocumentResult3 = await createDocument({
     graphql,
     parentFolderId: otherFolderId,
     workspaceId: userData2.workspace.id,
     activeDevice: userData2.webDevice,
-    authorizationHeader: userData2.sessionKey,
+    authorizationHeader: deriveSessionAuthorization({
+      sessionKey: userData2.sessionKey,
+    }).authorization,
   });
   otherDocumentId = createDocumentResult3.createDocument.id;
 };
@@ -172,7 +186,9 @@ test("user should be able to get a document path", async () => {
   const result = await getDocumentPath({
     graphql,
     documentId: parentDocumentId,
-    authorizationHeader: userData1.sessionKey,
+    authorizationHeader: deriveSessionAuthorization({
+      sessionKey: userData1.sessionKey,
+    }).authorization,
   });
   const documentPath = result.documentPath;
   expect(documentPath.length).toBe(1);
@@ -190,7 +206,9 @@ test("user should be able to get a document path for a deep tree", async () => {
   const result = await getDocumentPath({
     graphql,
     documentId: documentId,
-    authorizationHeader: userData1.sessionKey,
+    authorizationHeader: deriveSessionAuthorization({
+      sessionKey: userData1.sessionKey,
+    }).authorization,
   });
   const documentPath = result.documentPath;
   expect(documentPath.length).toBe(2);
@@ -216,7 +234,9 @@ test("user should not be able to retrieve another user's folder", async () => {
       await getDocumentPath({
         graphql,
         documentId: otherDocumentId,
-        authorizationHeader: userData1.sessionKey,
+        authorizationHeader: deriveSessionAuthorization({
+          sessionKey: userData1.sessionKey,
+        }).authorization,
       }))()
   ).rejects.toThrow("Unauthorized");
 });
@@ -227,7 +247,9 @@ test("retrieving a document that doesn't exist should throw an error", async () 
       await getDocumentPath({
         graphql,
         documentId: generateId(),
-        authorizationHeader: userData1.sessionKey,
+        authorizationHeader: deriveSessionAuthorization({
+          sessionKey: userData1.sessionKey,
+        }).authorization,
       }))()
   ).rejects.toThrow(/FORBIDDEN/);
 });
@@ -244,7 +266,9 @@ test("Unauthenticated", async () => {
 });
 
 describe("Input errors", () => {
-  const authorizationHeader = { authorization: sessionKey };
+  const authorizationHeader = {
+    authorization: deriveSessionAuthorization({ sessionKey }).authorization,
+  };
   const query = gql`
     query documentPath($id: ID!) {
       documentPath(id: $id) {

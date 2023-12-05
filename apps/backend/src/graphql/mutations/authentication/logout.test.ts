@@ -1,4 +1,4 @@
-import { generateId } from "@serenity-tools/common";
+import { deriveSessionAuthorization, generateId } from "@serenity-tools/common";
 import { logout } from "../../../../test/helpers/authentication/logout";
 import deleteAllRecords from "../../../../test/helpers/deleteAllRecords";
 import setupGraphql from "../../../../test/helpers/setupGraphql";
@@ -111,7 +111,9 @@ test("Unauthenticated", async () => {
     (async () =>
       await logout({
         graphql,
-        authorizationHeader: loginResult1.sessionKey,
+        authorizationHeader: deriveSessionAuthorization({
+          sessionKey: loginResult1.sessionKey,
+        }).authorization,
       }))()
   ).rejects.toThrowError(/UNAUTHENTICATED/);
 });

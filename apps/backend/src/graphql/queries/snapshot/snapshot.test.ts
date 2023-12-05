@@ -1,6 +1,7 @@
 import {
   decryptWorkspaceKey,
   deriveKeysFromKeyDerivationTrace,
+  deriveSessionAuthorization,
   folderDerivedKeyContext,
   generateId,
   snapshotDerivedKeyContext,
@@ -131,7 +132,9 @@ test("retrieve a snapshot from documentShareLinkToken", async () => {
     sharingRole: Role.VIEWER,
     mainDevice: userData1.mainDevice,
     snapshotKey,
-    authorizationHeader: userData1.sessionKey,
+    authorizationHeader: deriveSessionAuthorization({
+      sessionKey: userData1.sessionKey,
+    }).authorization,
   });
   const result = await getSnapshot({
     graphql,
@@ -180,7 +183,8 @@ test("Input Errors", async () => {
       await getSnapshot({
         graphql,
         documentId: "",
-        authorizationHeader: sessionKey,
+        authorizationHeader: deriveSessionAuthorization({ sessionKey })
+          .authorization,
       }))()
   ).rejects.toThrowError(/BAD_USER_INPUT/);
 });

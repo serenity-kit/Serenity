@@ -1,4 +1,4 @@
-import { generateId } from "@serenity-tools/common";
+import { deriveSessionAuthorization, generateId } from "@serenity-tools/common";
 import { gql } from "graphql-request";
 import { registerUser } from "../../../../test/helpers/authentication/registerUser";
 import deleteAllRecords from "../../../../test/helpers/deleteAllRecords";
@@ -44,7 +44,9 @@ const setup = async () => {
     name: parentFolderName,
     parentFolderId: null,
     parentKey: workspaceKey,
-    authorizationHeader: userData1.sessionKey,
+    authorizationHeader: deriveSessionAuthorization({
+      sessionKey: userData1.sessionKey,
+    }).authorization,
     workspaceId: userData1.workspace.id,
     workspaceKeyId: userData1.workspace.currentWorkspaceKey.id,
   });
@@ -54,7 +56,9 @@ const setup = async () => {
     name: folderName,
     parentFolderId: parentFolderId,
     parentKey: workspaceKey,
-    authorizationHeader: userData1.sessionKey,
+    authorizationHeader: deriveSessionAuthorization({
+      sessionKey: userData1.sessionKey,
+    }).authorization,
     workspaceId: userData1.workspace.id,
     workspaceKeyId: userData1.workspace.currentWorkspaceKey.id,
   });
@@ -108,7 +112,9 @@ test("Unauthenticated", async () => {
 });
 
 test("Input Errors", async () => {
-  const authorizationHeader = { authorization: sessionKey };
+  const authorizationHeader = {
+    authorization: deriveSessionAuthorization({ sessionKey }).authorization,
+  };
   await expect(
     (async () =>
       await graphql.client.request(query, null, authorizationHeader))()

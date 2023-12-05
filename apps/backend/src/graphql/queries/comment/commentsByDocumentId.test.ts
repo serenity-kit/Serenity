@@ -1,4 +1,4 @@
-import { generateId } from "@serenity-tools/common";
+import { deriveSessionAuthorization, generateId } from "@serenity-tools/common";
 import { gql } from "graphql-request";
 import sodium from "react-native-libsodium";
 import { Role } from "../../../../prisma/generated/output";
@@ -33,7 +33,9 @@ const setup = async () => {
     creatorDevice: userData1.webDevice,
     creatorDeviceSigningPrivateKey: userData1.webDevice.signingPrivateKey,
     creatorDeviceEncryptionPrivateKey: userData1.webDevice.encryptionPrivateKey,
-    authorizationHeader: userData1.sessionKey,
+    authorizationHeader: deriveSessionAuthorization({
+      sessionKey: userData1.sessionKey,
+    }).authorization,
     documentId: userData1.document.id,
   });
   comment1 = comment1Result.createComment.comment;
@@ -45,7 +47,9 @@ const setup = async () => {
     creatorDevice: userData1.webDevice,
     creatorDeviceSigningPrivateKey: userData1.webDevice.signingPrivateKey,
     creatorDeviceEncryptionPrivateKey: userData1.webDevice.encryptionPrivateKey,
-    authorizationHeader: userData1.sessionKey,
+    authorizationHeader: deriveSessionAuthorization({
+      sessionKey: userData1.sessionKey,
+    }).authorization,
     documentId: userData1.document.id,
   });
   comment2 = comment2Result.createComment.comment;
@@ -61,7 +65,9 @@ test("one comment", async () => {
     graphql,
     documentId: userData1.document.id,
     first: 1,
-    authorizationHeader: userData1.sessionKey,
+    authorizationHeader: deriveSessionAuthorization({
+      sessionKey: userData1.sessionKey,
+    }).authorization,
   });
   const edges = result.commentsByDocumentId.edges;
   expect(edges.length).toBe(1);
@@ -72,7 +78,9 @@ test("one comment", async () => {
     documentId: userData1.document.id,
     first: 1,
     after: result.commentsByDocumentId.pageInfo.endCursor,
-    authorizationHeader: userData1.sessionKey,
+    authorizationHeader: deriveSessionAuthorization({
+      sessionKey: userData1.sessionKey,
+    }).authorization,
   });
   const edges2 = result2.commentsByDocumentId.edges;
   expect(edges2.length).toBe(1);
@@ -85,7 +93,9 @@ test("all comments", async () => {
     graphql,
     documentId: userData1.document.id,
     first: 50,
-    authorizationHeader: userData1.sessionKey,
+    authorizationHeader: deriveSessionAuthorization({
+      sessionKey: userData1.sessionKey,
+    }).authorization,
   });
   const edges = result.commentsByDocumentId.edges;
   expect(edges.length).toBe(2);
@@ -99,7 +109,9 @@ test("bad document share token", async () => {
         documentId: userData1.document.id,
         documentShareLinkToken: "badtoken",
         first: 50,
-        authorizationHeader: userData1.sessionKey,
+        authorizationHeader: deriveSessionAuthorization({
+          sessionKey: userData1.sessionKey,
+        }).authorization,
       }))()
   ).rejects.toThrowError(/BAD_USER_INPUT/);
 });
@@ -115,7 +127,9 @@ test("no access to workspace", async () => {
         graphql,
         documentId: userData1.document.id,
         first: 50,
-        authorizationHeader: userData2.sessionKey,
+        authorizationHeader: deriveSessionAuthorization({
+          sessionKey: userData2.sessionKey,
+        }).authorization,
       }))()
   ).rejects.toThrowError(/FORBIDDEN/);
 });
@@ -132,7 +146,9 @@ test("document share token", async () => {
     sharingRole: Role.VIEWER,
     mainDevice: userData1.mainDevice,
     snapshotKey,
-    authorizationHeader: userData1.sessionKey,
+    authorizationHeader: deriveSessionAuthorization({
+      sessionKey: userData1.sessionKey,
+    }).authorization,
   });
   const documentShareLinkToken =
     createDocumentShareLinkQueryResult.createDocumentShareLink.token;
@@ -141,7 +157,9 @@ test("document share token", async () => {
     documentId: userData1.document.id,
     documentShareLinkToken,
     first: 50,
-    authorizationHeader: userData2.sessionKey,
+    authorizationHeader: deriveSessionAuthorization({
+      sessionKey: userData2.sessionKey,
+    }).authorization,
   });
   const edges = result.commentsByDocumentId.edges;
   expect(edges.length).toBe(2);
@@ -154,7 +172,9 @@ test("too many", async () => {
         graphql,
         documentId: userData1.document.id,
         first: 51,
-        authorizationHeader: userData1.sessionKey,
+        authorizationHeader: deriveSessionAuthorization({
+          sessionKey: userData1.sessionKey,
+        }).authorization,
       }))()
   ).rejects.toThrowError(/BAD_USER_INPUT/);
 });
@@ -173,7 +193,7 @@ test("unauthenticated", async () => {
 
 describe("Input Errors", () => {
   const authorizationHeaders = {
-    authorization: sessionKey,
+    authorization: deriveSessionAuthorization({ sessionKey }).authorization,
   };
 
   const query = gql`

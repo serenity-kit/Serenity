@@ -1,6 +1,7 @@
 import {
   decryptWorkspaceKey,
   deriveKeysFromKeyDerivationTrace,
+  deriveSessionAuthorization,
   folderDerivedKeyContext,
   generateId,
 } from "@serenity-tools/common";
@@ -58,13 +59,15 @@ const setup = async () => {
     parentFolderId: addedFolder.id,
     workspaceId: addedWorkspace.id,
     activeDevice: userData1.webDevice,
-    authorizationHeader: sessionKey,
+    authorizationHeader: deriveSessionAuthorization({ sessionKey })
+      .authorization,
   });
   addedDocumentId = createDocumentResult.createDocument.id;
   const snapshotResult = await getSnapshot({
     graphql,
     documentId: addedDocumentId,
-    authorizationHeader: sessionKey,
+    authorizationHeader: deriveSessionAuthorization({ sessionKey })
+      .authorization,
   });
   addedDocumentSnapshot = snapshotResult.snapshot;
   const snapshotKeyTrace = deriveKeysFromKeyDerivationTrace({
@@ -136,7 +139,9 @@ test("Throw error when user doesn't have access", async () => {
     parentFolderId: userData1.folder.id,
     workspaceId: userData1.workspace.id,
     activeDevice: userData1.webDevice,
-    authorizationHeader: userData1.sessionKey,
+    authorizationHeader: deriveSessionAuthorization({
+      sessionKey: userData1.sessionKey,
+    }).authorization,
   });
   const id = otherUserDocumentResult.createDocument.id;
   const name = "Unauthorized Name";
@@ -148,7 +153,9 @@ test("Throw error when user doesn't have access", async () => {
         name,
         activeDevice: userData1.webDevice,
         workspaceKeyId: addedWorkspace.currentWorkspaceKey.id,
-        authorizationHeader: userData2.sessionKey,
+        authorizationHeader: deriveSessionAuthorization({
+          sessionKey: userData2.sessionKey,
+        }).authorization,
       }))()
   ).rejects.toThrow("Unauthorized");
 });
@@ -176,7 +183,9 @@ test("Commenter tries to update", async () => {
         name,
         activeDevice: userData1.webDevice,
         workspaceKeyId: addedWorkspace.currentWorkspaceKey.id,
-        authorizationHeader: otherUser.sessionKey,
+        authorizationHeader: deriveSessionAuthorization({
+          sessionKey: otherUser.sessionKey,
+        }).authorization,
       }))()
   ).rejects.toThrowError("Unauthorized");
 });
@@ -204,7 +213,9 @@ test("Viewer tries to update", async () => {
         name,
         activeDevice: userData1.webDevice,
         workspaceKeyId: addedWorkspace.currentWorkspaceKey.id,
-        authorizationHeader: otherUser.sessionKey,
+        authorizationHeader: deriveSessionAuthorization({
+          sessionKey: otherUser.sessionKey,
+        }).authorization,
       }))()
   ).rejects.toThrowError("Unauthorized");
 });
@@ -227,7 +238,7 @@ test("Unauthenticated", async () => {
 
 describe("Input errors", () => {
   const authorizationHeaders = {
-    authorization: sessionKey,
+    authorization: deriveSessionAuthorization({ sessionKey }).authorization,
   };
   const id = generateId();
   test("Invalid Id", async () => {

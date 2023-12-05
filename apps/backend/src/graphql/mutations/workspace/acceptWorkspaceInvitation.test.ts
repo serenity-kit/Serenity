@@ -1,4 +1,4 @@
-import { generateId } from "@serenity-tools/common";
+import { deriveSessionAuthorization, generateId } from "@serenity-tools/common";
 import { gql } from "graphql-request";
 import { Role } from "../../../../prisma/generated/output";
 import deleteAllRecords from "../../../../test/helpers/deleteAllRecords";
@@ -45,7 +45,9 @@ test("accept admin role", async () => {
     graphql,
     role,
     workspaceId,
-    authorizationHeader: inviterUserAndDevice.sessionKey,
+    authorizationHeader: deriveSessionAuthorization({
+      sessionKey: inviterUserAndDevice.sessionKey,
+    }).authorization,
     mainDevice: inviterUserAndDevice.mainDevice,
   });
   invitationId =
@@ -57,7 +59,9 @@ test("accept admin role", async () => {
     inviteeMainDevice: inviteeUserAndDevice.mainDevice,
     invitationSigningKeyPairSeed:
       workspaceInvitationResult.invitationSigningKeyPairSeed,
-    authorizationHeader: inviteeUserAndDevice.sessionKey,
+    authorizationHeader: deriveSessionAuthorization({
+      sessionKey: inviteeUserAndDevice.sessionKey,
+    }).authorization,
   });
 
   expect(acceptedWorkspaceResult.acceptWorkspaceInvitation.workspaceId).toBe(
@@ -79,7 +83,9 @@ test("double-accepting invitation throws an error", async () => {
         inviteeMainDevice: inviteeUserAndDevice.mainDevice,
         invitationSigningKeyPairSeed:
           workspaceInvitationResult.invitationSigningKeyPairSeed,
-        authorizationHeader: inviteeUserAndDevice.sessionKey,
+        authorizationHeader: deriveSessionAuthorization({
+          sessionKey: inviteeUserAndDevice.sessionKey,
+        }).authorization,
       }))()
   ).rejects.toThrow();
 });
@@ -108,7 +114,9 @@ test("accept editor role", async () => {
     graphql,
     role,
     workspaceId,
-    authorizationHeader: inviterUserAndDevice.sessionKey,
+    authorizationHeader: deriveSessionAuthorization({
+      sessionKey: inviterUserAndDevice.sessionKey,
+    }).authorization,
     mainDevice: inviterUserAndDevice.mainDevice,
   });
   invitationId =
@@ -119,7 +127,9 @@ test("accept editor role", async () => {
     inviteeMainDevice: inviteeUserAndDevice.mainDevice,
     invitationSigningKeyPairSeed:
       workspaceInvitationResult.invitationSigningKeyPairSeed,
-    authorizationHeader: inviteeUserAndDevice.sessionKey,
+    authorizationHeader: deriveSessionAuthorization({
+      sessionKey: inviteeUserAndDevice.sessionKey,
+    }).authorization,
   });
 
   expect(acceptedWorkspaceResult.acceptWorkspaceInvitation.workspaceId).toBe(
@@ -156,7 +166,9 @@ test("accept commenter role", async () => {
     graphql,
     role,
     workspaceId,
-    authorizationHeader: inviterUserAndDevice.sessionKey,
+    authorizationHeader: deriveSessionAuthorization({
+      sessionKey: inviterUserAndDevice.sessionKey,
+    }).authorization,
     mainDevice: inviterUserAndDevice.mainDevice,
   });
   invitationId =
@@ -168,7 +180,9 @@ test("accept commenter role", async () => {
     inviteeMainDevice: inviteeUserAndDevice.mainDevice,
     invitationSigningKeyPairSeed:
       workspaceInvitationResult.invitationSigningKeyPairSeed,
-    authorizationHeader: inviteeUserAndDevice.sessionKey,
+    authorizationHeader: deriveSessionAuthorization({
+      sessionKey: inviteeUserAndDevice.sessionKey,
+    }).authorization,
   });
 
   expect(acceptedWorkspaceResult.acceptWorkspaceInvitation.workspaceId).toBe(
@@ -205,7 +219,9 @@ test("accept viewer role", async () => {
     graphql,
     role,
     workspaceId,
-    authorizationHeader: inviterUserAndDevice.sessionKey,
+    authorizationHeader: deriveSessionAuthorization({
+      sessionKey: inviterUserAndDevice.sessionKey,
+    }).authorization,
     mainDevice: inviterUserAndDevice.mainDevice,
   });
   invitationId =
@@ -217,7 +233,9 @@ test("accept viewer role", async () => {
     inviteeMainDevice: inviteeUserAndDevice.mainDevice,
     invitationSigningKeyPairSeed:
       workspaceInvitationResult.invitationSigningKeyPairSeed,
-    authorizationHeader: inviteeUserAndDevice.sessionKey,
+    authorizationHeader: deriveSessionAuthorization({
+      sessionKey: inviteeUserAndDevice.sessionKey,
+    }).authorization,
   });
 
   expect(acceptedWorkspaceResult.acceptWorkspaceInvitation.workspaceId).toBe(
@@ -235,7 +253,9 @@ test("invalid invitation id should throw error", async () => {
     graphql,
     role: Role.ADMIN,
     workspaceId,
-    authorizationHeader: inviterUserAndDevice.sessionKey,
+    authorizationHeader: deriveSessionAuthorization({
+      sessionKey: inviterUserAndDevice.sessionKey,
+    }).authorization,
     mainDevice: inviterUserAndDevice.mainDevice,
   });
   const invitationId2 =
@@ -249,7 +269,9 @@ test("invalid invitation id should throw error", async () => {
         inviteeMainDevice: inviteeUserAndDevice.mainDevice,
         invitationSigningKeyPairSeed:
           workspaceInvitationResult.invitationSigningKeyPairSeed,
-        authorizationHeader: inviteeUserAndDevice.sessionKey,
+        authorizationHeader: deriveSessionAuthorization({
+          sessionKey: inviteeUserAndDevice.sessionKey,
+        }).authorization,
         overwriteInvitationId: invitationId2,
       }))()
   ).rejects.toThrow();

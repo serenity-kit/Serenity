@@ -1,4 +1,5 @@
 import {
+  deriveSessionAuthorization,
   encryptFolderName,
   folderDerivedKeyContext,
   generateId,
@@ -189,7 +190,9 @@ test("duplicate ID throws an error", async () => {
 });
 
 test("Throw error on duplicate subkeyId, workspaceId", async () => {
-  const authorizationHeaders = { authorization: sessionKey };
+  const authorizationHeaders = {
+    authorization: deriveSessionAuthorization({ sessionKey }).authorization,
+  };
   const name = "subkey test";
   const workspaceId = userData1.workspace.id;
   const existingSubkeyId = userData1.folder.subkeyId;
@@ -285,7 +288,8 @@ test("Throw error when user doesn't have access", async () => {
         parentFolderId: null,
         workspaceId: otherAddedWorkspace.id,
         workspaceKeyId: addedWorkspace.currentWorkspaceKey.id,
-        authorizationHeader: sessionKey,
+        authorizationHeader: deriveSessionAuthorization({ sessionKey })
+          .authorization,
       }))()
   ).rejects.toThrow("Unauthorized");
 });
@@ -314,7 +318,9 @@ test("Commentor tries to create", async () => {
         parentFolderId: null,
         workspaceId: addedWorkspace.id,
         workspaceKeyId: addedWorkspace.currentWorkspaceKey.id,
-        authorizationHeader: otherUser.sessionKey,
+        authorizationHeader: deriveSessionAuthorization({
+          sessionKey: otherUser.sessionKey,
+        }).authorization,
       }))()
   ).rejects.toThrowError("Unauthorized");
 });
@@ -343,7 +349,9 @@ test("Viewer tries to create", async () => {
         parentFolderId: null,
         workspaceId: addedWorkspace.id,
         workspaceKeyId: addedWorkspace.currentWorkspaceKey.id,
-        authorizationHeader: otherUser.sessionKey,
+        authorizationHeader: deriveSessionAuthorization({
+          sessionKey: otherUser.sessionKey,
+        }).authorization,
       }))()
   ).rejects.toThrowError("Unauthorized");
 });
@@ -367,7 +375,7 @@ test("Unauthenticated", async () => {
 
 describe("Input errors", () => {
   const authorizationHeaders = {
-    authorization: sessionKey,
+    authorization: deriveSessionAuthorization({ sessionKey }).authorization,
   };
   const query = gql`
     mutation createFolder($input: CreateFolderInput!) {

@@ -1,4 +1,4 @@
-import { generateId } from "@serenity-tools/common";
+import { deriveSessionAuthorization, generateId } from "@serenity-tools/common";
 import { gql } from "graphql-request";
 import deleteAllRecords from "../../../../test/helpers/deleteAllRecords";
 import setupGraphql from "../../../../test/helpers/setupGraphql";
@@ -25,7 +25,9 @@ test("user should be able to delete a workspace", async () => {
   const result = await deleteWorkspaces({
     graphql,
     ids: [userData1.workspace.id],
-    authorizationHeader: userData1.sessionKey,
+    authorizationHeader: deriveSessionAuthorization({
+      sessionKey: userData1.sessionKey,
+    }).authorization,
   });
   expect(result.deleteWorkspace).toMatchInlineSnapshot(`undefined`);
 });
@@ -35,7 +37,9 @@ test("Deleting nonexistent workspace does nothing", async () => {
   const result = await deleteWorkspaces({
     graphql,
     ids,
-    authorizationHeader: userData1.sessionKey,
+    authorizationHeader: deriveSessionAuthorization({
+      sessionKey: userData1.sessionKey,
+    }).authorization,
   });
   expect(result.deleteWorkspace).toMatchInlineSnapshot(`undefined`);
 });

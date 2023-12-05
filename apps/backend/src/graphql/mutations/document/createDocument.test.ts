@@ -1,4 +1,4 @@
-import { generateId } from "@serenity-tools/common";
+import { deriveSessionAuthorization, generateId } from "@serenity-tools/common";
 import { gql } from "graphql-request";
 import { Role } from "../../../../prisma/generated/output";
 import { registerUser } from "../../../../test/helpers/authentication/registerUser";
@@ -40,7 +40,9 @@ test("user should be able to create a document", async () => {
   // });
   const result = await createDocument({
     graphql,
-    authorizationHeader: userData1.sessionKey,
+    authorizationHeader: deriveSessionAuthorization({
+      sessionKey: userData1.sessionKey,
+    }).authorization,
     parentFolderId: userData1.folder.id,
     activeDevice: userData1.webDevice,
     workspaceId: userData1.workspace.id,
@@ -65,7 +67,9 @@ test("commenter tries to create", async () => {
     (async () =>
       await createDocument({
         graphql,
-        authorizationHeader: otherUser.sessionKey,
+        authorizationHeader: deriveSessionAuthorization({
+          sessionKey: otherUser.sessionKey,
+        }).authorization,
         parentFolderId: userData1.folder.id,
         activeDevice: userData1.webDevice,
         workspaceId: userData1.workspace.id,
@@ -90,7 +94,9 @@ test("viewer attempts to create", async () => {
     (async () =>
       await createDocument({
         graphql,
-        authorizationHeader: otherUser.sessionKey,
+        authorizationHeader: deriveSessionAuthorization({
+          sessionKey: otherUser.sessionKey,
+        }).authorization,
         parentFolderId: userData1.folder.id,
         activeDevice: userData1.webDevice,
         workspaceId: userData1.workspace.id,
@@ -113,7 +119,7 @@ test("Unauthenticated", async () => {
 
 describe("Input errors", () => {
   const authorizationHeaders = {
-    authorization: sessionKey,
+    authorization: deriveSessionAuthorization({ sessionKey }).authorization,
   };
   const query = gql`
     mutation createDocument($input: CreateDocumentInput!) {

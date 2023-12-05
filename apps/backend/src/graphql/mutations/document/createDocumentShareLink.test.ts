@@ -1,6 +1,7 @@
 import {
   createSnapshotKey,
   deriveKeysFromKeyDerivationTrace,
+  deriveSessionAuthorization,
   generateId,
 } from "@serenity-tools/common";
 import { gql } from "graphql-request";
@@ -26,7 +27,9 @@ const setup = async () => {
   const getWorkspaceResult = await getWorkspace({
     graphql,
     workspaceId: userData1.workspace.id,
-    authorizationHeader: userData1.sessionKey,
+    authorizationHeader: deriveSessionAuthorization({
+      sessionKey: userData1.sessionKey,
+    }).authorization,
     deviceSigningPublicKey: userData1.webDevice.signingPublicKey,
   });
   user1Workspace = getWorkspaceResult.workspace;
@@ -57,7 +60,9 @@ test("create admin share link fails", async () => {
         sharingRole: Role.ADMIN,
         mainDevice: userData1.mainDevice,
         snapshotKey: snapshotKeyData.key,
-        authorizationHeader: userData1.sessionKey,
+        authorizationHeader: deriveSessionAuthorization({
+          sessionKey: userData1.sessionKey,
+        }).authorization,
       }))()
   ).rejects.toThrowError(/Internal server error/);
 });
@@ -80,7 +85,9 @@ test("create editor share link", async () => {
     sharingRole,
     mainDevice: userData1.mainDevice,
     snapshotKey: snapshotKeyData.key,
-    authorizationHeader: userData1.sessionKey,
+    authorizationHeader: deriveSessionAuthorization({
+      sessionKey: userData1.sessionKey,
+    }).authorization,
   });
   const documentShareLink =
     createDocumentShareLinkQueryResult.createDocumentShareLink;
@@ -105,7 +112,9 @@ test("create commenter share link", async () => {
     sharingRole,
     mainDevice: userData1.mainDevice,
     snapshotKey: snapshotKeyData.key,
-    authorizationHeader: userData1.sessionKey,
+    authorizationHeader: deriveSessionAuthorization({
+      sessionKey: userData1.sessionKey,
+    }).authorization,
   });
   const documentShareLink =
     createDocumentShareLinkQueryResult.createDocumentShareLink;
@@ -130,7 +139,9 @@ test("create viewer share link", async () => {
     sharingRole,
     mainDevice: userData1.mainDevice,
     snapshotKey: snapshotKeyData.key,
-    authorizationHeader: userData1.sessionKey,
+    authorizationHeader: deriveSessionAuthorization({
+      sessionKey: userData1.sessionKey,
+    }).authorization,
   });
   const documentShareLink =
     createDocumentShareLinkQueryResult.createDocumentShareLink;
@@ -213,7 +224,11 @@ describe("Input errors", () => {
               snapshotKey,
             },
           },
-          { authorization: userData1.sessionKey }
+          {
+            authorization: deriveSessionAuthorization({
+              sessionKey: userData1.sessionKey,
+            }).authorization,
+          }
         ))()
     ).rejects.toThrowError(/BAD_USER_INPUT/);
   });
@@ -240,7 +255,11 @@ describe("Input errors", () => {
               snapshotKey,
             },
           },
-          { authorization: userData1.sessionKey }
+          {
+            authorization: deriveSessionAuthorization({
+              sessionKey: userData1.sessionKey,
+            }).authorization,
+          }
         ))()
     ).rejects.toThrowError(/BAD_USER_INPUT/);
   });
@@ -264,7 +283,9 @@ describe("Input errors", () => {
           sharingRole: "bad-role",
           mainDevice: userData1.mainDevice,
           snapshotKey: snapshotKeyData.key,
-          authorizationHeader: userData1.sessionKey,
+          authorizationHeader: deriveSessionAuthorization({
+            sessionKey: userData1.sessionKey,
+          }).authorization,
         }))()
     ).rejects.toThrowError(/Internal server error/);
   });
@@ -296,7 +317,11 @@ describe("Input errors", () => {
               snapshotKey,
             },
           },
-          { authorization: userData1.sessionKey }
+          {
+            authorization: deriveSessionAuthorization({
+              sessionKey: userData1.sessionKey,
+            }).authorization,
+          }
         ))()
     ).rejects.toThrowError(/BAD_USER_INPUT/);
   });
@@ -312,7 +337,11 @@ describe("Input errors", () => {
           {
             input: null,
           },
-          { authorization: userData1.sessionKey }
+          {
+            authorization: deriveSessionAuthorization({
+              sessionKey: userData1.sessionKey,
+            }).authorization,
+          }
         ))()
     ).rejects.toThrowError();
   });
@@ -324,7 +353,9 @@ describe("Input errors", () => {
     await expect(
       (async () =>
         await graphql.client.request(query, null, {
-          authorization: userData1.sessionKey,
+          authorization: deriveSessionAuthorization({
+            sessionKey: userData1.sessionKey,
+          }).authorization,
         }))()
     ).rejects.toThrowError();
   });
