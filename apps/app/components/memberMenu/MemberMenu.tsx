@@ -43,6 +43,17 @@ export default function MemberMenu(props: Props) {
       }
     >
       <MenuButton
+        testID={`member-menu--${memberId}__make-viewer`}
+        onPress={() => {
+          setIsOpenMenu(false);
+          props.onUpdateRole("VIEWER");
+        }}
+        iconName={"check-line"}
+        hideIcon={role !== "VIEWER"}
+      >
+        Viewer
+      </MenuButton>
+      <MenuButton
         testID={`member-menu--${memberId}__make-commenter`}
         onPress={() => {
           setIsOpenMenu(false);

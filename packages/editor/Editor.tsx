@@ -334,13 +334,15 @@ export const Editor = (props: EditorProps) => {
                 );
               }
 
-              const hasEditorFocus = view.hasFocus() || isChildOfMenu;
+              const canAccessTheBubble =
+                (editor.isEditable && view.hasFocus()) || // in editing mode
+                (!editor.isEditable && canComment && !empty); // commenter with selected text
 
               if (
-                !hasEditorFocus ||
+                !canAccessTheBubble ||
+                isChildOfMenu ||
                 empty ||
                 isEmptyTextBlock ||
-                !editor.isEditable ||
                 editor.isActive("file") ||
                 isCellSelection(state.selection)
               ) {
@@ -404,45 +406,73 @@ export const Editor = (props: EditorProps) => {
                 </>
               ) : (
                 <>
-                  <Tooltip label={"Bold"} placement={"top"} hasArrow={false}>
-                    <ToggleButton
-                      onPress={() => editor.chain().focus().toggleBold().run()}
-                      name="bold"
-                      isActive={editor.isActive("bold")}
-                    />
-                  </Tooltip>
+                  {props.editable && (
+                    <>
+                      <Tooltip
+                        label={"Bold"}
+                        placement={"top"}
+                        hasArrow={false}
+                      >
+                        <ToggleButton
+                          onPress={() =>
+                            editor.chain().focus().toggleBold().run()
+                          }
+                          name="bold"
+                          isActive={editor.isActive("bold")}
+                        />
+                      </Tooltip>
 
-                  <Tooltip label={"Italic"} placement={"top"} hasArrow={false}>
-                    <ToggleButton
-                      onPress={() =>
-                        editor.chain().focus().toggleItalic().run()
-                      }
-                      name="italic"
-                      isActive={editor.isActive("italic")}
-                    />
-                  </Tooltip>
+                      <Tooltip
+                        label={"Italic"}
+                        placement={"top"}
+                        hasArrow={false}
+                      >
+                        <ToggleButton
+                          onPress={() =>
+                            editor.chain().focus().toggleItalic().run()
+                          }
+                          name="italic"
+                          isActive={editor.isActive("italic")}
+                        />
+                      </Tooltip>
 
-                  <Tooltip label={"Code"} placement={"top"} hasArrow={false}>
-                    <ToggleButton
-                      onPress={() => editor.chain().focus().toggleCode().run()}
-                      name="code-view"
-                      isActive={editor.isActive("code")}
-                    />
-                  </Tooltip>
+                      <Tooltip
+                        label={"Code"}
+                        placement={"top"}
+                        hasArrow={false}
+                      >
+                        <ToggleButton
+                          onPress={() =>
+                            editor.chain().focus().toggleCode().run()
+                          }
+                          name="code-view"
+                          isActive={editor.isActive("code")}
+                        />
+                      </Tooltip>
 
-                  <VerticalDivider />
+                      <VerticalDivider />
 
-                  <Tooltip label={"Link"} placement={"top"} hasArrow={false}>
-                    <ToggleButton
-                      onPress={() =>
-                        editor.chain().focus().toggleLink({ href: "#" }).run()
-                      }
-                      name="link"
-                      isActive={editor.isActive("link")}
-                    />
-                  </Tooltip>
+                      <Tooltip
+                        label={"Link"}
+                        placement={"top"}
+                        hasArrow={false}
+                      >
+                        <ToggleButton
+                          onPress={() =>
+                            editor
+                              .chain()
+                              .focus()
+                              .toggleLink({ href: "#" })
+                              .run()
+                          }
+                          name="link"
+                          isActive={editor.isActive("link")}
+                        />
+                      </Tooltip>
 
-                  <VerticalDivider />
+                      <VerticalDivider />
+                    </>
+                  )}
 
                   {canComment && (
                     <Tooltip
