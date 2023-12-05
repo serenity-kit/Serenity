@@ -23,7 +23,6 @@ export const ready = async () => {
   db = open({
     name: "serenity-db",
     encryptionKey: key,
-    inMemory: true,
   });
   return Promise.resolve();
 };
