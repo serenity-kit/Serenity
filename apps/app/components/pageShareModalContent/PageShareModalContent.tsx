@@ -245,8 +245,8 @@ export function PageShareModalContent() {
                     aria-label="Set sharing access level"
                     defaultValue="VIEWER"
                   >
-                    <SelectItem label="Editor" value="EDITOR" />
-                    <SelectItem label="Commenter" value="COMMENTER" />
+                    {/* <SelectItem label="Editor" value="EDITOR" /> */}
+                    {/* <SelectItem label="Commenter" value="COMMENTER" /> */}
                     <SelectItem label="Viewer" value="VIEWER" />
                   </Select>
                   <Button
