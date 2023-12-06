@@ -1,4 +1,4 @@
-import { generateId } from "@serenity-tools/common";
+import { deriveSessionAuthorization, generateId } from "@serenity-tools/common";
 import { gql } from "graphql-request";
 import { Role } from "../../../../prisma/generated/output";
 import deleteAllRecords from "../../../../test/helpers/deleteAllRecords";
@@ -34,7 +34,9 @@ test("Invite admin", async () => {
     graphql,
     role,
     workspaceId: userAndDevice.workspace.id,
-    authorizationHeader: userAndDevice.sessionKey,
+    authorizationHeader: deriveSessionAuthorization({
+      sessionKey: userAndDevice.sessionKey,
+    }).authorization,
     mainDevice: userAndDevice.mainDevice,
   });
   const workspaceInvitation =
@@ -65,7 +67,9 @@ test("invite editor", async () => {
     graphql,
     role,
     workspaceId: userAndDevice.workspace.id,
-    authorizationHeader: userAndDevice.sessionKey,
+    authorizationHeader: deriveSessionAuthorization({
+      sessionKey: userAndDevice.sessionKey,
+    }).authorization,
     mainDevice: userAndDevice.mainDevice,
   });
   const workspaceInvitation =
@@ -96,7 +100,9 @@ test("invite commenter", async () => {
     graphql,
     role,
     workspaceId: userAndDevice.workspace.id,
-    authorizationHeader: userAndDevice.sessionKey,
+    authorizationHeader: deriveSessionAuthorization({
+      sessionKey: userAndDevice.sessionKey,
+    }).authorization,
     mainDevice: userAndDevice.mainDevice,
   });
   const workspaceInvitation =
@@ -127,7 +133,9 @@ test("invite viewer", async () => {
     graphql,
     role,
     workspaceId: userAndDevice.workspace.id,
-    authorizationHeader: userAndDevice.sessionKey,
+    authorizationHeader: deriveSessionAuthorization({
+      sessionKey: userAndDevice.sessionKey,
+    }).authorization,
     mainDevice: userAndDevice.mainDevice,
   });
   const workspaceInvitation =
@@ -151,7 +159,9 @@ test("fail on unknown role", async () => {
         workspaceId: userAndDevice.workspace.id,
         //@ts-expect-error: bad role type
         role: "bad-role",
-        authorizationHeader: userAndDevice.sessionKey,
+        authorizationHeader: deriveSessionAuthorization({
+          sessionKey: userAndDevice.sessionKey,
+        }).authorization,
         mainDevice: userAndDevice.mainDevice,
       }))()
   ).rejects.toThrow();
@@ -172,7 +182,9 @@ test("user should not be able to invite from a workspace they don't own", async 
         graphql,
         workspaceId: userAndDevice2.workspace.id,
         role: Role.EDITOR,
-        authorizationHeader: userAndDevice1.sessionKey,
+        authorizationHeader: deriveSessionAuthorization({
+          sessionKey: userAndDevice1.sessionKey,
+        }).authorization,
         mainDevice: userAndDevice1.mainDevice,
       }))()
   ).rejects.toThrow("Unauthorized");

@@ -9,6 +9,8 @@ export const KeyDerivationContext = z.union([
   z.literal("wsinvite"),
   z.literal("folder__"),
   z.literal("m_device"),
+  z.literal("session_datetime"),
+  z.literal("session_token"),
 ]);
 export type KeyDerivationContext = z.infer<typeof KeyDerivationContext>;
 

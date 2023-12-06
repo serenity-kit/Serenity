@@ -53,7 +53,10 @@ export const addDeviceMutation = mutationField("addDevice", {
     if (!context.authorizationHeader) {
       throw new ForbiddenError("Unauthorized");
     }
-    const sessionKey = context.authorizationHeader;
+    const [sessionToken, date, dateToken] =
+      context.authorizationHeader.split("|");
+
+    // TODO add checks for date and dateToken
 
     if (!process.env.OPAQUE_SERVER_SETUP) {
       throw new Error("Missing process.env.OPAQUE_SERVER_SETUP");
@@ -77,15 +80,16 @@ export const addDeviceMutation = mutationField("addDevice", {
     });
 
     if (
-      loginAttempt.sessionKey === null ||
-      loginAttempt.sessionKey !== sessionKey
+      loginAttempt.sessionToken === null ||
+      loginAttempt.sessionToken !== sessionToken ||
+      loginAttempt.sessionKey === null
     ) {
       throw new ForbiddenError("Unauthorized");
     }
 
     const isValidSessionTokenSignature = sodium.crypto_sign_verify_detached(
       sodium.from_base64(args.input.sessionTokenSignature),
-      "login_session_key" + sessionKey,
+      "login_session_key" + loginAttempt.sessionKey,
       sodium.from_base64(args.input.deviceSigningPublicKey)
     );
     if (!isValidSessionTokenSignature) {
@@ -109,7 +113,7 @@ export const addDeviceMutation = mutationField("addDevice", {
 
     const session = await createSessionAndDevice({
       username: loginAttempt.username,
-      sessionKey: sessionKey,
+      sessionKey: loginAttempt.sessionKey,
       device: {
         signingPublicKey: args.input.deviceSigningPublicKey,
         encryptionPublicKey: args.input.deviceEncryptionPublicKey,

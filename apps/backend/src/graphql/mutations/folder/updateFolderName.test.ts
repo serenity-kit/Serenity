@@ -1,4 +1,4 @@
-import { generateId } from "@serenity-tools/common";
+import { deriveSessionAuthorization, generateId } from "@serenity-tools/common";
 import { gql } from "graphql-request";
 import { Role } from "../../../../prisma/generated/output";
 import { registerUser } from "../../../../test/helpers/authentication/registerUser";
@@ -39,7 +39,9 @@ const setup = async () => {
     parentKey: workspaceKey,
     workspaceId: userData1.workspace.id,
     workspaceKeyId: userData1.workspace.currentWorkspaceKey.id,
-    authorizationHeader: userData1.sessionKey,
+    authorizationHeader: deriveSessionAuthorization({
+      sessionKey: userData1.sessionKey,
+    }).authorization,
   });
   addedFolder = createFolderResult.createFolder.folder;
   addedFolderId = createFolderResult.createFolder.folder.id;
@@ -59,7 +61,9 @@ test("user should be able to change a folder name", async () => {
     workspaceKey,
     workspaceKeyId: userData1.workspace.currentWorkspaceKey.id,
     parentFolderId: userData1.folder.parentFolderId,
-    authorizationHeader: userData1.sessionKey,
+    authorizationHeader: deriveSessionAuthorization({
+      sessionKey: userData1.sessionKey,
+    }).authorization,
     workspaceId: userData1.workspace.id,
   });
   const updatedFolder = result.updateFolderName.folder;
@@ -83,7 +87,9 @@ test("throw error when folder doesn't exist", async () => {
         workspaceKey,
         workspaceKeyId: addedWorkspace.currentWorkspaceKey.id,
         parentFolderId: null,
-        authorizationHeader: userData1.sessionKey,
+        authorizationHeader: deriveSessionAuthorization({
+          sessionKey: userData1.sessionKey,
+        }).authorization,
         workspaceId: userData1.workspace.id,
       }))()
   ).rejects.toThrow("Unauthorized");
@@ -104,9 +110,13 @@ test("throw error when user doesn't have access", async () => {
     parentKey: workspaceKey,
     workspaceId: userData1.workspace.id,
     workspaceKeyId: userData1.workspace.currentWorkspaceKey!.id,
-    authorizationHeader: userData1.sessionKey,
+    authorizationHeader: deriveSessionAuthorization({
+      sessionKey: userData1.sessionKey,
+    }).authorization,
   });
-  const authorizationHeader = sessionKey;
+  const authorizationHeader = deriveSessionAuthorization({
+    sessionKey,
+  }).authorization;
   const id = otherUserFolderResult.createFolder.folder.id;
   const name = "Unauthorized Name";
   await expect(
@@ -118,7 +128,9 @@ test("throw error when user doesn't have access", async () => {
         workspaceKey,
         workspaceKeyId: userData1.workspace.currentWorkspaceKey.id,
         parentFolderId: newFolder.parentFolderId,
-        authorizationHeader: userData2.sessionKey,
+        authorizationHeader: deriveSessionAuthorization({
+          sessionKey: userData2.sessionKey,
+        }).authorization,
         workspaceId: userData1.workspace.id,
       }))()
   ).rejects.toThrow("Unauthorized");
@@ -146,7 +158,9 @@ test("Commentor tries to update", async () => {
         workspaceKey,
         workspaceKeyId: addedWorkspace.currentWorkspaceKey.id,
         parentFolderId: null,
-        authorizationHeader: otherUser.sessionKey,
+        authorizationHeader: deriveSessionAuthorization({
+          sessionKey: otherUser.sessionKey,
+        }).authorization,
         workspaceId: addedWorkspace.id,
       }))()
   ).rejects.toThrowError("Unauthorized");
@@ -174,7 +188,9 @@ test("Viewer tries to update", async () => {
         workspaceKey,
         workspaceKeyId: addedWorkspace.currentWorkspaceKey.id,
         parentFolderId: null,
-        authorizationHeader: otherUser.sessionKey,
+        authorizationHeader: deriveSessionAuthorization({
+          sessionKey: otherUser.sessionKey,
+        }).authorization,
         workspaceId: addedWorkspace.id,
       }))()
   ).rejects.toThrowError("Unauthorized");
@@ -198,7 +214,7 @@ test("Unauthenticated", async () => {
 
 describe("Input errors", () => {
   const authorizationHeaders = {
-    authorization: sessionKey,
+    authorization: deriveSessionAuthorization({ sessionKey }).authorization,
   };
   test("Invalid id", async () => {
     const query = gql`

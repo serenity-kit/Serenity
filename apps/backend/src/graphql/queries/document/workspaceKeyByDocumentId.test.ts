@@ -1,4 +1,4 @@
-import { generateId } from "@serenity-tools/common";
+import { deriveSessionAuthorization, generateId } from "@serenity-tools/common";
 import { gql } from "graphql-request";
 import { Role } from "../../../../prisma/generated/output";
 import deleteAllRecords from "../../../../test/helpers/deleteAllRecords";
@@ -36,7 +36,9 @@ test("key for main workspace", async () => {
     graphql,
     documentId: userData1.document.id,
     deviceSigningPublicKey: userData1.webDevice.signingPublicKey,
-    authorizationHeader: userData1.sessionKey,
+    authorizationHeader: deriveSessionAuthorization({
+      sessionKey: userData1.sessionKey,
+    }).authorization,
   });
   const workspaceKey =
     workspaceKeyResult.workspaceKeyByDocumentId.nameWorkspaceKey;
@@ -55,7 +57,9 @@ test("key for main workspace, main device", async () => {
     graphql,
     documentId: userData1.document.id,
     deviceSigningPublicKey: userData1.mainDevice.signingPublicKey,
-    authorizationHeader: userData1.sessionKey,
+    authorizationHeader: deriveSessionAuthorization({
+      sessionKey: userData1.sessionKey,
+    }).authorization,
   });
   const workspaceKey =
     workspaceKeyResult.workspaceKeyByDocumentId.nameWorkspaceKey;
@@ -83,7 +87,9 @@ test("empty keys on incomplete workspace share", async () => {
     graphql,
     role: Role.VIEWER,
     workspaceId: userData1.workspace.id,
-    authorizationHeader: userData1.sessionKey,
+    authorizationHeader: deriveSessionAuthorization({
+      sessionKey: userData1.sessionKey,
+    }).authorization,
     mainDevice: userData1.mainDevice,
   });
   const workspaceInvitation =
@@ -95,13 +101,17 @@ test("empty keys on incomplete workspace share", async () => {
     inviteeMainDevice: userData2.mainDevice,
     invitationSigningKeyPairSeed:
       workspaceInvitationResult.invitationSigningKeyPairSeed,
-    authorizationHeader: userData2.sessionKey,
+    authorizationHeader: deriveSessionAuthorization({
+      sessionKey: userData2.sessionKey,
+    }).authorization,
   });
   const workspaceKeyResult = await getWorkspaceKeyByDocumentId({
     graphql,
     documentId: userData1.document.id,
     deviceSigningPublicKey: userData2.webDevice.signingPublicKey,
-    authorizationHeader: userData2.sessionKey,
+    authorizationHeader: deriveSessionAuthorization({
+      sessionKey: userData2.sessionKey,
+    }).authorization,
   });
   const workspaceKey =
     workspaceKeyResult.workspaceKeyByDocumentId.nameWorkspaceKey;
@@ -133,7 +143,9 @@ test("key for shared workspace", async () => {
     graphql,
     documentId: userData1.document.id,
     deviceSigningPublicKey: userData2.webDevice.signingPublicKey,
-    authorizationHeader: userData2.sessionKey,
+    authorizationHeader: deriveSessionAuthorization({
+      sessionKey: userData2.sessionKey,
+    }).authorization,
   });
   const workspaceKey =
     workspaceKeyResult.workspaceKeyByDocumentId.nameWorkspaceKey;
@@ -161,7 +173,9 @@ test("error on unauthorized workspace", async () => {
         graphql,
         documentId: userData2.document.id,
         deviceSigningPublicKey: userData1.webDevice.signingPublicKey,
-        authorizationHeader: userData1.sessionKey,
+        authorizationHeader: deriveSessionAuthorization({
+          sessionKey: userData1.sessionKey,
+        }).authorization,
       }))()
   ).rejects.toThrowError(/FORBIDDEN/);
 });
@@ -173,7 +187,9 @@ test("error on invalid document", async () => {
         graphql,
         documentId: "bad-document-id",
         deviceSigningPublicKey: userData1.webDevice.signingPublicKey,
-        authorizationHeader: userData1.sessionKey,
+        authorizationHeader: deriveSessionAuthorization({
+          sessionKey: userData1.sessionKey,
+        }).authorization,
       }))()
   ).rejects.toThrowError(/FORBIDDEN/);
 });
@@ -189,7 +205,9 @@ test("bad deviceSigningPublicKey", async () => {
         graphql,
         documentId: userData1.document.id,
         deviceSigningPublicKey: userData2.webDevice.signingPublicKey,
-        authorizationHeader: userData1.sessionKey,
+        authorizationHeader: deriveSessionAuthorization({
+          sessionKey: userData1.sessionKey,
+        }).authorization,
       }))()
   ).rejects.toThrowError();
 });
@@ -208,7 +226,7 @@ test("unauthenticated", async () => {
 
 describe("Input errors", () => {
   const authorizationHeaders = {
-    authorization: sessionKey,
+    authorization: deriveSessionAuthorization({ sessionKey }).authorization,
   };
   const query = gql`
     query workspaceKeyByDocumentId(

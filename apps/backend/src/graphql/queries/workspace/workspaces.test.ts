@@ -1,3 +1,4 @@
+import { deriveSessionAuthorization } from "@serenity-tools/common";
 import { gql } from "graphql-request";
 import deleteAllRecords from "../../../../test/helpers/deleteAllRecords";
 import setupGraphql, {
@@ -41,7 +42,8 @@ const setup = async () => {
       },
       mainDevice: userData1.mainDevice,
       devices: [userData1.device, userData1.webDevice],
-      authorizationHeader: sessionKey,
+      authorizationHeader: deriveSessionAuthorization({ sessionKey })
+        .authorization,
     });
   otherWorkspace =
     createInitialWorkspaceStructureResult.createInitialWorkspaceStructure;
@@ -138,7 +140,9 @@ test("user should be able to list workspaces", async () => {
     graphql,
     first: 50,
     deviceSigningPublicKey: device.signingPublicKey,
-    authorizationHeader: userData1.sessionKey,
+    authorizationHeader: deriveSessionAuthorization({
+      sessionKey: userData1.sessionKey,
+    }).authorization,
   });
   const workspaces = result.workspaces.nodes;
   expect(workspaces.length).toBe(2);
@@ -170,7 +174,8 @@ test("user cannot query more than 50 results", async () => {
       graphql,
       deviceSigningPublicKey: device.signingPublicKey,
       first: 51,
-      authorizationHeader: sessionKey,
+      authorizationHeader: deriveSessionAuthorization({ sessionKey })
+        .authorization,
     });
   }).rejects.toThrowError(
     "Requested too many workspaces. First value exceeds 50."
@@ -183,7 +188,8 @@ test("user can query by paginating cursor", async () => {
     deviceSigningPublicKey: device.signingPublicKey,
     first: 1,
     after: firstWorkspaceCursor,
-    authorizationHeader: sessionKey,
+    authorizationHeader: deriveSessionAuthorization({ sessionKey })
+      .authorization,
   });
   const workspaces = result.workspaces.nodes;
   expect(workspaces.length).toBe(1);
@@ -199,7 +205,7 @@ test("user can query by paginating cursor", async () => {
 //       graphql,
 //       deviceSigningPublicKey: "abcde",
 //       first: 50,
-//       authorizationHeader: sessionKey,
+//       authorizationHeader: deriveSessionAuthorization({ sessionKey }).authorization,
 //     });
 //   }).rejects.toThrowError(/Internal server error/);
 // });
@@ -216,7 +222,9 @@ test("Unauthenticated", async () => {
 });
 
 test("Input errors", async () => {
-  const authorizationHeader = { authorization: sessionKey };
+  const authorizationHeader = {
+    authorization: deriveSessionAuthorization({ sessionKey }).authorization,
+  };
   const query = gql`
     {
       workspaces(first: 51) {

@@ -1,6 +1,10 @@
 import { AuthenticationError, UserInputError } from "apollo-server-express";
 import { idArg, nonNull, queryField } from "nexus";
-import { getLoginAttemptAndUserBySessionKey } from "../../../database/authentication/getLoginAttemptAndUserBySessionKey";
+import { getLoginAttemptAndUserBySessionToken } from "../../../database/authentication/getLoginAttemptAndUserBySessionToken";
+import {
+  isValidSessionAuthorization,
+  splitSessionAuthorization,
+} from "../../../database/authentication/getSessionIncludingUserBySessionAuthorization";
 import { getWorkspaceChain } from "../../../database/workspaceChain/getWorkspaceChain";
 import { WorkspaceChainEvent } from "../../types/workspaceChain";
 
@@ -24,11 +28,24 @@ export const workspaceChainQuery = queryField((t) => {
       if (context.user) {
         userId = context.user.id;
       } else if (context.authorizationHeader) {
-        const sessionKey = context.authorizationHeader;
+        const { sessionToken } = splitSessionAuthorization({
+          authorization: context.authorizationHeader,
+        });
+
         try {
-          const { user } = await getLoginAttemptAndUserBySessionKey({
-            sessionKey,
-          });
+          const { user, loginAttempt } =
+            await getLoginAttemptAndUserBySessionToken({
+              sessionToken,
+            });
+          if (
+            !loginAttempt.sessionKey ||
+            !isValidSessionAuthorization({
+              authorization: context.authorizationHeader,
+              sessionKey: loginAttempt.sessionKey,
+            })
+          ) {
+            throw new AuthenticationError("Not authenticated");
+          }
           userId = user.id;
         } catch (e) {
           throw new AuthenticationError("Not authenticated");

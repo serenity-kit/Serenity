@@ -1,4 +1,5 @@
 import * as workspaceChain from "@serenity-kit/workspace-chain";
+import { deriveSessionAuthorization } from "@serenity-tools/common";
 import { gql } from "graphql-request";
 import sodium from "react-native-libsodium";
 import { Role } from "../../../../prisma/generated/output";
@@ -31,7 +32,9 @@ test("user should be able to delete a workspace invitation they created", async 
     graphql,
     role: Role.VIEWER,
     workspaceId: userAndDevice1.workspace.id,
-    authorizationHeader: userAndDevice1.sessionKey,
+    authorizationHeader: deriveSessionAuthorization({
+      sessionKey: userAndDevice1.sessionKey,
+    }).authorization,
     mainDevice: userAndDevice1.mainDevice,
   });
   const workspaceInvitationId =
@@ -55,7 +58,9 @@ test("user should be able to delete a workspace invitation they created", async 
   const deleteWorkspaceInvitationResult = await deleteWorkspaceInvitations({
     graphql,
     workspaceChainEvent: removeInvitationEvent,
-    authorizationHeader: userAndDevice1.sessionKey,
+    authorizationHeader: deriveSessionAuthorization({
+      sessionKey: userAndDevice1.sessionKey,
+    }).authorization,
     mainDevice: userAndDevice1.mainDevice,
     workspaceId: userAndDevice1.workspace.id,
   });
@@ -73,7 +78,9 @@ test("user should not be able to delete a workspace invitation if they aren't ad
     graphql,
     role: "EDITOR",
     workspaceId: userAndDevice1.workspace.id,
-    authorizationHeader: userAndDevice1.sessionKey,
+    authorizationHeader: deriveSessionAuthorization({
+      sessionKey: userAndDevice1.sessionKey,
+    }).authorization,
     mainDevice: userAndDevice1.mainDevice,
   });
   const invitationId =
@@ -85,7 +92,9 @@ test("user should not be able to delete a workspace invitation if they aren't ad
     inviteeMainDevice: userAndDevice2.mainDevice,
     invitationSigningKeyPairSeed:
       workspaceInvitationResult.invitationSigningKeyPairSeed,
-    authorizationHeader: userAndDevice2.sessionKey,
+    authorizationHeader: deriveSessionAuthorization({
+      sessionKey: userAndDevice2.sessionKey,
+    }).authorization,
   });
   const { lastChainEntry } = await getLastWorkspaceChainEvent({
     workspaceId: userAndDevice1.workspace.id,
@@ -107,7 +116,9 @@ test("user should not be able to delete a workspace invitation if they aren't ad
       await deleteWorkspaceInvitations({
         graphql,
         workspaceChainEvent: removeInvitationEvent,
-        authorizationHeader: userAndDevice2.sessionKey,
+        authorizationHeader: deriveSessionAuthorization({
+          sessionKey: userAndDevice2.sessionKey,
+        }).authorization,
         mainDevice: userAndDevice1.mainDevice,
         workspaceId: userAndDevice1.workspace.id,
       }))()
@@ -119,7 +130,9 @@ test("Unauthenticated", async () => {
     graphql,
     role: Role.VIEWER,
     workspaceId: userAndDevice1.workspace.id,
-    authorizationHeader: userAndDevice1.sessionKey,
+    authorizationHeader: deriveSessionAuthorization({
+      sessionKey: userAndDevice1.sessionKey,
+    }).authorization,
     mainDevice: userAndDevice1.mainDevice,
   });
 

@@ -1,4 +1,4 @@
-import { generateId } from "@serenity-tools/common";
+import { deriveSessionAuthorization, generateId } from "@serenity-tools/common";
 import { Role } from "../../../../prisma/generated/output";
 import deleteAllRecords from "../../../../test/helpers/deleteAllRecords";
 import setupGraphql from "../../../../test/helpers/setupGraphql";
@@ -38,20 +38,26 @@ test("should return a list of workspace invitations if they are admin", async ()
     graphql,
     workspaceId,
     role: Role.ADMIN,
-    authorizationHeader: inviterUserAndDevice1.sessionKey,
+    authorizationHeader: deriveSessionAuthorization({
+      sessionKey: inviterUserAndDevice1.sessionKey,
+    }).authorization,
     mainDevice: inviterUserAndDevice1.mainDevice,
   });
   await createWorkspaceInvitation({
     graphql,
     workspaceId,
     role: Role.EDITOR,
-    authorizationHeader: inviterUserAndDevice1.sessionKey,
+    authorizationHeader: deriveSessionAuthorization({
+      sessionKey: inviterUserAndDevice1.sessionKey,
+    }).authorization,
     mainDevice: inviterUserAndDevice1.mainDevice,
   });
   const workspaceInvitationsResult = await workspaceInvitations({
     graphql,
     workspaceId,
-    authorizationHeader: inviterUserAndDevice1.sessionKey,
+    authorizationHeader: deriveSessionAuthorization({
+      sessionKey: inviterUserAndDevice1.sessionKey,
+    }).authorization,
   });
   const invitations = workspaceInvitationsResult.workspaceInvitations.edges;
   expect(invitations.length).toBe(2);
@@ -67,7 +73,9 @@ test("should throw an error if we try to fetch more than 50", async () => {
       await workspaceInvitations({
         graphql,
         workspaceId,
-        authorizationHeader: userAndDevice.sessionKey,
+        authorizationHeader: deriveSessionAuthorization({
+          sessionKey: userAndDevice.sessionKey,
+        }).authorization,
         first: 51,
       }))()
   ).rejects.toThrowError(/BAD_USER_INPUT/);
@@ -99,7 +107,9 @@ test("not admin should throw error", async () => {
       await workspaceInvitations({
         graphql,
         workspaceId,
-        authorizationHeader: userAndDevice.sessionKey,
+        authorizationHeader: deriveSessionAuthorization({
+          sessionKey: userAndDevice.sessionKey,
+        }).authorization,
       }))()
   ).rejects.toThrowError(/FORBIDDEN/);
 });
@@ -149,7 +159,9 @@ describe("Input errors", () => {
         await workspaceInvitations({
           graphql,
           workspaceId: "",
-          authorizationHeader: userAndDevice.sessionKey,
+          authorizationHeader: deriveSessionAuthorization({
+            sessionKey: userAndDevice.sessionKey,
+          }).authorization,
         }))()
     ).rejects.toThrowError(/BAD_USER_INPUT/);
   });

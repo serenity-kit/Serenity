@@ -1,3 +1,4 @@
+import { deriveSessionAuthorization } from "@serenity-tools/common";
 import { gql } from "graphql-request";
 import { TestContext } from "../setupGraphql";
 
@@ -13,7 +14,9 @@ export const getActiveWorkspaceKeys = async ({
   deviceSigningPublicKey,
   sessionKey,
 }: Props) => {
-  const authorizationHeader = { authorization: sessionKey };
+  const authorizationHeader = {
+    authorization: deriveSessionAuthorization({ sessionKey }).authorization,
+  };
   const query = gql`
     query activeWorkspaceKeys(
       $workspaceId: ID!

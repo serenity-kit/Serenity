@@ -1,5 +1,9 @@
 import * as workspaceChain from "@serenity-kit/workspace-chain";
-import { generateId, notNull } from "@serenity-tools/common";
+import {
+  deriveSessionAuthorization,
+  generateId,
+  notNull,
+} from "@serenity-tools/common";
 import canonicalize from "canonicalize";
 import { useSyncExternalStore } from "react";
 import sodium from "react-native-libsodium";
@@ -212,7 +216,15 @@ export const loadRemoteWorkspaceChain = async ({
         : undefined,
     },
     sessionKey
-      ? { fetchOptions: { headers: { Authorization: sessionKey } } }
+      ? {
+          fetchOptions: {
+            headers: {
+              Authorization: deriveSessionAuthorization({
+                sessionKey,
+              }).authorization,
+            },
+          },
+        }
       : undefined
   );
 

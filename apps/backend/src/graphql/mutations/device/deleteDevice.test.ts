@@ -1,4 +1,5 @@
 import {
+  deriveSessionAuthorization,
   encryptWorkspaceKeyForDevice,
   generateId,
 } from "@serenity-tools/common";
@@ -48,7 +49,6 @@ beforeAll(async () => {
 });
 
 test("delete and keep devices mismatch", async () => {
-  const authorizationHeader1 = userData1.sessionKey;
   const workspaceKeyBox1 = encryptWorkspaceKeyForDevice({
     receiverDeviceEncryptionPublicKey: userData1.device.encryptionPublicKey,
     creatorDeviceEncryptionPrivateKey: userData1.encryptionPrivateKey,
@@ -77,14 +77,18 @@ test("delete and keep devices mismatch", async () => {
         creatorSigningPublicKey: userData1.device.signingPublicKey,
         newDeviceWorkspaceKeyBoxes,
         deviceSigningPublicKeyToBeDeleted: user1Device2.signingPublicKey,
-        authorizationHeader: authorizationHeader1,
+        authorizationHeader: deriveSessionAuthorization({
+          sessionKey: userData1.sessionKey,
+        }).authorization,
         mainDevice: userData1.mainDevice,
       }))()
   ).rejects.toThrowError(/Missing newWorkspaceDevicekeyBox workspaceDevice/);
 });
 
 test("delete a device", async () => {
-  const authorizationHeader = userData1.sessionKey;
+  const authorizationHeader = deriveSessionAuthorization({
+    sessionKey: userData1.sessionKey,
+  }).authorization;
   const numDevicesAfterCreate = await getDevices({
     graphql,
     onlyNotExpired: true,
@@ -167,7 +171,9 @@ test("delete a device", async () => {
 });
 
 test("delete login device clears session", async () => {
-  const authorizationHeader = userData1.sessionKey;
+  const authorizationHeader = deriveSessionAuthorization({
+    sessionKey: userData1.sessionKey,
+  }).authorization;
   const numDevicesAfterCreate = await getDevices({
     graphql,
     onlyNotExpired: true,

@@ -1,4 +1,4 @@
-import { generateId } from "@serenity-tools/common";
+import { deriveSessionAuthorization, generateId } from "@serenity-tools/common";
 import sodium from "react-native-libsodium";
 import { Role } from "../../../../prisma/generated/output";
 import { createComment } from "../../../../test/helpers/comment/createComment";
@@ -56,7 +56,9 @@ test("commenter deletes own comment", async () => {
     creatorDevice: userData1.webDevice,
     creatorDeviceSigningPrivateKey: userData1.webDevice.signingPrivateKey,
     creatorDeviceEncryptionPrivateKey: userData1.webDevice.encryptionPrivateKey,
-    authorizationHeader: userData1.sessionKey,
+    authorizationHeader: deriveSessionAuthorization({
+      sessionKey: userData1.sessionKey,
+    }).authorization,
     documentId: userData1.document.id,
   });
   const comment = commentResult.createComment.comment;
@@ -67,7 +69,9 @@ test("commenter deletes own comment", async () => {
   const deleteCommentsResult = await deleteComments({
     graphql,
     commentIds: [comment.id],
-    authorizationHeader: userData1.sessionKey,
+    authorizationHeader: deriveSessionAuthorization({
+      sessionKey: userData1.sessionKey,
+    }).authorization,
   });
   expect(deleteCommentsResult.deleteComments.status).toBe("success");
   const numCommentsAfterDelete = await prisma.comment.count({
@@ -94,7 +98,9 @@ test("admin deletes comment", async () => {
     creatorDevice: userData2.webDevice,
     creatorDeviceSigningPrivateKey: userData2.webDevice.signingPrivateKey,
     creatorDeviceEncryptionPrivateKey: userData2.webDevice.encryptionPrivateKey,
-    authorizationHeader: userData2.sessionKey,
+    authorizationHeader: deriveSessionAuthorization({
+      sessionKey: userData2.sessionKey,
+    }).authorization,
     documentId: userData1.document.id,
   });
   const comment = commentResult.createComment.comment;
@@ -105,7 +111,9 @@ test("admin deletes comment", async () => {
   const deleteCommentsResult = await deleteComments({
     graphql,
     commentIds: [comment.id],
-    authorizationHeader: userData1.sessionKey,
+    authorizationHeader: deriveSessionAuthorization({
+      sessionKey: userData1.sessionKey,
+    }).authorization,
   });
   expect(deleteCommentsResult.deleteComments.status).toBe("success");
   const numCommentsAfterDelete = await prisma.comment.count({
@@ -132,7 +140,9 @@ test("editor deletes comment", async () => {
     creatorDevice: userData2.webDevice,
     creatorDeviceSigningPrivateKey: userData2.webDevice.signingPrivateKey,
     creatorDeviceEncryptionPrivateKey: userData2.webDevice.encryptionPrivateKey,
-    authorizationHeader: userData2.sessionKey,
+    authorizationHeader: deriveSessionAuthorization({
+      sessionKey: userData2.sessionKey,
+    }).authorization,
     documentId: userData1.document.id,
   });
   const comment = commentResult.createComment.comment;
@@ -143,7 +153,9 @@ test("editor deletes comment", async () => {
   const deleteCommentsResult = await deleteComments({
     graphql,
     commentIds: [comment.id],
-    authorizationHeader: userData1.sessionKey,
+    authorizationHeader: deriveSessionAuthorization({
+      sessionKey: userData1.sessionKey,
+    }).authorization,
   });
   expect(deleteCommentsResult.deleteComments.status).toBe("success");
   const numCommentsAfterDelete = await prisma.comment.count({
@@ -170,7 +182,9 @@ test("commentor tries to delete other comment", async () => {
     creatorDevice: userData2.webDevice,
     creatorDeviceSigningPrivateKey: userData2.webDevice.signingPrivateKey,
     creatorDeviceEncryptionPrivateKey: userData2.webDevice.encryptionPrivateKey,
-    authorizationHeader: userData2.sessionKey,
+    authorizationHeader: deriveSessionAuthorization({
+      sessionKey: userData2.sessionKey,
+    }).authorization,
     documentId: userData1.document.id,
   });
   const comment = commentResult.createComment.comment;
@@ -179,7 +193,9 @@ test("commentor tries to delete other comment", async () => {
       await deleteComments({
         graphql,
         commentIds: [comment.id],
-        authorizationHeader: userData1.sessionKey,
+        authorizationHeader: deriveSessionAuthorization({
+          sessionKey: userData1.sessionKey,
+        }).authorization,
       }))()
   ).rejects.toThrowError(/BAD_USER_INPUT/);
 });
@@ -202,7 +218,9 @@ test("viewer tries to delete other comment", async () => {
     creatorDevice: userData2.webDevice,
     creatorDeviceSigningPrivateKey: userData2.webDevice.signingPrivateKey,
     creatorDeviceEncryptionPrivateKey: userData2.webDevice.encryptionPrivateKey,
-    authorizationHeader: userData2.sessionKey,
+    authorizationHeader: deriveSessionAuthorization({
+      sessionKey: userData2.sessionKey,
+    }).authorization,
     documentId: userData1.document.id,
   });
   const comment = commentResult.createComment.comment;
@@ -211,7 +229,9 @@ test("viewer tries to delete other comment", async () => {
       await deleteComments({
         graphql,
         commentIds: [comment.id],
-        authorizationHeader: userData1.sessionKey,
+        authorizationHeader: deriveSessionAuthorization({
+          sessionKey: userData1.sessionKey,
+        }).authorization,
       }))()
   ).rejects.toThrowError(/BAD_USER_INPUT/);
   // return the user to admin
@@ -235,7 +255,9 @@ test("delete some comments", async () => {
     creatorDevice: userData2.webDevice,
     creatorDeviceSigningPrivateKey: userData2.webDevice.signingPrivateKey,
     creatorDeviceEncryptionPrivateKey: userData2.webDevice.encryptionPrivateKey,
-    authorizationHeader: userData2.sessionKey,
+    authorizationHeader: deriveSessionAuthorization({
+      sessionKey: userData2.sessionKey,
+    }).authorization,
     documentId: userData1.document.id,
   });
   const comment = commentResult.createComment.comment;
@@ -246,7 +268,9 @@ test("delete some comments", async () => {
   const deleteCommentsResult = await deleteComments({
     graphql,
     commentIds: [comment.id],
-    authorizationHeader: userData2.sessionKey,
+    authorizationHeader: deriveSessionAuthorization({
+      sessionKey: userData2.sessionKey,
+    }).authorization,
   });
   expect(deleteCommentsResult.deleteComments.status).toBe("success");
   const numCommentsAfterDelete = await prisma.comment.count({
@@ -265,7 +289,9 @@ test("editor share token", async () => {
     creatorDevice: userData1.webDevice,
     creatorDeviceSigningPrivateKey: userData1.webDevice.signingPrivateKey,
     creatorDeviceEncryptionPrivateKey: userData1.webDevice.encryptionPrivateKey,
-    authorizationHeader: userData1.sessionKey,
+    authorizationHeader: deriveSessionAuthorization({
+      sessionKey: userData1.sessionKey,
+    }).authorization,
     documentId: userData1.document.id,
   });
   const comment = commentResult.createComment.comment;
@@ -280,7 +306,9 @@ test("editor share token", async () => {
     sharingRole: Role.EDITOR,
     mainDevice: userData1.mainDevice,
     snapshotKey,
-    authorizationHeader: userData1.sessionKey,
+    authorizationHeader: deriveSessionAuthorization({
+      sessionKey: userData1.sessionKey,
+    }).authorization,
   });
   const numCommentsBeforeDelete = await prisma.comment.count({
     where: { documentId: userData1.document.id },
@@ -294,7 +322,9 @@ test("editor share token", async () => {
         graphql,
         commentIds: [comment.id],
         documentShareLinkToken,
-        authorizationHeader: userData2.sessionKey,
+        authorizationHeader: deriveSessionAuthorization({
+          sessionKey: userData2.sessionKey,
+        }).authorization,
       });
     })()
   ).rejects.toThrowError(/BAD_USER_INPUT/);
@@ -309,7 +339,9 @@ test("commenter share token", async () => {
     creatorDevice: userData1.webDevice,
     creatorDeviceSigningPrivateKey: userData1.webDevice.signingPrivateKey,
     creatorDeviceEncryptionPrivateKey: userData1.webDevice.encryptionPrivateKey,
-    authorizationHeader: userData1.sessionKey,
+    authorizationHeader: deriveSessionAuthorization({
+      sessionKey: userData1.sessionKey,
+    }).authorization,
     documentId: userData1.document.id,
   });
   const comment = commentResult.createComment.comment;
@@ -324,7 +356,9 @@ test("commenter share token", async () => {
     sharingRole: Role.COMMENTER,
     mainDevice: userData1.mainDevice,
     snapshotKey,
-    authorizationHeader: userData1.sessionKey,
+    authorizationHeader: deriveSessionAuthorization({
+      sessionKey: userData1.sessionKey,
+    }).authorization,
   });
   const documentShareLinkToken =
     createDocumentShareLinkQueryResult.createDocumentShareLink.token;
@@ -334,7 +368,9 @@ test("commenter share token", async () => {
         graphql,
         commentIds: [comment.id],
         documentShareLinkToken,
-        authorizationHeader: userData2.sessionKey,
+        authorizationHeader: deriveSessionAuthorization({
+          sessionKey: userData2.sessionKey,
+        }).authorization,
       });
     })()
   ).rejects.toThrowError(/BAD_USER_INPUT/);
@@ -349,7 +385,9 @@ test("viewer share token can't delete", async () => {
     creatorDevice: userData1.webDevice,
     creatorDeviceSigningPrivateKey: userData1.webDevice.signingPrivateKey,
     creatorDeviceEncryptionPrivateKey: userData1.webDevice.encryptionPrivateKey,
-    authorizationHeader: userData1.sessionKey,
+    authorizationHeader: deriveSessionAuthorization({
+      sessionKey: userData1.sessionKey,
+    }).authorization,
     documentId: userData1.document.id,
   });
   const comment = commentResult.createComment.comment;
@@ -364,7 +402,9 @@ test("viewer share token can't delete", async () => {
     sharingRole: Role.COMMENTER,
     mainDevice: userData1.mainDevice,
     snapshotKey,
-    authorizationHeader: userData1.sessionKey,
+    authorizationHeader: deriveSessionAuthorization({
+      sessionKey: userData1.sessionKey,
+    }).authorization,
   });
   const documentShareLinkToken =
     createDocumentShareLinkQueryResult.createDocumentShareLink.token;
@@ -374,7 +414,9 @@ test("viewer share token can't delete", async () => {
         graphql,
         commentIds: [comment.id],
         documentShareLinkToken,
-        authorizationHeader: userData2.sessionKey,
+        authorizationHeader: deriveSessionAuthorization({
+          sessionKey: userData2.sessionKey,
+        }).authorization,
       });
     })()
   ).rejects.toThrowError(/BAD_USER_INPUT/);
@@ -389,7 +431,9 @@ test("can't delete comments on outside document", async () => {
     creatorDevice: userData2.webDevice,
     creatorDeviceSigningPrivateKey: userData2.webDevice.signingPrivateKey,
     creatorDeviceEncryptionPrivateKey: userData2.webDevice.encryptionPrivateKey,
-    authorizationHeader: userData2.sessionKey,
+    authorizationHeader: deriveSessionAuthorization({
+      sessionKey: userData2.sessionKey,
+    }).authorization,
     documentId: userData1.document.id,
   });
   await prisma.usersToWorkspaces.deleteMany({
@@ -404,7 +448,9 @@ test("can't delete comments on outside document", async () => {
       await deleteComments({
         graphql,
         commentIds: [comment.id],
-        authorizationHeader: userData2.sessionKey,
+        authorizationHeader: deriveSessionAuthorization({
+          sessionKey: userData2.sessionKey,
+        }).authorization,
       });
     })()
   ).rejects.toThrowError(/BAD_USER_INPUT/);
@@ -416,7 +462,9 @@ test("invalid comment", async () => {
       await deleteComments({
         graphql,
         commentIds: ["bad-id"],
-        authorizationHeader: userData1.sessionKey,
+        authorizationHeader: deriveSessionAuthorization({
+          sessionKey: userData1.sessionKey,
+        }).authorization,
       });
     })()
   ).rejects.toThrowError(/BAD_USER_INPUT/);
@@ -428,7 +476,9 @@ test("no comments", async () => {
       await deleteComments({
         graphql,
         commentIds: [],
-        authorizationHeader: userData1.sessionKey,
+        authorizationHeader: deriveSessionAuthorization({
+          sessionKey: userData1.sessionKey,
+        }).authorization,
       });
     })()
   ).rejects.toThrowError(/BAD_USER_INPUT/);

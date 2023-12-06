@@ -1,6 +1,7 @@
 import {
   decryptWorkspaceKey,
   deriveKeysFromKeyDerivationTrace,
+  deriveSessionAuthorization,
   generateId,
 } from "@serenity-tools/common";
 import { decryptDocumentTitleBasedOnSnapshotKey } from "@serenity-tools/common/src/decryptDocumentTitleBasedOnSnapshotKey/decryptDocumentTitleBasedOnSnapshotKey";
@@ -48,7 +49,9 @@ beforeAll(async () => {
 });
 
 test("user should be retrieve a document", async () => {
-  const authorizationHeader = userData1.sessionKey;
+  const authorizationHeader = deriveSessionAuthorization({
+    sessionKey: userData1.sessionKey,
+  }).authorization;
   const documentName = "Test document";
   const createDocumentResponse = await createDocument({
     graphql,
@@ -125,7 +128,8 @@ test("Input Errors", async () => {
       await getDocument({
         graphql,
         id: "",
-        authorizationHeader: sessionKey,
+        authorizationHeader: deriveSessionAuthorization({ sessionKey })
+          .authorization,
       }))()
   ).rejects.toThrowError(/BAD_USER_INPUT/);
 });

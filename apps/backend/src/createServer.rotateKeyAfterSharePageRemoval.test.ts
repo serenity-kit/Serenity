@@ -1,6 +1,7 @@
 import {
   createSnapshotKey,
   decryptWorkspaceKey,
+  deriveSessionAuthorization,
   folderDerivedKeyContext,
   LocalDevice,
   SerenitySnapshotPublicData,
@@ -81,7 +82,8 @@ const setup = async () => {
     parentFolderId: addedFolder.id,
     workspaceId,
     activeDevice: result.webDevice,
-    authorizationHeader: sessionKey,
+    authorizationHeader: deriveSessionAuthorization({ sessionKey })
+      .authorization,
   });
   documentId = createDocumentResult.createDocument.id;
 };
@@ -97,7 +99,11 @@ test("successfully creates a snapshot", async () => {
 
   const { client, messages } = await createSocketClient(
     graphql.port,
-    `/${documentId}?sessionKey=${sessionKey}`,
+    `/${documentId}?sessionKey=${
+      deriveSessionAuthorization({
+        sessionKey,
+      }).authorization
+    }`,
     2
   );
 
@@ -168,7 +174,11 @@ test("successfully creates a snapshot", async () => {
 test("successfully creates an update", async () => {
   const { client, messages } = await createSocketClient(
     graphql.port,
-    `/${documentId}?sessionKey=${sessionKey}`,
+    `/${documentId}?sessionKey=${
+      deriveSessionAuthorization({
+        sessionKey,
+      }).authorization
+    }`,
     2
   );
 
@@ -210,7 +220,11 @@ test("if document is set to requiresSnapshot updates will fail", async () => {
 
   const { client, messages } = await createSocketClient(
     graphql.port,
-    `/${documentId}?sessionKey=${sessionKey}`,
+    `/${documentId}?sessionKey=${
+      deriveSessionAuthorization({
+        sessionKey,
+      }).authorization
+    }`,
     2
   );
 
@@ -248,7 +262,11 @@ test("if document is set to requiresSnapshot updates will fail", async () => {
 test("successfully creates a snapshot", async () => {
   const { client, messages } = await createSocketClient(
     graphql.port,
-    `/${documentId}?sessionKey=${sessionKey}`,
+    `/${documentId}?sessionKey=${
+      deriveSessionAuthorization({
+        sessionKey,
+      }).authorization
+    }`,
     2
   );
 
@@ -257,7 +275,8 @@ test("successfully creates a snapshot", async () => {
   const workspaceResult = await getWorkspace({
     graphql,
     workspaceId,
-    authorizationHeader: sessionKey,
+    authorizationHeader: deriveSessionAuthorization({ sessionKey })
+      .authorization,
     deviceSigningPublicKey: device!.signingPublicKey,
   });
 
@@ -351,7 +370,11 @@ test("successfully creates a snapshot", async () => {
 test("successfully creates an update", async () => {
   const { client, messages } = await createSocketClient(
     graphql.port,
-    `/${documentId}?sessionKey=${sessionKey}`,
+    `/${documentId}?sessionKey=${
+      deriveSessionAuthorization({
+        sessionKey,
+      }).authorization
+    }`,
     2
   );
 

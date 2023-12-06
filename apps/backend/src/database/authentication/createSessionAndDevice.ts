@@ -1,6 +1,11 @@
 import * as userChain from "@serenity-kit/user-chain";
 import * as workspaceMemberDevicesProofUtil from "@serenity-kit/workspace-member-devices-proof";
-import { Device, equalStringArrays, generateId } from "@serenity-tools/common";
+import {
+  Device,
+  deriveSessionAuthorization,
+  equalStringArrays,
+  generateId,
+} from "@serenity-tools/common";
 import { z } from "zod";
 import { Prisma } from "../../../prisma/generated/output";
 import { addDays } from "../../utils/addDays/addDays";
@@ -137,9 +142,11 @@ export async function createSessionAndDevice({
       }
 
       const webDeviceAccessToken = generateId();
+      const { sessionToken } = deriveSessionAuthorization({ sessionKey });
 
       return await prisma.session.create({
         data: {
+          sessionToken,
           sessionKey,
           expiresAt: sessionExpiresAt,
           user: { connect: { username } },

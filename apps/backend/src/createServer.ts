@@ -18,7 +18,7 @@ import express from "express";
 import { createServer as httpCreateServer } from "http";
 import { URLSearchParams } from "url";
 import { WebSocketServer } from "ws";
-import { getSessionIncludingUser } from "./database/authentication/getSessionIncludingUser";
+import { getSessionIncludingUserBySessionAuthorization } from "./database/authentication/getSessionIncludingUserBySessionAuthorization";
 import { createSnapshot } from "./database/createSnapshot";
 import { createUpdate } from "./database/createUpdate";
 import { getDocument } from "./database/document/getDocument";
@@ -38,9 +38,10 @@ export default async function createServer() {
     persistedQueries: false, // to prevent denial of service attacks via memory exhaustion
     context: async (request) => {
       if (request.req.headers.authorization) {
-        const session = await getSessionIncludingUser({
-          sessionKey: request.req.headers.authorization,
+        const session = await getSessionIncludingUserBySessionAuthorization({
+          authorization: request.req.headers.authorization,
         });
+
         if (session && session.user) {
           return {
             session,
@@ -144,8 +145,8 @@ export default async function createServer() {
         if (!params.websocketSessionKey) {
           return false;
         }
-        const session = await getSessionIncludingUser({
-          sessionKey: params.websocketSessionKey,
+        const session = await getSessionIncludingUserBySessionAuthorization({
+          authorization: params.websocketSessionKey,
         });
         const documentShareLink = await prisma.documentShareLink.findFirst({
           where: { websocketSessionKey: params.websocketSessionKey },
@@ -229,10 +230,10 @@ export default async function createServer() {
     if (queryStartPos !== -1) {
       const queryString = request.url?.slice(queryStartPos + 1);
       const queryParameters = new URLSearchParams(queryString);
-      const sessionKey = queryParameters.get("sessionKey");
-      if (sessionKey) {
-        const session = await getSessionIncludingUser({
-          sessionKey,
+      const sessionAuthorization = queryParameters.get("sessionKey");
+      if (sessionAuthorization) {
+        const session = await getSessionIncludingUserBySessionAuthorization({
+          authorization: sessionAuthorization,
         });
         if (session && session.user) {
           context = {

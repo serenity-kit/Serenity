@@ -1,4 +1,4 @@
-import { generateId } from "@serenity-tools/common";
+import { deriveSessionAuthorization, generateId } from "@serenity-tools/common";
 import { gql } from "graphql-request";
 import { registerUser } from "../../../../test/helpers/authentication/registerUser";
 import deleteAllRecords from "../../../../test/helpers/deleteAllRecords";
@@ -44,7 +44,9 @@ const setup = async () => {
     name: parentFolderName,
     parentFolderId: null,
     parentKey: workspaceKey,
-    authorizationHeader: userData1.sessionKey,
+    authorizationHeader: deriveSessionAuthorization({
+      sessionKey: userData1.sessionKey,
+    }).authorization,
     workspaceId: userData1.workspace.id,
     workspaceKeyId: userData1.workspace.currentWorkspaceKey.id,
   });
@@ -54,7 +56,9 @@ const setup = async () => {
     name: folderName,
     parentFolderId: parentFolderId,
     parentKey: workspaceKey,
-    authorizationHeader: userData1.sessionKey,
+    authorizationHeader: deriveSessionAuthorization({
+      sessionKey: userData1.sessionKey,
+    }).authorization,
     workspaceId: userData1.workspace.id,
     workspaceKeyId: userData1.workspace.currentWorkspaceKey.id,
   });
@@ -69,7 +73,11 @@ test("user should be able to retrieve the first document", async () => {
   const result = await graphql.client.request(
     query,
     { workspaceId: userData1.workspace.id },
-    { authorization: userData1.sessionKey }
+    {
+      authorization: deriveSessionAuthorization({
+        sessionKey: userData1.sessionKey,
+      }).authorization,
+    }
   );
   const firstDocument = result.firstDocument;
   expect(firstDocument.id).toBe(userData1.document.id);
@@ -83,7 +91,9 @@ test("user should not be able to retreive the first document from another worksp
   );
 
   const authorizationHeader = {
-    authorization: registerUserResult2.sessionKey,
+    authorization: deriveSessionAuthorization({
+      sessionKey: registerUserResult2.sessionKey,
+    }).authorization,
   };
   await expect(
     (async () =>
@@ -108,7 +118,9 @@ test("Unauthenticated", async () => {
 });
 
 test("Input Errors", async () => {
-  const authorizationHeader = { authorization: sessionKey };
+  const authorizationHeader = {
+    authorization: deriveSessionAuthorization({ sessionKey }).authorization,
+  };
   await expect(
     (async () =>
       await graphql.client.request(query, null, authorizationHeader))()

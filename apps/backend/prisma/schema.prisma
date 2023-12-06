@@ -139,7 +139,8 @@ model UserChainEvent {
 }
 
 model Session {
-  sessionKey             String   @id
+  sessionToken           String   @id
+  sessionKey             String   @unique
   expiresAt              DateTime
   createdAt              DateTime @default(now())
   user                   User     @relation(fields: [userId], references: [id], onDelete: Cascade)
@@ -394,4 +395,5 @@ model LoginAttempt {
   startLoginServerData String
   createdAt            DateTime @default(now())
   sessionKey           String?  @unique
+  sessionToken         String?  @unique
 }

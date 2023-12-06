@@ -1,15 +1,15 @@
 import { prisma } from "../prisma";
 
 type Params = {
-  sessionKey: string;
+  sessionToken: string;
 };
 
-export async function getLoginAttemptAndUserBySessionKey({
-  sessionKey,
+export async function getLoginAttemptAndUserBySessionToken({
+  sessionToken,
 }: Params) {
   const loginAttempt = await prisma.loginAttempt.findFirstOrThrow({
     where: {
-      sessionKey,
+      sessionToken,
       // only valid for 30 seconds
       createdAt: { lt: new Date(Date.now() + 1000 * 30) },
     },

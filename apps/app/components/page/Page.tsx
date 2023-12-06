@@ -4,6 +4,7 @@ import {
   KeyDerivationTrace,
   LocalDevice,
   SerenitySnapshotPublicData,
+  deriveSessionAuthorization,
   encryptDocumentTitle,
   encryptSnapshotKeyForShareLinkDevice,
   generateId,
@@ -130,7 +131,8 @@ export default function Page({
     documentId: docId,
     signatureKeyPair,
     websocketHost: websocketOrigin,
-    websocketSessionKey: sessionKey,
+    websocketSessionKey: deriveSessionAuthorization({ sessionKey })
+      .authorization,
     onDocumentUpdated: ({ type, knownSnapshotInfo }) => {
       if (type === "snapshot-saved") {
         if (snapshotInFlightDataRef.current) {

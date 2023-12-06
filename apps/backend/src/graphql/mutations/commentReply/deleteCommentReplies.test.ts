@@ -1,4 +1,4 @@
-import { generateId } from "@serenity-tools/common";
+import { deriveSessionAuthorization, generateId } from "@serenity-tools/common";
 import { Role } from "../../../../prisma/generated/output";
 import { createComment } from "../../../../test/helpers/comment/createComment";
 import { createCommentReply } from "../../../../test/helpers/commentReply/createCommentReply";
@@ -49,7 +49,9 @@ const setup = async () => {
     creatorDevice: userData1.webDevice,
     creatorDeviceSigningPrivateKey: userData1.webDevice.signingPrivateKey,
     creatorDeviceEncryptionPrivateKey: userData1.webDevice.encryptionPrivateKey,
-    authorizationHeader: userData1.sessionKey,
+    authorizationHeader: deriveSessionAuthorization({
+      sessionKey: userData1.sessionKey,
+    }).authorization,
     documentId: userData1.document.id,
   });
   user1Comment = user1CommentResult.createComment.comment;
@@ -61,7 +63,9 @@ const setup = async () => {
     creatorDevice: userData2.webDevice,
     creatorDeviceSigningPrivateKey: userData2.webDevice.signingPrivateKey,
     creatorDeviceEncryptionPrivateKey: userData2.webDevice.encryptionPrivateKey,
-    authorizationHeader: userData2.sessionKey,
+    authorizationHeader: deriveSessionAuthorization({
+      sessionKey: userData2.sessionKey,
+    }).authorization,
     documentId: userData1.document.id,
   });
   user2Comment = user2CommentResult.createComment.comment;
@@ -82,7 +86,9 @@ test("commenter deletes own reply", async () => {
     creatorDevice: userData1.webDevice,
     creatorDeviceSigningPrivateKey: userData1.webDevice.signingPrivateKey,
     creatorDeviceEncryptionPrivateKey: userData1.webDevice.encryptionPrivateKey,
-    authorizationHeader: userData1.sessionKey,
+    authorizationHeader: deriveSessionAuthorization({
+      sessionKey: userData1.sessionKey,
+    }).authorization,
     documentId: userData1.document.id,
   });
   const commentReply = commentReplyResult.createCommentReply.commentReply;
@@ -93,7 +99,9 @@ test("commenter deletes own reply", async () => {
   const deleteCommentRepliesResult = await deleteCommentReplies({
     graphql,
     commentReplyIds: [commentReply.id],
-    authorizationHeader: userData1.sessionKey,
+    authorizationHeader: deriveSessionAuthorization({
+      sessionKey: userData1.sessionKey,
+    }).authorization,
   });
   expect(deleteCommentRepliesResult.deleteCommentReplies.status).toBe(
     "success"
@@ -123,7 +131,9 @@ test("admin deletes reply", async () => {
     creatorDevice: userData2.webDevice,
     creatorDeviceSigningPrivateKey: userData2.webDevice.signingPrivateKey,
     creatorDeviceEncryptionPrivateKey: userData2.webDevice.encryptionPrivateKey,
-    authorizationHeader: userData2.sessionKey,
+    authorizationHeader: deriveSessionAuthorization({
+      sessionKey: userData2.sessionKey,
+    }).authorization,
     documentId: userData1.document.id,
   });
   const commentReply = commentReplyResult.createCommentReply.commentReply;
@@ -134,7 +144,9 @@ test("admin deletes reply", async () => {
   const deleteCommentRepliesResult = await deleteCommentReplies({
     graphql,
     commentReplyIds: [commentReply.id],
-    authorizationHeader: userData1.sessionKey,
+    authorizationHeader: deriveSessionAuthorization({
+      sessionKey: userData1.sessionKey,
+    }).authorization,
   });
   expect(deleteCommentRepliesResult.deleteCommentReplies.status).toBe(
     "success"
@@ -164,7 +176,9 @@ test("editor deletes reply", async () => {
     creatorDevice: userData2.webDevice,
     creatorDeviceSigningPrivateKey: userData2.webDevice.signingPrivateKey,
     creatorDeviceEncryptionPrivateKey: userData2.webDevice.encryptionPrivateKey,
-    authorizationHeader: userData2.sessionKey,
+    authorizationHeader: deriveSessionAuthorization({
+      sessionKey: userData2.sessionKey,
+    }).authorization,
     documentId: userData1.document.id,
   });
   const commentReply = commentReplyResult.createCommentReply.commentReply;
@@ -175,7 +189,9 @@ test("editor deletes reply", async () => {
   const deleteCommentRepliesResult = await deleteCommentReplies({
     graphql,
     commentReplyIds: [commentReply.id],
-    authorizationHeader: userData1.sessionKey,
+    authorizationHeader: deriveSessionAuthorization({
+      sessionKey: userData1.sessionKey,
+    }).authorization,
   });
   expect(deleteCommentRepliesResult.deleteCommentReplies.status).toBe(
     "success"
@@ -205,7 +221,9 @@ test("commentor tries to delete other reply", async () => {
     creatorDevice: userData2.webDevice,
     creatorDeviceSigningPrivateKey: userData2.webDevice.signingPrivateKey,
     creatorDeviceEncryptionPrivateKey: userData2.webDevice.encryptionPrivateKey,
-    authorizationHeader: userData2.sessionKey,
+    authorizationHeader: deriveSessionAuthorization({
+      sessionKey: userData2.sessionKey,
+    }).authorization,
     documentId: userData1.document.id,
   });
   const commentReply = commentReplyResult.createCommentReply.commentReply;
@@ -214,7 +232,9 @@ test("commentor tries to delete other reply", async () => {
       await deleteCommentReplies({
         graphql,
         commentReplyIds: [commentReply.id],
-        authorizationHeader: userData1.sessionKey,
+        authorizationHeader: deriveSessionAuthorization({
+          sessionKey: userData1.sessionKey,
+        }).authorization,
       });
     })()
   ).rejects.toThrowError(/BAD_USER_INPUT/);
@@ -239,7 +259,9 @@ test("viewer tries to delete other reply", async () => {
     creatorDevice: userData2.webDevice,
     creatorDeviceSigningPrivateKey: userData2.webDevice.signingPrivateKey,
     creatorDeviceEncryptionPrivateKey: userData2.webDevice.encryptionPrivateKey,
-    authorizationHeader: userData2.sessionKey,
+    authorizationHeader: deriveSessionAuthorization({
+      sessionKey: userData2.sessionKey,
+    }).authorization,
     documentId: userData1.document.id,
   });
   const commentReply = commentReplyResult.createCommentReply.commentReply;
@@ -248,7 +270,9 @@ test("viewer tries to delete other reply", async () => {
       await deleteCommentReplies({
         graphql,
         commentReplyIds: [commentReply.id],
-        authorizationHeader: userData1.sessionKey,
+        authorizationHeader: deriveSessionAuthorization({
+          sessionKey: userData1.sessionKey,
+        }).authorization,
       });
     })()
   ).rejects.toThrowError(/BAD_USER_INPUT/);
@@ -264,7 +288,9 @@ test("delete some replies", async () => {
     creatorDevice: userData2.webDevice,
     creatorDeviceSigningPrivateKey: userData2.webDevice.signingPrivateKey,
     creatorDeviceEncryptionPrivateKey: userData2.webDevice.encryptionPrivateKey,
-    authorizationHeader: userData2.sessionKey,
+    authorizationHeader: deriveSessionAuthorization({
+      sessionKey: userData2.sessionKey,
+    }).authorization,
     documentId: userData1.document.id,
   });
   const commentReply = commentReplyResult.createCommentReply.commentReply;
@@ -275,7 +301,9 @@ test("delete some replies", async () => {
   const deleteCommentRepliesResult = await deleteCommentReplies({
     graphql,
     commentReplyIds: [commentReply.id],
-    authorizationHeader: userData2.sessionKey,
+    authorizationHeader: deriveSessionAuthorization({
+      sessionKey: userData2.sessionKey,
+    }).authorization,
   });
   expect(deleteCommentRepliesResult.deleteCommentReplies.status).toBe(
     "success"
@@ -297,7 +325,9 @@ test("cant delete replies on outside document", async () => {
     creatorDevice: userData2.webDevice,
     creatorDeviceSigningPrivateKey: userData2.webDevice.signingPrivateKey,
     creatorDeviceEncryptionPrivateKey: userData2.webDevice.encryptionPrivateKey,
-    authorizationHeader: userData2.sessionKey,
+    authorizationHeader: deriveSessionAuthorization({
+      sessionKey: userData2.sessionKey,
+    }).authorization,
     documentId: userData1.document.id,
   });
   await prisma.usersToWorkspaces.deleteMany({
@@ -312,7 +342,9 @@ test("cant delete replies on outside document", async () => {
       await deleteCommentReplies({
         graphql,
         commentReplyIds: [commentReply.id],
-        authorizationHeader: userData2.sessionKey,
+        authorizationHeader: deriveSessionAuthorization({
+          sessionKey: userData2.sessionKey,
+        }).authorization,
       });
     })()
   ).rejects.toThrowError(/BAD_USER_INPUT/);
@@ -324,7 +356,9 @@ test("invalid reply", async () => {
       await deleteCommentReplies({
         graphql,
         commentReplyIds: ["bad-id"],
-        authorizationHeader: userData1.sessionKey,
+        authorizationHeader: deriveSessionAuthorization({
+          sessionKey: userData1.sessionKey,
+        }).authorization,
       });
     })()
   ).rejects.toThrowError(/BAD_USER_INPUT/);
@@ -338,7 +372,9 @@ test("no replies", async () => {
   const deleteCommentRepliesResult = await deleteCommentReplies({
     graphql,
     commentReplyIds: [],
-    authorizationHeader: userData2.sessionKey,
+    authorizationHeader: deriveSessionAuthorization({
+      sessionKey: userData2.sessionKey,
+    }).authorization,
   });
   expect(deleteCommentRepliesResult.deleteCommentReplies.status).toBe(
     "success"

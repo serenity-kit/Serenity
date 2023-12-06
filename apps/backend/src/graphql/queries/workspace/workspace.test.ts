@@ -1,3 +1,4 @@
+import { deriveSessionAuthorization } from "@serenity-tools/common";
 import deleteAllRecords from "../../../../test/helpers/deleteAllRecords";
 import setupGraphql from "../../../../test/helpers/setupGraphql";
 import { createInitialWorkspaceStructure } from "../../../../test/helpers/workspace/createInitialWorkspaceStructure";
@@ -35,7 +36,8 @@ const setup = async () => {
       },
       mainDevice: userData1.mainDevice,
       devices: [userData1.device, userData1.webDevice],
-      authorizationHeader: sessionKey,
+      authorizationHeader: deriveSessionAuthorization({ sessionKey })
+        .authorization,
     });
   otherWorkspace =
     createInitialWorkspaceStructureResult.createInitialWorkspaceStructure;
@@ -50,7 +52,8 @@ test("user should be able to get a workspace by id", async () => {
   const result = await getWorkspace({
     graphql,
     workspaceId: otherWorkspace.workspace.id,
-    authorizationHeader: sessionKey,
+    authorizationHeader: deriveSessionAuthorization({ sessionKey })
+      .authorization,
     deviceSigningPublicKey: device.signingPublicKey,
   });
   const workspace = result.workspace;
@@ -76,7 +79,8 @@ test("user should get a workspace without providing an id", async () => {
   const result = await getWorkspace({
     graphql,
     workspaceId: undefined,
-    authorizationHeader: sessionKey,
+    authorizationHeader: deriveSessionAuthorization({ sessionKey })
+      .authorization,
     deviceSigningPublicKey: device.signingPublicKey,
   });
   const workspace = result.workspace;
@@ -104,7 +108,8 @@ test("User should not be able to retrieve a workspace for another device", async
       await getWorkspace({
         graphql,
         workspaceId: undefined,
-        authorizationHeader: sessionKey,
+        authorizationHeader: deriveSessionAuthorization({ sessionKey })
+          .authorization,
         deviceSigningPublicKey: "abcd",
       }))()
   ).rejects.toThrowError(/Internal server error/);

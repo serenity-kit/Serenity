@@ -3,6 +3,7 @@ import {
   decryptFolderName,
   decryptWorkspaceKey,
   deriveKeysFromKeyDerivationTrace,
+  deriveSessionAuthorization,
   folderDerivedKeyContext,
   generateId,
 } from "@serenity-tools/common";
@@ -27,7 +28,9 @@ beforeAll(async () => {
 });
 
 test("create initial workspace structure", async () => {
-  const authorizationHeader = userData1.sessionKey;
+  const authorizationHeader = deriveSessionAuthorization({
+    sessionKey: userData1.sessionKey,
+  }).authorization;
   const workspaceName = "My Workspace";
   const result = await createInitialWorkspaceStructure({
     graphql,
@@ -210,7 +213,11 @@ test("Invalid workspace infoCiphertext", async () => {
             creatorDeviceSigningPublicKey: "",
           },
         },
-        { authorization: userData1.sessionKey }
+        {
+          authorization: deriveSessionAuthorization({
+            sessionKey: userData1.sessionKey,
+          }).authorization,
+        }
       ))()
   ).rejects.toThrowError(/BAD_USER_INPUT/);
 });
@@ -247,7 +254,11 @@ test("Invalid workspace id", async () => {
             creatorDeviceSigningPublicKey: "",
           },
         },
-        { authorization: userData1.sessionKey }
+        {
+          authorization: deriveSessionAuthorization({
+            sessionKey: userData1.sessionKey,
+          }).authorization,
+        }
       ))()
   ).rejects.toThrowError(/BAD_USER_INPUT/);
 });
@@ -284,7 +295,11 @@ test("Invalid folder id", async () => {
             creatorDeviceSigningPublicKey: "",
           },
         },
-        { authorization: userData1.sessionKey }
+        {
+          authorization: deriveSessionAuthorization({
+            sessionKey: userData1.sessionKey,
+          }).authorization,
+        }
       ))()
   ).rejects.toThrowError(/BAD_USER_INPUT/);
 });
@@ -321,7 +336,11 @@ test("Invalid folder name", async () => {
             creatorDeviceSigningPublicKey: "",
           },
         },
-        { authorization: userData1.sessionKey }
+        {
+          authorization: deriveSessionAuthorization({
+            sessionKey: userData1.sessionKey,
+          }).authorization,
+        }
       ))()
   ).rejects.toThrowError(/BAD_USER_INPUT/);
 });
@@ -358,7 +377,11 @@ test("Invalid folder nonce", async () => {
             creatorDeviceSigningPublicKey: "",
           },
         },
-        { authorization: userData1.sessionKey }
+        {
+          authorization: deriveSessionAuthorization({
+            sessionKey: userData1.sessionKey,
+          }).authorization,
+        }
       ))()
   ).rejects.toThrowError(/BAD_USER_INPUT/);
 });
@@ -391,7 +414,11 @@ test("Invalid folder trace", async () => {
             creatorDeviceSigningPublicKey: "",
           },
         },
-        { authorization: userData1.sessionKey }
+        {
+          authorization: deriveSessionAuthorization({
+            sessionKey: userData1.sessionKey,
+          }).authorization,
+        }
       ))()
   ).rejects.toThrowError(/BAD_USER_INPUT/);
 });
@@ -428,7 +455,11 @@ test("Invalid document id", async () => {
             creatorDeviceSigningPublicKey: "",
           },
         },
-        { authorization: userData1.sessionKey }
+        {
+          authorization: deriveSessionAuthorization({
+            sessionKey: userData1.sessionKey,
+          }).authorization,
+        }
       ))()
   ).rejects.toThrowError(/BAD_USER_INPUT/);
 });
@@ -465,7 +496,11 @@ test("Invalid document name", async () => {
             creatorDeviceSigningPublicKey: "",
           },
         },
-        { authorization: userData1.sessionKey }
+        {
+          authorization: deriveSessionAuthorization({
+            sessionKey: userData1.sessionKey,
+          }).authorization,
+        }
       ))()
   ).rejects.toThrowError(/BAD_USER_INPUT/);
 });
@@ -502,7 +537,11 @@ test("Invalid document nonce", async () => {
             creatorDeviceSigningPublicKey: "",
           },
         },
-        { authorization: userData1.sessionKey }
+        {
+          authorization: deriveSessionAuthorization({
+            sessionKey: userData1.sessionKey,
+          }).authorization,
+        }
       ))()
   ).rejects.toThrowError(/BAD_USER_INPUT/);
 });
@@ -539,7 +578,11 @@ test("Invalid subkeyId", async () => {
             creatorDeviceSigningPublicKey: "",
           },
         },
-        { authorization: userData1.sessionKey }
+        {
+          authorization: deriveSessionAuthorization({
+            sessionKey: userData1.sessionKey,
+          }).authorization,
+        }
       ))()
   ).rejects.toThrowError(/BAD_USER_INPUT/);
 });
@@ -576,7 +619,11 @@ test("Invalid creator device", async () => {
             creatorDeviceSigningPublicKey: null,
           },
         },
-        { authorization: userData1.sessionKey }
+        {
+          authorization: deriveSessionAuthorization({
+            sessionKey: userData1.sessionKey,
+          }).authorization,
+        }
       ))()
   ).rejects.toThrowError(/BAD_USER_INPUT/);
 });
@@ -613,7 +660,11 @@ test("creator device must belong to user", async () => {
             creatorDeviceSigningPublicKey: "invalid-device-public-key",
           },
         },
-        { authorization: userData1.sessionKey }
+        {
+          authorization: deriveSessionAuthorization({
+            sessionKey: userData1.sessionKey,
+          }).authorization,
+        }
       ))()
   ).rejects.toThrowError(/BAD_USER_INPUT/);
 });

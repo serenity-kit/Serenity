@@ -1,4 +1,4 @@
-import { generateId } from "@serenity-tools/common";
+import { deriveSessionAuthorization, generateId } from "@serenity-tools/common";
 import { gql } from "graphql-request";
 import deleteAllRecords from "../../../../test/helpers/deleteAllRecords";
 import setupGraphql from "../../../../test/helpers/setupGraphql";
@@ -61,7 +61,9 @@ const setup = async () => {
     },
     mainDevice: userData1.mainDevice,
     devices: [userData1.device, userData1.webDevice],
-    authorizationHeader: userData1.sessionKey,
+    authorizationHeader: deriveSessionAuthorization({
+      sessionKey: userData1.sessionKey,
+    }).authorization,
   });
   otherWorkspaceStructure =
     createWorkspaceResult.createInitialWorkspaceStructure;
@@ -74,7 +76,9 @@ beforeAll(async () => {
 
 test("user should be able to get their username", async () => {
   const result = await graphql.client.request(meQuery, null, {
-    authorization: userData1.sessionKey,
+    authorization: deriveSessionAuthorization({
+      sessionKey: userData1.sessionKey,
+    }).authorization,
   });
   expect(result.me.id).toEqual(userData1.user.id);
   expect(result.me.username).toEqual(userData1.user.username);
@@ -89,7 +93,11 @@ test("should be able to get the workspaceLoadingInfo with a defined workspaceId 
       returnOtherWorkspaceIfNotFound: false,
       returnOtherDocumentIfNotFound: false,
     },
-    { authorization: userData1.sessionKey }
+    {
+      authorization: deriveSessionAuthorization({
+        sessionKey: userData1.sessionKey,
+      }).authorization,
+    }
   );
   expect(result.me.workspaceLoadingInfo).toMatchInlineSnapshot(`
     {
@@ -109,7 +117,11 @@ test("should get the fallback workspace if the workspaceId is not available and 
       returnOtherWorkspaceIfNotFound: true,
       returnOtherDocumentIfNotFound: true,
     },
-    { authorization: userData1.sessionKey }
+    {
+      authorization: deriveSessionAuthorization({
+        sessionKey: userData1.sessionKey,
+      }).authorization,
+    }
   );
   expect(result.me.workspaceLoadingInfo).toMatchInlineSnapshot(`
     {
@@ -129,7 +141,11 @@ test("should get no workspace if the workspaceId is not available and return oth
       returnOtherWorkspaceIfNotFound: false,
       returnOtherDocumentIfNotFound: false,
     },
-    { authorization: userData1.sessionKey }
+    {
+      authorization: deriveSessionAuthorization({
+        sessionKey: userData1.sessionKey,
+      }).authorization,
+    }
   );
   expect(result.me.workspaceLoadingInfo).toBe(null);
 });
@@ -142,7 +158,11 @@ test("should be able to get the workspaceLoadingInfo, but another documentId if 
       documentId: "abc",
       returnOtherDocumentIfNotFound: true,
     },
-    { authorization: userData1.sessionKey }
+    {
+      authorization: deriveSessionAuthorization({
+        sessionKey: userData1.sessionKey,
+      }).authorization,
+    }
   );
   expect(result.me.workspaceLoadingInfo).toMatchInlineSnapshot(`
     {
@@ -161,7 +181,11 @@ test("should get the workspaceLoadingInfo, but no documentId if the provided doc
       documentId: "abc",
       returnOtherDocumentIfNotFound: false,
     },
-    { authorization: userData1.sessionKey }
+    {
+      authorization: deriveSessionAuthorization({
+        sessionKey: userData1.sessionKey,
+      }).authorization,
+    }
   );
   expect(result.me.workspaceLoadingInfo).toMatchInlineSnapshot(`
     {
@@ -180,7 +204,11 @@ test("documentId provided but not the workspaceId", async () => {
         {
           documentId: userData1.document.id,
         },
-        { authorization: userData1.sessionKey }
+        {
+          authorization: deriveSessionAuthorization({
+            sessionKey: userData1.sessionKey,
+          }).authorization,
+        }
       ))()
   ).rejects.toThrowError(/BAD_USER_INPUT/);
 });

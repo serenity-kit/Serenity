@@ -3,6 +3,7 @@ import {
   SerenitySnapshotPublicData,
   createSnapshotKey,
   decryptWorkspaceKey,
+  deriveSessionAuthorization,
   folderDerivedKeyContext,
   snapshotDerivedKeyContext,
 } from "@serenity-tools/common";
@@ -71,7 +72,8 @@ const setup = async () => {
     parentFolderId: addedFolder.id,
     workspaceId,
     activeDevice: result.webDevice,
-    authorizationHeader: sessionKey,
+    authorizationHeader: deriveSessionAuthorization({ sessionKey })
+      .authorization,
   });
   documentId = createDocumentResult.createDocument.id;
 };
@@ -131,7 +133,11 @@ test("document-error if no valid session key is provided", async () => {
 test("successfully retrieves a document", async () => {
   const { client, messages } = await createSocketClient(
     graphql.port,
-    `/${documentId}?sessionKey=${sessionKey}`,
+    `/${documentId}?sessionKey=${
+      deriveSessionAuthorization({
+        sessionKey,
+      }).authorization
+    }`,
     1
   );
   await waitForClientState(client, client.CLOSED);
@@ -145,7 +151,11 @@ test("successfully creates a snapshot", async () => {
 
   const { client, messages } = await createSocketClient(
     graphql.port,
-    `/${documentId}?sessionKey=${sessionKey}`,
+    `/${documentId}?sessionKey=${
+      deriveSessionAuthorization({
+        sessionKey,
+      }).authorization
+    }`,
     2
   );
 
@@ -216,7 +226,11 @@ test("successfully creates a snapshot", async () => {
 test("successfully creates an update", async () => {
   const { client, messages } = await createSocketClient(
     graphql.port,
-    `/${documentId}?sessionKey=${sessionKey}`,
+    `/${documentId}?sessionKey=${
+      deriveSessionAuthorization({
+        sessionKey,
+      }).authorization
+    }`,
     2
   );
 

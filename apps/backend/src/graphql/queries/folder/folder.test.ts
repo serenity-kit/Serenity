@@ -1,5 +1,6 @@
 import {
   decryptWorkspaceKey,
+  deriveSessionAuthorization,
   folderDerivedKeyContext,
   generateId,
 } from "@serenity-tools/common";
@@ -46,7 +47,9 @@ beforeAll(async () => {
 });
 
 test("user should be retrieve a folder", async () => {
-  const authorizationHeader = sessionKey;
+  const authorizationHeader = deriveSessionAuthorization({
+    sessionKey,
+  }).authorization;
   const folderId = generateId();
   const folderName = "New folder";
   await createFolder({
@@ -87,7 +90,8 @@ test("Input Errors", async () => {
       await getFolder({
         graphql,
         id: "",
-        authorizationHeader: sessionKey,
+        authorizationHeader: deriveSessionAuthorization({ sessionKey })
+          .authorization,
       }))()
   ).rejects.toThrowError(/BAD_USER_INPUT/);
 });

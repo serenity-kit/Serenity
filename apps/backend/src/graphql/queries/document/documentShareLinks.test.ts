@@ -1,6 +1,7 @@
 import {
   createSnapshotKey,
   deriveKeysFromKeyDerivationTrace,
+  deriveSessionAuthorization,
   generateId,
 } from "@serenity-tools/common";
 import { gql } from "graphql-request";
@@ -27,7 +28,9 @@ const setup = async () => {
   const getWorkspaceResult = await getWorkspace({
     graphql,
     workspaceId: userData1.workspace.id,
-    authorizationHeader: userData1.sessionKey,
+    authorizationHeader: deriveSessionAuthorization({
+      sessionKey: userData1.sessionKey,
+    }).authorization,
     deviceSigningPublicKey: userData1.webDevice.signingPublicKey,
   });
   user1Workspace = getWorkspaceResult.workspace;
@@ -57,14 +60,18 @@ test("list share link", async () => {
     sharingRole: Role.EDITOR,
     mainDevice: userData1.mainDevice,
     snapshotKey: snapshotKeyData.key,
-    authorizationHeader: userData1.sessionKey,
+    authorizationHeader: deriveSessionAuthorization({
+      sessionKey: userData1.sessionKey,
+    }).authorization,
   });
   const token =
     createDocumentShareLinkQueryResult.createDocumentShareLink.token;
 
   const documentShareLinks = await getDocumentShareLinks({
     documentId: userData1.document.id,
-    authorizationHeader: userData1.sessionKey,
+    authorizationHeader: deriveSessionAuthorization({
+      sessionKey: userData1.sessionKey,
+    }).authorization,
     graphql,
   });
 
@@ -81,7 +88,9 @@ test("User has no access to the workspace", async () => {
     (async () =>
       await getDocumentShareLinks({
         documentId: userData1.document.id,
-        authorizationHeader: otherUser.sessionKey,
+        authorizationHeader: deriveSessionAuthorization({
+          sessionKey: otherUser.sessionKey,
+        }).authorization,
         graphql,
       }))()
   ).rejects.toThrowError("Unauthorized");
@@ -123,7 +132,11 @@ describe("Input errors", () => {
           {
             documentId: null,
           },
-          { authorization: userData1.sessionKey }
+          {
+            authorization: deriveSessionAuthorization({
+              sessionKey: userData1.sessionKey,
+            }).authorization,
+          }
         ))()
     ).rejects.toThrowError(/BAD_USER_INPUT/);
   });
@@ -137,7 +150,11 @@ describe("Input errors", () => {
             documentId: userData1.document.id,
             first: 51,
           },
-          { authorization: userData1.sessionKey }
+          {
+            authorization: deriveSessionAuthorization({
+              sessionKey: userData1.sessionKey,
+            }).authorization,
+          }
         ))()
     ).rejects.toThrowError(/BAD_USER_INPUT/);
   });

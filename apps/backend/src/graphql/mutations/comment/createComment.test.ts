@@ -1,4 +1,4 @@
-import { generateId } from "@serenity-tools/common";
+import { deriveSessionAuthorization, generateId } from "@serenity-tools/common";
 import { gql } from "graphql-request";
 import sodium from "react-native-libsodium";
 import { Role } from "../../../../prisma/generated/output";
@@ -39,7 +39,9 @@ test("owner comments", async () => {
     creatorDevice: userData1.webDevice,
     creatorDeviceEncryptionPrivateKey: userData1.webDevice.encryptionPrivateKey,
     creatorDeviceSigningPrivateKey: userData1.webDevice.signingPrivateKey,
-    authorizationHeader: userData1.sessionKey,
+    authorizationHeader: deriveSessionAuthorization({
+      sessionKey: userData1.sessionKey,
+    }).authorization,
     documentId: documentId1,
   });
   const comment = createCommentResult.createComment.comment;
@@ -69,7 +71,9 @@ test("shared editor comments", async () => {
     sharingRole: Role.EDITOR,
     mainDevice: userData1.mainDevice,
     snapshotKey,
-    authorizationHeader: userData1.sessionKey,
+    authorizationHeader: deriveSessionAuthorization({
+      sessionKey: userData1.sessionKey,
+    }).authorization,
   });
   const documentShareLinkToken =
     createDocumentShareLinkQueryResult.createDocumentShareLink.token;
@@ -82,7 +86,9 @@ test("shared editor comments", async () => {
     creatorDeviceEncryptionPrivateKey: userData2.webDevice.encryptionPrivateKey,
     creatorDeviceSigningPrivateKey: userData2.webDevice.signingPrivateKey,
     documentShareLinkToken,
-    authorizationHeader: userData2.sessionKey,
+    authorizationHeader: deriveSessionAuthorization({
+      sessionKey: userData2.sessionKey,
+    }).authorization,
     documentId: userData1.document.id,
   });
   const comment = createCommentResult.createComment.comment;
@@ -111,7 +117,9 @@ test("shared commentor comments", async () => {
     sharingRole: Role.COMMENTER,
     mainDevice: userData1.mainDevice,
     snapshotKey,
-    authorizationHeader: userData1.sessionKey,
+    authorizationHeader: deriveSessionAuthorization({
+      sessionKey: userData1.sessionKey,
+    }).authorization,
   });
   const documentShareLinkToken =
     createDocumentShareLinkQueryResult.createDocumentShareLink.token;
@@ -124,7 +132,9 @@ test("shared commentor comments", async () => {
     creatorDeviceEncryptionPrivateKey: userData2.webDevice.encryptionPrivateKey,
     creatorDeviceSigningPrivateKey: userData2.webDevice.signingPrivateKey,
     documentShareLinkToken,
-    authorizationHeader: userData2.sessionKey,
+    authorizationHeader: deriveSessionAuthorization({
+      sessionKey: userData2.sessionKey,
+    }).authorization,
     documentId: userData1.document.id,
   });
   const comment = createCommentResult.createComment.comment;
@@ -153,7 +163,9 @@ test("shared viewer cannot comment", async () => {
     sharingRole: Role.VIEWER,
     mainDevice: userData1.mainDevice,
     snapshotKey,
-    authorizationHeader: userData1.sessionKey,
+    authorizationHeader: deriveSessionAuthorization({
+      sessionKey: userData1.sessionKey,
+    }).authorization,
   });
   const documentShareLinkToken =
     createDocumentShareLinkQueryResult.createDocumentShareLink.token;
@@ -168,7 +180,9 @@ test("shared viewer cannot comment", async () => {
         creatorDeviceEncryptionPrivateKey: userData2.deviceEncryptionPrivateKey,
         creatorDeviceSigningPrivateKey: userData2.deviceSigningPrivateKey,
         documentShareLinkToken,
-        authorizationHeader: userData2.sessionKey,
+        authorizationHeader: deriveSessionAuthorization({
+          sessionKey: userData2.sessionKey,
+        }).authorization,
         documentId: userData1.document.id,
       }))()
   ).rejects.toThrowError(/BAD_USER_INPUT/);
@@ -192,7 +206,9 @@ test("admin comments", async () => {
     creatorDevice: userData1.webDevice,
     creatorDeviceEncryptionPrivateKey: userData1.webDevice.encryptionPrivateKey,
     creatorDeviceSigningPrivateKey: userData1.webDevice.signingPrivateKey,
-    authorizationHeader: userData1.sessionKey,
+    authorizationHeader: deriveSessionAuthorization({
+      sessionKey: userData1.sessionKey,
+    }).authorization,
     documentId: userData1.document.id,
   });
   const comment = createCommentResult.createComment.comment;
@@ -227,7 +243,9 @@ test("editor comments", async () => {
     creatorDevice: userData1.webDevice,
     creatorDeviceEncryptionPrivateKey: userData1.webDevice.encryptionPrivateKey,
     creatorDeviceSigningPrivateKey: userData1.webDevice.signingPrivateKey,
-    authorizationHeader: userData1.sessionKey,
+    authorizationHeader: deriveSessionAuthorization({
+      sessionKey: userData1.sessionKey,
+    }).authorization,
     documentId: userData1.document.id,
   });
   const comment = createCommentResult.createComment.comment;
@@ -262,7 +280,9 @@ test("commenter comment", async () => {
     creatorDevice: userData1.webDevice,
     creatorDeviceEncryptionPrivateKey: userData1.webDevice.encryptionPrivateKey,
     creatorDeviceSigningPrivateKey: userData1.webDevice.signingPrivateKey,
-    authorizationHeader: userData1.sessionKey,
+    authorizationHeader: deriveSessionAuthorization({
+      sessionKey: userData1.sessionKey,
+    }).authorization,
     documentId: userData1.document.id,
   });
   const comment = createCommentResult.createComment.comment;
@@ -300,7 +320,9 @@ test("viewer tries to comment", async () => {
         creatorDeviceEncryptionPrivateKey:
           userData1.webDevice.encryptionPrivateKey,
         creatorDeviceSigningPrivateKey: userData1.webDevice.signingPrivateKey,
-        authorizationHeader: userData1.sessionKey,
+        authorizationHeader: deriveSessionAuthorization({
+          sessionKey: userData1.sessionKey,
+        }).authorization,
         documentId: userData1.document.id,
       }))()
   ).rejects.toThrowError("Unauthorized");
@@ -321,7 +343,9 @@ test("unauthorized document", async () => {
         creatorDevice: otherUser.webDevice,
         creatorDeviceEncryptionPrivateKey: otherUser.deviceEncryptionPrivateKey,
         creatorDeviceSigningPrivateKey: otherUser.deviceSigningPrivateKey,
-        authorizationHeader: otherUser.sessionKey,
+        authorizationHeader: deriveSessionAuthorization({
+          sessionKey: otherUser.sessionKey,
+        }).authorization,
         documentId: userData1.document.id,
       }))()
   ).rejects.toThrowError("Unauthorized");
@@ -340,7 +364,9 @@ test("invalid document", async () => {
         creatorDeviceEncryptionPrivateKey:
           userData1.webDevice.encryptionPrivateKey,
         creatorDeviceSigningPrivateKey: userData1.webDevice.signingPrivateKey,
-        authorizationHeader: userData1.sessionKey,
+        authorizationHeader: deriveSessionAuthorization({
+          sessionKey: userData1.sessionKey,
+        }).authorization,
         documentId: userData1.document.id,
       }))()
   ).rejects.toThrowError("Unauthorized");
@@ -366,7 +392,7 @@ test("Unauthenticated", async () => {
 
 describe("Input errors", () => {
   const authorizationHeaders = {
-    authorization: sessionKey,
+    authorization: deriveSessionAuthorization({ sessionKey }).authorization,
   };
   const query = gql`
     mutation createComment($input: CreateCommentInput!) {

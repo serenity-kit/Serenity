@@ -1,7 +1,12 @@
 import { client, ready as opaqueReady } from "@serenity-kit/opaque";
 import * as userChain from "@serenity-kit/user-chain";
 import * as workspaceMemberDevicesProofUtil from "@serenity-kit/workspace-member-devices-proof";
-import { LocalDevice, createDevice, generateId } from "@serenity-tools/common";
+import {
+  LocalDevice,
+  createDevice,
+  deriveSessionAuthorization,
+  generateId,
+} from "@serenity-tools/common";
 import { gql } from "graphql-request";
 import sodium from "react-native-libsodium";
 import { prisma } from "../../../src/database/prisma";
@@ -157,7 +162,10 @@ export const loginUser = async ({
     }
   `;
 
-  graphql.client.setHeader("authorization", sessionKey);
+  graphql.client.setHeader(
+    "authorization",
+    deriveSessionAuthorization({ sessionKey }).authorization
+  );
   await graphql.client.request(addDeviceQuery, {
     input: {
       loginId: startLoginResult.data.loginId,

@@ -1,6 +1,7 @@
 import {
   createSnapshotKey,
   decryptWorkspaceKey,
+  deriveSessionAuthorization,
   encryptWorkspaceKeyForDevice,
   folderDerivedKeyContext,
   LocalDevice,
@@ -92,7 +93,8 @@ const setup = async () => {
     parentFolderId: addedFolder.id,
     workspaceId,
     activeDevice: userAndWorkspaceData.webDevice,
-    authorizationHeader: sessionKey,
+    authorizationHeader: deriveSessionAuthorization({ sessionKey })
+      .authorization,
   });
   documentId = createDocumentResult.createDocument.id;
 
@@ -116,7 +118,11 @@ test("successfully creates a snapshot", async () => {
 
   const { client, messages } = await createSocketClient(
     graphql.port,
-    `/${documentId}?sessionKey=${sessionKey}`,
+    `/${documentId}?sessionKey=${
+      deriveSessionAuthorization({
+        sessionKey,
+      }).authorization
+    }`,
     2
   );
 
@@ -187,7 +193,11 @@ test("successfully creates a snapshot", async () => {
 test("successfully creates an update", async () => {
   const { client, messages } = await createSocketClient(
     graphql.port,
-    `/${documentId}?sessionKey=${sessionKey}`,
+    `/${documentId}?sessionKey=${
+      deriveSessionAuthorization({
+        sessionKey,
+      }).authorization
+    }`,
     2
   );
 
@@ -222,7 +232,9 @@ test("successfully creates an update", async () => {
 });
 
 test("delete a device", async () => {
-  const authorizationHeader = sessionKey;
+  const authorizationHeader = deriveSessionAuthorization({
+    sessionKey,
+  }).authorization;
 
   const workspaceKeyBox1 = encryptWorkspaceKeyForDevice({
     receiverDeviceEncryptionPublicKey: device!.encryptionPublicKey,
@@ -270,7 +282,11 @@ test("delete a device", async () => {
 test("document update will fail", async () => {
   const { client, messages } = await createSocketClient(
     graphql.port,
-    `/${documentId}?sessionKey=${sessionKey}`,
+    `/${documentId}?sessionKey=${
+      deriveSessionAuthorization({
+        sessionKey,
+      }).authorization
+    }`,
     2
   );
 
@@ -308,7 +324,11 @@ test("document update will fail", async () => {
 test("snapshot based on old workspace key fails", async () => {
   const { client, messages } = await createSocketClient(
     graphql.port,
-    `/${documentId}?sessionKey=${sessionKey}`,
+    `/${documentId}?sessionKey=${
+      deriveSessionAuthorization({
+        sessionKey,
+      }).authorization
+    }`,
     2
   );
 
@@ -379,7 +399,11 @@ test("snapshot based on old workspace key fails", async () => {
 test("successfully creates a snapshot", async () => {
   const { client, messages } = await createSocketClient(
     graphql.port,
-    `/${documentId}?sessionKey=${sessionKey}`,
+    `/${documentId}?sessionKey=${
+      deriveSessionAuthorization({
+        sessionKey,
+      }).authorization
+    }`,
     2
   );
 
@@ -388,7 +412,8 @@ test("successfully creates a snapshot", async () => {
   const workspaceResult = await getWorkspace({
     graphql,
     workspaceId,
-    authorizationHeader: sessionKey,
+    authorizationHeader: deriveSessionAuthorization({ sessionKey })
+      .authorization,
     deviceSigningPublicKey: device!.signingPublicKey,
   });
 
@@ -479,7 +504,11 @@ test("successfully creates a snapshot", async () => {
 test("successfully creates an update", async () => {
   const { client, messages } = await createSocketClient(
     graphql.port,
-    `/${documentId}?sessionKey=${sessionKey}`,
+    `/${documentId}?sessionKey=${
+      deriveSessionAuthorization({
+        sessionKey,
+      }).authorization
+    }`,
     2
   );
 

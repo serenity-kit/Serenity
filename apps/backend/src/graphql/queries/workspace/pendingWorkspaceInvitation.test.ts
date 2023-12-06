@@ -1,3 +1,4 @@
+import { deriveSessionAuthorization } from "@serenity-tools/common";
 import { gql } from "graphql-request";
 import { registerUser } from "../../../../test/helpers/authentication/registerUser";
 import deleteAllRecords from "../../../../test/helpers/deleteAllRecords";
@@ -16,7 +17,9 @@ beforeAll(async () => {
 test("user should be be able to get their pending workspace invitation when null", async () => {
   const registerUser1Result = await registerUser(graphql, username, password);
   const sessionKey = registerUser1Result.sessionKey;
-  const authorizationHeader = { authorization: sessionKey };
+  const authorizationHeader = {
+    authorization: deriveSessionAuthorization({ sessionKey }).authorization,
+  };
   // get root folders from graphql
   const query = gql`
     {
@@ -41,7 +44,9 @@ test("user should be be able to get their pending workspace invitation", async (
     pendingWorkspaceInvitation2
   );
   const sessionKey = registerUser1Result.sessionKey;
-  const authorizationHeader = { authorization: sessionKey };
+  const authorizationHeader = {
+    authorization: deriveSessionAuthorization({ sessionKey }).authorization,
+  };
   // get root folders from graphql
   const query = gql`
     {

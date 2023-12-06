@@ -1,4 +1,4 @@
-import { generateId } from "@serenity-tools/common";
+import { deriveSessionAuthorization, generateId } from "@serenity-tools/common";
 import { gql } from "graphql-request";
 import { Role } from "../../../../prisma/generated/output";
 import { registerUser } from "../../../../test/helpers/authentication/registerUser";
@@ -27,7 +27,8 @@ const setup = async () => {
   const folder = userData1.folder;
   const createDocumentResult = await createDocument({
     graphql,
-    authorizationHeader: sessionKey,
+    authorizationHeader: deriveSessionAuthorization({ sessionKey })
+      .authorization,
     parentFolderId: folder.id,
     activeDevice: userData1.webDevice,
     workspaceId: addedWorkspace.id,
@@ -41,7 +42,9 @@ beforeAll(async () => {
 });
 
 test("user should be able to delete a document", async () => {
-  const authorizationHeader = sessionKey;
+  const authorizationHeader = deriveSessionAuthorization({
+    sessionKey,
+  }).authorization;
   const ids = [addedDocumentId];
   const result = await deleteDocuments({
     graphql,
@@ -57,7 +60,9 @@ test("user should be able to delete a document", async () => {
 });
 
 test("Deleting nonexistent document does nothing", async () => {
-  const authorizationHeader = sessionKey;
+  const authorizationHeader = deriveSessionAuthorization({
+    sessionKey,
+  }).authorization;
   const ids = ["badthing"];
   const result = await deleteDocuments({
     graphql,
@@ -92,7 +97,9 @@ test("commenter attempts to delete", async () => {
         graphql,
         ids,
         workspaceId: addedWorkspace.id,
-        authorizationHeader: otherUser.sessionKey,
+        authorizationHeader: deriveSessionAuthorization({
+          sessionKey: otherUser.sessionKey,
+        }).authorization,
       }))()
   ).rejects.toThrowError("Unauthorized");
 });
@@ -117,7 +124,9 @@ test("viewer attempts to delete", async () => {
         graphql,
         ids,
         workspaceId: addedWorkspace.id,
-        authorizationHeader: otherUser.sessionKey,
+        authorizationHeader: deriveSessionAuthorization({
+          sessionKey: otherUser.sessionKey,
+        }).authorization,
       }))()
   ).rejects.toThrowError("Unauthorized");
 });
@@ -137,7 +146,7 @@ test("Unauthenticated", async () => {
 
 describe("Input errors", () => {
   const authorizationHeaders = {
-    authorization: sessionKey,
+    authorization: deriveSessionAuthorization({ sessionKey }).authorization,
   };
   const id = generateId();
   const query = gql`

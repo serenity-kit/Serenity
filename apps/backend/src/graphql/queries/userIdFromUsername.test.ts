@@ -1,3 +1,4 @@
+import { deriveSessionAuthorization } from "@serenity-tools/common";
 import { gql } from "graphql-request";
 import { registerUser } from "../../../test/helpers/authentication/registerUser";
 import deleteAllRecords from "../../../test/helpers/deleteAllRecords";
@@ -22,7 +23,9 @@ beforeAll(async () => {
 });
 
 test("can retrieve a user by username", async () => {
-  const authorizationHeader = { authorization: sessionKey };
+  const authorizationHeader = {
+    authorization: deriveSessionAuthorization({ sessionKey }).authorization,
+  };
   // get root folders from graphql
   const query = gql`
     {
@@ -36,7 +39,9 @@ test("can retrieve a user by username", async () => {
 });
 
 test("can't retrieve a non-existant user", async () => {
-  const authorizationHeader = { authorization: sessionKey };
+  const authorizationHeader = {
+    authorization: deriveSessionAuthorization({ sessionKey }).authorization,
+  };
   const query = gql`
     {
       userIdFromUsername(username: "${username2}") {
@@ -67,7 +72,9 @@ test("Unauthenticated", async () => {
 
 describe("Input errors", () => {
   test("Invalid input", async () => {
-    const authorizationHeader = { authorization: sessionKey };
+    const authorizationHeader = {
+      authorization: deriveSessionAuthorization({ sessionKey }).authorization,
+    };
     const query1 = gql`
       {
         userIdFromUsername(username: "") {
@@ -81,7 +88,9 @@ describe("Input errors", () => {
     ).rejects.toThrowError(/BAD_USER_INPUT/);
   });
   test("Invalid username", async () => {
-    const authorizationHeader = { authorization: sessionKey };
+    const authorizationHeader = {
+      authorization: deriveSessionAuthorization({ sessionKey }).authorization,
+    };
     const query2 = gql`
       {
         userIdFromUsername(username: "nouser") {

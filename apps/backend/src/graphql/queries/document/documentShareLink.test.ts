@@ -1,6 +1,7 @@
 import {
   createSnapshotKey,
   deriveKeysFromKeyDerivationTrace,
+  deriveSessionAuthorization,
   generateId,
 } from "@serenity-tools/common";
 import { Role } from "../../../../prisma/generated/output";
@@ -23,7 +24,9 @@ const setup = async () => {
   const getWorkspaceResult = await getWorkspace({
     graphql,
     workspaceId: userData.workspace.id,
-    authorizationHeader: userData.sessionKey,
+    authorizationHeader: deriveSessionAuthorization({
+      sessionKey: userData.sessionKey,
+    }).authorization,
     deviceSigningPublicKey: userData.webDevice.signingPublicKey,
   });
   user1Workspace = getWorkspaceResult.workspace;
@@ -43,7 +46,9 @@ const setup = async () => {
     sharingRole: Role.VIEWER,
     mainDevice: userData.mainDevice,
     snapshotKey: snapshotKeyData.key,
-    authorizationHeader: userData.sessionKey,
+    authorizationHeader: deriveSessionAuthorization({
+      sessionKey: userData.sessionKey,
+    }).authorization,
   });
   token = createDocumentShareLinkQueryResult.createDocumentShareLink.token;
 };

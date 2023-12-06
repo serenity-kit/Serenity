@@ -2,6 +2,7 @@ import * as workspaceChain from "@serenity-kit/workspace-chain";
 import {
   decryptFolderName,
   deriveKeysFromKeyDerivationTrace,
+  deriveSessionAuthorization,
   encryptWorkspaceKeyForDevice,
   generateId,
 } from "@serenity-tools/common";
@@ -89,7 +90,9 @@ test("user cannot remove self", async () => {
         workspaceId: userData1.workspace.id,
         creatorDeviceSigningPublicKey: userData1.device.signingPublicKey,
         deviceWorkspaceKeyBoxes,
-        authorizationHeader: userData1.sessionKey,
+        authorizationHeader: deriveSessionAuthorization({
+          sessionKey: userData1.sessionKey,
+        }).authorization,
         workspaceChainEvent: removeMemberEvent,
         mainDevice: userData1.mainDevice,
         userIdToRemove: userData1.user.id,
@@ -107,7 +110,9 @@ test("user cannot revoke own main device", async () => {
     graphql,
     role: Role.VIEWER,
     workspaceId: userData1.workspace.id,
-    authorizationHeader: userData1.sessionKey,
+    authorizationHeader: deriveSessionAuthorization({
+      sessionKey: userData1.sessionKey,
+    }).authorization,
     mainDevice: userData1.mainDevice,
   });
   const invitationId =
@@ -118,7 +123,9 @@ test("user cannot revoke own main device", async () => {
     inviteeMainDevice: userData2.mainDevice,
     invitationSigningKeyPairSeed:
       workspaceInvitationResult.invitationSigningKeyPairSeed,
-    authorizationHeader: userData2.sessionKey,
+    authorizationHeader: deriveSessionAuthorization({
+      sessionKey: userData2.sessionKey,
+    }).authorization,
   });
 
   const loginResult = await createDeviceAndLogin({
@@ -163,7 +170,9 @@ test("user cannot revoke own main device", async () => {
         workspaceId: userData1.workspace.id,
         creatorDeviceSigningPublicKey: userData1.device.signingPublicKey,
         deviceWorkspaceKeyBoxes,
-        authorizationHeader: userData1.sessionKey,
+        authorizationHeader: deriveSessionAuthorization({
+          sessionKey: userData1.sessionKey,
+        }).authorization,
         workspaceChainEvent: removeMemberEvent,
         mainDevice: userData1.mainDevice,
         userIdToRemove: userData2.user.id,
@@ -182,7 +191,9 @@ test("user can remove another user", async () => {
     graphql,
     role: Role.VIEWER,
     workspaceId: userData1.workspace.id,
-    authorizationHeader: userData1.sessionKey,
+    authorizationHeader: deriveSessionAuthorization({
+      sessionKey: userData1.sessionKey,
+    }).authorization,
     mainDevice: userData1.mainDevice,
   });
   const invitationId =
@@ -193,7 +204,9 @@ test("user can remove another user", async () => {
     inviteeMainDevice: userData2.mainDevice,
     invitationSigningKeyPairSeed:
       workspaceInvitationResult.invitationSigningKeyPairSeed,
-    authorizationHeader: userData2.sessionKey,
+    authorizationHeader: deriveSessionAuthorization({
+      sessionKey: userData2.sessionKey,
+    }).authorization,
   });
   const user2WebDeviceKeyBox = encryptWorkspaceKeyForDevice({
     receiverDeviceEncryptionPublicKey: userData1.webDevice.signingPublicKey,
@@ -246,7 +259,9 @@ test("user can remove another user", async () => {
     graphql,
     deviceSigningPublicKey: userData2.device.signingPublicKey,
     creatorDeviceSigningPublicKey: userData1.device.signingPublicKey,
-    authorizationHeader: userData1.sessionKey,
+    authorizationHeader: deriveSessionAuthorization({
+      sessionKey: userData1.sessionKey,
+    }).authorization,
     deviceWorkspaceKeyBoxes: approvedDeviceKeyBoxes,
   });
   const user1MainDeviceGen1 = encryptWorkspaceKeyForDevice({
@@ -309,7 +324,9 @@ test("user can remove another user", async () => {
     workspaceId: userData1.workspace.id,
     creatorDeviceSigningPublicKey: userData1.mainDevice.signingPublicKey,
     deviceWorkspaceKeyBoxes,
-    authorizationHeader: userData1.sessionKey,
+    authorizationHeader: deriveSessionAuthorization({
+      sessionKey: userData1.sessionKey,
+    }).authorization,
     workspaceChainEvent: removeMemberEvent,
     mainDevice: userData1.mainDevice,
     userIdToRemove: userData2.user.id,
@@ -362,7 +379,9 @@ test("user can remove another user", async () => {
     graphql,
     workspaceId: userData1.workspace.id,
     deviceSigningPublicKey: userData1.webDevice.signingPublicKey,
-    authorizationHeader: userData1.sessionKey,
+    authorizationHeader: deriveSessionAuthorization({
+      sessionKey: userData1.sessionKey,
+    }).authorization,
   });
 
   const workspace = workspaceResult.workspace;
@@ -390,7 +409,9 @@ test("user can remove another user", async () => {
     graphql,
     workspaceId: workspace.id,
     first: 50,
-    authorizationHeader: userData1.sessionKey,
+    authorizationHeader: deriveSessionAuthorization({
+      sessionKey: userData1.sessionKey,
+    }).authorization,
   });
   const firstFolder = rootFoldersResult.rootFolders.edges[0].node;
   // fetch the workspaceKey for the folder
@@ -429,7 +450,9 @@ test("user can rotate key for multiple devices", async () => {
     graphql,
     role: Role.VIEWER,
     workspaceId: userData1.workspace.id,
-    authorizationHeader: userData1.sessionKey,
+    authorizationHeader: deriveSessionAuthorization({
+      sessionKey: userData1.sessionKey,
+    }).authorization,
     mainDevice: userData1.mainDevice,
   });
   const invitationId =
@@ -440,7 +463,9 @@ test("user can rotate key for multiple devices", async () => {
     inviteeMainDevice: userData2.mainDevice,
     invitationSigningKeyPairSeed:
       workspaceInvitationResult.invitationSigningKeyPairSeed,
-    authorizationHeader: userData2.sessionKey,
+    authorizationHeader: deriveSessionAuthorization({
+      sessionKey: userData2.sessionKey,
+    }).authorization,
   });
   const user2DeviceKeyBox = encryptWorkspaceKeyForDevice({
     receiverDeviceEncryptionPublicKey: userData1.device.signingPublicKey,
@@ -465,7 +490,9 @@ test("user can rotate key for multiple devices", async () => {
     graphql,
     deviceSigningPublicKey: userData2.device.signingPublicKey,
     creatorDeviceSigningPublicKey: userData1.device.signingPublicKey,
-    authorizationHeader: userData1.sessionKey,
+    authorizationHeader: deriveSessionAuthorization({
+      sessionKey: userData1.sessionKey,
+    }).authorization,
     deviceWorkspaceKeyBoxes: user2DeviceKeyBoxes,
   });
   const workspaceUsersBefore = await prisma.usersToWorkspaces.findMany({
@@ -545,7 +572,9 @@ test("user can rotate key for multiple devices", async () => {
     workspaceId: userData1.workspace.id,
     creatorDeviceSigningPublicKey: userData1.device.signingPublicKey,
     deviceWorkspaceKeyBoxes,
-    authorizationHeader: userData1.sessionKey,
+    authorizationHeader: deriveSessionAuthorization({
+      sessionKey: userData1.sessionKey,
+    }).authorization,
     workspaceChainEvent: removeMemberEvent,
     mainDevice: userData1.mainDevice,
     userIdToRemove: userData2.user.id,
@@ -588,7 +617,9 @@ test("user can rotate key for multiple devices", async () => {
     graphql,
     workspaceId: userData1.workspace.id,
     deviceSigningPublicKey: userData1.device.signingPublicKey,
-    authorizationHeader: userData1.sessionKey,
+    authorizationHeader: deriveSessionAuthorization({
+      sessionKey: userData1.sessionKey,
+    }).authorization,
   });
 
   const workspace = workspaceResult.workspace;

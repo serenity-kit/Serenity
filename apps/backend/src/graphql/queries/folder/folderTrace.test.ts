@@ -1,4 +1,4 @@
-import { generateId } from "@serenity-tools/common";
+import { deriveSessionAuthorization, generateId } from "@serenity-tools/common";
 import deleteAllRecords from "../../../../test/helpers/deleteAllRecords";
 import { getWorkspaceKeyForWorkspaceAndDevice } from "../../../../test/helpers/device/getWorkspaceKeyForWorkspaceAndDevice";
 import { createFolder } from "../../../../test/helpers/folder/createFolder";
@@ -30,7 +30,9 @@ const setup = async () => {
     id: generateId(),
     parentKey: workspaceKey,
     parentFolderId: userData1.folder.id,
-    authorizationHeader: userData1.sessionKey,
+    authorizationHeader: deriveSessionAuthorization({
+      sessionKey: userData1.sessionKey,
+    }).authorization,
     workspaceId: userData1.workspace.id,
     workspaceKeyId: userData1.workspace.currentWorkspaceKey.id,
   });
@@ -41,7 +43,9 @@ const setup = async () => {
     id: generateId(),
     parentKey: workspaceKey,
     parentFolderId: childFolder.id,
-    authorizationHeader: userData1.sessionKey,
+    authorizationHeader: deriveSessionAuthorization({
+      sessionKey: userData1.sessionKey,
+    }).authorization,
     workspaceId: userData1.workspace.id,
     workspaceKeyId: userData1.workspace.currentWorkspaceKey.id,
   });
@@ -62,7 +66,9 @@ test("root folder", async () => {
   const result = await getFolderTrace({
     graphql,
     folderId: userData1.folder.id,
-    authorizationHeader: userData1.sessionKey,
+    authorizationHeader: deriveSessionAuthorization({
+      sessionKey: userData1.sessionKey,
+    }).authorization,
   });
   expect(result.folderTrace.length).toBe(1);
   const folder = result.folderTrace[0];
@@ -73,7 +79,9 @@ test("child folder", async () => {
   const result = await getFolderTrace({
     graphql,
     folderId: childFolder.id,
-    authorizationHeader: userData1.sessionKey,
+    authorizationHeader: deriveSessionAuthorization({
+      sessionKey: userData1.sessionKey,
+    }).authorization,
   });
   expect(result.folderTrace.length).toBe(2);
   const rootFolderTrace = result.folderTrace[0];
@@ -86,7 +94,9 @@ test("grandchild folder", async () => {
   const result = await getFolderTrace({
     graphql,
     folderId: grandChildFolder.id,
-    authorizationHeader: userData1.sessionKey,
+    authorizationHeader: deriveSessionAuthorization({
+      sessionKey: userData1.sessionKey,
+    }).authorization,
   });
   expect(result.folderTrace.length).toBe(3);
   const rootFolderTrace = result.folderTrace[0];
@@ -103,7 +113,9 @@ test("bad folderId", async () => {
       await getFolderTrace({
         graphql,
         folderId: "bad-folderId",
-        authorizationHeader: userData1.sessionKey,
+        authorizationHeader: deriveSessionAuthorization({
+          sessionKey: userData1.sessionKey,
+        }).authorization,
       }))()
   ).rejects.toThrow(/BAD_USER_INPUT/);
 });
@@ -114,7 +126,9 @@ test("no access to workspace", async () => {
       await getFolderTrace({
         graphql,
         folderId: userData1.folder.id,
-        authorizationHeader: userData2.sessionKey,
+        authorizationHeader: deriveSessionAuthorization({
+          sessionKey: userData2.sessionKey,
+        }).authorization,
       }))()
   ).rejects.toThrow(/FORBIDDEN/);
 });

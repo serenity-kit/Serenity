@@ -16,6 +16,7 @@ export * from "./decryptWorkspaceInfo/decryptWorkspaceInfo";
 export * from "./decryptWorkspaceInvitationKey/decryptWorkspaceInvitationKey";
 export * from "./decryptWorkspaceKey/decryptWorkspaceKey";
 export * from "./deriveKeysFromKeyDerivationTrace/deriveKeysFromKeyDerivationTrace";
+export * from "./deriveSessionAuthorization/deriveSessionAuthorization";
 export * from "./encryptAead/encryptAead";
 export * from "./encryptAndSignComment/encryptAndSignComment";
 export * from "./encryptAndSignCommentReply/encryptAndSignCommentReply";

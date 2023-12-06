@@ -1,6 +1,7 @@
 import {
   decryptWorkspaceKey,
   deriveKeysFromKeyDerivationTrace,
+  deriveSessionAuthorization,
   folderDerivedKeyContext,
   generateId,
   snapshotDerivedKeyContext,
@@ -94,7 +95,9 @@ beforeAll(async () => {
 });
 
 test("retrieve a snapshot", async () => {
-  const authorizationHeader = userData1.sessionKey;
+  const authorizationHeader = deriveSessionAuthorization({
+    sessionKey: userData1.sessionKey,
+  }).authorization;
   const result = await getSnapshot({
     graphql,
     documentId: userData1.document.id,
@@ -124,14 +127,18 @@ test("retrieve a snapshot", async () => {
 });
 
 test("retrieve a snapshot from documentShareLinkToken", async () => {
-  const authorizationHeader = userData1.sessionKey;
+  const authorizationHeader = deriveSessionAuthorization({
+    sessionKey: userData1.sessionKey,
+  }).authorization;
   const { createDocumentShareLinkQueryResult } = await createDocumentShareLink({
     graphql,
     documentId: userData1.document.id,
     sharingRole: Role.VIEWER,
     mainDevice: userData1.mainDevice,
     snapshotKey,
-    authorizationHeader: userData1.sessionKey,
+    authorizationHeader: deriveSessionAuthorization({
+      sessionKey: userData1.sessionKey,
+    }).authorization,
   });
   const result = await getSnapshot({
     graphql,
@@ -180,7 +187,8 @@ test("Input Errors", async () => {
       await getSnapshot({
         graphql,
         documentId: "",
-        authorizationHeader: sessionKey,
+        authorizationHeader: deriveSessionAuthorization({ sessionKey })
+          .authorization,
       }))()
   ).rejects.toThrowError(/BAD_USER_INPUT/);
 });

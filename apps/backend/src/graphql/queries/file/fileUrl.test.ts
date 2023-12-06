@@ -1,4 +1,4 @@
-import { generateId } from "@serenity-tools/common";
+import { deriveSessionAuthorization, generateId } from "@serenity-tools/common";
 import { gql } from "graphql-request";
 import { registerUser } from "../../../../test/helpers/authentication/registerUser";
 import deleteAllRecords from "../../../../test/helpers/deleteAllRecords";
@@ -22,7 +22,9 @@ const setup = async () => {
     graphql,
     documentId: userData.document.id,
     workspaceId: userData.workspace.id,
-    authorization: userData.sessionKey,
+    authorization: deriveSessionAuthorization({
+      sessionKey: userData.sessionKey,
+    }).authorization,
   });
   fileUploadData = fileUploadResult.initiateFileUpload;
 };
@@ -71,7 +73,9 @@ test("get file url", async () => {
     fileId: fileUploadData.fileId,
     documentId: userData.document.id,
     workspaceId: userData.workspace.id,
-    authorization: userData.sessionKey,
+    authorization: deriveSessionAuthorization({
+      sessionKey: userData.sessionKey,
+    }).authorization,
   });
   const fileUrl = result.fileUrl;
   expect(typeof fileUrl.id).toBe("string");
@@ -92,7 +96,9 @@ test("invalid access", async () => {
         fileId: fileUploadData.fileId,
         documentId: userData.document.id,
         workspaceId: userData.workspace.id,
-        authorization: otherUser.sessionKey,
+        authorization: deriveSessionAuthorization({
+          sessionKey: otherUser.sessionKey,
+        }).authorization,
       }))()
   ).rejects.toThrow("Unauthorized");
 });

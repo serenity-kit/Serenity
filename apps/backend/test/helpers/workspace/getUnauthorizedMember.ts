@@ -1,3 +1,4 @@
+import { deriveSessionAuthorization } from "@serenity-tools/common";
 import { gql } from "graphql-request";
 import { TestContext } from "../setupGraphql";
 
@@ -11,7 +12,9 @@ export const getUnauthorizedMember = async ({
   input,
   sessionKey,
 }: Props) => {
-  const authorizationHeader = { authorization: sessionKey };
+  const authorizationHeader = {
+    authorization: deriveSessionAuthorization({ sessionKey }).authorization,
+  };
   const query = gql`
     query unauthorizedMember {
       unauthorizedMember {

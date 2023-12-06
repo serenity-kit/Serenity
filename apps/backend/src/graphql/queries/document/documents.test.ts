@@ -1,4 +1,4 @@
-import { generateId } from "@serenity-tools/common";
+import { deriveSessionAuthorization, generateId } from "@serenity-tools/common";
 import { gql } from "graphql-request";
 import deleteAllRecords from "../../../../test/helpers/deleteAllRecords";
 import { getWorkspaceKeyForWorkspaceAndDevice } from "../../../../test/helpers/device/getWorkspaceKeyForWorkspaceAndDevice";
@@ -103,7 +103,9 @@ const setup = async () => {
     name: parentFolderName,
     parentFolderId: null,
     parentKey: workspaceKey,
-    authorizationHeader: userData1.sessionKey,
+    authorizationHeader: deriveSessionAuthorization({
+      sessionKey: userData1.sessionKey,
+    }).authorization,
     workspaceId: userData1.workspace.id,
     workspaceKeyId: userData1.workspace.currentWorkspaceKey.id,
   });
@@ -113,7 +115,9 @@ const setup = async () => {
     name: folderName,
     parentFolderId: parentFolderId,
     parentKey: workspaceKey,
-    authorizationHeader: userData1.sessionKey,
+    authorizationHeader: deriveSessionAuthorization({
+      sessionKey: userData1.sessionKey,
+    }).authorization,
     workspaceId: userData1.workspace.id,
     workspaceKeyId: userData1.workspace.currentWorkspaceKey.id,
   });
@@ -123,7 +127,9 @@ const setup = async () => {
     name: childFolderName,
     parentFolderId: folderId,
     parentKey: workspaceKey,
-    authorizationHeader: userData1.sessionKey,
+    authorizationHeader: deriveSessionAuthorization({
+      sessionKey: userData1.sessionKey,
+    }).authorization,
     workspaceId: userData1.workspace.id,
     workspaceKeyId: userData1.workspace.currentWorkspaceKey.id,
   });
@@ -145,7 +151,9 @@ const setup = async () => {
     name: otherFolderName,
     parentFolderId: null,
     parentKey: workspaceKey2,
-    authorizationHeader: userData2.sessionKey,
+    authorizationHeader: deriveSessionAuthorization({
+      sessionKey: userData2.sessionKey,
+    }).authorization,
     workspaceId: userData2.workspace.id,
     workspaceKeyId: userData2.workspace.currentWorkspaceKey.id,
   });
@@ -159,7 +167,9 @@ test("user should be able to list documents in a folder when empty", async () =>
   // get root folders from graphql
   const result = await getDocuments({
     graphql,
-    authorizationHeader: userData1.sessionKey,
+    authorizationHeader: deriveSessionAuthorization({
+      sessionKey: userData1.sessionKey,
+    }).authorization,
     parentFolderId,
     usingOldKeys: false,
   });
@@ -180,13 +190,17 @@ test("user should be able to list documents in a folder with one item", async ()
     parentFolderId,
     workspaceId: userData1.workspace.id,
     activeDevice: userData1.webDevice,
-    authorizationHeader: userData1.sessionKey,
+    authorizationHeader: deriveSessionAuthorization({
+      sessionKey: userData1.sessionKey,
+    }).authorization,
   });
   documentId1 = createDocumentResult.createDocument.id;
 
   const result = await getDocuments({
     graphql,
-    authorizationHeader: userData1.sessionKey,
+    authorizationHeader: deriveSessionAuthorization({
+      sessionKey: userData1.sessionKey,
+    }).authorization,
     parentFolderId,
     usingOldKeys: false,
   });
@@ -210,13 +224,17 @@ test("user should be able to list documents in a folder with multiple items", as
     parentFolderId,
     workspaceId: userData1.workspace.id,
     activeDevice: userData1.webDevice,
-    authorizationHeader: userData1.sessionKey,
+    authorizationHeader: deriveSessionAuthorization({
+      sessionKey: userData1.sessionKey,
+    }).authorization,
   });
   documentId2 = createDocumentResult.createDocument.id;
 
   const result = await getDocuments({
     graphql,
-    authorizationHeader: userData1.sessionKey,
+    authorizationHeader: deriveSessionAuthorization({
+      sessionKey: userData1.sessionKey,
+    }).authorization,
     parentFolderId,
     usingOldKeys: false,
   });
@@ -248,13 +266,17 @@ test("user should be able to list without showing subfolder documents", async ()
     parentFolderId: folderId,
     workspaceId: userData1.workspace.id,
     activeDevice: userData1.webDevice,
-    authorizationHeader: userData1.sessionKey,
+    authorizationHeader: deriveSessionAuthorization({
+      sessionKey: userData1.sessionKey,
+    }).authorization,
   });
   childDocumentId = createDocumentResult.createDocument.id;
 
   const result = await getDocuments({
     graphql,
-    authorizationHeader: userData1.sessionKey,
+    authorizationHeader: deriveSessionAuthorization({
+      sessionKey: userData1.sessionKey,
+    }).authorization,
     parentFolderId,
     usingOldKeys: false,
   });
@@ -283,7 +305,9 @@ test("user should be able to list without showing subfolder documents", async ()
 test("old workspace keys", async () => {
   const result = await getDocuments({
     graphql,
-    authorizationHeader: userData1.sessionKey,
+    authorizationHeader: deriveSessionAuthorization({
+      sessionKey: userData1.sessionKey,
+    }).authorization,
     parentFolderId,
     usingOldKeys: true,
   });
@@ -304,7 +328,9 @@ test("retrieving a folder that doesn't exist throws an error", async () => {
     (async () =>
       await getDocuments({
         graphql,
-        authorizationHeader: userData1.sessionKey,
+        authorizationHeader: deriveSessionAuthorization({
+          sessionKey: userData1.sessionKey,
+        }).authorization,
         parentFolderId: fakeFolderId,
         usingOldKeys: false,
       }))()
@@ -316,7 +342,9 @@ test("listing documents that the user doesn't own throws an error", async () => 
     (async () =>
       await getDocuments({
         graphql,
-        authorizationHeader: userData1.sessionKey,
+        authorizationHeader: deriveSessionAuthorization({
+          sessionKey: userData1.sessionKey,
+        }).authorization,
         parentFolderId: otherFolderId,
         usingOldKeys: false,
       }))()
@@ -349,7 +377,9 @@ test("Query too many", async () => {
 });
 
 describe("Input Errors", () => {
-  const authorizationHeader = { authorization: sessionKey };
+  const authorizationHeader = {
+    authorization: deriveSessionAuthorization({ sessionKey }).authorization,
+  };
   test("Invalid input", async () => {
     const query2 = gql`
       {

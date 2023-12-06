@@ -1,4 +1,4 @@
-import { generateId } from "@serenity-tools/common";
+import { deriveSessionAuthorization, generateId } from "@serenity-tools/common";
 import { gql } from "graphql-request";
 import deleteAllRecords from "../../../../test/helpers/deleteAllRecords";
 import { getWorkspaceKeyForWorkspaceAndDevice } from "../../../../test/helpers/device/getWorkspaceKeyForWorkspaceAndDevice";
@@ -89,7 +89,9 @@ const setup = async () => {
     parentKey: workspaceKey,
     workspaceId: userData1.workspace.id,
     workspaceKeyId: workspace.currentWorkspaceKey.id,
-    authorizationHeader: userData1.sessionKey,
+    authorizationHeader: deriveSessionAuthorization({
+      sessionKey: userData1.sessionKey,
+    }).authorization,
   });
 
   userData2 = await createUserWithWorkspace({
@@ -110,7 +112,9 @@ const setup = async () => {
     parentKey: workspaceKey2,
     workspaceId: userData2.workspace.id,
     workspaceKeyId: userData2.workspace.currentWorkspaceKey.id,
-    authorizationHeader: userData2.sessionKey,
+    authorizationHeader: deriveSessionAuthorization({
+      sessionKey: userData2.sessionKey,
+    }).authorization,
   });
 };
 
@@ -123,7 +127,9 @@ test("user should be able to list folders in a workspace when no subfoldes", asy
   const result = await getFolders({
     parentFolderId,
     usingOldKeys: false,
-    authorizationHeader: userData1.sessionKey,
+    authorizationHeader: deriveSessionAuthorization({
+      sessionKey: userData1.sessionKey,
+    }).authorization,
   });
   expect(result.folders.edges.length).toBe(0);
 });
@@ -137,12 +143,16 @@ test("user should be able to list folders in a workspace with one item", async (
     parentKey: workspaceKey,
     workspaceId: userData1.workspace.id,
     workspaceKeyId: userData1.workspace.currentWorkspaceKey.id,
-    authorizationHeader: userData1.sessionKey,
+    authorizationHeader: deriveSessionAuthorization({
+      sessionKey: userData1.sessionKey,
+    }).authorization,
   });
   const result = await getFolders({
     parentFolderId,
     usingOldKeys: false,
-    authorizationHeader: userData1.sessionKey,
+    authorizationHeader: deriveSessionAuthorization({
+      sessionKey: userData1.sessionKey,
+    }).authorization,
   });
   expect(result.folders.edges.length).toBe(1);
   result.folders.edges.forEach(
@@ -166,12 +176,16 @@ test("user should be able to list folders in a workspace with multiple items", a
     parentKey: workspaceKey,
     workspaceId: userData1.workspace.id,
     workspaceKeyId: userData1.workspace.currentWorkspaceKey.id,
-    authorizationHeader: userData1.sessionKey,
+    authorizationHeader: deriveSessionAuthorization({
+      sessionKey: userData1.sessionKey,
+    }).authorization,
   });
   const result = await getFolders({
     parentFolderId,
     usingOldKeys: false,
-    authorizationHeader: userData1.sessionKey,
+    authorizationHeader: deriveSessionAuthorization({
+      sessionKey: userData1.sessionKey,
+    }).authorization,
   });
   expect(result.folders.edges.length).toBe(2);
   result.folders.edges.forEach(
@@ -195,12 +209,16 @@ test("user should be able to list without showing subfolders", async () => {
     parentKey: workspaceKey,
     workspaceId: userData1.workspace.id,
     workspaceKeyId: userData1.workspace.currentWorkspaceKey.id,
-    authorizationHeader: userData1.sessionKey,
+    authorizationHeader: deriveSessionAuthorization({
+      sessionKey: userData1.sessionKey,
+    }).authorization,
   });
   const result = await getFolders({
     parentFolderId,
     usingOldKeys: false,
-    authorizationHeader: userData1.sessionKey,
+    authorizationHeader: deriveSessionAuthorization({
+      sessionKey: userData1.sessionKey,
+    }).authorization,
   });
   expect(result.folders.edges.length).toBe(2);
 });
@@ -209,7 +227,9 @@ test("old workpace keys", async () => {
   const result = await getFolders({
     parentFolderId,
     usingOldKeys: true,
-    authorizationHeader: userData1.sessionKey,
+    authorizationHeader: deriveSessionAuthorization({
+      sessionKey: userData1.sessionKey,
+    }).authorization,
   });
   expect(result.folders.edges.length).toBe(0);
 });
@@ -221,7 +241,9 @@ test("retrieving a folder that doesn't exist throws an error", async () => {
       await getFolders({
         parentFolderId: fakeFolderId,
         usingOldKeys: false,
-        authorizationHeader: userData1.sessionKey,
+        authorizationHeader: deriveSessionAuthorization({
+          sessionKey: userData1.sessionKey,
+        }).authorization,
       }))()
   ).rejects.toThrow("Unauthorized");
 });
@@ -232,7 +254,9 @@ test("listing folders that the user doesn't own throws an error", async () => {
       await getFolders({
         parentFolderId: otherFolderId,
         usingOldKeys: false,
-        authorizationHeader: userData1.sessionKey,
+        authorizationHeader: deriveSessionAuthorization({
+          sessionKey: userData1.sessionKey,
+        }).authorization,
       }))()
   ).rejects.toThrow("Unauthorized");
 });
