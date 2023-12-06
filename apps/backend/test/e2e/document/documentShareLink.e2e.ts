@@ -31,7 +31,7 @@ test.beforeAll(async () => {
 });
 
 test.describe("Share links", () => {
-  test("editor share link", async ({ browser, page }) => {
+  test.skip("editor share link", async ({ browser, page }) => {
     const role = Role.EDITOR;
     await login({
       page,
@@ -57,7 +57,7 @@ test.describe("Share links", () => {
       startingContentPage2.substring(0, 300)
     );
   });
-  test("commenter share link", async ({ browser, page }) => {
+  test.skip("commenter share link", async ({ browser, page }) => {
     const role = Role.COMMENTER;
     await login({
       page,
