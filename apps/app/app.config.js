@@ -21,10 +21,10 @@ export default {
     assetBundlePatterns: ["**/*"],
     ios: {
       supportsTablet: true,
-      bundleIdentifier: "re.serenity.app",
+      bundleIdentifier: "page.serenityapp.app",
     },
     android: {
-      package: "re.serenity.app",
+      package: "page.serenityapp.app",
       adaptiveIcon: {
         foregroundImage: "./assets/images/logo_serenity_android.png",
         backgroundColor: "#FFF",
