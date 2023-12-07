@@ -108,6 +108,16 @@ cd apps/desktop-app
 yarn dev # runs the electron app
 ```
 
+#### Build electron
+
+```sh
+cd apps/desktop-app
+yarn build # builds the electron app for local env
+# yarn build:staging # builds the electron app for mac
+# yarn build:production # builds the electron app for mac
+yarn make
+```
+
 ### Editor (standalone)
 
 ```sh

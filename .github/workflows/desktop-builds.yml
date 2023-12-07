@@ -1,6 +1,8 @@
 name: Desktop Builds
 
-on: [push]
+on:
+  workflow_dispatch:
+  push:
 
 jobs:
   build-electron-web-build:
@@ -15,9 +17,21 @@ jobs:
         run: yarn global add node-gyp
       - name: Install dependencies
         run: yarn install --frozen-lockfile
-      - name: Build Electron Web bundle
+      - name: Build Electron Web bundle (dev)
         working-directory: apps/desktop-app
+        # only build on PRs
+        if: endsWith(github.ref, 'main') == false
         run: yarn build
+      - name: Build Electron Web bundle (staging)
+        working-directory: apps/desktop-app
+        # only build on the main branch if the event was a push
+        if: endsWith(github.ref, 'main') == true && github.event_name == 'push'
+        run: yarn build:staging
+      - name: Build Electron Web bundle (production)
+        working-directory: apps/desktop-app
+        # only build on the main branch if it was manually triggered
+        if: endsWith(github.ref, 'main') == true && github.event_name == 'workflow_dispatch'
+        run: yarn build:production
       - name: Upload build
         uses: actions/upload-artifact@v3
         with:
