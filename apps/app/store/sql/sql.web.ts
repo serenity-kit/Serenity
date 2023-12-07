@@ -10,10 +10,9 @@ export const ready = async () => {
   const { default: initSqlJs } = await import("sql.js/dist/sql-wasm.js");
   SQL = await initSqlJs({
     locateFile: (file: string) => {
-      // TODO host this file ourselves
-      // The issue here was Webpack 4 having issues with loading wasm files.
-      // Should be easier to resolve after upgrading to Webpack 5 or Metro.
-      return `https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.8.0/${file}`;
+      // Wasm file is located at the root of the public folder (see apps/app/web)
+      // more info https://docs.expo.dev/guides/customizing-metro/#expo-webpack-versus-expo-metro
+      return `/${file}`;
     },
   });
 
