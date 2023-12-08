@@ -20,7 +20,13 @@
         "SERENITY_ENV": "development"
       }
     },
-    "preview": {
+    "preview-staging": {
+      "distribution": "internal",
+      "env": {
+        "SERENITY_ENV": "staging"
+      }
+    },
+    "preview-production": {
       "distribution": "internal",
       "env": {
         "SERENITY_ENV": "staging"
