@@ -29,7 +29,7 @@
     "preview-production": {
       "distribution": "internal",
       "env": {
-        "SERENITY_ENV": "staging"
+        "SERENITY_ENV": "production"
       }
     },
     "production": {
