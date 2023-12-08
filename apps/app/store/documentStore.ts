@@ -30,6 +30,8 @@ export const initialize = () => {
   );
 };
 
+export const wipeCaches = () => {};
+
 export const createOrReplaceDocument = ({
   documentId,
   name,

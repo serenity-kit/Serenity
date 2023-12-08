@@ -28,6 +28,10 @@ export const initialize = () => {
   );
 };
 
+export const wipeCaches = () => {
+  getWorkspacesCache = [];
+};
+
 type Workspace = {
   id: string;
   name: string;

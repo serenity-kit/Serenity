@@ -10,12 +10,12 @@ import {
   runLogoutMutation,
   runUserChainQuery,
 } from "../../../generated/graphql";
-import { createSqlTables } from "../../../store/createSqlTables";
 import { getMainDevice } from "../../../store/mainDeviceMemoryStore";
 import {
   destroyPersistedDatabase,
   resetInMemoryDatabase,
 } from "../../../store/sql/sql";
+import { createSqlTables, wipeStoreCaches } from "../../../store/sqlUtils";
 import { getLastWorkspaceChainEvent } from "../../../store/workspaceChainStore";
 import { loadRemoteWorkspaceMemberDevicesProofsQuery } from "../../../store/workspaceMemberDevicesProofStore";
 import { RootStackScreenProps } from "../../../types/navigationProps";
@@ -157,6 +157,7 @@ export default function LogoutInProgress({
           );
         }
         resetInMemoryDatabase();
+        wipeStoreCaches();
         await createSqlTables();
         navigation.navigate("Login");
       }

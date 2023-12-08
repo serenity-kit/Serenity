@@ -31,6 +31,11 @@ export const initialize = () => {
   );
 };
 
+export const wipeCaches = () => {
+  getLastWorkspaceMemberDevicesProofCache = {};
+  getWorkspaceMemberDevicesProofByHashCache = {};
+};
+
 export type WorkspaceMemberDevicesProofLocalDbEntry = {
   proof: workspaceMemberDevicesProofUtil.WorkspaceMemberDevicesProof;
   data: workspaceMemberDevicesProofUtil.WorkspaceMemberDevicesProofData;

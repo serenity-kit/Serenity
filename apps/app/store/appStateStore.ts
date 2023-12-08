@@ -12,6 +12,8 @@ export const initialize = () => {
   );
 };
 
+export const wipeCaches = () => {};
+
 type AppState = {
   id: string;
   lastOpenWorkspaceId: string;

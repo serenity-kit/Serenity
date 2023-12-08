@@ -28,6 +28,10 @@ export const initialize = () => {
   );
 };
 
+export const wipeCaches = () => {
+  getLastWorkspaceChainEventCache = {};
+};
+
 const getLastWorkspaceChainListeners: { [id: string]: () => void } = {};
 export const triggerGetLastWorkspaceChain = () => {
   Object.values(getLastWorkspaceChainListeners).forEach((listener) =>
