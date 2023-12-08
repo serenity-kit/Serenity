@@ -30,6 +30,10 @@ export const initialize = () => {
   );
 };
 
+export const wipeCaches = () => {
+  getDocumentChainEntriesCache = [];
+};
+
 export const createDocumentChainEvent = ({
   documentId,
   event,

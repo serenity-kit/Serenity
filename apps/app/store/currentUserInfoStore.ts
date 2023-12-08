@@ -18,6 +18,8 @@ export const initialize = () => {
   );
 };
 
+export const wipeCaches = () => {};
+
 export const setCurrentUserInfo = ({
   userId,
   mainDeviceSigningPublicKey,

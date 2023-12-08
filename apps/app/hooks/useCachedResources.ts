@@ -4,9 +4,9 @@ import * as SplashScreen from "expo-splash-screen";
 import { useCallback, useEffect, useState } from "react";
 import sodium from "react-native-libsodium";
 import { Client } from "urql";
-import { createSqlTables } from "../store/createSqlTables";
 import * as SessionKeyStore from "../store/sessionKeyStore/sessionKeyStore";
 import { getSessionKey } from "../store/sessionKeyStore/sessionKeyStore";
+import { createSqlTables } from "../store/sqlUtils";
 import { loadRemoteCurrentUser } from "../store/userChainStore";
 import { getActiveDevice } from "../utils/device/getActiveDevice";
 import {

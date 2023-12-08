@@ -24,6 +24,8 @@ export const initialize = () => {
   );
 };
 
+export const wipeCaches = () => {};
+
 export type User = {
   id: string;
   username: string;

@@ -34,6 +34,10 @@ export const initialize = () => {
   );
 };
 
+export const wipeCaches = () => {
+  getLastUserChainEventCache = {};
+};
+
 export const createUserChainEvent = ({
   userId,
   event,
