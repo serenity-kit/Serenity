@@ -1,7 +1,7 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { Button, Text, View, tw } from "@serenity-tools/ui";
+import { Pressable, ScrollView, Text, View, tw } from "@serenity-tools/ui";
 import { useCallback, useEffect, useState } from "react";
-import * as workspaceStore from "../../store/workspaceStore";
+import { useInterval } from "../../hooks/useInterval";
 import * as sql from "./sql";
 
 type RowParams = {
@@ -14,7 +14,7 @@ const Row: React.FC<RowParams> = ({ entry }) => {
       {Object.keys(entry).map((key) => {
         return (
           <View key={key} style={tw`flex-1 border-r p-2`}>
-            <Text>{entry[key]}</Text>
+            <Text variant="xs">{entry[key]}</Text>
           </View>
         );
       })}
@@ -22,14 +22,33 @@ const Row: React.FC<RowParams> = ({ entry }) => {
   );
 };
 
-export const WorkspacesTable = () => {
-  const { workspaces } = workspaceStore.useLocalWorkspaces();
+export const Table = ({ tableName }: { tableName: string }) => {
+  const results = sql.execute(`SELECT * FROM ${tableName}`);
 
   return (
     <View>
-      {workspaces.map((workspace) => {
-        return <Row key={workspace.id} entry={workspace} />;
-      })}
+      <View>
+        <Text variant="xs" bold>
+          {tableName}
+        </Text>
+      </View>
+      {results[0] && (
+        <View style={tw`flex-row border-t border-gray-700	`}>
+          {Object.keys(results[0]).map((key) => {
+            return (
+              <View key={key} style={tw`flex-1 border-r p-2`}>
+                <Text variant="xs">{key}</Text>
+              </View>
+            );
+          })}
+        </View>
+      )}
+      <View>
+        {results.map((entry) => {
+          let idPropertyName = Object.keys(entry)[0];
+          return <Row key={entry[idPropertyName]} entry={entry} />;
+        })}
+      </View>
     </View>
   );
 };
@@ -37,8 +56,16 @@ export const WorkspacesTable = () => {
 export const SqliteDebugger = () => {
   const [, updateState] = useState<any>();
   const [isReady, setIsReady] = useState(false);
-
+  const [collapsed, setCollapsed] = useState(true);
   const forceUpdate = useCallback(() => updateState({}), []);
+
+  useInterval(() => {
+    forceUpdate();
+  }, 3000);
+
+  const tables = sql.execute(
+    "SELECT name FROM sqlite_master WHERE type='table'"
+  );
 
   useEffect(() => {
     // wait until sql is ready and then a bit longer till all the local migrations did run
@@ -56,18 +83,15 @@ export const SqliteDebugger = () => {
   if (!isReady) return null;
 
   return (
-    <View style={tw`bg-gray-200`}>
-      <View style={tw`flex-row`}>
-        <Text>Workspaces</Text>
-        <Button
-          onPress={() => {
-            forceUpdate();
-          }}
-        >
-          ↺
-        </Button>
+    <ScrollView style={tw`bg-gray-200 ${collapsed ? `max-h-8` : `max-h-96`}`}>
+      <View style={tw`m-auto`}>
+        <Pressable onPress={() => setCollapsed(!collapsed)}>
+          <Text>{!collapsed ? "⬇" : "⬆"}</Text>
+        </Pressable>
       </View>
-      <WorkspacesTable />
-    </View>
+      {tables.map((table) => {
+        return <Table key={table.name} tableName={table.name} />;
+      })}
+    </ScrollView>
   );
 };
