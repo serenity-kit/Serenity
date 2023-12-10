@@ -14,4 +14,5 @@ export type EditorProps = {
   editable: boolean;
   documentState: DocumentState;
   canComment: boolean;
+  currentDeviceSigningPublicKey: string;
 };

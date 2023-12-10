@@ -39,6 +39,7 @@ import {
   createOrReplaceDocument,
   getLocalDocument,
 } from "../../store/documentStore";
+import { loadRemoteUserChainsForWorkspace } from "../../store/userChainStore";
 import { getLocalOrLoadRemoteUserByUserChainHash } from "../../store/userStore";
 import {
   useCanComment,
@@ -356,24 +357,38 @@ export default function Page({
       return false;
     },
     isValidClient: async (signingPublicKey: string) => {
-      // TODO verify that the users match the entries in the workspaceChain when verifying the proof?
-      if (activeSnapshotWorkspaceMemberDevicesProofEntryRef.current) {
-        for (const [userId, userChainHash] of Object.entries(
-          activeSnapshotWorkspaceMemberDevicesProofEntryRef.current.data
-            .userChainHashes
-        )) {
-          const user = await getLocalOrLoadRemoteUserByUserChainHash({
-            userChainHash,
-            userId,
-            workspaceId,
-          });
-          if (user && Object.keys(user.devices).includes(signingPublicKey)) {
-            return true;
+      const isValidClientForSigningPublicKey = async () => {
+        // TODO verify that the users match the entries in the workspaceChain when verifying the proof?
+        if (activeSnapshotWorkspaceMemberDevicesProofEntryRef.current) {
+          for (const [userId, userChainHash] of Object.entries(
+            activeSnapshotWorkspaceMemberDevicesProofEntryRef.current.data
+              .userChainHashes
+          )) {
+            const user = await getLocalOrLoadRemoteUserByUserChainHash({
+              userChainHash,
+              userId,
+              workspaceId,
+            });
+            // console.log("user: ", user);
+
+            if (user && Object.keys(user.devices).includes(signingPublicKey)) {
+              return true;
+            }
           }
         }
+
+        return false;
+      };
+
+      let isValid = await isValidClientForSigningPublicKey();
+      if (isValid === false) {
+        activeSnapshotWorkspaceMemberDevicesProofEntryRef.current =
+          await loadRemoteWorkspaceMemberDevicesProofQuery({ workspaceId });
+        await loadRemoteUserChainsForWorkspace({ workspaceId });
+        isValid = await isValidClientForSigningPublicKey();
       }
 
-      return false;
+      return isValid;
     },
     additionalAuthenticationDataValidations: {
       snapshot: SerenitySnapshotPublicData,
@@ -627,6 +642,9 @@ export default function Page({
         isNew={isNew}
         documentLoaded={documentLoaded || state.matches("failed")}
         documentState={documentState}
+        currentDeviceSigningPublicKey={sodium.to_base64(
+          signatureKeyPair.publicKey
+        )}
       />
     </>
   );

@@ -49,6 +49,12 @@ ydoc.on("updateV2", (update: any, origin: string) => {
 });
 
 const yAwareness = new Awareness(ydoc);
+// usually set in useYjsSync, but since in this a new Awareness instance inside the
+// react-native-webview on mobile devices we just pipe it through
+yAwareness.setLocalStateField("user", {
+  publicKey: window.currentDeviceSigningPublicKey,
+});
+
 window.applyYAwarenessUpdate = function (update) {
   if (update) {
     const updateArray = new Uint8Array(update);

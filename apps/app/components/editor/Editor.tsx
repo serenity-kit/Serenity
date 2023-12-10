@@ -94,6 +94,7 @@ export default function Editor({
   editable,
   documentState,
   canComment,
+  currentDeviceSigningPublicKey,
 }: EditorProps) {
   const webViewRef = useRef<WebView>(null);
   // leveraging a ref here since the injectedJavaScriptBeforeContentLoaded
@@ -375,6 +376,7 @@ export default function Editor({
             Array.apply([], Y.encodeStateAsUpdateV2(yDocRef.current))
           )};
           window.editorEditable = ${editable};
+          window.currentDeviceSigningPublicKey = "${currentDeviceSigningPublicKey}";
           true; // this is required, or you'll sometimes get silent failures
         `}
         onLoad={() => {

@@ -132,6 +132,7 @@ declare global {
     updateHasOpenCommentsSidebar: (hasOpenCommentsSidebar: boolean) => void;
     setEditorEditable(editable: boolean): void;
     workspaceDevicesToUsernames: { [deviceId: string]: string };
+    currentDeviceSigningPublicKey: string;
     setWorkspaceDevicesToUsernames: (
       serializedWorkspaceDevicesToUsernames: string
     ) => void;

@@ -66,9 +66,9 @@ export const createWorkspaceMemberDevicesProof = ({
     authorMainDeviceSigningPublicKey,
     workspaceId,
   ]);
-  // if (triggerRerender !== false) {
-  //   triggerGetLastWorkspaceChain();
-  // }
+  if (triggerRerender !== false) {
+    triggerGetLastWorkspaceMemberDevicesProof();
+  }
 };
 
 export const loadRemoteWorkspaceMemberDevicesProofsQuery = async () => {
@@ -401,7 +401,7 @@ export const getWorkspaceMemberDevicesProofByHash = ({
 const getLastWorkspaceMemberDevicesProofListeners: {
   [id: string]: () => void;
 } = {};
-export const triggerGetLastWorkspaceChain = () => {
+export const triggerGetLastWorkspaceMemberDevicesProof = () => {
   Object.values(getLastWorkspaceMemberDevicesProofListeners).forEach(
     (listener) => listener()
   );

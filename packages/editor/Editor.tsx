@@ -98,6 +98,15 @@ export const Editor = (props: EditorProps) => {
   const bubbleMenuRef = useRef<HTMLDivElement>(null);
   const canComment = props.canComment;
 
+  // needed since the YAwarenessExtension.render function doesn't get updated on every
+  // render of the current React component
+  const workspaceDevicesToUsernamesRef = useRef(
+    props.workspaceDevicesToUsernames
+  );
+  useEffect(() => {
+    workspaceDevicesToUsernamesRef.current = props.workspaceDevicesToUsernames;
+  });
+
   const editor = useEditor(
     {
       editable: props.editable,
@@ -149,8 +158,11 @@ export const Editor = (props: EditorProps) => {
         YAwarenessExtension.configure({
           awareness: props.yAwarenessRef.current,
           render: (user) => {
+            // using a ref since the YAwarenessExtension.render function doesn't get updated
+            // on every render of the current React component
             const username =
-              props.workspaceDevicesToUsernames[user.publicKey] || "Unknown";
+              workspaceDevicesToUsernamesRef.current[user.publicKey] ||
+              "Unknown";
             const cursor = document.createElement("span");
             if (username) {
               cursor.style.setProperty("--collab-color", "#444");
