@@ -243,13 +243,18 @@ function WorkspaceStackNavigator(props) {
   });
 
   useEffect(() => {
-    loadRemoteWorkspaceDetails({ workspaceId: props.route.params.workspaceId });
-    loadRemoteUserChainsForWorkspace({
-      workspaceId: props.route.params.workspaceId,
-    });
-    loadRemoteWorkspaceMemberDevicesProofQuery({
-      workspaceId: props.route.params.workspaceId,
-    });
+    const load = async () => {
+      await loadRemoteWorkspaceDetails({
+        workspaceId: props.route.params.workspaceId,
+      });
+      await loadRemoteWorkspaceMemberDevicesProofQuery({
+        workspaceId: props.route.params.workspaceId,
+      });
+      await loadRemoteUserChainsForWorkspace({
+        workspaceId: props.route.params.workspaceId,
+      });
+    };
+    load();
   }, []);
 
   const lastWorkspaceChainEvent = useLocalLastWorkspaceChainEvent({

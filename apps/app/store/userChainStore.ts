@@ -372,5 +372,13 @@ export const loadRemoteCurrentUser = async () => {
     throw new Error("Invalid user chain. device not found");
   }
 
+  userStore.createUser({
+    id: state.id,
+    username: state.email,
+    mainDeviceSigningPublicKey: state.mainDeviceSigningPublicKey,
+    devices: state.devices,
+    removedDevices: state.removedDevices,
+  });
+
   return getLastUserChainEvent({ userId: currentUserInfo.userId });
 };
