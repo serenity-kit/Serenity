@@ -343,6 +343,9 @@ export const SharePage: React.FC<Props> = ({
         isNew={false}
         documentLoaded={documentLoaded || state.matches("failed")}
         documentState={documentState}
+        currentDeviceSigningPublicKey={sodium.to_base64(
+          signatureKeyPair.publicKey
+        )}
       />
     </>
   );

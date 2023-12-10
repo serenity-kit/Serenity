@@ -642,6 +642,9 @@ export default function Page({
         isNew={isNew}
         documentLoaded={documentLoaded || state.matches("failed")}
         documentState={documentState}
+        currentDeviceSigningPublicKey={sodium.to_base64(
+          signatureKeyPair.publicKey
+        )}
       />
     </>
   );
