@@ -22,6 +22,7 @@ import { RootStackScreenProps } from "../../../types/navigationProps";
 import { clearDeviceAndSessionStores } from "../../../utils/authentication/clearDeviceAndSessionStores";
 
 let logoutInitiated = false;
+let renderedOncePerLogoutInitiated = false;
 
 export const initiateLogout = () => {
   logoutInitiated = true;
@@ -29,22 +30,30 @@ export const initiateLogout = () => {
 
 export default function LogoutInProgress({
   navigation,
+  route,
 }: RootStackScreenProps<"LogoutInProgress">) {
   useWindowDimensions(); // needed to ensure tw-breakpoints are triggered when resizing
   const { updateAuthentication, activeDevice } = useAppContext();
 
   useFocusEffect(() => {
     async function logout() {
+      if (logoutInitiated) {
+        renderedOncePerLogoutInitiated = true;
+      }
       // Protect against direct links to this screen. The logout should only happen
       // if it was initiated by the user by clicking the logout button.
       if (!logoutInitiated) {
-        navigation.navigate("Root");
+        if (!renderedOncePerLogoutInitiated) {
+          navigation.navigate("Root");
+        }
         return;
       }
       logoutInitiated = false;
+      renderedOncePerLogoutInitiated = true;
 
       let localCleanupSuccessful = false;
       let remoteCleanupSuccessful = false;
+
       try {
         const mainDevice = getMainDevice();
         if (!mainDevice) {
@@ -138,7 +147,6 @@ export default function LogoutInProgress({
         remoteCleanupSuccessful = logoutResult.data?.logout?.success || false;
         await destroyPersistedDatabase();
         await clearDeviceAndSessionStores();
-        await updateAuthentication(null);
         localCleanupSuccessful = true;
       } catch (err) {
         console.error(err);
@@ -159,6 +167,7 @@ export default function LogoutInProgress({
         resetInMemoryDatabase();
         wipeStoreCaches();
         await createSqlTables();
+        await updateAuthentication(null);
         navigation.navigate("Login");
       }
     }

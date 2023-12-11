@@ -52,7 +52,6 @@ export default function AccountMenu({
     },
   });
   const [isPasswordModalVisible, setIsPasswordModalVisible] = useState(false);
-  const workspacesQueryResult = state.context.workspacesQueryResult;
   const { workspaces } = workspaceStore.useLocalWorkspaces();
 
   const logout = () => {
@@ -117,9 +116,7 @@ export default function AccountMenu({
         bottomSheetModalProps={{
           snapPoints: [
             // 50 is the height of a single workspace item
-            180 +
-              (workspacesQueryResult?.data?.workspaces?.nodes?.length || 1) *
-                50,
+            220 + (workspaces.length || 1) * 50,
           ],
         }}
         popoverProps={{
@@ -259,7 +256,11 @@ export default function AccountMenu({
         isVisible={isPasswordModalVisible}
         description="Logging out requires access to the main account and therefore verifying your password is required"
         onSuccess={() => {
-          logout();
+          setIsPasswordModalVisible(false);
+          setTimeout(() => {
+            // wait for the modal to close in the next JS tick otherwise this iOS app will crash
+            logout();
+          }, 500);
         }}
         onCancel={() => {
           setIsPasswordModalVisible(false);
