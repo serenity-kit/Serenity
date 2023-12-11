@@ -6,6 +6,14 @@ export const serenityDbKeyId = "serenity-db.key";
 
 let db: OPSQLiteConnection;
 
+const createNewDbKey = async () => {
+  let key = sodium.to_base64(
+    sodium.randombytes_buf(sodium.crypto_secretbox_KEYBYTES)
+  );
+  await SecureStore.setItemAsync(serenityDbKeyId, key);
+  return key;
+};
+
 export const ready = async () => {
   if (db) {
     return undefined;
@@ -14,10 +22,7 @@ export const ready = async () => {
   await sodium.ready;
   let key = await SecureStore.getItemAsync(serenityDbKeyId);
   if (!key) {
-    key = sodium.to_base64(
-      sodium.randombytes_buf(sodium.crypto_secretbox_KEYBYTES)
-    );
-    await SecureStore.setItemAsync(serenityDbKeyId, key);
+    key = await createNewDbKey();
   }
 
   db = open({
@@ -34,8 +39,12 @@ export const triggerDebouncedDatabasePersisting = () => {};
 export const destroyPersistedDatabase = async () => {
   db.delete();
   await SecureStore.deleteItemAsync(serenityDbKeyId);
-  // creates a new empty DB that is encrypted with a new key
-  await ready();
+
+  const newKey = await createNewDbKey();
+  db = open({
+    name: "serenity-db",
+    encryptionKey: newKey,
+  });
 };
 
 export const execute = (
