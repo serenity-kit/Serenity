@@ -99,6 +99,13 @@ cd apps/app
 yarn eas build --profile preview-production --platform ios
 ```
 
+Creating a build for the App store (production environment)
+
+```sh
+cd apps/app
+yarn eas build --profile production --platform ios
+```
+
 Build new graphql types
 
 ```sh
