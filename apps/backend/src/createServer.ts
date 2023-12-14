@@ -101,6 +101,7 @@ export default async function createServer() {
           String: () => (Math.random() + 1).toString(36).substring(2),
         }
       : false,
+    allowBatchedHttpRequests: false,
   });
   await apolloServer.start();
 
