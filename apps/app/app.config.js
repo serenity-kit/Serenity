@@ -22,6 +22,7 @@ export default {
     ios: {
       supportsTablet: true,
       bundleIdentifier: "page.serenityapp.app",
+      associatedDomains: ["applinks:serenity.li"],
     },
     android: {
       package: "page.serenityapp.app",
