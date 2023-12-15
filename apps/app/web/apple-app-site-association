@@ -1,0 +1,27 @@
+{
+  "applinks": {
+    "details": [
+      {
+        "appIDs": [
+          "RYZ8QY8L2A.page.serenityapp.app"
+        ],
+        "components": [
+          {
+            "/": "*",
+            "comment": "Matches all routes"
+          }
+        ]
+      }
+    ]
+  },
+  "activitycontinuation": {
+    "apps": [
+      "RYZ8QY8L2A.page.serenityapp.app"
+    ]
+  },
+  "webcredentials": {
+    "apps": [
+      "RYZ8QY8L2A.page.serenityapp.app"
+    ]
+  }
+}
