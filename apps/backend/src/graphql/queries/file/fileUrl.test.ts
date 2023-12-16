@@ -60,7 +60,7 @@ const getFileUrl = async ({
       }
     }
   `;
-  return graphql.client.request(
+  return graphql.client.request<any>(
     query,
     { fileId, documentId, workspaceId },
     { authorization }
@@ -133,7 +133,7 @@ describe("Input errors", () => {
     });
     await expect(
       (async () =>
-        await graphql.client.request(
+        await graphql.client.request<any>(
           query,
           {
             input: {
@@ -153,7 +153,7 @@ describe("Input errors", () => {
     });
     await expect(
       (async () =>
-        await graphql.client.request(
+        await graphql.client.request<any>(
           query,
           {
             input: {
@@ -172,7 +172,7 @@ describe("Input errors", () => {
     });
     await expect(
       (async () =>
-        await graphql.client.request(query, null, {
+        await graphql.client.request<any>(query, undefined, {
           authorization: userData.sessionKey,
         }))()
     ).rejects.toThrowError();

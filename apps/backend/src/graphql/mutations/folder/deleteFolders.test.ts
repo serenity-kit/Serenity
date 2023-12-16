@@ -411,7 +411,7 @@ describe("Input errors", () => {
     `;
     await expect(
       (async () =>
-        await graphql.client.request(
+        await graphql.client.request<any>(
           query,
           { input: { ids: null } },
           authorizationHeaders
@@ -428,7 +428,7 @@ describe("Input errors", () => {
     `;
     await expect(
       (async () =>
-        await graphql.client.request(
+        await graphql.client.request<any>(
           query,
           { input: null },
           authorizationHeaders
@@ -445,7 +445,11 @@ describe("Input errors", () => {
     `;
     await expect(
       (async () =>
-        await graphql.client.request(query, null, authorizationHeaders))()
+        await graphql.client.request<any>(
+          query,
+          undefined,
+          authorizationHeaders
+        ))()
     ).rejects.toThrowError(/BAD_USER_INPUT/);
   });
 });

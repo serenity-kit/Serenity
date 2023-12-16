@@ -42,7 +42,7 @@ export const getRootFolders = async ({
       }
     }
   `;
-  const result = await graphql.client.request(
+  const result = await graphql.client.request<any>(
     query,
     {
       workspaceId,

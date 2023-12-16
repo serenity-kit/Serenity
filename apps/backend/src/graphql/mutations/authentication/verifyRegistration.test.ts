@@ -169,7 +169,7 @@ describe("Input errors", () => {
   test("Invalid username", async () => {
     await expect(
       (async () =>
-        await graphql.client.request(verifyRegistrationQuery, {
+        await graphql.client.request<any>(verifyRegistrationQuery, {
           input: {
             username: null,
             verificationCode: "1234",
@@ -180,7 +180,7 @@ describe("Input errors", () => {
   test("Invalid verificationCode", async () => {
     await expect(
       (async () =>
-        await graphql.client.request(verifyRegistrationQuery, {
+        await graphql.client.request<any>(verifyRegistrationQuery, {
           input: {
             username: "user@example.com",
             verificationCode: null,
@@ -191,15 +191,14 @@ describe("Input errors", () => {
   test("Invalid input", async () => {
     await expect(
       (async () =>
-        await graphql.client.request(verifyRegistrationQuery, {
+        await graphql.client.request<any>(verifyRegistrationQuery, {
           input: null,
         }))()
     ).rejects.toThrowError(/BAD_USER_INPUT/);
   });
   test("No input", async () => {
     await expect(
-      (async () =>
-        await graphql.client.request(verifyRegistrationQuery, null))()
+      (async () => await graphql.client.request<any>(verifyRegistrationQuery))()
     ).rejects.toThrowError(/BAD_USER_INPUT/);
   });
 });

@@ -19,7 +19,7 @@ export const verifyUser = async ({
       }
     }
   `;
-  const verifyRegistrationResponse = await graphql.client.request(
+  const verifyRegistrationResponse = await graphql.client.request<any>(
     verifyRegistrationQuery,
     {
       input: {

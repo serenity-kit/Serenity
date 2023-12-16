@@ -45,7 +45,7 @@ export const getActiveWorkspaceKeys = async ({
       }
     }
   `;
-  return await graphql.client.request(
+  return await graphql.client.request<any>(
     query,
     { workspaceId, deviceSigningPublicKey },
     authorizationHeader

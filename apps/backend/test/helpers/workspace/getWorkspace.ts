@@ -73,7 +73,7 @@ export const getWorkspace = async ({
       }
     }
   `;
-  const result = await graphql.client.request(
+  const result = await graphql.client.request<any>(
     query,
     { id: workspaceId, deviceSigningPublicKey },
     headers

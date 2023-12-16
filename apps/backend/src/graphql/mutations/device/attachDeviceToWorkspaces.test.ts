@@ -218,7 +218,7 @@ describe("Input errors", () => {
     });
     await expect(
       (async () =>
-        await graphql.client.request(
+        await graphql.client.request<any>(
           query,
           {
             input: {
@@ -251,7 +251,7 @@ describe("Input errors", () => {
     });
     await expect(
       (async () =>
-        await graphql.client.request(
+        await graphql.client.request<any>(
           query,
           {
             input: {
@@ -284,7 +284,7 @@ describe("Input errors", () => {
     });
     await expect(
       (async () =>
-        await graphql.client.request(
+        await graphql.client.request<any>(
           query,
           {
             input: {
@@ -311,7 +311,7 @@ describe("Input errors", () => {
   test("Invalid deviceWorkspaceKeyBoxes", async () => {
     await expect(
       (async () =>
-        await graphql.client.request(
+        await graphql.client.request<any>(
           query,
           {
             input: {
@@ -337,7 +337,7 @@ describe("Input errors", () => {
     });
     await expect(
       (async () =>
-        await graphql.client.request(
+        await graphql.client.request<any>(
           query,
           {
             input: {
@@ -371,7 +371,7 @@ describe("Input errors", () => {
     });
     await expect(
       (async () =>
-        await graphql.client.request(
+        await graphql.client.request<any>(
           query,
           {
             input: {

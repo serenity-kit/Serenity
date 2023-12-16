@@ -1,6 +1,6 @@
 import { IncomingMessage } from "http";
 import sodium from "libsodium-wrappers";
-import { WebSocket } from "ws";
+import WebSocket from "ws";
 import { createWebSocketConnection } from "./createWebSocketConnection";
 import { addConnection, broadcastMessage, removeConnection } from "./store";
 

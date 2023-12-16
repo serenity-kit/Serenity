@@ -226,6 +226,10 @@ test("Input Error", async () => {
   `;
   await expect(
     (async () =>
-      await graphql.client.request(query1, null, authorizationHeaders))()
+      await graphql.client.request<any>(
+        query1,
+        undefined,
+        authorizationHeaders
+      ))()
   ).rejects.toThrowError(/GRAPHQL_VALIDATION_FAILED/);
 });

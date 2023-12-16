@@ -241,7 +241,7 @@ test("Throw error on duplicate subkeyId, workspaceId", async () => {
   `;
   await expect(
     (async () =>
-      await graphql.client.request(
+      await graphql.client.request<any>(
         query,
         {
           input: {
@@ -426,7 +426,7 @@ describe("Input errors", () => {
     const nameNonce = encryptedFolderResult.nonce;
     await expect(
       (async () =>
-        await graphql.client.request(
+        await graphql.client.request<any>(
           query,
           {
             input: {
@@ -468,7 +468,7 @@ describe("Input errors", () => {
     const nameNonce = encryptedFolderResult.nonce;
     await expect(
       (async () =>
-        await graphql.client.request(
+        await graphql.client.request<any>(
           query,
           {
             input: {
@@ -488,7 +488,7 @@ describe("Input errors", () => {
   test("Invalid input", async () => {
     await expect(
       (async () =>
-        await graphql.client.request(
+        await graphql.client.request<any>(
           query,
           {
             input: null,
@@ -500,7 +500,11 @@ describe("Input errors", () => {
   test("No input", async () => {
     await expect(
       (async () =>
-        await graphql.client.request(query, null, authorizationHeaders))()
+        await graphql.client.request<any>(
+          query,
+          undefined,
+          authorizationHeaders
+        ))()
     ).rejects.toThrowError(/BAD_USER_INPUT/);
   });
 });

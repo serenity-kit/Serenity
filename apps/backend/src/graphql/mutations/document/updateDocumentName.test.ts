@@ -259,7 +259,11 @@ describe("Input errors", () => {
     `;
     await expect(
       (async () =>
-        await graphql.client.request(query, null, authorizationHeaders))()
+        await graphql.client.request<any>(
+          query,
+          undefined,
+          authorizationHeaders
+        ))()
     ).rejects.toThrowError(/GRAPHQL_VALIDATION_FAILED/);
   });
   test("Invalid name", async () => {
@@ -281,7 +285,11 @@ describe("Input errors", () => {
       `;
     await expect(
       (async () =>
-        await graphql.client.request(query, null, authorizationHeaders))()
+        await graphql.client.request<any>(
+          query,
+          undefined,
+          authorizationHeaders
+        ))()
     ).rejects.toThrowError(/GRAPHQL_VALIDATION_FAILED/);
   });
   test("Invalid subkeyId", async () => {
@@ -303,7 +311,11 @@ describe("Input errors", () => {
     `;
     await expect(
       (async () =>
-        await graphql.client.request(query, null, authorizationHeaders))()
+        await graphql.client.request<any>(
+          query,
+          undefined,
+          authorizationHeaders
+        ))()
     ).rejects.toThrowError(/GRAPHQL_VALIDATION_FAILED/);
   });
   test("Invalid input", async () => {
@@ -318,7 +330,11 @@ describe("Input errors", () => {
     `;
     await expect(
       (async () =>
-        await graphql.client.request(query, null, authorizationHeaders))()
+        await graphql.client.request<any>(
+          query,
+          undefined,
+          authorizationHeaders
+        ))()
     ).rejects.toThrowError(/GRAPHQL_VALIDATION_FAILED/);
   });
 });

@@ -28,7 +28,11 @@ test("user should be be able to get their pending workspace invitation when null
       }
     }
   `;
-  const result = await graphql.client.request(query, null, authorizationHeader);
+  const result = await graphql.client.request<any>(
+    query,
+    undefined,
+    authorizationHeader
+  );
   expect(result.pendingWorkspaceInvitation).toMatchInlineSnapshot(`
     {
       "id": null,
@@ -58,7 +62,11 @@ test("user should be be able to get their pending workspace invitation", async (
       }
     }
   `;
-  const result = await graphql.client.request(query, null, authorizationHeader);
+  const result = await graphql.client.request<any>(
+    query,
+    undefined,
+    authorizationHeader
+  );
   expect(result.pendingWorkspaceInvitation).toMatchInlineSnapshot(`
       {
         "ciphertext": "${registerUser1Result.pendingWorkspaceInvitationKeyCiphertext}",
@@ -80,6 +88,10 @@ test("Unauthenticated", async () => {
   `;
   await expect(
     (async () =>
-      await graphql.client.request(query, null, authorizationHeader))()
+      await graphql.client.request<any>(
+        query,
+        undefined,
+        authorizationHeader
+      ))()
   ).rejects.toThrowError(/UNAUTHENTICATED/);
 });

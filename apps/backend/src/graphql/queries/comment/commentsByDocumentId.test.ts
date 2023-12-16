@@ -238,7 +238,7 @@ describe("Input Errors", () => {
   test("bad documentId", async () => {
     await expect(
       (async () =>
-        await graphql.client.request(
+        await graphql.client.request<any>(
           query,
           {
             documentId: null,
@@ -252,7 +252,7 @@ describe("Input Errors", () => {
   test("bad first", async () => {
     await expect(
       (async () =>
-        await graphql.client.request(
+        await graphql.client.request<any>(
           query,
           {
             documentId: documentId1,
@@ -266,7 +266,11 @@ describe("Input Errors", () => {
   test("bad input", async () => {
     await expect(
       (async () =>
-        await graphql.client.request(query, null, authorizationHeaders))()
+        await graphql.client.request<any>(
+          query,
+          undefined,
+          authorizationHeaders
+        ))()
     ).rejects.toThrowError(/BAD_USER_INPUT/);
   });
 });

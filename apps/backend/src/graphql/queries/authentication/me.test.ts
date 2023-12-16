@@ -75,7 +75,7 @@ beforeAll(async () => {
 });
 
 test("user should be able to get their username", async () => {
-  const result = await graphql.client.request(meQuery, null, {
+  const result = await graphql.client.request<any>(meQuery, undefined, {
     authorization: deriveSessionAuthorization({
       sessionKey: userData1.sessionKey,
     }).authorization,
@@ -85,7 +85,7 @@ test("user should be able to get their username", async () => {
 });
 
 test("should be able to get the workspaceLoadingInfo with a defined workspaceId and documentId", async () => {
-  const result = await graphql.client.request(
+  const result = await graphql.client.request<any>(
     meWithWorkspaceLoadingInfoQuery,
     {
       workspaceId: userData1.workspace.id,
@@ -109,7 +109,7 @@ test("should be able to get the workspaceLoadingInfo with a defined workspaceId 
 });
 
 test("should get the fallback workspace if the workspaceId is not available and return other is true", async () => {
-  const result = await graphql.client.request(
+  const result = await graphql.client.request<any>(
     meWithWorkspaceLoadingInfoQuery,
     {
       workspaceId: "abc",
@@ -133,7 +133,7 @@ test("should get the fallback workspace if the workspaceId is not available and 
 });
 
 test("should get no workspace if the workspaceId is not available and return other is false", async () => {
-  const result = await graphql.client.request(
+  const result = await graphql.client.request<any>(
     meWithWorkspaceLoadingInfoQuery,
     {
       workspaceId: "abc",
@@ -151,7 +151,7 @@ test("should get no workspace if the workspaceId is not available and return oth
 });
 
 test("should be able to get the workspaceLoadingInfo, but another documentId if the provided documentId is not available and return other is true", async () => {
-  const result = await graphql.client.request(
+  const result = await graphql.client.request<any>(
     meWithWorkspaceLoadingInfoQuery,
     {
       workspaceId: userData1.workspace.id,
@@ -174,7 +174,7 @@ test("should be able to get the workspaceLoadingInfo, but another documentId if 
 });
 
 test("should get the workspaceLoadingInfo, but no documentId if the provided documentId is not available and return other is false", async () => {
-  const result = await graphql.client.request(
+  const result = await graphql.client.request<any>(
     meWithWorkspaceLoadingInfoQuery,
     {
       workspaceId: userData1.workspace.id,
@@ -199,7 +199,7 @@ test("should get the workspaceLoadingInfo, but no documentId if the provided doc
 test("documentId provided but not the workspaceId", async () => {
   await expect(
     (async () =>
-      await graphql.client.request(
+      await graphql.client.request<any>(
         meWithWorkspaceLoadingInfoQuery,
         {
           documentId: userData1.document.id,
@@ -214,7 +214,7 @@ test("documentId provided but not the workspaceId", async () => {
 });
 
 test("Unauthenticated", async () => {
-  const result = await graphql.client.request(meQuery, null, {
+  const result = await graphql.client.request<any>(meQuery, undefined, {
     authorization: "bad-session-key",
   });
   expect(result.me).toEqual(null);

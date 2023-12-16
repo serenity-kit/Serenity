@@ -77,7 +77,7 @@ export const registerUnverifiedUser = async ({
     encryptionPublicKey: mainDevice.encryptionPublicKey,
   });
 
-  const registrationResponse = await graphql.client.request(query, {
+  const registrationResponse = await graphql.client.request<any>(query, {
     input: {
       registrationRecord: clientRegistrationFinishResult.registrationRecord,
       encryptedMainDevice: {

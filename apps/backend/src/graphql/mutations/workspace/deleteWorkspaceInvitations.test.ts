@@ -182,7 +182,7 @@ describe("Input Errors", () => {
     };
     await expect(
       (async () =>
-        await graphql.client.request(
+        await graphql.client.request<any>(
           query,
           {
             input: {
@@ -199,7 +199,7 @@ describe("Input Errors", () => {
     };
     await expect(
       (async () =>
-        await graphql.client.request(
+        await graphql.client.request<any>(
           query,
           { input: null },
           authorizationHeaders
@@ -212,7 +212,11 @@ describe("Input Errors", () => {
     };
     await expect(
       (async () =>
-        await graphql.client.request(query, null, authorizationHeaders))()
+        await graphql.client.request<any>(
+          query,
+          undefined,
+          authorizationHeaders
+        ))()
     ).rejects.toThrowError(/GRAPHQL_VALIDATION_FAILED/);
   });
 });

@@ -127,7 +127,7 @@ describe("Input errors", () => {
   test("Invalid documentId", async () => {
     await expect(
       (async () =>
-        await graphql.client.request(
+        await graphql.client.request<any>(
           query,
           {
             documentId: null,
@@ -144,7 +144,7 @@ describe("Input errors", () => {
   test("Invalid first", async () => {
     await expect(
       (async () =>
-        await graphql.client.request(
+        await graphql.client.request<any>(
           query,
           {
             documentId: userData1.document.id,
@@ -162,7 +162,7 @@ describe("Input errors", () => {
   test("No Input", async () => {
     await expect(
       (async () =>
-        await graphql.client.request(query, null, {
+        await graphql.client.request<any>(query, undefined, {
           authorization: userData1.sessionKey,
         }))()
     ).rejects.toThrowError(/BAD_USER_INPUT/);

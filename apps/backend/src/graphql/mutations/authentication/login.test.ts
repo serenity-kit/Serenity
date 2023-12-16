@@ -84,7 +84,7 @@ test("server should login a user", async () => {
     }
   `;
   // client gets login response from server, which contains encrypted data
-  const loginResponse = await graphql.client.request(query, {
+  const loginResponse = await graphql.client.request<any>(query, {
     input: {
       loginId: result.data.loginId,
       message: clientLoginFinishResult.finishLoginRequest,
@@ -138,7 +138,7 @@ describe("Input errors", () => {
     }
     await expect(
       (async () =>
-        await graphql.client.request(query, {
+        await graphql.client.request<any>(query, {
           input: {
             loginId: null,
             message: clientLoginFinishResult.finishLoginRequest,
@@ -155,7 +155,7 @@ describe("Input errors", () => {
     });
     await expect(
       (async () =>
-        await graphql.client.request(query, {
+        await graphql.client.request<any>(query, {
           input: {
             loginId: result.data.loginId,
             message: null,
@@ -167,7 +167,7 @@ describe("Input errors", () => {
   test("Invalid input", async () => {
     await expect(
       (async () =>
-        await graphql.client.request(query, {
+        await graphql.client.request<any>(query, {
           input: null,
         }))()
     ).rejects.toThrowError(/GRAPHQL_VALIDATION_FAILED/);
@@ -175,7 +175,7 @@ describe("Input errors", () => {
 
   test("No input", async () => {
     await expect(
-      (async () => await graphql.client.request(query, null))()
+      (async () => await graphql.client.request<any>(query))()
     ).rejects.toThrowError(/GRAPHQL_VALIDATION_FAILED/);
   });
 });

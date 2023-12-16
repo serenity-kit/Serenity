@@ -21,7 +21,7 @@ export const initateFileUpload = async ({
       }
     }
   `;
-  return graphql.client.request(
+  return graphql.client.request<any>(
     query,
     { input: { documentId, workspaceId } },
     { authorization }

@@ -77,7 +77,7 @@ export const createFolder = async ({
       }
     }
   `;
-  const result = await graphql.client.request(
+  const result = await graphql.client.request<any>(
     query,
     {
       input: {

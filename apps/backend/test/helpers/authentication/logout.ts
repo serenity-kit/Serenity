@@ -15,7 +15,7 @@ export const logout = async ({ graphql, authorizationHeader }: Params) => {
       }
     }
   `;
-  const response = await graphql.client.request(
+  const response = await graphql.client.request<any>(
     query,
     undefined,
     authorizationHeaders
