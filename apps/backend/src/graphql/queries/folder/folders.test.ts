@@ -60,9 +60,9 @@ const getFolders = async ({
           }
       }
   }`;
-  const result = await graphql.client.request(
+  const result = await graphql.client.request<any>(
     query,
-    null,
+    undefined,
     authorizationHeaders
   );
   return result;

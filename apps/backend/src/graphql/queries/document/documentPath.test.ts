@@ -174,7 +174,7 @@ export const getDocumentPath = async ({
       }
     }
   `;
-  const result = await graphql.client.request(
+  const result = await graphql.client.request<any>(
     query,
     { id: documentId },
     { authorization: authorizationHeader }
@@ -282,7 +282,7 @@ describe("Input errors", () => {
   test("Invalid id", async () => {
     await expect(
       (async () =>
-        await graphql.client.request(
+        await graphql.client.request<any>(
           query,
           { id: null },
           authorizationHeader
@@ -292,7 +292,11 @@ describe("Input errors", () => {
   test("No input", async () => {
     await expect(
       (async () =>
-        await graphql.client.request(query, null, authorizationHeader))()
+        await graphql.client.request<any>(
+          query,
+          undefined,
+          authorizationHeader
+        ))()
     ).rejects.toThrowError(/BAD_USER_INPUT/);
   });
 });

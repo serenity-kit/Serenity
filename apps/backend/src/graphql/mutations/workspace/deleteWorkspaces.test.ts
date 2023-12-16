@@ -69,6 +69,10 @@ test("Input Errors", async () => {
   `;
   await expect(
     (async () =>
-      await graphql.client.request(query, null, authorizationHeaders))()
+      await graphql.client.request<any>(
+        query,
+        undefined,
+        authorizationHeaders
+      ))()
   ).rejects.toThrowError();
 });

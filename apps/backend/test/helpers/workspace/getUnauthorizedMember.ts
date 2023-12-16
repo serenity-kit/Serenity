@@ -23,5 +23,5 @@ export const getUnauthorizedMember = async ({
       }
     }
   `;
-  return await graphql.client.request(query, input, authorizationHeader);
+  return await graphql.client.request<any>(query, input, authorizationHeader);
 };

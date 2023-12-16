@@ -66,7 +66,7 @@ test("server should register a user", async () => {
     encryptionPublicKey: mainDevice.encryptionPublicKey,
   });
 
-  const registrationResponse = await graphql.client.request(query, {
+  const registrationResponse = await graphql.client.request<any>(query, {
     input: {
       registrationRecord: clientRegistrationFinishResult.registrationRecord,
       encryptedMainDevice: {
@@ -127,7 +127,7 @@ test("server should register a user with a pending workspace id", async () => {
     encryptionPublicKey: mainDevice.encryptionPublicKey,
   });
 
-  const registrationResponse = await graphql.client.request(query, {
+  const registrationResponse = await graphql.client.request<any>(query, {
     input: {
       registrationRecord: clientRegistrationFinishResult.registrationRecord,
       encryptedMainDevice: {
@@ -208,7 +208,7 @@ describe("Input errors", () => {
 
     await expect(
       (async () =>
-        await graphql.client.request(query, {
+        await graphql.client.request<any>(query, {
           input: {
             registrationRecord:
               clientRegistrationFinishResult.registrationRecord,
@@ -257,7 +257,7 @@ describe("Input errors", () => {
 
     await expect(
       (async () =>
-        await graphql.client.request(query, {
+        await graphql.client.request<any>(query, {
           input: {
             registrationRecord: null,
             encryptedMainDevice: {
@@ -302,7 +302,7 @@ describe("Input errors", () => {
 
     await expect(
       (async () =>
-        await graphql.client.request(query, {
+        await graphql.client.request<any>(query, {
           input: {
             registrationRecord:
               clientRegistrationFinishResult.registrationRecord,
@@ -345,7 +345,7 @@ describe("Input errors", () => {
 
     await expect(
       (async () =>
-        await graphql.client.request(query, {
+        await graphql.client.request<any>(query, {
           input: {
             registrationRecord:
               clientRegistrationFinishResult.registrationRecord,
@@ -391,7 +391,7 @@ describe("Input errors", () => {
 
     await expect(
       (async () =>
-        await graphql.client.request(query, {
+        await graphql.client.request<any>(query, {
           input: {
             registrationRecord:
               clientRegistrationFinishResult.registrationRecord,
@@ -408,14 +408,14 @@ describe("Input errors", () => {
   test("Invalid input", async () => {
     await expect(
       (async () =>
-        await graphql.client.request(query, {
+        await graphql.client.request<any>(query, {
           input: null,
         }))()
     ).rejects.toThrowError(/BAD_USER_INPUT/);
   });
   test("No input", async () => {
     await expect(
-      (async () => await graphql.client.request(query, null))()
+      (async () => await graphql.client.request<any>(query))()
     ).rejects.toThrowError(/BAD_USER_INPUT/);
   });
 });

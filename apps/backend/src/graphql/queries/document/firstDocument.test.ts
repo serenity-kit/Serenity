@@ -70,7 +70,7 @@ beforeAll(async () => {
 });
 
 test("user should be able to retrieve the first document", async () => {
-  const result = await graphql.client.request(
+  const result = await graphql.client.request<any>(
     query,
     { workspaceId: userData1.workspace.id },
     {
@@ -97,7 +97,7 @@ test("user should not be able to retreive the first document from another worksp
   };
   await expect(
     (async () =>
-      await graphql.client.request(
+      await graphql.client.request<any>(
         query,
         { workspaceId },
         authorizationHeader
@@ -109,7 +109,7 @@ test("Unauthenticated", async () => {
   const authorizationHeader = { authorization: "badauthheader" };
   await expect(
     (async () =>
-      await graphql.client.request(
+      await graphql.client.request<any>(
         query,
         { workspaceId },
         authorizationHeader
@@ -123,11 +123,15 @@ test("Input Errors", async () => {
   };
   await expect(
     (async () =>
-      await graphql.client.request(query, null, authorizationHeader))()
+      await graphql.client.request<any>(
+        query,
+        undefined,
+        authorizationHeader
+      ))()
   ).rejects.toThrowError(/BAD_USER_INPUT/);
   await expect(
     (async () =>
-      await graphql.client.request(
+      await graphql.client.request<any>(
         query,
         { workspaceId: null },
         authorizationHeader

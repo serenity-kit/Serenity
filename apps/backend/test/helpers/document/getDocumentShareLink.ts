@@ -19,5 +19,5 @@ export const getDocumentShareLink = async ({
       }
     }
   `;
-  return await graphql.client.request(query, { token });
+  return await graphql.client.request<any>(query, { token });
 };

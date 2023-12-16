@@ -184,7 +184,7 @@ const query = gql`
 test("Invalid workspace infoCiphertext", async () => {
   await expect(
     (async () =>
-      await graphql.client.request(
+      await graphql.client.request<any>(
         query,
         {
           input: {
@@ -225,7 +225,7 @@ test("Invalid workspace infoCiphertext", async () => {
 test("Invalid workspace id", async () => {
   await expect(
     (async () =>
-      await graphql.client.request(
+      await graphql.client.request<any>(
         query,
         {
           input: {
@@ -266,7 +266,7 @@ test("Invalid workspace id", async () => {
 test("Invalid folder id", async () => {
   await expect(
     (async () =>
-      await graphql.client.request(
+      await graphql.client.request<any>(
         query,
         {
           input: {
@@ -307,7 +307,7 @@ test("Invalid folder id", async () => {
 test("Invalid folder name", async () => {
   await expect(
     (async () =>
-      await graphql.client.request(
+      await graphql.client.request<any>(
         query,
         {
           input: {
@@ -348,7 +348,7 @@ test("Invalid folder name", async () => {
 test("Invalid folder nonce", async () => {
   await expect(
     (async () =>
-      await graphql.client.request(
+      await graphql.client.request<any>(
         query,
         {
           input: {
@@ -389,7 +389,7 @@ test("Invalid folder nonce", async () => {
 test("Invalid folder trace", async () => {
   await expect(
     (async () =>
-      await graphql.client.request(
+      await graphql.client.request<any>(
         query,
         {
           input: {
@@ -426,7 +426,7 @@ test("Invalid folder trace", async () => {
 test("Invalid document id", async () => {
   await expect(
     (async () =>
-      await graphql.client.request(
+      await graphql.client.request<any>(
         query,
         {
           input: {
@@ -467,7 +467,7 @@ test("Invalid document id", async () => {
 test("Invalid document name", async () => {
   await expect(
     (async () =>
-      await graphql.client.request(
+      await graphql.client.request<any>(
         query,
         {
           input: {
@@ -508,7 +508,7 @@ test("Invalid document name", async () => {
 test("Invalid document nonce", async () => {
   await expect(
     (async () =>
-      await graphql.client.request(
+      await graphql.client.request<any>(
         query,
         {
           input: {
@@ -549,7 +549,7 @@ test("Invalid document nonce", async () => {
 test("Invalid subkeyId", async () => {
   await expect(
     (async () =>
-      await graphql.client.request(
+      await graphql.client.request<any>(
         query,
         {
           input: {
@@ -590,7 +590,7 @@ test("Invalid subkeyId", async () => {
 test("Invalid creator device", async () => {
   await expect(
     (async () =>
-      await graphql.client.request(
+      await graphql.client.request<any>(
         query,
         {
           input: {
@@ -631,7 +631,7 @@ test("Invalid creator device", async () => {
 test("creator device must belong to user", async () => {
   await expect(
     (async () =>
-      await graphql.client.request(
+      await graphql.client.request<any>(
         query,
         {
           input: {

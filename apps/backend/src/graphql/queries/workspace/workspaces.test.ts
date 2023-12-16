@@ -124,7 +124,7 @@ const getWorkspaces = async ({
       }
     }
   `;
-  return graphql.client.request(
+  return graphql.client.request<any>(
     query,
     {
       deviceSigningPublicKey,
@@ -240,6 +240,10 @@ test("Input errors", async () => {
   `;
   await expect(
     (async () =>
-      await graphql.client.request(query, null, authorizationHeader))()
+      await graphql.client.request<any>(
+        query,
+        undefined,
+        authorizationHeader
+      ))()
   ).rejects.toThrowError();
 });

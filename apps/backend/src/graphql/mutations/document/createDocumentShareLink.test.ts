@@ -213,7 +213,7 @@ describe("Input errors", () => {
     const snapshotKey = sodium.to_base64(sodium.crypto_kdf_keygen());
     await expect(
       (async () =>
-        await graphql.client.request(
+        await graphql.client.request<any>(
           query,
           {
             input: {
@@ -244,7 +244,7 @@ describe("Input errors", () => {
     const snapshotKey = sodium.to_base64(sodium.crypto_kdf_keygen());
     await expect(
       (async () =>
-        await graphql.client.request(
+        await graphql.client.request<any>(
           query,
           {
             input: {
@@ -306,7 +306,7 @@ describe("Input errors", () => {
     const snapshotKey = sodium.to_base64(sodium.crypto_kdf_keygen());
     await expect(
       (async () =>
-        await graphql.client.request(
+        await graphql.client.request<any>(
           query,
           {
             input: {
@@ -334,7 +334,7 @@ describe("Input errors", () => {
     });
     await expect(
       (async () =>
-        await graphql.client.request(
+        await graphql.client.request<any>(
           query,
           {
             input: null,
@@ -354,7 +354,7 @@ describe("Input errors", () => {
     });
     await expect(
       (async () =>
-        await graphql.client.request(query, null, {
+        await graphql.client.request<any>(query, undefined, {
           authorization: deriveSessionAuthorization({
             sessionKey: userData1.sessionKey,
           }).authorization,

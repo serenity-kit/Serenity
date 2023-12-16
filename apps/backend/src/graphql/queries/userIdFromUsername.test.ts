@@ -34,7 +34,11 @@ test("can retrieve a user by username", async () => {
       }
     }
   `;
-  const result = await graphql.client.request(query, null, authorizationHeader);
+  const result = await graphql.client.request<any>(
+    query,
+    undefined,
+    authorizationHeader
+  );
   expect(result.me).toMatchInlineSnapshot(`undefined`);
 });
 
@@ -51,7 +55,11 @@ test("can't retrieve a non-existant user", async () => {
   `;
   await expect(
     (async () =>
-      await graphql.client.request(query, null, authorizationHeader))()
+      await graphql.client.request<any>(
+        query,
+        undefined,
+        authorizationHeader
+      ))()
   ).rejects.toThrow("User not found");
 });
 
@@ -66,7 +74,11 @@ test("Unauthenticated", async () => {
   `;
   await expect(
     (async () =>
-      await graphql.client.request(query, null, authorizationHeader))()
+      await graphql.client.request<any>(
+        query,
+        undefined,
+        authorizationHeader
+      ))()
   ).rejects.toThrowError(/UNAUTHENTICATED/);
 });
 
@@ -84,7 +96,11 @@ describe("Input errors", () => {
     `;
     await expect(
       (async () =>
-        await graphql.client.request(query1, null, authorizationHeader))()
+        await graphql.client.request<any>(
+          query1,
+          undefined,
+          authorizationHeader
+        ))()
     ).rejects.toThrowError(/BAD_USER_INPUT/);
   });
   test("Invalid username", async () => {
@@ -100,7 +116,11 @@ describe("Input errors", () => {
     `;
     await expect(
       (async () =>
-        await graphql.client.request(query2, null, authorizationHeader))()
+        await graphql.client.request<any>(
+          query2,
+          undefined,
+          authorizationHeader
+        ))()
     ).rejects.toThrowError(/BAD_USER_INPUT/);
   });
 });

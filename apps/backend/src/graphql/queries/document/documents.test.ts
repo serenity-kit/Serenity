@@ -72,7 +72,7 @@ const getDocuments = async ({
       }
     }
   `;
-  const result = await graphql.client.request(
+  const result = await graphql.client.request<any>(
     query,
     {
       parentFolderId,
@@ -401,7 +401,11 @@ describe("Input Errors", () => {
     `;
     await expect(
       (async () =>
-        await graphql.client.request(query2, null, authorizationHeader))()
+        await graphql.client.request<any>(
+          query2,
+          undefined,
+          authorizationHeader
+        ))()
     ).rejects.toThrowError(/BAD_USER_INPUT/);
   });
 });

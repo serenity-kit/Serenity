@@ -248,7 +248,7 @@ describe("Input errors", () => {
   test("Invalid documentId", async () => {
     await expect(
       (async () =>
-        await graphql.client.request(
+        await graphql.client.request<any>(
           query,
           {
             documentId: null,
@@ -261,7 +261,7 @@ describe("Input errors", () => {
   test("Invalid deviceSigningPublicKey", async () => {
     await expect(
       (async () =>
-        await graphql.client.request(
+        await graphql.client.request<any>(
           query,
           {
             documentId,
