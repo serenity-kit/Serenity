@@ -2,7 +2,7 @@ import Constants from "expo-constants";
 
 // Public keys are generated using opaque.server.getPublicKey
 export const getOpaqueServerPublicKey = () => {
-  const env = Constants.manifest?.extra?.serenityEnvironment;
+  const env = Constants.expoConfig?.extra?.serenityEnvironment;
 
   if (env === "e2e") {
     // dev env based on .e2e-tests.env OPAQUE_SERVER_SETUP
