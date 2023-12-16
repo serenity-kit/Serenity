@@ -7,25 +7,27 @@ export type InputMaybe<T> = Maybe<T>;
 export type Exact<T extends { [key: string]: unknown }> = { [K in keyof T]: T[K] };
 export type MakeOptional<T, K extends keyof T> = Omit<T, K> & { [SubKey in K]?: Maybe<T[SubKey]> };
 export type MakeMaybe<T, K extends keyof T> = Omit<T, K> & { [SubKey in K]: Maybe<T[SubKey]> };
+export type MakeEmpty<T extends { [key: string]: unknown }, K extends keyof T> = { [_ in K]?: never };
+export type Incremental<T> = T | { [P in keyof T]?: P extends ' $fragmentName' | '__typename' ? T[P] : never };
 export type Omit<T, K extends keyof T> = Pick<T, Exclude<keyof T, K>>;
 /** All built-in and custom scalars, mapped to their actual values */
 export type Scalars = {
-  ID: string;
-  String: string;
-  Boolean: boolean;
-  Int: number;
-  Float: number;
-  Date: any;
+  ID: { input: string; output: string; }
+  String: { input: string; output: string; }
+  Boolean: { input: boolean; output: boolean; }
+  Int: { input: number; output: number; }
+  Float: { input: number; output: number; }
+  Date: { input: any; output: any; }
 };
 
 export type AcceptWorkspaceInvitationInput = {
-  serializedWorkspaceChainEvent: Scalars['String'];
-  serializedWorkspaceMemberDevicesProof: Scalars['String'];
+  serializedWorkspaceChainEvent: Scalars['String']['input'];
+  serializedWorkspaceMemberDevicesProof: Scalars['String']['input'];
 };
 
 export type AcceptWorkspaceInvitationResult = {
   __typename?: 'AcceptWorkspaceInvitationResult';
-  workspaceId: Scalars['String'];
+  workspaceId: Scalars['String']['output'];
 };
 
 export type ActiveWorkspaceKeysResult = {
@@ -34,34 +36,34 @@ export type ActiveWorkspaceKeysResult = {
 };
 
 export type AddDeviceInput = {
-  deviceEncryptionPublicKey: Scalars['String'];
-  deviceEncryptionPublicKeySignature: Scalars['String'];
-  deviceInfo: Scalars['String'];
-  deviceSigningPublicKey: Scalars['String'];
-  deviceType: Scalars['String'];
-  loginId: Scalars['String'];
-  serializedUserChainEvent: Scalars['String'];
-  sessionTokenSignature: Scalars['String'];
-  webDeviceCiphertext?: InputMaybe<Scalars['String']>;
-  webDeviceNonce?: InputMaybe<Scalars['String']>;
+  deviceEncryptionPublicKey: Scalars['String']['input'];
+  deviceEncryptionPublicKeySignature: Scalars['String']['input'];
+  deviceInfo: Scalars['String']['input'];
+  deviceSigningPublicKey: Scalars['String']['input'];
+  deviceType: Scalars['String']['input'];
+  loginId: Scalars['String']['input'];
+  serializedUserChainEvent: Scalars['String']['input'];
+  sessionTokenSignature: Scalars['String']['input'];
+  webDeviceCiphertext?: InputMaybe<Scalars['String']['input']>;
+  webDeviceNonce?: InputMaybe<Scalars['String']['input']>;
   workspaceMemberDevicesProofs: Array<WorkspaceMemberDevicesProofEntryInput>;
 };
 
 export type AddDeviceResult = {
   __typename?: 'AddDeviceResult';
-  expiresAt: Scalars['Date'];
-  webDeviceAccessToken?: Maybe<Scalars['String']>;
+  expiresAt: Scalars['Date']['output'];
+  webDeviceAccessToken?: Maybe<Scalars['String']['output']>;
 };
 
 export type AddMemberWorkspaceKeyInput = {
   workspaceKeyBoxes: Array<WorkspaceDeviceInput>;
-  workspaceKeyId: Scalars['String'];
+  workspaceKeyId: Scalars['String']['input'];
 };
 
 export type AttachDeviceToWorkspacesInput = {
-  creatorDeviceSigningPublicKey: Scalars['String'];
+  creatorDeviceSigningPublicKey: Scalars['String']['input'];
   deviceWorkspaceKeyBoxes: Array<WorkspaceKeyBoxData>;
-  receiverDeviceSigningPublicKey: Scalars['String'];
+  receiverDeviceSigningPublicKey: Scalars['String']['input'];
 };
 
 export type AttachDeviceToWorkspacesResult = {
@@ -70,28 +72,28 @@ export type AttachDeviceToWorkspacesResult = {
 };
 
 export type AuthorizeMemberInput = {
-  creatorDeviceSigningPublicKey: Scalars['String'];
-  workspaceId: Scalars['String'];
+  creatorDeviceSigningPublicKey: Scalars['String']['input'];
+  workspaceId: Scalars['String']['input'];
   workspaceKeys: Array<AddMemberWorkspaceKeyInput>;
 };
 
 export type AuthorizeMemberResult = {
   __typename?: 'AuthorizeMemberResult';
-  success: Scalars['Boolean'];
+  success: Scalars['Boolean']['output'];
 };
 
 export type Comment = {
   __typename?: 'Comment';
   commentReplies?: Maybe<Array<Maybe<CommentReply>>>;
-  contentCiphertext: Scalars['String'];
-  contentNonce: Scalars['String'];
-  createdAt: Scalars['Date'];
+  contentCiphertext: Scalars['String']['output'];
+  contentNonce: Scalars['String']['output'];
+  createdAt: Scalars['Date']['output'];
   creatorDevice: CreatorDevice;
-  documentId: Scalars['String'];
-  id: Scalars['String'];
-  signature: Scalars['String'];
-  snapshotId: Scalars['String'];
-  subkeyId: Scalars['String'];
+  documentId: Scalars['String']['output'];
+  id: Scalars['String']['output'];
+  signature: Scalars['String']['output'];
+  snapshotId: Scalars['String']['output'];
+  subkeyId: Scalars['String']['output'];
 };
 
 export type CommentConnection = {
@@ -107,44 +109,44 @@ export type CommentConnection = {
 export type CommentEdge = {
   __typename?: 'CommentEdge';
   /** https://facebook.github.io/relay/graphql/connections.htm#sec-Cursor */
-  cursor: Scalars['String'];
+  cursor: Scalars['String']['output'];
   /** https://facebook.github.io/relay/graphql/connections.htm#sec-Node */
   node?: Maybe<Comment>;
 };
 
 export type CommentReply = {
   __typename?: 'CommentReply';
-  commentId: Scalars['String'];
-  contentCiphertext: Scalars['String'];
-  contentNonce: Scalars['String'];
-  createdAt: Scalars['Date'];
+  commentId: Scalars['String']['output'];
+  contentCiphertext: Scalars['String']['output'];
+  contentNonce: Scalars['String']['output'];
+  createdAt: Scalars['Date']['output'];
   creatorDevice: CreatorDevice;
-  documentId: Scalars['String'];
-  id: Scalars['String'];
-  signature: Scalars['String'];
-  snapshotId: Scalars['String'];
-  subkeyId: Scalars['String'];
+  documentId: Scalars['String']['output'];
+  id: Scalars['String']['output'];
+  signature: Scalars['String']['output'];
+  snapshotId: Scalars['String']['output'];
+  subkeyId: Scalars['String']['output'];
 };
 
 export type CreateCommentInput = {
-  commentId: Scalars['String'];
-  contentCiphertext: Scalars['String'];
-  contentNonce: Scalars['String'];
-  documentShareLinkToken?: InputMaybe<Scalars['String']>;
-  signature: Scalars['String'];
-  snapshotId: Scalars['String'];
-  subkeyId: Scalars['String'];
+  commentId: Scalars['String']['input'];
+  contentCiphertext: Scalars['String']['input'];
+  contentNonce: Scalars['String']['input'];
+  documentShareLinkToken?: InputMaybe<Scalars['String']['input']>;
+  signature: Scalars['String']['input'];
+  snapshotId: Scalars['String']['input'];
+  subkeyId: Scalars['String']['input'];
 };
 
 export type CreateCommentReplyInput = {
-  commentId: Scalars['String'];
-  commentReplyId: Scalars['String'];
-  contentCiphertext: Scalars['String'];
-  contentNonce: Scalars['String'];
-  documentShareLinkToken?: InputMaybe<Scalars['String']>;
-  signature: Scalars['String'];
-  snapshotId: Scalars['String'];
-  subkeyId: Scalars['String'];
+  commentId: Scalars['String']['input'];
+  commentReplyId: Scalars['String']['input'];
+  contentCiphertext: Scalars['String']['input'];
+  contentNonce: Scalars['String']['input'];
+  documentShareLinkToken?: InputMaybe<Scalars['String']['input']>;
+  signature: Scalars['String']['input'];
+  snapshotId: Scalars['String']['input'];
+  subkeyId: Scalars['String']['input'];
 };
 
 export type CreateCommentReplyResult = {
@@ -158,42 +160,42 @@ export type CreateCommentResult = {
 };
 
 export type CreateDocumentInput = {
-  nameCiphertext: Scalars['String'];
-  nameNonce: Scalars['String'];
-  parentFolderId: Scalars['String'];
-  serializedDocumentChainEvent: Scalars['String'];
+  nameCiphertext: Scalars['String']['input'];
+  nameNonce: Scalars['String']['input'];
+  parentFolderId: Scalars['String']['input'];
+  serializedDocumentChainEvent: Scalars['String']['input'];
   snapshot: DocumentSnapshotInput;
-  subkeyId: Scalars['String'];
-  workspaceId: Scalars['String'];
+  subkeyId: Scalars['String']['input'];
+  workspaceId: Scalars['String']['input'];
 };
 
 export type CreateDocumentResult = {
   __typename?: 'CreateDocumentResult';
-  id: Scalars['String'];
+  id: Scalars['String']['output'];
 };
 
 export type CreateDocumentShareLinkInput = {
-  deviceSecretBoxCiphertext: Scalars['String'];
-  deviceSecretBoxNonce: Scalars['String'];
-  documentId: Scalars['String'];
-  serializedDocumentChainEvent: Scalars['String'];
+  deviceSecretBoxCiphertext: Scalars['String']['input'];
+  deviceSecretBoxNonce: Scalars['String']['input'];
+  documentId: Scalars['String']['input'];
+  serializedDocumentChainEvent: Scalars['String']['input'];
   snapshotDeviceKeyBox: SnapshotDeviceKeyBoxInput;
 };
 
 export type CreateDocumentShareLinkResult = {
   __typename?: 'CreateDocumentShareLinkResult';
-  token: Scalars['String'];
+  token: Scalars['String']['output'];
 };
 
 export type CreateFolderInput = {
-  id: Scalars['String'];
+  id: Scalars['String']['input'];
   keyDerivationTrace: KeyDerivationTraceInput;
-  nameCiphertext: Scalars['String'];
-  nameNonce: Scalars['String'];
-  parentFolderId?: InputMaybe<Scalars['String']>;
-  subkeyId: Scalars['String'];
-  workspaceId: Scalars['String'];
-  workspaceKeyId: Scalars['String'];
+  nameCiphertext: Scalars['String']['input'];
+  nameNonce: Scalars['String']['input'];
+  parentFolderId?: InputMaybe<Scalars['String']['input']>;
+  subkeyId: Scalars['String']['input'];
+  workspaceId: Scalars['String']['input'];
+  workspaceKeyId: Scalars['String']['input'];
 };
 
 export type CreateFolderResult = {
@@ -202,34 +204,34 @@ export type CreateFolderResult = {
 };
 
 export type CreateInitialDocumentInput = {
-  nameCiphertext: Scalars['String'];
-  nameNonce: Scalars['String'];
-  serializedDocumentChainEvent: Scalars['String'];
+  nameCiphertext: Scalars['String']['input'];
+  nameNonce: Scalars['String']['input'];
+  serializedDocumentChainEvent: Scalars['String']['input'];
   snapshot: DocumentSnapshotInput;
-  subkeyId: Scalars['String'];
+  subkeyId: Scalars['String']['input'];
 };
 
 export type CreateInitialFolderInput = {
-  id: Scalars['String'];
-  idSignature: Scalars['String'];
+  id: Scalars['String']['input'];
+  idSignature: Scalars['String']['input'];
   keyDerivationTrace: KeyDerivationTraceInput;
-  nameCiphertext: Scalars['String'];
-  nameNonce: Scalars['String'];
+  nameCiphertext: Scalars['String']['input'];
+  nameNonce: Scalars['String']['input'];
 };
 
 export type CreateInitialWorkspaceInput = {
   deviceWorkspaceKeyBoxes: Array<DeviceWorkspaceKeyBoxInput>;
-  infoCiphertext: Scalars['String'];
-  infoNonce: Scalars['String'];
-  workspaceKeyId: Scalars['String'];
+  infoCiphertext: Scalars['String']['input'];
+  infoNonce: Scalars['String']['input'];
+  workspaceKeyId: Scalars['String']['input'];
 };
 
 export type CreateInitialWorkspaceStructureInput = {
-  creatorDeviceSigningPublicKey: Scalars['String'];
+  creatorDeviceSigningPublicKey: Scalars['String']['input'];
   document: CreateInitialDocumentInput;
   folder: CreateInitialFolderInput;
-  serializedWorkspaceChainEvent: Scalars['String'];
-  serializedWorkspaceMemberDevicesProof: Scalars['String'];
+  serializedWorkspaceChainEvent: Scalars['String']['input'];
+  serializedWorkspaceMemberDevicesProof: Scalars['String']['input'];
   workspace: CreateInitialWorkspaceInput;
 };
 
@@ -241,9 +243,9 @@ export type CreateInitialWorkspaceStructureResult = {
 };
 
 export type CreateWorkspaceInvitationInput = {
-  serializedWorkspaceChainEvent: Scalars['String'];
-  serializedWorkspaceMemberDevicesProof: Scalars['String'];
-  workspaceId: Scalars['String'];
+  serializedWorkspaceChainEvent: Scalars['String']['input'];
+  serializedWorkspaceMemberDevicesProof: Scalars['String']['input'];
+  workspaceId: Scalars['String']['input'];
 };
 
 export type CreateWorkspaceInvitationResult = {
@@ -253,87 +255,87 @@ export type CreateWorkspaceInvitationResult = {
 
 export type CreatorDevice = {
   __typename?: 'CreatorDevice';
-  createdAt?: Maybe<Scalars['Date']>;
-  encryptionPublicKey: Scalars['String'];
-  encryptionPublicKeySignature: Scalars['String'];
-  signingPublicKey: Scalars['String'];
+  createdAt?: Maybe<Scalars['Date']['output']>;
+  encryptionPublicKey: Scalars['String']['output'];
+  encryptionPublicKeySignature: Scalars['String']['output'];
+  signingPublicKey: Scalars['String']['output'];
 };
 
 export type DeleteCommentRepliesInput = {
-  commentReplyIds: Array<Scalars['String']>;
+  commentReplyIds: Array<Scalars['String']['input']>;
 };
 
 export type DeleteCommentRepliesResult = {
   __typename?: 'DeleteCommentRepliesResult';
-  status: Scalars['String'];
+  status: Scalars['String']['output'];
 };
 
 export type DeleteCommentsInput = {
-  commentIds: Array<Scalars['String']>;
-  documentShareLinkToken?: InputMaybe<Scalars['String']>;
+  commentIds: Array<Scalars['String']['input']>;
+  documentShareLinkToken?: InputMaybe<Scalars['String']['input']>;
 };
 
 export type DeleteCommentsResult = {
   __typename?: 'DeleteCommentsResult';
-  status: Scalars['String'];
+  status: Scalars['String']['output'];
 };
 
 export type DeleteDeviceInput = {
-  creatorSigningPublicKey: Scalars['String'];
+  creatorSigningPublicKey: Scalars['String']['input'];
   newDeviceWorkspaceKeyBoxes: Array<WorkspaceWithWorkspaceDevicesParingInput>;
-  serializedUserChainEvent: Scalars['String'];
+  serializedUserChainEvent: Scalars['String']['input'];
   workspaceMemberDevicesProofs: Array<WorkspaceMemberDevicesProofEntryInput>;
 };
 
 export type DeleteDeviceResult = {
   __typename?: 'DeleteDeviceResult';
-  status: Scalars['String'];
+  status: Scalars['String']['output'];
 };
 
 export type DeleteDocumentsInput = {
-  ids: Array<Scalars['String']>;
-  workspaceId: Scalars['String'];
+  ids: Array<Scalars['String']['input']>;
+  workspaceId: Scalars['String']['input'];
 };
 
 export type DeleteDocumentsResult = {
   __typename?: 'DeleteDocumentsResult';
-  status: Scalars['String'];
+  status: Scalars['String']['output'];
 };
 
 export type DeleteFoldersInput = {
-  ids: Array<Scalars['String']>;
-  workspaceId: Scalars['String'];
+  ids: Array<Scalars['String']['input']>;
+  workspaceId: Scalars['String']['input'];
 };
 
 export type DeleteFoldersResult = {
   __typename?: 'DeleteFoldersResult';
-  status: Scalars['String'];
+  status: Scalars['String']['output'];
 };
 
 export type DeleteWorkspaceInvitationsInput = {
-  serializedWorkspaceChainEvent: Scalars['String'];
-  serializedWorkspaceMemberDevicesProof: Scalars['String'];
+  serializedWorkspaceChainEvent: Scalars['String']['input'];
+  serializedWorkspaceMemberDevicesProof: Scalars['String']['input'];
 };
 
 export type DeleteWorkspaceInvitationsResult = {
   __typename?: 'DeleteWorkspaceInvitationsResult';
-  status: Scalars['String'];
+  status: Scalars['String']['output'];
 };
 
 export type DeleteWorkspacesInput = {
-  ids: Array<Scalars['String']>;
+  ids: Array<Scalars['String']['input']>;
 };
 
 export type DeleteWorkspacesResult = {
   __typename?: 'DeleteWorkspacesResult';
-  status: Scalars['String'];
+  status: Scalars['String']['output'];
 };
 
 export type Device = {
   __typename?: 'Device';
-  createdAt?: Maybe<Scalars['Date']>;
-  info?: Maybe<Scalars['String']>;
-  signingPublicKey: Scalars['String'];
+  createdAt?: Maybe<Scalars['Date']['output']>;
+  info?: Maybe<Scalars['String']['output']>;
+  signingPublicKey: Scalars['String']['output'];
 };
 
 export type DeviceConnection = {
@@ -349,33 +351,33 @@ export type DeviceConnection = {
 export type DeviceEdge = {
   __typename?: 'DeviceEdge';
   /** https://facebook.github.io/relay/graphql/connections.htm#sec-Cursor */
-  cursor: Scalars['String'];
+  cursor: Scalars['String']['output'];
   /** https://facebook.github.io/relay/graphql/connections.htm#sec-Node */
   node?: Maybe<Device>;
 };
 
 export type DeviceWorkspaceKeyBoxInput = {
-  ciphertext: Scalars['String'];
-  deviceSigningPublicKey: Scalars['String'];
-  nonce: Scalars['String'];
+  ciphertext: Scalars['String']['input'];
+  deviceSigningPublicKey: Scalars['String']['input'];
+  nonce: Scalars['String']['input'];
 };
 
 export type Document = {
   __typename?: 'Document';
-  id: Scalars['String'];
-  nameCiphertext: Scalars['String'];
-  nameNonce: Scalars['String'];
-  parentFolderId?: Maybe<Scalars['String']>;
-  rootFolderId?: Maybe<Scalars['String']>;
-  subkeyId: Scalars['String'];
-  workspaceId: Scalars['String'];
+  id: Scalars['String']['output'];
+  nameCiphertext: Scalars['String']['output'];
+  nameNonce: Scalars['String']['output'];
+  parentFolderId?: Maybe<Scalars['String']['output']>;
+  rootFolderId?: Maybe<Scalars['String']['output']>;
+  subkeyId: Scalars['String']['output'];
+  workspaceId: Scalars['String']['output'];
   workspaceKey?: Maybe<WorkspaceKey>;
 };
 
 export type DocumentChainEvent = {
   __typename?: 'DocumentChainEvent';
-  position: Scalars['Int'];
-  serializedContent: Scalars['String'];
+  position: Scalars['Int']['output'];
+  serializedContent: Scalars['String']['output'];
 };
 
 export type DocumentChainEventConnection = {
@@ -391,7 +393,7 @@ export type DocumentChainEventConnection = {
 export type DocumentChainEventEdge = {
   __typename?: 'DocumentChainEventEdge';
   /** https://facebook.github.io/relay/graphql/connections.htm#sec-Cursor */
-  cursor: Scalars['String'];
+  cursor: Scalars['String']['output'];
   /** https://facebook.github.io/relay/graphql/connections.htm#sec-Node */
   node?: Maybe<DocumentChainEvent>;
 };
@@ -409,15 +411,15 @@ export type DocumentConnection = {
 export type DocumentEdge = {
   __typename?: 'DocumentEdge';
   /** https://facebook.github.io/relay/graphql/connections.htm#sec-Cursor */
-  cursor: Scalars['String'];
+  cursor: Scalars['String']['output'];
   /** https://facebook.github.io/relay/graphql/connections.htm#sec-Node */
   node?: Maybe<Document>;
 };
 
 export type DocumentShareLink = {
   __typename?: 'DocumentShareLink';
-  deviceSigningPublicKey: Scalars['String'];
-  token: Scalars['String'];
+  deviceSigningPublicKey: Scalars['String']['output'];
+  token: Scalars['String']['output'];
 };
 
 export type DocumentShareLinkConnection = {
@@ -433,7 +435,7 @@ export type DocumentShareLinkConnection = {
 export type DocumentShareLinkEdge = {
   __typename?: 'DocumentShareLinkEdge';
   /** https://facebook.github.io/relay/graphql/connections.htm#sec-Cursor */
-  cursor: Scalars['String'];
+  cursor: Scalars['String']['output'];
   /** https://facebook.github.io/relay/graphql/connections.htm#sec-Node */
   node?: Maybe<DocumentShareLink>;
 };
@@ -441,61 +443,61 @@ export type DocumentShareLinkEdge = {
 export type DocumentShareLinkForSharePage = {
   __typename?: 'DocumentShareLinkForSharePage';
   activeSnapshotKeyBox: SnapshotKeyBox;
-  deviceEncryptionPublicKey: Scalars['String'];
-  deviceEncryptionPublicKeySignature: Scalars['String'];
-  deviceSecretBoxCiphertext: Scalars['String'];
-  deviceSecretBoxNonce: Scalars['String'];
-  deviceSigningPublicKey: Scalars['String'];
+  deviceEncryptionPublicKey: Scalars['String']['output'];
+  deviceEncryptionPublicKeySignature: Scalars['String']['output'];
+  deviceSecretBoxCiphertext: Scalars['String']['output'];
+  deviceSecretBoxNonce: Scalars['String']['output'];
+  deviceSigningPublicKey: Scalars['String']['output'];
   role: ShareDocumentRole;
-  token: Scalars['String'];
-  websocketSessionKey: Scalars['String'];
-  workspaceId: Scalars['String'];
+  token: Scalars['String']['output'];
+  websocketSessionKey: Scalars['String']['output'];
+  workspaceId: Scalars['String']['output'];
 };
 
 export type DocumentSnapshotInput = {
-  ciphertext: Scalars['String'];
-  nonce: Scalars['String'];
+  ciphertext: Scalars['String']['input'];
+  nonce: Scalars['String']['input'];
   publicData: DocumentSnapshotPublicDataInput;
-  signature: Scalars['String'];
+  signature: Scalars['String']['input'];
 };
 
 export type DocumentSnapshotPublicDataInput = {
-  docId: Scalars['String'];
-  documentChainEventHash: Scalars['String'];
+  docId: Scalars['String']['input'];
+  documentChainEventHash: Scalars['String']['input'];
   keyDerivationTrace: KeyDerivationTraceInput;
-  parentSnapshotId: Scalars['String'];
-  parentSnapshotProof: Scalars['String'];
+  parentSnapshotId: Scalars['String']['input'];
+  parentSnapshotProof: Scalars['String']['input'];
   parentSnapshotUpdateClocks: DocumentSnapshotPublicDataParentSnapshotClocksInput;
-  pubKey: Scalars['String'];
-  snapshotId?: InputMaybe<Scalars['String']>;
+  pubKey: Scalars['String']['input'];
+  snapshotId?: InputMaybe<Scalars['String']['input']>;
   workspaceMemberDevicesProof: WorkspaceMemberDevicesProofInput;
 };
 
 export type DocumentSnapshotPublicDataParentSnapshotClocksInput = {
-  dummy?: InputMaybe<Scalars['String']>;
+  dummy?: InputMaybe<Scalars['String']['input']>;
 };
 
 export type EncryptedWebDeviceResult = {
   __typename?: 'EncryptedWebDeviceResult';
-  ciphertext: Scalars['String'];
-  nonce: Scalars['String'];
+  ciphertext: Scalars['String']['output'];
+  nonce: Scalars['String']['output'];
 };
 
 export type File = {
   __typename?: 'File';
-  downloadUrl: Scalars['String'];
-  id: Scalars['String'];
+  downloadUrl: Scalars['String']['output'];
+  id: Scalars['String']['output'];
 };
 
 export type FinishLoginInput = {
-  loginId: Scalars['String'];
-  message: Scalars['String'];
+  loginId: Scalars['String']['input'];
+  message: Scalars['String']['input'];
 };
 
 export type FinishLoginMainDevice = {
   __typename?: 'FinishLoginMainDevice';
-  ciphertext: Scalars['String'];
-  nonce: Scalars['String'];
+  ciphertext: Scalars['String']['output'];
+  nonce: Scalars['String']['output'];
 };
 
 export type FinishLoginResult = {
@@ -506,35 +508,35 @@ export type FinishLoginResult = {
 };
 
 export type FinishRegistrationDeviceInput = {
-  ciphertext: Scalars['String'];
-  nonce: Scalars['String'];
+  ciphertext: Scalars['String']['input'];
+  nonce: Scalars['String']['input'];
 };
 
 export type FinishRegistrationInput = {
   encryptedMainDevice: FinishRegistrationDeviceInput;
-  pendingWorkspaceInvitationId?: InputMaybe<Scalars['String']>;
-  pendingWorkspaceInvitationKeyCiphertext?: InputMaybe<Scalars['String']>;
-  pendingWorkspaceInvitationKeyPublicNonce?: InputMaybe<Scalars['String']>;
-  pendingWorkspaceInvitationKeySubkeyId?: InputMaybe<Scalars['String']>;
-  registrationRecord: Scalars['String'];
-  serializedUserChainEvent: Scalars['String'];
+  pendingWorkspaceInvitationId?: InputMaybe<Scalars['String']['input']>;
+  pendingWorkspaceInvitationKeyCiphertext?: InputMaybe<Scalars['String']['input']>;
+  pendingWorkspaceInvitationKeyPublicNonce?: InputMaybe<Scalars['String']['input']>;
+  pendingWorkspaceInvitationKeySubkeyId?: InputMaybe<Scalars['String']['input']>;
+  registrationRecord: Scalars['String']['input'];
+  serializedUserChainEvent: Scalars['String']['input'];
 };
 
 export type FinishRegistrationResult = {
   __typename?: 'FinishRegistrationResult';
-  id: Scalars['String'];
-  verificationCode?: Maybe<Scalars['String']>;
+  id: Scalars['String']['output'];
+  verificationCode?: Maybe<Scalars['String']['output']>;
 };
 
 export type Folder = {
   __typename?: 'Folder';
-  id: Scalars['String'];
+  id: Scalars['String']['output'];
   keyDerivationTrace: KeyDerivationTrace;
-  nameCiphertext: Scalars['String'];
-  nameNonce: Scalars['String'];
-  parentFolderId?: Maybe<Scalars['String']>;
-  rootFolderId?: Maybe<Scalars['String']>;
-  workspaceId?: Maybe<Scalars['String']>;
+  nameCiphertext: Scalars['String']['output'];
+  nameNonce: Scalars['String']['output'];
+  parentFolderId?: Maybe<Scalars['String']['output']>;
+  rootFolderId?: Maybe<Scalars['String']['output']>;
+  workspaceId?: Maybe<Scalars['String']['output']>;
   workspaceKey?: Maybe<WorkspaceKey>;
 };
 
@@ -551,78 +553,78 @@ export type FolderConnection = {
 export type FolderEdge = {
   __typename?: 'FolderEdge';
   /** https://facebook.github.io/relay/graphql/connections.htm#sec-Cursor */
-  cursor: Scalars['String'];
+  cursor: Scalars['String']['output'];
   /** https://facebook.github.io/relay/graphql/connections.htm#sec-Node */
   node?: Maybe<Folder>;
 };
 
 export type InitiateFileUploadInput = {
-  documentId: Scalars['String'];
-  workspaceId: Scalars['String'];
+  documentId: Scalars['String']['input'];
+  workspaceId: Scalars['String']['input'];
 };
 
 export type InitiateFileUploadResult = {
   __typename?: 'InitiateFileUploadResult';
-  fileId: Scalars['String'];
-  uploadUrl: Scalars['String'];
+  fileId: Scalars['String']['output'];
+  uploadUrl: Scalars['String']['output'];
 };
 
 export type KeyDerivationTrace = {
   __typename?: 'KeyDerivationTrace';
   trace: Array<KeyDerivationTraceEntry>;
-  workspaceKeyId: Scalars['String'];
+  workspaceKeyId: Scalars['String']['output'];
 };
 
 export type KeyDerivationTraceEntry = {
   __typename?: 'KeyDerivationTraceEntry';
-  context: Scalars['String'];
-  entryId: Scalars['String'];
-  parentId?: Maybe<Scalars['String']>;
-  subkeyId: Scalars['String'];
+  context: Scalars['String']['output'];
+  entryId: Scalars['String']['output'];
+  parentId?: Maybe<Scalars['String']['output']>;
+  subkeyId: Scalars['String']['output'];
 };
 
 export type KeyDerivationTraceEntryInput = {
-  context: Scalars['String'];
-  entryId: Scalars['String'];
-  parentId?: InputMaybe<Scalars['String']>;
-  subkeyId: Scalars['String'];
+  context: Scalars['String']['input'];
+  entryId: Scalars['String']['input'];
+  parentId?: InputMaybe<Scalars['String']['input']>;
+  subkeyId: Scalars['String']['input'];
 };
 
 export type KeyDerivationTraceInput = {
   trace: Array<KeyDerivationTraceEntryInput>;
-  workspaceKeyId: Scalars['String'];
+  workspaceKeyId: Scalars['String']['input'];
 };
 
 export type LogoutInput = {
-  serializedUserChainEvent: Scalars['String'];
+  serializedUserChainEvent: Scalars['String']['input'];
   workspaceMemberDevicesProofs: Array<WorkspaceMemberDevicesProofEntryInput>;
 };
 
 export type LogoutResult = {
   __typename?: 'LogoutResult';
-  success: Scalars['Boolean'];
+  success: Scalars['Boolean']['output'];
 };
 
 export type MainDeviceResult = {
   __typename?: 'MainDeviceResult';
-  ciphertext: Scalars['String'];
-  nonce: Scalars['String'];
+  ciphertext: Scalars['String']['output'];
+  nonce: Scalars['String']['output'];
 };
 
 export type MeResult = {
   __typename?: 'MeResult';
-  id: Scalars['String'];
-  mainDeviceSigningPublicKey: Scalars['String'];
-  username: Scalars['String'];
+  id: Scalars['String']['output'];
+  mainDeviceSigningPublicKey: Scalars['String']['output'];
+  username: Scalars['String']['output'];
   workspaceLoadingInfo?: Maybe<WorkspaceLoadingInfo>;
 };
 
 
 export type MeResultWorkspaceLoadingInfoArgs = {
-  documentId?: InputMaybe<Scalars['ID']>;
-  returnOtherDocumentIfNotFound?: InputMaybe<Scalars['Boolean']>;
-  returnOtherWorkspaceIfNotFound?: InputMaybe<Scalars['Boolean']>;
-  workspaceId?: InputMaybe<Scalars['ID']>;
+  documentId?: InputMaybe<Scalars['ID']['input']>;
+  returnOtherDocumentIfNotFound?: InputMaybe<Scalars['Boolean']['input']>;
+  returnOtherWorkspaceIfNotFound?: InputMaybe<Scalars['Boolean']['input']>;
+  workspaceId?: InputMaybe<Scalars['ID']['input']>;
 };
 
 export type Mutation = {
@@ -819,21 +821,21 @@ export type MutationVerifyRegistrationArgs = {
 export type PageInfo = {
   __typename?: 'PageInfo';
   /** The cursor corresponding to the last nodes in edges. Null if the connection is empty. */
-  endCursor?: Maybe<Scalars['String']>;
+  endCursor?: Maybe<Scalars['String']['output']>;
   /** Used to indicate whether more edges exist following the set defined by the clients arguments. */
-  hasNextPage: Scalars['Boolean'];
+  hasNextPage: Scalars['Boolean']['output'];
   /** Used to indicate whether more edges exist prior to the set defined by the clients arguments. */
-  hasPreviousPage: Scalars['Boolean'];
+  hasPreviousPage: Scalars['Boolean']['output'];
   /** The cursor corresponding to the first nodes in edges. Null if the connection is empty. */
-  startCursor?: Maybe<Scalars['String']>;
+  startCursor?: Maybe<Scalars['String']['output']>;
 };
 
 export type PendingWorkspaceInvitationResult = {
   __typename?: 'PendingWorkspaceInvitationResult';
-  ciphertext?: Maybe<Scalars['String']>;
-  id?: Maybe<Scalars['String']>;
-  publicNonce?: Maybe<Scalars['String']>;
-  subkeyId?: Maybe<Scalars['String']>;
+  ciphertext?: Maybe<Scalars['String']['output']>;
+  id?: Maybe<Scalars['String']['output']>;
+  publicNonce?: Maybe<Scalars['String']['output']>;
+  subkeyId?: Maybe<Scalars['String']['output']>;
 };
 
 export type Query = {
@@ -877,217 +879,217 @@ export type Query = {
 
 
 export type QueryActiveWorkspaceKeysArgs = {
-  deviceSigningPublicKey: Scalars['String'];
-  workspaceId: Scalars['ID'];
+  deviceSigningPublicKey: Scalars['String']['input'];
+  workspaceId: Scalars['ID']['input'];
 };
 
 
 export type QueryCommentsByDocumentIdArgs = {
-  after?: InputMaybe<Scalars['String']>;
-  before?: InputMaybe<Scalars['String']>;
-  documentId: Scalars['ID'];
-  documentShareLinkToken?: InputMaybe<Scalars['String']>;
-  first?: InputMaybe<Scalars['Int']>;
-  last?: InputMaybe<Scalars['Int']>;
+  after?: InputMaybe<Scalars['String']['input']>;
+  before?: InputMaybe<Scalars['String']['input']>;
+  documentId: Scalars['ID']['input'];
+  documentShareLinkToken?: InputMaybe<Scalars['String']['input']>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+  last?: InputMaybe<Scalars['Int']['input']>;
 };
 
 
 export type QueryDevicesArgs = {
-  after?: InputMaybe<Scalars['String']>;
-  first: Scalars['Int'];
-  onlyNotExpired: Scalars['Boolean'];
+  after?: InputMaybe<Scalars['String']['input']>;
+  first: Scalars['Int']['input'];
+  onlyNotExpired: Scalars['Boolean']['input'];
 };
 
 
 export type QueryDocumentArgs = {
-  id: Scalars['ID'];
+  id: Scalars['ID']['input'];
 };
 
 
 export type QueryDocumentChainArgs = {
-  after?: InputMaybe<Scalars['String']>;
-  documentId: Scalars['ID'];
-  first: Scalars['Int'];
+  after?: InputMaybe<Scalars['String']['input']>;
+  documentId: Scalars['ID']['input'];
+  first: Scalars['Int']['input'];
 };
 
 
 export type QueryDocumentPathArgs = {
-  id: Scalars['ID'];
+  id: Scalars['ID']['input'];
 };
 
 
 export type QueryDocumentShareLinkArgs = {
-  token: Scalars['ID'];
+  token: Scalars['ID']['input'];
 };
 
 
 export type QueryDocumentShareLinkSnapshotKeyBoxArgs = {
-  snapshotId: Scalars['ID'];
-  token: Scalars['ID'];
+  snapshotId: Scalars['ID']['input'];
+  token: Scalars['ID']['input'];
 };
 
 
 export type QueryDocumentShareLinksArgs = {
-  after?: InputMaybe<Scalars['String']>;
-  documentId: Scalars['ID'];
-  first: Scalars['Int'];
+  after?: InputMaybe<Scalars['String']['input']>;
+  documentId: Scalars['ID']['input'];
+  first: Scalars['Int']['input'];
 };
 
 
 export type QueryDocumentsArgs = {
-  after?: InputMaybe<Scalars['String']>;
-  first: Scalars['Int'];
-  parentFolderId: Scalars['ID'];
-  usingOldKeys?: InputMaybe<Scalars['Boolean']>;
+  after?: InputMaybe<Scalars['String']['input']>;
+  first: Scalars['Int']['input'];
+  parentFolderId: Scalars['ID']['input'];
+  usingOldKeys?: InputMaybe<Scalars['Boolean']['input']>;
 };
 
 
 export type QueryEncryptedWebDeviceArgs = {
-  accessToken: Scalars['String'];
+  accessToken: Scalars['String']['input'];
 };
 
 
 export type QueryFileUrlArgs = {
-  documentId: Scalars['ID'];
-  fileId: Scalars['ID'];
-  workspaceId: Scalars['ID'];
+  documentId: Scalars['ID']['input'];
+  fileId: Scalars['ID']['input'];
+  workspaceId: Scalars['ID']['input'];
 };
 
 
 export type QueryFirstDocumentArgs = {
-  workspaceId: Scalars['ID'];
+  workspaceId: Scalars['ID']['input'];
 };
 
 
 export type QueryFolderArgs = {
-  id: Scalars['ID'];
+  id: Scalars['ID']['input'];
 };
 
 
 export type QueryFolderTraceArgs = {
-  folderId: Scalars['ID'];
+  folderId: Scalars['ID']['input'];
 };
 
 
 export type QueryFoldersArgs = {
-  after?: InputMaybe<Scalars['String']>;
-  first: Scalars['Int'];
-  parentFolderId: Scalars['ID'];
-  usingOldKeys?: InputMaybe<Scalars['Boolean']>;
+  after?: InputMaybe<Scalars['String']['input']>;
+  first: Scalars['Int']['input'];
+  parentFolderId: Scalars['ID']['input'];
+  usingOldKeys?: InputMaybe<Scalars['Boolean']['input']>;
 };
 
 
 export type QueryRootFoldersArgs = {
-  after?: InputMaybe<Scalars['String']>;
-  first: Scalars['Int'];
-  workspaceId: Scalars['ID'];
+  after?: InputMaybe<Scalars['String']['input']>;
+  first: Scalars['Int']['input'];
+  workspaceId: Scalars['ID']['input'];
 };
 
 
 export type QuerySnapshotArgs = {
-  documentId: Scalars['ID'];
-  documentShareLinkToken?: InputMaybe<Scalars['String']>;
+  documentId: Scalars['ID']['input'];
+  documentShareLinkToken?: InputMaybe<Scalars['String']['input']>;
 };
 
 
 export type QueryUserChainArgs = {
-  after?: InputMaybe<Scalars['String']>;
-  first: Scalars['Int'];
-  userId?: InputMaybe<Scalars['ID']>;
-  workspaceId?: InputMaybe<Scalars['ID']>;
+  after?: InputMaybe<Scalars['String']['input']>;
+  first: Scalars['Int']['input'];
+  userId?: InputMaybe<Scalars['ID']['input']>;
+  workspaceId?: InputMaybe<Scalars['ID']['input']>;
 };
 
 
 export type QueryUserIdFromUsernameArgs = {
-  username: Scalars['String'];
+  username: Scalars['String']['input'];
 };
 
 
 export type QueryWorkspaceArgs = {
-  deviceSigningPublicKey: Scalars['String'];
-  id?: InputMaybe<Scalars['ID']>;
+  deviceSigningPublicKey: Scalars['String']['input'];
+  id?: InputMaybe<Scalars['ID']['input']>;
 };
 
 
 export type QueryWorkspaceChainArgs = {
-  after?: InputMaybe<Scalars['String']>;
-  first: Scalars['Int'];
-  workspaceId: Scalars['ID'];
+  after?: InputMaybe<Scalars['String']['input']>;
+  first: Scalars['Int']['input'];
+  workspaceId: Scalars['ID']['input'];
 };
 
 
 export type QueryWorkspaceChainByInvitationIdArgs = {
-  after?: InputMaybe<Scalars['String']>;
-  first: Scalars['Int'];
-  invitationId: Scalars['ID'];
+  after?: InputMaybe<Scalars['String']['input']>;
+  first: Scalars['Int']['input'];
+  invitationId: Scalars['ID']['input'];
 };
 
 
 export type QueryWorkspaceInvitationArgs = {
-  id: Scalars['ID'];
+  id: Scalars['ID']['input'];
 };
 
 
 export type QueryWorkspaceInvitationsArgs = {
-  after?: InputMaybe<Scalars['String']>;
-  first: Scalars['Int'];
-  workspaceId: Scalars['ID'];
+  after?: InputMaybe<Scalars['String']['input']>;
+  first: Scalars['Int']['input'];
+  workspaceId: Scalars['ID']['input'];
 };
 
 
 export type QueryWorkspaceKeyByDocumentIdArgs = {
-  deviceSigningPublicKey: Scalars['String'];
-  documentId: Scalars['ID'];
+  deviceSigningPublicKey: Scalars['String']['input'];
+  documentId: Scalars['ID']['input'];
 };
 
 
 export type QueryWorkspaceMemberDevicesProofArgs = {
-  hash?: InputMaybe<Scalars['String']>;
-  invitationId?: InputMaybe<Scalars['ID']>;
-  workspaceId: Scalars['ID'];
+  hash?: InputMaybe<Scalars['String']['input']>;
+  invitationId?: InputMaybe<Scalars['ID']['input']>;
+  workspaceId: Scalars['ID']['input'];
 };
 
 
 export type QueryWorkspaceMemberDevicesProofsArgs = {
-  after?: InputMaybe<Scalars['String']>;
-  first: Scalars['Int'];
+  after?: InputMaybe<Scalars['String']['input']>;
+  first: Scalars['Int']['input'];
 };
 
 
 export type QueryWorkspaceMembersArgs = {
-  after?: InputMaybe<Scalars['String']>;
-  first: Scalars['Int'];
-  workspaceId: Scalars['ID'];
+  after?: InputMaybe<Scalars['String']['input']>;
+  first: Scalars['Int']['input'];
+  workspaceId: Scalars['ID']['input'];
 };
 
 
 export type QueryWorkspaceMembersByMainDeviceSigningPublicKeyArgs = {
-  mainDeviceSigningPublicKeys: Array<Scalars['String']>;
-  workspaceId: Scalars['ID'];
+  mainDeviceSigningPublicKeys: Array<Scalars['String']['input']>;
+  workspaceId: Scalars['ID']['input'];
 };
 
 
 export type QueryWorkspacesArgs = {
-  after?: InputMaybe<Scalars['String']>;
-  deviceSigningPublicKey: Scalars['String'];
-  first: Scalars['Int'];
+  after?: InputMaybe<Scalars['String']['input']>;
+  deviceSigningPublicKey: Scalars['String']['input'];
+  first: Scalars['Int']['input'];
 };
 
 export type RemoveDocumentShareLinkInput = {
-  serializedDocumentChainEvent: Scalars['String'];
+  serializedDocumentChainEvent: Scalars['String']['input'];
 };
 
 export type RemoveDocumentShareLinkResult = {
   __typename?: 'RemoveDocumentShareLinkResult';
-  success: Scalars['Boolean'];
+  success: Scalars['Boolean']['output'];
 };
 
 export type RemoveMemberAndRotateWorkspaceKeyInput = {
-  creatorDeviceSigningPublicKey: Scalars['String'];
+  creatorDeviceSigningPublicKey: Scalars['String']['input'];
   deviceWorkspaceKeyBoxes: Array<WorkspaceDeviceInput>;
-  serializedWorkspaceChainEvent: Scalars['String'];
-  serializedWorkspaceMemberDevicesProof: Scalars['String'];
-  workspaceId: Scalars['String'];
+  serializedWorkspaceChainEvent: Scalars['String']['input'];
+  serializedWorkspaceMemberDevicesProof: Scalars['String']['input'];
+  workspaceId: Scalars['String']['input'];
 };
 
 export type RemoveMemberAndRotateWorkspaceKeyResult = {
@@ -1111,77 +1113,77 @@ export enum ShareDocumentRole {
 export type Snapshot = {
   __typename?: 'Snapshot';
   activeDocumentSnapshot?: Maybe<Document>;
-  clocks: Array<Scalars['Int']>;
-  createdAt: Scalars['Date'];
-  data: Scalars['String'];
+  clocks: Array<Scalars['Int']['output']>;
+  createdAt: Scalars['Date']['output'];
+  data: Scalars['String']['output'];
   document?: Maybe<Document>;
-  documentId: Scalars['String'];
-  id: Scalars['String'];
+  documentId: Scalars['String']['output'];
+  id: Scalars['String']['output'];
   keyDerivationTrace: KeyDerivationTrace;
   updates?: Maybe<Array<Update>>;
 };
 
 export type SnapshotDeviceKeyBoxInput = {
-  ciphertext: Scalars['String'];
-  deviceSigningPublicKey: Scalars['String'];
-  nonce: Scalars['String'];
+  ciphertext: Scalars['String']['input'];
+  deviceSigningPublicKey: Scalars['String']['input'];
+  nonce: Scalars['String']['input'];
 };
 
 export type SnapshotKeyBox = {
   __typename?: 'SnapshotKeyBox';
-  ciphertext: Scalars['String'];
+  ciphertext: Scalars['String']['output'];
   creatorDevice: CreatorDevice;
-  creatorDeviceSigningPublicKey: Scalars['String'];
-  deviceSigningPublicKey: Scalars['String'];
-  id: Scalars['String'];
-  nonce: Scalars['String'];
+  creatorDeviceSigningPublicKey: Scalars['String']['output'];
+  deviceSigningPublicKey: Scalars['String']['output'];
+  id: Scalars['String']['output'];
+  nonce: Scalars['String']['output'];
 };
 
 export type StartLoginInput = {
-  challenge: Scalars['String'];
-  username: Scalars['String'];
+  challenge: Scalars['String']['input'];
+  username: Scalars['String']['input'];
 };
 
 export type StartLoginResult = {
   __typename?: 'StartLoginResult';
-  challengeResponse: Scalars['String'];
-  loginId: Scalars['String'];
+  challengeResponse: Scalars['String']['output'];
+  loginId: Scalars['String']['output'];
 };
 
 export type StartRegistrationInput = {
-  challenge: Scalars['String'];
-  username: Scalars['String'];
+  challenge: Scalars['String']['input'];
+  username: Scalars['String']['input'];
 };
 
 export type StartRegistrationResult = {
   __typename?: 'StartRegistrationResult';
-  challengeResponse: Scalars['String'];
+  challengeResponse: Scalars['String']['output'];
 };
 
 export type UnauthorizedMemberResult = {
   __typename?: 'UnauthorizedMemberResult';
-  userId: Scalars['String'];
-  userMainDeviceSigningPublicKey: Scalars['String'];
-  workspaceId: Scalars['String'];
+  userId: Scalars['String']['output'];
+  userMainDeviceSigningPublicKey: Scalars['String']['output'];
+  workspaceId: Scalars['String']['output'];
 };
 
 export type Update = {
   __typename?: 'Update';
-  clock: Scalars['Int'];
-  data: Scalars['String'];
-  id: Scalars['String'];
-  pubKey: Scalars['String'];
+  clock: Scalars['Int']['output'];
+  data: Scalars['String']['output'];
+  id: Scalars['String']['output'];
+  pubKey: Scalars['String']['output'];
   snapshot?: Maybe<Snapshot>;
-  snapshotId: Scalars['String'];
-  version: Scalars['Int'];
+  snapshotId: Scalars['String']['output'];
+  version: Scalars['Int']['output'];
 };
 
 export type UpdateDocumentNameInput = {
-  id: Scalars['String'];
-  nameCiphertext: Scalars['String'];
-  nameNonce: Scalars['String'];
-  subkeyId: Scalars['String'];
-  workspaceKeyId: Scalars['String'];
+  id: Scalars['String']['input'];
+  nameCiphertext: Scalars['String']['input'];
+  nameNonce: Scalars['String']['input'];
+  subkeyId: Scalars['String']['input'];
+  workspaceKeyId: Scalars['String']['input'];
 };
 
 export type UpdateDocumentNameResult = {
@@ -1190,12 +1192,12 @@ export type UpdateDocumentNameResult = {
 };
 
 export type UpdateFolderNameInput = {
-  id: Scalars['String'];
+  id: Scalars['String']['input'];
   keyDerivationTrace: KeyDerivationTraceInput;
-  nameCiphertext: Scalars['String'];
-  nameNonce: Scalars['String'];
-  subkeyId: Scalars['String'];
-  workspaceKeyId: Scalars['String'];
+  nameCiphertext: Scalars['String']['input'];
+  nameNonce: Scalars['String']['input'];
+  subkeyId: Scalars['String']['input'];
+  workspaceKeyId: Scalars['String']['input'];
 };
 
 export type UpdateFolderNameResult = {
@@ -1204,9 +1206,9 @@ export type UpdateFolderNameResult = {
 };
 
 export type UpdateWorkspaceMemberRoleInput = {
-  serializedWorkspaceChainEvent: Scalars['String'];
-  serializedWorkspaceMemberDevicesProof: Scalars['String'];
-  workspaceId: Scalars['String'];
+  serializedWorkspaceChainEvent: Scalars['String']['input'];
+  serializedWorkspaceMemberDevicesProof: Scalars['String']['input'];
+  workspaceId: Scalars['String']['input'];
 };
 
 export type UpdateWorkspaceMemberRoleResult = {
@@ -1215,10 +1217,10 @@ export type UpdateWorkspaceMemberRoleResult = {
 };
 
 export type UpdateWorkspaceNameInput = {
-  id: Scalars['String'];
-  infoCiphertext: Scalars['String'];
-  infoNonce: Scalars['String'];
-  infoWorkspaceKeyId: Scalars['String'];
+  id: Scalars['String']['input'];
+  infoCiphertext: Scalars['String']['input'];
+  infoNonce: Scalars['String']['input'];
+  infoWorkspaceKeyId: Scalars['String']['input'];
 };
 
 export type UpdateWorkspaceNameResult = {
@@ -1229,14 +1231,14 @@ export type UpdateWorkspaceNameResult = {
 export type User = {
   __typename?: 'User';
   chain: Array<UserChainEvent>;
-  id: Scalars['String'];
-  username: Scalars['String'];
+  id: Scalars['String']['output'];
+  username: Scalars['String']['output'];
 };
 
 export type UserChainEvent = {
   __typename?: 'UserChainEvent';
-  position: Scalars['Int'];
-  serializedContent: Scalars['String'];
+  position: Scalars['Int']['output'];
+  serializedContent: Scalars['String']['output'];
 };
 
 export type UserChainEventConnection = {
@@ -1252,41 +1254,41 @@ export type UserChainEventConnection = {
 export type UserChainEventEdge = {
   __typename?: 'UserChainEventEdge';
   /** https://facebook.github.io/relay/graphql/connections.htm#sec-Cursor */
-  cursor: Scalars['String'];
+  cursor: Scalars['String']['output'];
   /** https://facebook.github.io/relay/graphql/connections.htm#sec-Node */
   node?: Maybe<UserChainEvent>;
 };
 
 export type UserIdFromUsernameResult = {
   __typename?: 'UserIdFromUsernameResult';
-  id: Scalars['String'];
+  id: Scalars['String']['output'];
 };
 
 export type VerifyRegistrationInput = {
-  username: Scalars['String'];
-  verificationCode: Scalars['String'];
+  username: Scalars['String']['input'];
+  verificationCode: Scalars['String']['input'];
 };
 
 export type VerifyRegistrationResult = {
   __typename?: 'VerifyRegistrationResult';
-  id: Scalars['String'];
+  id: Scalars['String']['output'];
 };
 
 export type Workspace = {
   __typename?: 'Workspace';
   currentWorkspaceKey?: Maybe<WorkspaceKey>;
-  id: Scalars['String'];
-  infoCiphertext?: Maybe<Scalars['String']>;
-  infoNonce?: Maybe<Scalars['String']>;
+  id: Scalars['String']['output'];
+  infoCiphertext?: Maybe<Scalars['String']['output']>;
+  infoNonce?: Maybe<Scalars['String']['output']>;
   infoWorkspaceKey?: Maybe<WorkspaceKey>;
-  infoWorkspaceKeyId?: Maybe<Scalars['String']>;
+  infoWorkspaceKeyId?: Maybe<Scalars['String']['output']>;
   workspaceKeys?: Maybe<Array<WorkspaceKey>>;
 };
 
 export type WorkspaceChainEvent = {
   __typename?: 'WorkspaceChainEvent';
-  position: Scalars['Int'];
-  serializedContent: Scalars['String'];
+  position: Scalars['Int']['output'];
+  serializedContent: Scalars['String']['output'];
 };
 
 export type WorkspaceChainEventConnection = {
@@ -1302,7 +1304,7 @@ export type WorkspaceChainEventConnection = {
 export type WorkspaceChainEventEdge = {
   __typename?: 'WorkspaceChainEventEdge';
   /** https://facebook.github.io/relay/graphql/connections.htm#sec-Cursor */
-  cursor: Scalars['String'];
+  cursor: Scalars['String']['output'];
   /** https://facebook.github.io/relay/graphql/connections.htm#sec-Node */
   node?: Maybe<WorkspaceChainEvent>;
 };
@@ -1318,30 +1320,30 @@ export type WorkspaceConnection = {
 };
 
 export type WorkspaceDeviceInput = {
-  ciphertext: Scalars['String'];
-  nonce: Scalars['String'];
-  receiverDeviceSigningPublicKey: Scalars['String'];
+  ciphertext: Scalars['String']['input'];
+  nonce: Scalars['String']['input'];
+  receiverDeviceSigningPublicKey: Scalars['String']['input'];
 };
 
 export type WorkspaceEdge = {
   __typename?: 'WorkspaceEdge';
   /** https://facebook.github.io/relay/graphql/connections.htm#sec-Cursor */
-  cursor: Scalars['String'];
+  cursor: Scalars['String']['output'];
   /** https://facebook.github.io/relay/graphql/connections.htm#sec-Node */
   node?: Maybe<Workspace>;
 };
 
 export type WorkspaceInvitation = {
   __typename?: 'WorkspaceInvitation';
-  expiresAt: Scalars['Date'];
-  id: Scalars['String'];
-  invitationDataSignature: Scalars['String'];
-  invitationSigningPublicKey: Scalars['String'];
-  inviterUserId: Scalars['String'];
-  inviterUsername: Scalars['String'];
+  expiresAt: Scalars['Date']['output'];
+  id: Scalars['String']['output'];
+  invitationDataSignature: Scalars['String']['output'];
+  invitationSigningPublicKey: Scalars['String']['output'];
+  inviterUserId: Scalars['String']['output'];
+  inviterUsername: Scalars['String']['output'];
   role: Role;
-  workspaceId: Scalars['String'];
-  workspaceName?: Maybe<Scalars['String']>;
+  workspaceId: Scalars['String']['output'];
+  workspaceName?: Maybe<Scalars['String']['output']>;
 };
 
 export type WorkspaceInvitationConnection = {
@@ -1357,33 +1359,33 @@ export type WorkspaceInvitationConnection = {
 export type WorkspaceInvitationEdge = {
   __typename?: 'WorkspaceInvitationEdge';
   /** https://facebook.github.io/relay/graphql/connections.htm#sec-Cursor */
-  cursor: Scalars['String'];
+  cursor: Scalars['String']['output'];
   /** https://facebook.github.io/relay/graphql/connections.htm#sec-Node */
   node?: Maybe<WorkspaceInvitation>;
 };
 
 export type WorkspaceKey = {
   __typename?: 'WorkspaceKey';
-  generation: Scalars['Int'];
-  id: Scalars['String'];
-  workspaceId: Scalars['String'];
+  generation: Scalars['Int']['output'];
+  id: Scalars['String']['output'];
+  workspaceId: Scalars['String']['output'];
   workspaceKeyBox?: Maybe<WorkspaceKeyBox>;
   workspaceKeyBoxes?: Maybe<Array<WorkspaceKeyBox>>;
 };
 
 export type WorkspaceKeyBox = {
   __typename?: 'WorkspaceKeyBox';
-  ciphertext: Scalars['String'];
+  ciphertext: Scalars['String']['output'];
   creatorDevice: CreatorDevice;
-  creatorDeviceSigningPublicKey: Scalars['String'];
-  deviceSigningPublicKey: Scalars['String'];
-  id: Scalars['String'];
-  nonce: Scalars['String'];
-  workspaceKeyId: Scalars['String'];
+  creatorDeviceSigningPublicKey: Scalars['String']['output'];
+  deviceSigningPublicKey: Scalars['String']['output'];
+  id: Scalars['String']['output'];
+  nonce: Scalars['String']['output'];
+  workspaceKeyId: Scalars['String']['output'];
 };
 
 export type WorkspaceKeyBoxData = {
-  workspaceId: Scalars['String'];
+  workspaceId: Scalars['String']['input'];
   workspaceKeyDevicePairs: Array<WorkspaceKeyDevicePair>;
 };
 
@@ -1393,21 +1395,21 @@ export type WorkspaceKeyByDocumentIdResult = {
 };
 
 export type WorkspaceKeyDevicePair = {
-  ciphertext: Scalars['String'];
-  nonce: Scalars['String'];
-  workspaceKeyId: Scalars['String'];
+  ciphertext: Scalars['String']['input'];
+  nonce: Scalars['String']['input'];
+  workspaceKeyId: Scalars['String']['input'];
 };
 
 export type WorkspaceLoadingInfo = {
   __typename?: 'WorkspaceLoadingInfo';
-  documentId?: Maybe<Scalars['String']>;
-  id: Scalars['String'];
-  isAuthorized: Scalars['Boolean'];
+  documentId?: Maybe<Scalars['String']['output']>;
+  id: Scalars['String']['output'];
+  isAuthorized: Scalars['Boolean']['output'];
 };
 
 export type WorkspaceMember = {
   __typename?: 'WorkspaceMember';
-  id: Scalars['String'];
+  id: Scalars['String']['output'];
   user: User;
 };
 
@@ -1423,10 +1425,10 @@ export type WorkspaceMemberConnection = {
 
 export type WorkspaceMemberDevicesProof = {
   __typename?: 'WorkspaceMemberDevicesProof';
-  authorMainDeviceSigningPublicKey: Scalars['String'];
+  authorMainDeviceSigningPublicKey: Scalars['String']['output'];
   proof: WorkspaceMemberDevicesProofContent;
-  serializedData: Scalars['String'];
-  workspaceId: Scalars['String'];
+  serializedData: Scalars['String']['output'];
+  workspaceId: Scalars['String']['output'];
 };
 
 export type WorkspaceMemberDevicesProofConnection = {
@@ -1441,36 +1443,36 @@ export type WorkspaceMemberDevicesProofConnection = {
 
 export type WorkspaceMemberDevicesProofContent = {
   __typename?: 'WorkspaceMemberDevicesProofContent';
-  clock: Scalars['Int'];
-  hash: Scalars['String'];
-  hashSignature: Scalars['String'];
-  version: Scalars['Int'];
+  clock: Scalars['Int']['output'];
+  hash: Scalars['String']['output'];
+  hashSignature: Scalars['String']['output'];
+  version: Scalars['Int']['output'];
 };
 
 export type WorkspaceMemberDevicesProofEdge = {
   __typename?: 'WorkspaceMemberDevicesProofEdge';
   /** https://facebook.github.io/relay/graphql/connections.htm#sec-Cursor */
-  cursor: Scalars['String'];
+  cursor: Scalars['String']['output'];
   /** https://facebook.github.io/relay/graphql/connections.htm#sec-Node */
   node?: Maybe<WorkspaceMemberDevicesProof>;
 };
 
 export type WorkspaceMemberDevicesProofEntryInput = {
-  serializedWorkspaceMemberDevicesProof: Scalars['String'];
-  workspaceId: Scalars['String'];
+  serializedWorkspaceMemberDevicesProof: Scalars['String']['input'];
+  workspaceId: Scalars['String']['input'];
 };
 
 export type WorkspaceMemberDevicesProofInput = {
-  clock: Scalars['Int'];
-  hash: Scalars['String'];
-  hashSignature: Scalars['String'];
-  version: Scalars['Int'];
+  clock: Scalars['Int']['input'];
+  hash: Scalars['String']['input'];
+  hashSignature: Scalars['String']['input'];
+  version: Scalars['Int']['input'];
 };
 
 export type WorkspaceMemberEdge = {
   __typename?: 'WorkspaceMemberEdge';
   /** https://facebook.github.io/relay/graphql/connections.htm#sec-Cursor */
-  cursor: Scalars['String'];
+  cursor: Scalars['String']['output'];
   /** https://facebook.github.io/relay/graphql/connections.htm#sec-Node */
   node?: Maybe<WorkspaceMember>;
 };
@@ -1481,7 +1483,7 @@ export type WorkspaceMembersByMainDeviceSigningPublicKeyResult = {
 };
 
 export type WorkspaceWithWorkspaceDevicesParingInput = {
-  id: Scalars['String'];
+  id: Scalars['String']['input'];
   workspaceDevices: Array<WorkspaceDeviceInput>;
 };
 
@@ -1703,120 +1705,120 @@ export type VerifyRegistrationMutationVariables = Exact<{
 export type VerifyRegistrationMutation = { __typename?: 'Mutation', verifyRegistration?: { __typename?: 'VerifyRegistrationResult', id: string } | null };
 
 export type CommentsByDocumentIdQueryVariables = Exact<{
-  documentId: Scalars['ID'];
-  documentShareLinkToken?: InputMaybe<Scalars['String']>;
-  first?: InputMaybe<Scalars['Int']>;
-  after?: InputMaybe<Scalars['String']>;
+  documentId: Scalars['ID']['input'];
+  documentShareLinkToken?: InputMaybe<Scalars['String']['input']>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+  after?: InputMaybe<Scalars['String']['input']>;
 }>;
 
 
 export type CommentsByDocumentIdQuery = { __typename?: 'Query', commentsByDocumentId?: { __typename?: 'CommentConnection', nodes?: Array<{ __typename?: 'Comment', id: string, documentId: string, snapshotId: string, subkeyId: string, contentCiphertext: string, contentNonce: string, signature: string, createdAt: any, creatorDevice: { __typename?: 'CreatorDevice', signingPublicKey: string, encryptionPublicKey: string, encryptionPublicKeySignature: string }, commentReplies?: Array<{ __typename?: 'CommentReply', id: string, snapshotId: string, subkeyId: string, contentCiphertext: string, contentNonce: string, signature: string, createdAt: any, creatorDevice: { __typename?: 'CreatorDevice', signingPublicKey: string, encryptionPublicKey: string, encryptionPublicKeySignature: string } } | null> | null } | null> | null, pageInfo: { __typename?: 'PageInfo', hasNextPage: boolean, hasPreviousPage: boolean, startCursor?: string | null, endCursor?: string | null } } | null };
 
 export type DevicesQueryVariables = Exact<{
-  onlyNotExpired: Scalars['Boolean'];
-  first: Scalars['Int'];
-  after?: InputMaybe<Scalars['String']>;
+  onlyNotExpired: Scalars['Boolean']['input'];
+  first: Scalars['Int']['input'];
+  after?: InputMaybe<Scalars['String']['input']>;
 }>;
 
 
 export type DevicesQuery = { __typename?: 'Query', devices?: { __typename?: 'DeviceConnection', nodes?: Array<{ __typename?: 'Device', signingPublicKey: string, info?: string | null, createdAt?: any | null } | null> | null, pageInfo: { __typename?: 'PageInfo', hasNextPage: boolean, endCursor?: string | null } } | null };
 
 export type DocumentQueryVariables = Exact<{
-  id: Scalars['ID'];
+  id: Scalars['ID']['input'];
 }>;
 
 
 export type DocumentQuery = { __typename?: 'Query', document?: { __typename?: 'Document', id: string, nameCiphertext: string, nameNonce: string, parentFolderId?: string | null, workspaceId: string, subkeyId: string } | null };
 
 export type DocumentChainQueryVariables = Exact<{
-  documentId: Scalars['ID'];
-  after?: InputMaybe<Scalars['String']>;
+  documentId: Scalars['ID']['input'];
+  after?: InputMaybe<Scalars['String']['input']>;
 }>;
 
 
 export type DocumentChainQuery = { __typename?: 'Query', documentChain?: { __typename?: 'DocumentChainEventConnection', nodes?: Array<{ __typename?: 'DocumentChainEvent', serializedContent: string, position: number } | null> | null } | null };
 
 export type DocumentPathQueryVariables = Exact<{
-  id: Scalars['ID'];
+  id: Scalars['ID']['input'];
 }>;
 
 
 export type DocumentPathQuery = { __typename?: 'Query', documentPath?: Array<{ __typename?: 'Folder', id: string, nameCiphertext: string, nameNonce: string, parentFolderId?: string | null, rootFolderId?: string | null, workspaceId?: string | null, keyDerivationTrace: { __typename?: 'KeyDerivationTrace', workspaceKeyId: string, trace: Array<{ __typename?: 'KeyDerivationTraceEntry', entryId: string, subkeyId: string, parentId?: string | null, context: string }> } } | null> | null };
 
 export type DocumentShareLinkQueryVariables = Exact<{
-  token: Scalars['ID'];
+  token: Scalars['ID']['input'];
 }>;
 
 
 export type DocumentShareLinkQuery = { __typename?: 'Query', documentShareLink?: { __typename?: 'DocumentShareLinkForSharePage', token: string, websocketSessionKey: string, workspaceId: string, role: ShareDocumentRole, deviceSecretBoxCiphertext: string, deviceSecretBoxNonce: string, activeSnapshotKeyBox: { __typename?: 'SnapshotKeyBox', id: string, ciphertext: string, nonce: string, creatorDevice: { __typename?: 'CreatorDevice', signingPublicKey: string, encryptionPublicKey: string } } } | null };
 
 export type DocumentShareLinkSnapshotKeyBoxQueryVariables = Exact<{
-  token: Scalars['ID'];
-  snapshotId: Scalars['ID'];
+  token: Scalars['ID']['input'];
+  snapshotId: Scalars['ID']['input'];
 }>;
 
 
 export type DocumentShareLinkSnapshotKeyBoxQuery = { __typename?: 'Query', documentShareLinkSnapshotKeyBox?: { __typename?: 'SnapshotKeyBox', id: string, ciphertext: string, nonce: string, creatorDevice: { __typename?: 'CreatorDevice', signingPublicKey: string, encryptionPublicKey: string } } | null };
 
 export type DocumentShareLinksQueryVariables = Exact<{
-  documentId: Scalars['ID'];
-  first?: Scalars['Int'];
-  after?: InputMaybe<Scalars['String']>;
+  documentId: Scalars['ID']['input'];
+  first?: Scalars['Int']['input'];
+  after?: InputMaybe<Scalars['String']['input']>;
 }>;
 
 
 export type DocumentShareLinksQuery = { __typename?: 'Query', documentShareLinks?: { __typename?: 'DocumentShareLinkConnection', nodes?: Array<{ __typename?: 'DocumentShareLink', deviceSigningPublicKey: string, token: string } | null> | null, pageInfo: { __typename?: 'PageInfo', hasNextPage: boolean, hasPreviousPage: boolean, startCursor?: string | null, endCursor?: string | null } } | null };
 
 export type DocumentsQueryVariables = Exact<{
-  parentFolderId: Scalars['ID'];
-  first?: Scalars['Int'];
-  after?: InputMaybe<Scalars['String']>;
+  parentFolderId: Scalars['ID']['input'];
+  first?: Scalars['Int']['input'];
+  after?: InputMaybe<Scalars['String']['input']>;
 }>;
 
 
 export type DocumentsQuery = { __typename?: 'Query', documents?: { __typename?: 'DocumentConnection', nodes?: Array<{ __typename?: 'Document', id: string, nameCiphertext: string, nameNonce: string, parentFolderId?: string | null, rootFolderId?: string | null, workspaceId: string, subkeyId: string } | null> | null, pageInfo: { __typename?: 'PageInfo', hasNextPage: boolean, hasPreviousPage: boolean, startCursor?: string | null, endCursor?: string | null } } | null };
 
 export type EncryptedWebDeviceQueryVariables = Exact<{
-  accessToken: Scalars['String'];
+  accessToken: Scalars['String']['input'];
 }>;
 
 
 export type EncryptedWebDeviceQuery = { __typename?: 'Query', encryptedWebDevice?: { __typename?: 'EncryptedWebDeviceResult', ciphertext: string, nonce: string } | null };
 
 export type FileUrlQueryVariables = Exact<{
-  fileId: Scalars['ID'];
-  workspaceId: Scalars['ID'];
-  documentId: Scalars['ID'];
+  fileId: Scalars['ID']['input'];
+  workspaceId: Scalars['ID']['input'];
+  documentId: Scalars['ID']['input'];
 }>;
 
 
 export type FileUrlQuery = { __typename?: 'Query', fileUrl?: { __typename?: 'File', id: string, downloadUrl: string } | null };
 
 export type FirstDocumentQueryVariables = Exact<{
-  workspaceId: Scalars['ID'];
+  workspaceId: Scalars['ID']['input'];
 }>;
 
 
 export type FirstDocumentQuery = { __typename?: 'Query', firstDocument?: { __typename?: 'Document', id: string } | null };
 
 export type FolderQueryVariables = Exact<{
-  id: Scalars['ID'];
+  id: Scalars['ID']['input'];
 }>;
 
 
 export type FolderQuery = { __typename?: 'Query', folder?: { __typename?: 'Folder', id: string, nameCiphertext: string, nameNonce: string, parentFolderId?: string | null, workspaceId?: string | null, keyDerivationTrace: { __typename?: 'KeyDerivationTrace', workspaceKeyId: string, trace: Array<{ __typename?: 'KeyDerivationTraceEntry', entryId: string, subkeyId: string, parentId?: string | null, context: string }> } } | null };
 
 export type FolderTraceQueryVariables = Exact<{
-  folderId: Scalars['ID'];
+  folderId: Scalars['ID']['input'];
 }>;
 
 
 export type FolderTraceQuery = { __typename?: 'Query', folderTrace: Array<{ __typename?: 'Folder', id: string, parentFolderId?: string | null, rootFolderId?: string | null, workspaceId?: string | null, nameCiphertext: string, nameNonce: string, keyDerivationTrace: { __typename?: 'KeyDerivationTrace', workspaceKeyId: string, trace: Array<{ __typename?: 'KeyDerivationTraceEntry', entryId: string, subkeyId: string, parentId?: string | null, context: string }> } }> };
 
 export type FoldersQueryVariables = Exact<{
-  parentFolderId: Scalars['ID'];
-  first: Scalars['Int'];
-  after?: InputMaybe<Scalars['String']>;
+  parentFolderId: Scalars['ID']['input'];
+  first: Scalars['Int']['input'];
+  after?: InputMaybe<Scalars['String']['input']>;
 }>;
 
 
@@ -1833,10 +1835,10 @@ export type MeQueryVariables = Exact<{ [key: string]: never; }>;
 export type MeQuery = { __typename?: 'Query', me?: { __typename?: 'MeResult', id: string, username: string } | null };
 
 export type MeWithWorkspaceLoadingInfoQueryVariables = Exact<{
-  workspaceId?: InputMaybe<Scalars['ID']>;
-  documentId?: InputMaybe<Scalars['ID']>;
-  returnOtherWorkspaceIfNotFound?: InputMaybe<Scalars['Boolean']>;
-  returnOtherDocumentIfNotFound?: InputMaybe<Scalars['Boolean']>;
+  workspaceId?: InputMaybe<Scalars['ID']['input']>;
+  documentId?: InputMaybe<Scalars['ID']['input']>;
+  returnOtherWorkspaceIfNotFound?: InputMaybe<Scalars['Boolean']['input']>;
+  returnOtherDocumentIfNotFound?: InputMaybe<Scalars['Boolean']['input']>;
 }>;
 
 
@@ -1848,16 +1850,16 @@ export type PendingWorkspaceInvitationQueryVariables = Exact<{ [key: string]: ne
 export type PendingWorkspaceInvitationQuery = { __typename?: 'Query', pendingWorkspaceInvitation?: { __typename?: 'PendingWorkspaceInvitationResult', id?: string | null, ciphertext?: string | null, publicNonce?: string | null, subkeyId?: string | null } | null };
 
 export type RootFoldersQueryVariables = Exact<{
-  workspaceId: Scalars['ID'];
-  first: Scalars['Int'];
-  after?: InputMaybe<Scalars['String']>;
+  workspaceId: Scalars['ID']['input'];
+  first: Scalars['Int']['input'];
+  after?: InputMaybe<Scalars['String']['input']>;
 }>;
 
 
 export type RootFoldersQuery = { __typename?: 'Query', rootFolders?: { __typename?: 'FolderConnection', nodes?: Array<{ __typename?: 'Folder', id: string, nameCiphertext: string, nameNonce: string, parentFolderId?: string | null, rootFolderId?: string | null, workspaceId?: string | null, keyDerivationTrace: { __typename?: 'KeyDerivationTrace', workspaceKeyId: string, trace: Array<{ __typename?: 'KeyDerivationTraceEntry', entryId: string, subkeyId: string, parentId?: string | null, context: string }> } } | null> | null, pageInfo: { __typename?: 'PageInfo', hasNextPage: boolean, endCursor?: string | null } } | null };
 
 export type SnapshotQueryVariables = Exact<{
-  documentId: Scalars['ID'];
+  documentId: Scalars['ID']['input'];
 }>;
 
 
@@ -1869,61 +1871,61 @@ export type UnauthorizedMemberQueryVariables = Exact<{ [key: string]: never; }>;
 export type UnauthorizedMemberQuery = { __typename?: 'Query', unauthorizedMember?: { __typename?: 'UnauthorizedMemberResult', userId: string, userMainDeviceSigningPublicKey: string, workspaceId: string } | null };
 
 export type UserChainQueryVariables = Exact<{
-  workspaceId?: InputMaybe<Scalars['ID']>;
-  userId?: InputMaybe<Scalars['ID']>;
+  workspaceId?: InputMaybe<Scalars['ID']['input']>;
+  userId?: InputMaybe<Scalars['ID']['input']>;
 }>;
 
 
 export type UserChainQuery = { __typename?: 'Query', userChain?: { __typename?: 'UserChainEventConnection', nodes?: Array<{ __typename?: 'UserChainEvent', serializedContent: string, position: number } | null> | null } | null };
 
 export type UserIdFromUsernameQueryVariables = Exact<{
-  username: Scalars['String'];
+  username: Scalars['String']['input'];
 }>;
 
 
 export type UserIdFromUsernameQuery = { __typename?: 'Query', userIdFromUsername?: { __typename?: 'UserIdFromUsernameResult', id: string } | null };
 
 export type WorkspaceQueryVariables = Exact<{
-  id?: InputMaybe<Scalars['ID']>;
-  deviceSigningPublicKey: Scalars['String'];
+  id?: InputMaybe<Scalars['ID']['input']>;
+  deviceSigningPublicKey: Scalars['String']['input'];
 }>;
 
 
 export type WorkspaceQuery = { __typename?: 'Query', workspace?: { __typename?: 'Workspace', id: string, infoCiphertext?: string | null, infoNonce?: string | null, infoWorkspaceKey?: { __typename?: 'WorkspaceKey', id: string, workspaceId: string, generation: number, workspaceKeyBox?: { __typename?: 'WorkspaceKeyBox', id: string, workspaceKeyId: string, deviceSigningPublicKey: string, ciphertext: string, nonce: string, creatorDevice: { __typename?: 'CreatorDevice', signingPublicKey: string, encryptionPublicKey: string } } | null } | null, currentWorkspaceKey?: { __typename?: 'WorkspaceKey', id: string, workspaceId: string, workspaceKeyBox?: { __typename?: 'WorkspaceKeyBox', id: string, workspaceKeyId: string, deviceSigningPublicKey: string, ciphertext: string, nonce: string, creatorDevice: { __typename?: 'CreatorDevice', signingPublicKey: string, encryptionPublicKey: string } } | null } | null, workspaceKeys?: Array<{ __typename?: 'WorkspaceKey', id: string, workspaceId: string, generation: number, workspaceKeyBox?: { __typename?: 'WorkspaceKeyBox', id: string, workspaceKeyId: string, deviceSigningPublicKey: string, ciphertext: string, nonce: string, creatorDevice: { __typename?: 'CreatorDevice', signingPublicKey: string, encryptionPublicKey: string } } | null }> | null } | null };
 
 export type WorkspaceChainQueryVariables = Exact<{
-  workspaceId: Scalars['ID'];
-  after?: InputMaybe<Scalars['String']>;
+  workspaceId: Scalars['ID']['input'];
+  after?: InputMaybe<Scalars['String']['input']>;
 }>;
 
 
 export type WorkspaceChainQuery = { __typename?: 'Query', workspaceChain?: { __typename?: 'WorkspaceChainEventConnection', nodes?: Array<{ __typename?: 'WorkspaceChainEvent', serializedContent: string, position: number } | null> | null } | null };
 
 export type WorkspaceChainByInvitationIdQueryVariables = Exact<{
-  invitationId: Scalars['ID'];
+  invitationId: Scalars['ID']['input'];
 }>;
 
 
 export type WorkspaceChainByInvitationIdQuery = { __typename?: 'Query', workspaceChainByInvitationId?: { __typename?: 'WorkspaceChainEventConnection', nodes?: Array<{ __typename?: 'WorkspaceChainEvent', serializedContent: string, position: number } | null> | null } | null };
 
 export type WorkspaceInvitationQueryVariables = Exact<{
-  id: Scalars['ID'];
+  id: Scalars['ID']['input'];
 }>;
 
 
 export type WorkspaceInvitationQuery = { __typename?: 'Query', me?: { __typename?: 'MeResult', id: string, username: string } | null, workspaceInvitation?: { __typename?: 'WorkspaceInvitation', id: string, workspaceId: string, inviterUserId: string, inviterUsername: string, role: Role, expiresAt: any, invitationDataSignature: string, invitationSigningPublicKey: string } | null };
 
 export type WorkspaceInvitationsQueryVariables = Exact<{
-  workspaceId: Scalars['ID'];
+  workspaceId: Scalars['ID']['input'];
 }>;
 
 
 export type WorkspaceInvitationsQuery = { __typename?: 'Query', workspaceInvitations?: { __typename?: 'WorkspaceInvitationConnection', nodes?: Array<{ __typename?: 'WorkspaceInvitation', id: string, workspaceId: string, inviterUserId: string, inviterUsername: string, role: Role, expiresAt: any } | null> | null, pageInfo: { __typename?: 'PageInfo', hasNextPage: boolean, endCursor?: string | null } } | null };
 
 export type WorkspaceMemberDevicesProofQueryVariables = Exact<{
-  workspaceId: Scalars['ID'];
-  invitationId?: InputMaybe<Scalars['ID']>;
-  hash?: InputMaybe<Scalars['String']>;
+  workspaceId: Scalars['ID']['input'];
+  invitationId?: InputMaybe<Scalars['ID']['input']>;
+  hash?: InputMaybe<Scalars['String']['input']>;
 }>;
 
 
@@ -1935,22 +1937,22 @@ export type WorkspaceMemberDevicesProofsQueryVariables = Exact<{ [key: string]: 
 export type WorkspaceMemberDevicesProofsQuery = { __typename?: 'Query', workspaceMemberDevicesProofs?: { __typename?: 'WorkspaceMemberDevicesProofConnection', nodes?: Array<{ __typename?: 'WorkspaceMemberDevicesProof', serializedData: string, workspaceId: string, authorMainDeviceSigningPublicKey: string, proof: { __typename?: 'WorkspaceMemberDevicesProofContent', hash: string, hashSignature: string, clock: number, version: number } } | null> | null } | null };
 
 export type WorkspaceMembersQueryVariables = Exact<{
-  workspaceId: Scalars['ID'];
+  workspaceId: Scalars['ID']['input'];
 }>;
 
 
 export type WorkspaceMembersQuery = { __typename?: 'Query', workspaceMembers?: { __typename?: 'WorkspaceMemberConnection', nodes?: Array<{ __typename?: 'WorkspaceMember', id: string, user: { __typename?: 'User', id: string, username: string, chain: Array<{ __typename?: 'UserChainEvent', serializedContent: string, position: number }> } } | null> | null, pageInfo: { __typename?: 'PageInfo', hasNextPage: boolean, endCursor?: string | null } } | null };
 
 export type WorkspaceMembersByMainDeviceSigningPublicKeyQueryVariables = Exact<{
-  workspaceId: Scalars['ID'];
-  mainDeviceSigningPublicKeys: Array<Scalars['String']> | Scalars['String'];
+  workspaceId: Scalars['ID']['input'];
+  mainDeviceSigningPublicKeys: Array<Scalars['String']['input']> | Scalars['String']['input'];
 }>;
 
 
 export type WorkspaceMembersByMainDeviceSigningPublicKeyQuery = { __typename?: 'Query', workspaceMembersByMainDeviceSigningPublicKey?: { __typename?: 'WorkspaceMembersByMainDeviceSigningPublicKeyResult', workspaceMembers: Array<{ __typename?: 'WorkspaceMember', id: string, user: { __typename?: 'User', id: string, username: string, chain: Array<{ __typename?: 'UserChainEvent', serializedContent: string }> } }> } | null };
 
 export type WorkspacesQueryVariables = Exact<{
-  deviceSigningPublicKey: Scalars['String'];
+  deviceSigningPublicKey: Scalars['String']['input'];
 }>;
 
 
