@@ -2,7 +2,7 @@ import Constants from "expo-constants";
 import { Platform } from "react-native";
 
 export const getEnvironmentUrls = () => {
-  const env = Constants.manifest?.extra?.serenityEnvironment;
+  const env = Constants.expoConfig?.extra?.serenityEnvironment;
 
   let websocketOrigin = "ws://localhost:4000";
   let graphqlEndpoint = "http://localhost:4000/graphql";
