@@ -36,5 +36,8 @@
   },
   "lint-staged": {
     "**/*": "prettier --write --ignore-unknown"
+  },
+  "resolutions": {
+    "graphql": "^16.6.0"
   }
 }
