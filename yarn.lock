@@ -21696,11 +21696,6 @@ type-is@~1.6.18:
     media-typer "0.3.0"
     mime-types "~2.1.24"
 
-typescript@^4.8.4:
-  version "4.8.4"
-  resolved "https://registry.yarnpkg.com/typescript/-/typescript-4.8.4.tgz#c464abca159669597be5f96b8943500b238e60e6"
-  integrity sha512-QCh+85mCy+h0IGff8r5XWzOVSbBO+KfeYrMQh7NJ58QujwcE22u+NUSmUxqF+un70P9GXKxa2HCNiTTMJknyjQ==
-
 typescript@^5.1.3:
   version "5.2.2"
   resolved "https://registry.yarnpkg.com/typescript/-/typescript-5.2.2.tgz#5ebb5e5a5b75f085f22bc3f8460fba308310fa78"
@@ -22544,13 +22539,12 @@ y-prosemirror@1.0.20:
   dependencies:
     lib0 "^0.2.42"
 
-y-prosemirror@^1.2.0:
-  version "1.2.0"
-  resolved "https://registry.yarnpkg.com/y-prosemirror/-/y-prosemirror-1.2.0.tgz#84771bd350834bc7759e946cd14c62ec26243a5c"
-  integrity sha512-t3uxuX4HIkb1GNt8jV+dplRbNH2OmQD/BNeCCbjLD3Mq0o6JEXxHedv58ZIPFDE6ma24jljlL+u8pGvN6B37XQ==
+y-prosemirror@^1.2.2:
+  version "1.2.2"
+  resolved "https://registry.yarnpkg.com/y-prosemirror/-/y-prosemirror-1.2.2.tgz#7b852ccd6847d79bf73236d9380e9a4d1b2d0650"
+  integrity sha512-hHdnIAhfa8mIoLWtTkMDb6RBzN3lye1QVkaZwVm58sledAA1zTl+yyEtgkrY/sdH6SaQL0rsLj61zHjgr5D0HQ==
   dependencies:
     lib0 "^0.2.42"
-    typescript "^4.8.4"
 
 y-protocols@^1.0.5:
   version "1.0.5"
