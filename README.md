@@ -66,6 +66,7 @@ yarn dev
 We are using the Expo dev client you need to download and install a dev build first which can be found in [https://github.com/SerenityNotes/app-builds](https://github.com/SerenityNotes/app-builds).
 
 ```sh
+npm install -g eas-cli
 cd apps/app
 yarn dev
 # in the console press `i` for iOS or `a` for Android or use the Expo Web-interface
@@ -75,35 +76,35 @@ Creating a dev build for iOS Simulator
 
 ```sh
 cd apps/app
-yarn eas build --profile development-simulator --platform ios
+eas build --profile development-simulator --platform ios
 ```
 
 Creating a dev build for iOS
 
 ```sh
 cd apps/app
-yarn eas build --profile development --platform ios
+eas build --profile development --platform ios
 ```
 
 Creating a preview build for internal distribution (staging environment)
 
 ```sh
 cd apps/app
-yarn eas build --profile preview-staging --platform ios
+eas build --profile preview-staging --platform ios
 ```
 
 Creating a preview build for internal distribution (production environment)
 
 ```sh
 cd apps/app
-yarn eas build --profile preview-production --platform ios
+eas build --profile preview-production --platform ios
 ```
 
 Creating a build for the App store (production environment)
 
 ```sh
 cd apps/app
-yarn eas build --profile production --platform ios
+eas build --profile production --platform ios
 ```
 
 Build new graphql types
