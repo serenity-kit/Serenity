@@ -17,7 +17,7 @@
     ]
   },
   "devDependencies": {
-    "eslint": "^8.23.0",
+    "eslint": "^8.56.0",
     "husky": "^8.0.1",
     "lint-staged": "^13.0.3",
     "patch-package": "^7.0.0",
