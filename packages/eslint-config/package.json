@@ -8,7 +8,7 @@
     "lint": "echo 'Nothing to lint'"
   },
   "devDependencies": {
-    "@typescript-eslint/parser": "^5.38.1",
+    "@typescript-eslint/parser": "^6.14.0",
     "eslint-plugin-react-hooks": "^4.6.0"
   }
 }
