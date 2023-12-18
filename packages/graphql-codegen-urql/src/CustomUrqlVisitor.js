@@ -135,6 +135,7 @@ export const ${lowerCaseOperationName}Service =
         intervalId
       ) {
         // perform cleanup
+        // @ts-expect-error
         clearInterval(intervalId);
         ${lowerCaseOperationName}ServiceSubscribers[variablesString].intervalId = null;
       }

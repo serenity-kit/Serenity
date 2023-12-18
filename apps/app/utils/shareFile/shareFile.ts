@@ -13,7 +13,6 @@ export const shareFile = async ({
   mimeType,
   fileName,
 }: Params) => {
-  // @ts-expect-error - types are wrong
   const fileExtension = mime.getExtension(mimeType);
   const uri = `${FileSystem.cacheDirectory}${fileName}.${fileExtension}`;
   await FileSystem.writeAsStringAsync(uri, contentAsBase64, {
