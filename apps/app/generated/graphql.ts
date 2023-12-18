@@ -3741,6 +3741,7 @@ export const commentsByDocumentIdQueryService =
         intervalId
       ) {
         // perform cleanup
+        // @ts-expect-error
         clearInterval(intervalId);
         commentsByDocumentIdQueryServiceSubscribers[variablesString].intervalId = null;
       }
@@ -3844,6 +3845,7 @@ export const devicesQueryService =
         intervalId
       ) {
         // perform cleanup
+        // @ts-expect-error
         clearInterval(intervalId);
         devicesQueryServiceSubscribers[variablesString].intervalId = null;
       }
@@ -3947,6 +3949,7 @@ export const documentQueryService =
         intervalId
       ) {
         // perform cleanup
+        // @ts-expect-error
         clearInterval(intervalId);
         documentQueryServiceSubscribers[variablesString].intervalId = null;
       }
@@ -4050,6 +4053,7 @@ export const documentChainQueryService =
         intervalId
       ) {
         // perform cleanup
+        // @ts-expect-error
         clearInterval(intervalId);
         documentChainQueryServiceSubscribers[variablesString].intervalId = null;
       }
@@ -4153,6 +4157,7 @@ export const documentPathQueryService =
         intervalId
       ) {
         // perform cleanup
+        // @ts-expect-error
         clearInterval(intervalId);
         documentPathQueryServiceSubscribers[variablesString].intervalId = null;
       }
@@ -4256,6 +4261,7 @@ export const documentShareLinkQueryService =
         intervalId
       ) {
         // perform cleanup
+        // @ts-expect-error
         clearInterval(intervalId);
         documentShareLinkQueryServiceSubscribers[variablesString].intervalId = null;
       }
@@ -4359,6 +4365,7 @@ export const documentShareLinkSnapshotKeyBoxQueryService =
         intervalId
       ) {
         // perform cleanup
+        // @ts-expect-error
         clearInterval(intervalId);
         documentShareLinkSnapshotKeyBoxQueryServiceSubscribers[variablesString].intervalId = null;
       }
@@ -4462,6 +4469,7 @@ export const documentShareLinksQueryService =
         intervalId
       ) {
         // perform cleanup
+        // @ts-expect-error
         clearInterval(intervalId);
         documentShareLinksQueryServiceSubscribers[variablesString].intervalId = null;
       }
@@ -4565,6 +4573,7 @@ export const documentsQueryService =
         intervalId
       ) {
         // perform cleanup
+        // @ts-expect-error
         clearInterval(intervalId);
         documentsQueryServiceSubscribers[variablesString].intervalId = null;
       }
@@ -4668,6 +4677,7 @@ export const encryptedWebDeviceQueryService =
         intervalId
       ) {
         // perform cleanup
+        // @ts-expect-error
         clearInterval(intervalId);
         encryptedWebDeviceQueryServiceSubscribers[variablesString].intervalId = null;
       }
@@ -4771,6 +4781,7 @@ export const fileUrlQueryService =
         intervalId
       ) {
         // perform cleanup
+        // @ts-expect-error
         clearInterval(intervalId);
         fileUrlQueryServiceSubscribers[variablesString].intervalId = null;
       }
@@ -4874,6 +4885,7 @@ export const firstDocumentQueryService =
         intervalId
       ) {
         // perform cleanup
+        // @ts-expect-error
         clearInterval(intervalId);
         firstDocumentQueryServiceSubscribers[variablesString].intervalId = null;
       }
@@ -4977,6 +4989,7 @@ export const folderQueryService =
         intervalId
       ) {
         // perform cleanup
+        // @ts-expect-error
         clearInterval(intervalId);
         folderQueryServiceSubscribers[variablesString].intervalId = null;
       }
@@ -5080,6 +5093,7 @@ export const folderTraceQueryService =
         intervalId
       ) {
         // perform cleanup
+        // @ts-expect-error
         clearInterval(intervalId);
         folderTraceQueryServiceSubscribers[variablesString].intervalId = null;
       }
@@ -5183,6 +5197,7 @@ export const foldersQueryService =
         intervalId
       ) {
         // perform cleanup
+        // @ts-expect-error
         clearInterval(intervalId);
         foldersQueryServiceSubscribers[variablesString].intervalId = null;
       }
@@ -5286,6 +5301,7 @@ export const mainDeviceQueryService =
         intervalId
       ) {
         // perform cleanup
+        // @ts-expect-error
         clearInterval(intervalId);
         mainDeviceQueryServiceSubscribers[variablesString].intervalId = null;
       }
@@ -5389,6 +5405,7 @@ export const meQueryService =
         intervalId
       ) {
         // perform cleanup
+        // @ts-expect-error
         clearInterval(intervalId);
         meQueryServiceSubscribers[variablesString].intervalId = null;
       }
@@ -5492,6 +5509,7 @@ export const meWithWorkspaceLoadingInfoQueryService =
         intervalId
       ) {
         // perform cleanup
+        // @ts-expect-error
         clearInterval(intervalId);
         meWithWorkspaceLoadingInfoQueryServiceSubscribers[variablesString].intervalId = null;
       }
@@ -5595,6 +5613,7 @@ export const pendingWorkspaceInvitationQueryService =
         intervalId
       ) {
         // perform cleanup
+        // @ts-expect-error
         clearInterval(intervalId);
         pendingWorkspaceInvitationQueryServiceSubscribers[variablesString].intervalId = null;
       }
@@ -5698,6 +5717,7 @@ export const rootFoldersQueryService =
         intervalId
       ) {
         // perform cleanup
+        // @ts-expect-error
         clearInterval(intervalId);
         rootFoldersQueryServiceSubscribers[variablesString].intervalId = null;
       }
@@ -5801,6 +5821,7 @@ export const snapshotQueryService =
         intervalId
       ) {
         // perform cleanup
+        // @ts-expect-error
         clearInterval(intervalId);
         snapshotQueryServiceSubscribers[variablesString].intervalId = null;
       }
@@ -5904,6 +5925,7 @@ export const unauthorizedMemberQueryService =
         intervalId
       ) {
         // perform cleanup
+        // @ts-expect-error
         clearInterval(intervalId);
         unauthorizedMemberQueryServiceSubscribers[variablesString].intervalId = null;
       }
@@ -6007,6 +6029,7 @@ export const userChainQueryService =
         intervalId
       ) {
         // perform cleanup
+        // @ts-expect-error
         clearInterval(intervalId);
         userChainQueryServiceSubscribers[variablesString].intervalId = null;
       }
@@ -6110,6 +6133,7 @@ export const userIdFromUsernameQueryService =
         intervalId
       ) {
         // perform cleanup
+        // @ts-expect-error
         clearInterval(intervalId);
         userIdFromUsernameQueryServiceSubscribers[variablesString].intervalId = null;
       }
@@ -6213,6 +6237,7 @@ export const workspaceQueryService =
         intervalId
       ) {
         // perform cleanup
+        // @ts-expect-error
         clearInterval(intervalId);
         workspaceQueryServiceSubscribers[variablesString].intervalId = null;
       }
@@ -6316,6 +6341,7 @@ export const workspaceChainQueryService =
         intervalId
       ) {
         // perform cleanup
+        // @ts-expect-error
         clearInterval(intervalId);
         workspaceChainQueryServiceSubscribers[variablesString].intervalId = null;
       }
@@ -6419,6 +6445,7 @@ export const workspaceChainByInvitationIdQueryService =
         intervalId
       ) {
         // perform cleanup
+        // @ts-expect-error
         clearInterval(intervalId);
         workspaceChainByInvitationIdQueryServiceSubscribers[variablesString].intervalId = null;
       }
@@ -6522,6 +6549,7 @@ export const workspaceInvitationQueryService =
         intervalId
       ) {
         // perform cleanup
+        // @ts-expect-error
         clearInterval(intervalId);
         workspaceInvitationQueryServiceSubscribers[variablesString].intervalId = null;
       }
@@ -6625,6 +6653,7 @@ export const workspaceInvitationsQueryService =
         intervalId
       ) {
         // perform cleanup
+        // @ts-expect-error
         clearInterval(intervalId);
         workspaceInvitationsQueryServiceSubscribers[variablesString].intervalId = null;
       }
@@ -6728,6 +6757,7 @@ export const workspaceMemberDevicesProofQueryService =
         intervalId
       ) {
         // perform cleanup
+        // @ts-expect-error
         clearInterval(intervalId);
         workspaceMemberDevicesProofQueryServiceSubscribers[variablesString].intervalId = null;
       }
@@ -6831,6 +6861,7 @@ export const workspaceMemberDevicesProofsQueryService =
         intervalId
       ) {
         // perform cleanup
+        // @ts-expect-error
         clearInterval(intervalId);
         workspaceMemberDevicesProofsQueryServiceSubscribers[variablesString].intervalId = null;
       }
@@ -6934,6 +6965,7 @@ export const workspaceMembersQueryService =
         intervalId
       ) {
         // perform cleanup
+        // @ts-expect-error
         clearInterval(intervalId);
         workspaceMembersQueryServiceSubscribers[variablesString].intervalId = null;
       }
@@ -7037,6 +7069,7 @@ export const workspaceMembersByMainDeviceSigningPublicKeyQueryService =
         intervalId
       ) {
         // perform cleanup
+        // @ts-expect-error
         clearInterval(intervalId);
         workspaceMembersByMainDeviceSigningPublicKeyQueryServiceSubscribers[variablesString].intervalId = null;
       }
@@ -7140,6 +7173,7 @@ export const workspacesQueryService =
         intervalId
       ) {
         // perform cleanup
+        // @ts-expect-error
         clearInterval(intervalId);
         workspacesQueryServiceSubscribers[variablesString].intervalId = null;
       }

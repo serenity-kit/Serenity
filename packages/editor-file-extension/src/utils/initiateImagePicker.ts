@@ -50,8 +50,7 @@ export const initiateImagePicker = async ({
         mimeType:
           Platform.OS === "web"
             ? extractMimeType(filePickerResult.assets[0].uri)
-            : // @ts-ignore - this is a bug in the types
-              mime.getType(filePickerResult.assets[0].fileName || ""),
+            : mime.getType(filePickerResult.assets[0].fileName || "") || "",
       },
     ],
     insertImage,
