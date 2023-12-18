@@ -14,13 +14,14 @@ import { getLocalUsersByIds } from "./userStore";
 import { loadRemoteWorkspaceChain } from "./workspaceChainStore";
 import { useLocalLastWorkspaceMemberDevicesProof } from "./workspaceMemberDevicesProofStore";
 
-export const table = "workspace_v1";
+export const table = "workspace_v2";
 
 export const initialize = () => {
   sql.execute(
     `CREATE TABLE IF NOT EXISTS ${table} (
       "id"	TEXT,
       "name"	TEXT NOT NULL,
+      "avatar"	TEXT,
       "remoteDeleted"	INTEGER NOT NULL,
       "lastOpenDocumentId"	TEXT,
       PRIMARY KEY("id")
@@ -35,14 +36,16 @@ export const wipeCaches = () => {
 type Workspace = {
   id: string;
   name: string;
+  avatar?: string;
   remoteDeleted: number; // 0 or 1
   lastOpenDocumentId?: string;
 };
 
 export const createWorkspace = (params: Omit<Workspace, "remoteDeleted">) => {
-  sql.execute(`INSERT INTO ${table} VALUES (?, ?, ?, ?);`, [
+  sql.execute(`INSERT INTO ${table} VALUES (?, ?, ?, ?, ?);`, [
     params.id,
     params.name,
+    params.avatar || null,
     0,
     null,
   ]);
@@ -174,9 +177,10 @@ export const loadRemoteWorkspaces = async ({
           typeof decryptedWorkspaceInfo.name === "string"
         ) {
           workspaceListName = decryptedWorkspaceInfo.name as string;
-          sql.execute(`REPLACE INTO ${table} VALUES (?, ?, ?, ?);`, [
+          sql.execute(`REPLACE INTO ${table} VALUES (?, ?, ?, ?, ?);`, [
             workspace.id,
             workspaceListName,
+            decryptedWorkspaceInfo.avatar || null,
             0,
             null,
           ]);

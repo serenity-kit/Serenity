@@ -1,4 +1,4 @@
-import { Avatar as NbAvatar, IAvatarProps } from "native-base";
+import { IAvatarProps, Avatar as NbAvatar } from "native-base";
 import React, { forwardRef } from "react";
 import { StyleSheet } from "react-native";
 import { tw } from "../../tailwind";

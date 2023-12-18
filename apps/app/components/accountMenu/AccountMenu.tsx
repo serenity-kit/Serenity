@@ -27,6 +27,7 @@ import { initiateLogout } from "../../navigation/screens/logoutInProgressScreen/
 import { getMainDevice } from "../../store/mainDeviceMemoryStore";
 import * as workspaceStore from "../../store/workspaceStore";
 import { OS } from "../../utils/platform/platform";
+import { prefixPngImageUri } from "../../utils/prefixPngImageUri/prefixPngImageUri";
 import { VerifyPasswordModal } from "../verifyPasswordModal/VerifyPasswordModal";
 import { accountMenuMachine } from "./accountMenuMachine";
 
@@ -75,6 +76,7 @@ export default function AccountMenu({
   };
 
   let workspaceName = "";
+  let workspaceAvatar: undefined | string;
   if (state.context.workspaceQueryResult?.data?.workspace) {
     const workspaceData = state.context.workspaceQueryResult.data.workspace;
 
@@ -106,6 +108,12 @@ export default function AccountMenu({
         typeof decryptedWorkspaceInfo.name === "string"
       ) {
         workspaceName = decryptedWorkspaceInfo.name as string;
+      }
+      if (
+        decryptedWorkspaceInfo &&
+        typeof decryptedWorkspaceInfo.avatar === "string"
+      ) {
+        workspaceAvatar = decryptedWorkspaceInfo.avatar as string;
       }
     }
   }
@@ -152,7 +160,14 @@ export default function AccountMenu({
                 isFocusVisible && tw`se-inset-focus-mini`,
               ]}
             >
-              <WorkspaceAvatar size={isDesktopDevice ? "xs" : "sm"} />
+              <WorkspaceAvatar
+                size={isDesktopDevice ? "xs" : "sm"}
+                source={
+                  workspaceAvatar
+                    ? { uri: prefixPngImageUri(workspaceAvatar) }
+                    : undefined
+                }
+              />
               <Text
                 variant={isDesktopDevice ? "xs" : "md"}
                 bold
@@ -202,6 +217,11 @@ export default function AccountMenu({
                     customColor={"honey"}
                     key={`avatar_${workspace.id}`}
                     size="xxs"
+                    source={
+                      workspace.avatar
+                        ? { uri: prefixPngImageUri(workspace.avatar) }
+                        : undefined
+                    }
                   />
                 }
               >

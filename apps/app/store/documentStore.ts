@@ -11,7 +11,7 @@ import {
 } from "../generated/graphql";
 import * as sql from "./sql/sql";
 
-export const table = "document_v1";
+export const table = "document_v2";
 
 type DocumentEntry = {
   documentId: string;

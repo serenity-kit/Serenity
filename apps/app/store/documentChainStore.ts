@@ -6,7 +6,7 @@ import { runDocumentChainQuery } from "../generated/graphql";
 import { showToast } from "../utils/toast/showToast";
 import * as sql from "./sql/sql";
 
-export const table = "document_chain_v1";
+export const table = "document_chain_v2";
 
 type DocumentChainEntry = {
   position: number;

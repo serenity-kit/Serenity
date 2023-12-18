@@ -1,6 +1,6 @@
 import * as sql from "./sql/sql";
 
-export const table = "current_user_store_v1";
+export const table = "current_user_store_v2";
 
 type UserInfo = {
   userId: string;
