@@ -7,6 +7,7 @@ import {
   nonNull,
   objectType,
 } from "nexus";
+import { v4 as uuidv4 } from "uuid";
 import { z } from "zod";
 import { createLoginAttempt } from "../../../database/authentication/createLoginAttempt";
 import { getRegistrationRecord } from "../../../database/authentication/getEnvelope";
@@ -44,7 +45,6 @@ export const startLoginMutation = mutationField("startLogin", {
       console.log(`Invalid email address: ${username}`);
       throw new UserInputError("Input error: invalid email address");
     }
-    let result: any = undefined;
 
     if (!process.env.OPAQUE_SERVER_SETUP) {
       throw new Error("Missing process.env.OPAQUE_SERVER_SETUP");
@@ -52,13 +52,9 @@ export const startLoginMutation = mutationField("startLogin", {
     await opaqueReady;
 
     try {
-      result = await getRegistrationRecord(username);
-    } catch (error) {
-      throw new Error("Failed to initiate login");
-    }
-    try {
+      const { envelop } = await getRegistrationRecord(username);
       const serverLoginStartResult = server.startLogin({
-        registrationRecord: result.envelop,
+        registrationRecord: envelop,
         userIdentifier: username,
         serverSetup: process.env.OPAQUE_SERVER_SETUP,
         startLoginRequest: args.input.challenge,
@@ -74,8 +70,17 @@ export const startLoginMutation = mutationField("startLogin", {
         challengeResponse: serverLoginStartResult.loginResponse,
       };
     } catch (err) {
-      console.error(err);
-      throw new Error("Failed to initiate login.");
+      const serverLoginStartResult = server.startLogin({
+        // creates a dummy response https://docs.rs/opaque-ke/latest/opaque_ke/#dummy-server-login
+        registrationRecord: null,
+        userIdentifier: username,
+        serverSetup: process.env.OPAQUE_SERVER_SETUP,
+        startLoginRequest: args.input.challenge,
+      });
+      return {
+        loginId: uuidv4(),
+        challengeResponse: serverLoginStartResult.loginResponse,
+      };
     }
   },
 });
