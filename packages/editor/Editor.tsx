@@ -1,6 +1,8 @@
 import {
   BubbleMenuContentWrapper,
+  Button,
   EditorContentButton,
+  RawInput,
   ScrollView,
   SubmitButton,
   TextArea,
@@ -89,6 +91,10 @@ export const Editor = (props: EditorProps) => {
   const [isNew] = useState(props.isNew ?? false);
   const [hasCreateCommentBubble, setHasCreateCommentBubble] = useState(false);
   const [commentText, setCommentText] = useState("");
+
+  const [hasLinkBubble, setHasLinkBubble] = useState(false);
+  const [linkHref, setLinkHref] = useState("");
+
   const [selectionType, setSelectionType] = useState<null | string>(null);
 
   const newTitleRef = useRef("");
@@ -130,6 +136,8 @@ export const Editor = (props: EditorProps) => {
         }),
         Link.configure({
           openOnClick: false,
+          // necessary for the autolinker and when pasting content
+          validate: (href) => /^https?:\/\//.test(href),
         }),
         Placeholder.configure({
           placeholder: ({ node }) => {
@@ -356,9 +364,11 @@ export const Editor = (props: EditorProps) => {
                 editor.isActive("file") ||
                 isCellSelection(state.selection)
               ) {
-                // hide the create comment bubble and clear the text when the bubble menu is blured
+                // hide the create comment & link bubble and clear the text when the bubble menu is blurred
                 setCommentText("");
                 setHasCreateCommentBubble(false);
+                setLinkHref("");
+                setHasLinkBubble(false);
                 return false;
               }
 
@@ -367,10 +377,42 @@ export const Editor = (props: EditorProps) => {
           >
             <BubbleMenuContentWrapper
               ref={bubbleMenuRef}
-              vertical={hasCreateCommentBubble}
-              style={hasCreateCommentBubble ? tw`w-80` : tw``}
+              vertical={hasCreateCommentBubble || hasLinkBubble}
+              style={hasCreateCommentBubble || hasLinkBubble ? tw`w-80` : tw``}
             >
-              {hasCreateCommentBubble ? (
+              {hasLinkBubble ? (
+                <>
+                  <HStack style={tw`p-2 bg-white`}>
+                    <View style={tw`flex-grow`}>
+                      <RawInput
+                        variant={"unstyled"}
+                        placeholder="https://"
+                        value={linkHref}
+                        autoFocus
+                        onChangeText={(text) => setLinkHref(text)}
+                        style={tw`mr-2`}
+                      />
+                    </View>
+                    <Button
+                      onPress={() => {
+                        setLinkHref("");
+                        setHasLinkBubble(false);
+                        editor.commands.setLink({
+                          href: linkHref,
+                          target: "_blank",
+                        });
+                      }}
+                      disabled={
+                        // don't even allow to save a link not starting with https://
+                        linkHref === "" || !linkHref.startsWith("https://")
+                      }
+                      testID="bubble-menu__save-comment-button"
+                    >
+                      Save
+                    </Button>
+                  </HStack>
+                </>
+              ) : hasCreateCommentBubble ? (
                 <>
                   <TextArea
                     placeholder="Add a comment"
@@ -446,9 +488,13 @@ export const Editor = (props: EditorProps) => {
 
                   <Tooltip label={"Link"} placement={"top"} hasArrow={false}>
                     <ToggleButton
-                      onPress={() =>
-                        editor.chain().focus().toggleLink({ href: "#" }).run()
-                      }
+                      onPress={() => {
+                        if (editor.isActive("link")) {
+                          editor.commands.unsetLink();
+                        } else {
+                          setHasLinkBubble(true);
+                        }
+                      }}
                       name="link"
                       isActive={editor.isActive("link")}
                     />
@@ -477,6 +523,7 @@ export const Editor = (props: EditorProps) => {
             </BubbleMenuContentWrapper>
           </BubbleMenu>
 
+          {/* Table menu */}
           <BubbleMenu
             editor={editor}
             tippyOptions={{ duration: 100, placement: "bottom" }}
@@ -537,6 +584,7 @@ export const Editor = (props: EditorProps) => {
             </BubbleMenuContentWrapper>
           </BubbleMenu>
 
+          {/* View Comment menu */}
           <BubbleMenu
             editor={editor}
             tippyOptions={{ duration: 100, placement: "bottom" }}
