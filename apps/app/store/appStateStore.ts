@@ -1,6 +1,6 @@
 import * as sql from "./sql/sql";
 
-export const table = "app_store_v1";
+export const table = "app_store_v2";
 
 export const initialize = () => {
   sql.execute(

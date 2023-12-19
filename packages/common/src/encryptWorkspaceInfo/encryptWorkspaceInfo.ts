@@ -4,6 +4,7 @@ import { encryptAead } from "../encryptAead/encryptAead";
 
 type Params = {
   name: string;
+  avatar?: string;
   key: string;
   publicData?: any;
 };
@@ -15,7 +16,7 @@ export const encryptWorkspaceInfo = (params: Params) => {
     throw new Error("Invalid public data for encrypting the workspace info.");
   }
   const result = encryptAead(
-    JSON.stringify({ name: params.name }),
+    JSON.stringify({ name: params.name, avatar: params.avatar }),
     canonicalizedPublicData,
     sodium.from_base64(params.key)
   );

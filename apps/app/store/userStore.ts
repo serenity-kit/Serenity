@@ -9,7 +9,7 @@ import {
   getUserChainEntryByHash,
 } from "./userChainStore";
 
-export const table = "user_v1";
+export const table = "user_v2";
 
 export const initialize = () => {
   sql.execute(

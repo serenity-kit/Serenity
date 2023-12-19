@@ -12,7 +12,7 @@ import { showToast } from "../utils/toast/showToast";
 import * as sql from "./sql/sql";
 import * as workspaceStore from "./workspaceStore";
 
-export const table = "workspace_chain_v1";
+export const table = "workspace_chain_v2";
 
 export const initialize = () => {
   sql.execute(

@@ -14,7 +14,7 @@ import {
 } from "./workspaceChainStore";
 import * as workspaceStore from "./workspaceStore";
 
-export const table = "workspace_member_devices_proof_v1";
+export const table = "workspace_member_devices_proof_v2";
 
 export const initialize = () => {
   sql.execute(

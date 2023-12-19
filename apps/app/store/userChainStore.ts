@@ -12,7 +12,7 @@ import { getCurrentUserInfo, setCurrentUserInfo } from "./currentUserInfoStore";
 import * as sql from "./sql/sql";
 import * as userStore from "./userStore";
 
-export const table = "user_chain_v1";
+export const table = "user_chain_v2";
 
 export type UserChainEntry = {
   position: number;

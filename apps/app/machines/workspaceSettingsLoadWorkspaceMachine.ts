@@ -24,6 +24,7 @@ export type WorkspaceQueryResult = {
 
 type WorkspaceInfo = {
   name: string;
+  avatar?: string; // base64 URI
 };
 
 type Context = {
@@ -154,6 +155,7 @@ export const workspaceSettingsLoadWorkspaceMachine =
             },
             workspaceInfo: (context) => {
               let workspaceName = "";
+              let workspaceAvatar: string | undefined;
 
               if (
                 context.workspaceQueryResult?.data?.workspace &&
@@ -194,10 +196,16 @@ export const workspaceSettingsLoadWorkspaceMachine =
                   ) {
                     workspaceName = decryptedWorkspaceInfo.name as string;
                   }
+                  if (
+                    decryptedWorkspaceInfo &&
+                    typeof decryptedWorkspaceInfo.avatar === "string"
+                  ) {
+                    workspaceAvatar = decryptedWorkspaceInfo.avatar as string;
+                  }
                 }
               }
 
-              return { name: workspaceName };
+              return { name: workspaceName, avatar: workspaceAvatar };
             },
           }),
           type: "final",
