@@ -11,6 +11,11 @@ module.exports = {
     osxSign: {
       // "hardened-runtime": true,
       // "gatekeeper-assess": false,
+      optionsForFile: (filePath) => {
+        return {
+          entitlements: path.resolve(__dirname, "config", "entitlements.plist"),
+        };
+      },
     },
     osxNotarize: {
       tool: "notarytool",
