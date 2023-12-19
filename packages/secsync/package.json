@@ -13,7 +13,7 @@
   "dependencies": {
     "canonicalize": "^2.0.0",
     "libsodium-wrappers": "^0.7.13",
-    "zod": "^3.21.4"
+    "zod": "^3.22.4"
   },
   "devDependencies": {
     "@babel/core": "^7.19.3",
