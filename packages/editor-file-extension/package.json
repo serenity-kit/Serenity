@@ -8,7 +8,7 @@
     "lint": "eslint --ext .tsx --ext .ts ./"
   },
   "devDependencies": {
-    "@babel/preset-flow": "^7.18.6",
+    "@babel/preset-flow": "^7.23.3",
     "@types/base-64": "^1.0.0",
     "@types/uuid": "^9.0.1"
   },
