@@ -1,4 +1,4 @@
 /*
   X-Frame-Options: DENY
   X-Content-Type-Options: nosniff
-  Content-Security-Policy: default-src 'self'; object-src 'none'
+  Content-Security-Policy: default-src 'self'; object-src 'none'; style-src 'unsafe-inline';
