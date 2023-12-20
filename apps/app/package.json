@@ -108,7 +108,7 @@
     "@graphql-codegen/typescript-urql": "^4.0.0",
     "@serenity-tools/eslint-config": "*",
     "@types/react": "^18.2.37",
-    "@types/sql.js": "^1.4.7",
+    "@types/sql.js": "^1.4.9",
     "@xstate/cli": "^0.4.2",
     "eslint": "^8.24.0",
     "jest": "^29.7.0",

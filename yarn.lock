@@ -6412,10 +6412,10 @@
   dependencies:
     "@types/node" "*"
 
-"@types/sql.js@^1.4.7":
-  version "1.4.7"
-  resolved "https://registry.yarnpkg.com/@types/sql.js/-/sql.js-1.4.7.tgz#991a07279e0564d114cac72d008e64793cc9ecfd"
-  integrity sha512-6NsC/6ECtyVdkEAw1jJcY44uFagQtL9dj+RxN8WceGcbON/E53IP/+/7zah2NnfzNzLnjAViiGLccWuAuKotgw==
+"@types/sql.js@^1.4.9":
+  version "1.4.9"
+  resolved "https://registry.yarnpkg.com/@types/sql.js/-/sql.js-1.4.9.tgz#31d2bed39aa63e56ada7a4469aa6f19ee2c74b94"
+  integrity sha512-ep8b36RKHlgWPqjNG9ToUrPiwkhwh0AEzy883mO5Xnd+cL6VBH1EvSjBAAuxLUFF2Vn/moE3Me6v9E1Lo+48GQ==
   dependencies:
     "@types/emscripten" "*"
     "@types/node" "*"
