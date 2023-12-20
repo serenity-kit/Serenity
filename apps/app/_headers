@@ -1,4 +1,4 @@
 /*
   X-Frame-Options: DENY
   X-Content-Type-Options: nosniff
-  Content-Security-Policy: default-src 'self' 'unsafe-eval'; object-src 'none'; style-src 'unsafe-inline'; style-src-elem https://www.serenity.li/
+  Content-Security-Policy: default-src 'self' 'unsafe-eval' https://serenity-dev.fly.dev/; object-src 'none'; style-src 'unsafe-inline'; style-src-elem 'unsafe-inline'
