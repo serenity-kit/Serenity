@@ -1,4 +1,4 @@
 /*
   X-Frame-Options: DENY
   X-Content-Type-Options: nosniff
-  Content-Security-Policy: script-src 'wasm-unsafe-eval'; script-src-elem 'self'; object-src 'none'; style-src 'unsafe-inline'; style-src-elem 'self' 'unsafe-inline'; img-src 'self' data:; manifest-src 'self'; font-src 'self'; connect-src 'self' https://serenity-dev.fly.dev/ wss://serenity-dev.fly.dev/ https://serenity-staging.0a38fa0abfbd8ef9cfd6aee1c02fc420.eu.r2.cloudflarestorage.com/
+  Content-Security-Policy: script-src 'wasm-unsafe-eval'; script-src-elem 'self'; object-src 'none'; style-src 'self' 'unsafe-inline'; style-src-elem 'self' 'unsafe-inline'; img-src 'self' data:; manifest-src 'self'; font-src 'self'; connect-src 'self' https://serenity-dev.fly.dev/ wss://serenity-dev.fly.dev/ https://serenity-staging.0a38fa0abfbd8ef9cfd6aee1c02fc420.eu.r2.cloudflarestorage.com/
