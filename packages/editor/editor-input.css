@@ -642,6 +642,26 @@
   .editor-comment-active:after {
     background-color: theme("colors.comment.active");
   }
+
+  /* ------------- search-extension ------------- */
+
+  .serenity-editor-search-result {
+    position: relative;
+    /* display setting needed to properly size background and add border */
+    display: inline-block;
+  }
+
+  .serenity-editor-search-result,
+  .serenity-editor-search-result:before,
+  .serenity-editor-search-result:after {
+    background-color: theme("colors.primary.100");
+  }
+
+  .serenity-editor-search-result-active,
+  .serenity-editor-search-result-active:before,
+  .serenity-editor-search-result-active:after {
+    background-color: theme("colors.primary.300");
+  }
 }
 
 @layer utilities {
