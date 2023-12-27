@@ -8,6 +8,8 @@ import {
 import { View, tw, useHasEditorSidebar } from "@serenity-tools/ui";
 import { Editor as TipTapEditor } from "@tiptap/core";
 import { useActor } from "@xstate/react";
+import { Packer } from "docx";
+import { DocxSerializer, defaultMarks, defaultNodes } from "prosemirror-docx";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { View as RNView } from "react-native";
 import { usePage } from "../../context/PageContext";
@@ -23,6 +25,34 @@ import {
 import { EditorLoading } from "../editorLoading/EditorLoading";
 import { initialEditorBottombarState } from "./initialEditorBottombarState";
 import { EditorProps } from "./types";
+
+// tiptap has these camelCased
+const nodeSerializer = {
+  ...defaultNodes,
+  hardBreak: defaultNodes.hard_break,
+  codeBlock: defaultNodes.code_block,
+  orderedList: defaultNodes.ordered_list,
+  taskList: defaultNodes.bullet_list,
+  taskItem: defaultNodes.list_item,
+  listItem: defaultNodes.list_item,
+  bulletList: defaultNodes.bullet_list,
+  horizontalRule: defaultNodes.horizontal_rule,
+  file(state, node) {
+    // if (node.attrs.subtype === "image") {
+    //   // image
+    //   state.image(node.attrs.src);
+    //   state.closeBlock(node);
+    //   return;
+    // }
+    // console.log(node);
+    // console.log(state);
+
+    // state.renderInline(node);
+    state.closeBlock(node);
+  },
+};
+
+const myDocxSerializer = new DocxSerializer(nodeSerializer, defaultMarks);
 
 export default function Editor({
   yDocRef,
@@ -48,6 +78,7 @@ export default function Editor({
   const setIsInEditingMode = useEditorStore(
     (state) => state.setIsInEditingMode
   );
+  const setExportWordDoc = useEditorStore((state) => state.setExportWordDoc);
 
   const { commentsService } = usePage();
   const [commentsState, send] = useActor(commentsService);
@@ -102,6 +133,36 @@ export default function Editor({
     };
 
     editorToolbarService.onEvent(onEventListener);
+    setExportWordDoc(async () => {
+      if (!tipTapEditorRef.current) {
+        return null;
+      }
+
+      const opts = {
+        getImageBuffer(src: string) {
+          return Buffer.from("real buffer here");
+        },
+      };
+
+      const wordDocument = myDocxSerializer.serialize(
+        tipTapEditorRef.current?.state.doc,
+        opts
+      );
+
+      const blob = await Packer.toBlob(wordDocument);
+      // create a URL for the blob
+      const url = URL.createObjectURL(blob);
+
+      // create a temporary anchor element and trigger the download
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "example.docx";
+      document.body.appendChild(a); // append to the body
+      a.click(); // simulate a click on the element
+      // clean up: remove the element and revoke the URL
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    });
 
     return () => {
       // @ts-expect-error - works in web only
