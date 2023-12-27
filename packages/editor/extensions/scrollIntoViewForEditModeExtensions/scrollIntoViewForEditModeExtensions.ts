@@ -6,7 +6,7 @@ type Storage = {};
 
 declare module "@tiptap/core" {
   interface Commands<ReturnType> {
-    customExtension: {
+    serenityScrollIntoViewForEditModeExtension: {
       scrollIntoViewOnEditMode: () => ReturnType;
       scrollIntoViewWhileEditMode: () => ReturnType;
     };

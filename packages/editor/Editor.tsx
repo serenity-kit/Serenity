@@ -44,6 +44,7 @@ import { CommentsExtension } from "./extensions/commentsExtension/commentsExtens
 import { findCommentForPos } from "./extensions/commentsExtension/findCommentForPos";
 import { updateCommentsDataAndScrollToHighlighted } from "./extensions/commentsExtension/updateCommentsDataAndScrollToHighlighted";
 import { SerenityScrollIntoViewForEditModeExtension } from "./extensions/scrollIntoViewForEditModeExtensions/scrollIntoViewForEditModeExtensions";
+import { SearchExtension } from "./extensions/searchExtension/searchExtension";
 import { YAwarenessExtension } from "./extensions/secSyncAwarenessExtension/secSyncAwarenessExtension";
 import { TableCellExtension } from "./extensions/tableCellExtension/tableCellExtension";
 import { isCellSelection } from "./extensions/tableExtension/isCellSelection";
@@ -205,6 +206,7 @@ export const Editor = (props: EditorProps) => {
         TableRow,
         TableHeaderExtension,
         TableCellExtension,
+        SearchExtension,
       ],
       onCreate: (params) => {
         if (isNew) {

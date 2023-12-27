@@ -13,15 +13,19 @@ import {
   EditorSidebarIcon,
   Heading,
   HorizontalDivider,
+  IconButton,
+  RawInput,
   SidebarButton,
   Tab,
   TabList,
   TabPanel,
   Text,
   tw,
+  View,
 } from "@serenity-tools/ui";
 import { Level } from "@tiptap/extension-heading";
 import { Editor } from "@tiptap/react";
+import { HStack } from "native-base";
 import React from "react";
 import { Platform } from "react-native";
 import TableOfContents from "../tableOfContents/TableOfContents";
@@ -36,6 +40,16 @@ type EditorSidebarProps = {
   editable: boolean;
 };
 
+export function debounce<
+  Func extends (...args: Parameters<Func>) => ReturnType<Func>
+>(func: Func, waitFor: number): (...args: Parameters<Func>) => void {
+  let timeout: any;
+  return (...args: Parameters<Func>): void => {
+    clearTimeout(timeout);
+    timeout = setTimeout(() => func(...args), waitFor);
+  };
+}
+
 export default function EditorSidebar({
   editor,
   headingLevels,
@@ -46,10 +60,20 @@ export default function EditorSidebar({
   const [activeTab, setActiveTab] = React.useState<
     "editing" | "tableOfContents"
   >("editing");
+  const [searchTerm, setSearchTerm] = React.useState("");
 
   const muteHeading = documentState !== "active";
   const disableButton = documentState !== "active" || editable === false;
   const disableTab = documentState === "loading";
+
+  const debouncedScrollSearchResultIntoView = React.useMemo(() => {
+    return debounce(() => {
+      if (!editor) {
+        return;
+      }
+      editor.chain().scrollSearchResultIntoView().run();
+    }, 400);
+  }, []);
 
   return (
     <>
@@ -78,6 +102,54 @@ export default function EditorSidebar({
 
       {activeTab === "tableOfContents" ? (
         <TabPanel tabId="tableOfContents">
+          <Heading lvl={4} style={tw`ml-4`} padded muted={muteHeading}>
+            Search
+          </Heading>
+
+          <HStack style={tw`mx-4 items-center`}>
+            <RawInput
+              value={searchTerm}
+              onChangeText={(text) => {
+                setSearchTerm(text);
+                editor?.chain().updateSearchTerm(text).run();
+                // longer timeout to avoid scrolling while typing fast
+                debouncedScrollSearchResultIntoView();
+              }}
+              style={tw`w-36`}
+            />
+
+            <View style={{ transform: [{ rotate: "180deg" }] }}>
+              <IconButton
+                size={"lg"}
+                onPress={() => {
+                  editor?.chain().goToPreviousResult().run();
+                  // first the content of the editor must be updated
+                  setTimeout(() => {
+                    editor?.chain().scrollSearchResultIntoView().run();
+                  }, 100);
+                }}
+                name="arrow-down-s-line"
+                disabled={searchTerm === ""}
+                color="black"
+              />
+            </View>
+            <IconButton
+              size={"lg"}
+              onPress={() => {
+                editor?.chain().goToNextResult().run();
+                // first the content of the editor must be updated
+                setTimeout(() => {
+                  editor?.chain().scrollSearchResultIntoView().run();
+                }, 100);
+              }}
+              name="arrow-down-s-line"
+              disabled={searchTerm === ""}
+              color="black"
+            />
+          </HStack>
+
+          <HorizontalDivider />
+
           <TableOfContents editor={editor} />
         </TabPanel>
       ) : (
