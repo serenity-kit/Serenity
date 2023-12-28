@@ -26,6 +26,7 @@ export const PageHeader: React.FC<Props> = ({
   const isInEditingMode = useEditorStore((state) => state.isInEditingMode);
   const syncState = useEditorStore((state) => state.syncState);
   const documentState = useEditorStore((state) => state.documentState);
+  const exportWordDoc = useEditorStore((state) => state.exportWordDoc);
   const isDesktopDevice = useIsDesktopDevice();
   const hasEditorSidebar = useHasEditorSidebar();
 
@@ -81,7 +82,7 @@ export const PageHeader: React.FC<Props> = ({
               disabled={documentState === "loading"}
             />
           </Tooltip>
-          <PageActionsMenu />
+          <PageActionsMenu exportWordDoc={exportWordDoc} />
         </>
       ) : null}
     </HStack>

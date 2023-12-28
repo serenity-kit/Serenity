@@ -26,6 +26,8 @@ interface EditorState {
   setSnapshotKey: (snapshotKey: Uint8Array) => void;
   snapshotId: string | null;
   setSnapshotId: (snapshotid: string) => void;
+  exportWordDoc: () => void;
+  setExportWordDoc: (exportWordDoc: () => void) => void;
 }
 
 export const useEditorStore = create<EditorState>((set, get) => ({
@@ -66,5 +68,10 @@ export const useEditorStore = create<EditorState>((set, get) => ({
   setDocumentState: (newDocumentState) =>
     set((state) => ({
       documentState: newDocumentState,
+    })),
+  exportWordDoc: () => undefined,
+  setExportWordDoc: (exportWordDoc) =>
+    set((state) => ({
+      exportWordDoc,
     })),
 }));
