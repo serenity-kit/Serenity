@@ -1,5 +1,6 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Pressable, ScrollView, Text, View, tw } from "@serenity-tools/ui";
+import canonicalize from "canonicalize";
 import { useCallback, useEffect, useState } from "react";
 import { useInterval } from "../../hooks/useInterval";
 import * as sql from "./sql";
@@ -45,8 +46,7 @@ export const Table = ({ tableName }: { tableName: string }) => {
       )}
       <View>
         {results.map((entry) => {
-          let idPropertyName = Object.keys(entry)[0];
-          return <Row key={entry[idPropertyName]} entry={entry} />;
+          return <Row key={canonicalize(entry)} entry={entry} />;
         })}
       </View>
     </View>
