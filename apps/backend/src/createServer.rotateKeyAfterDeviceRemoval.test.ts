@@ -4,6 +4,7 @@ import {
   deriveSessionAuthorization,
   encryptWorkspaceKeyForDevice,
   folderDerivedKeyContext,
+  generateId,
   LocalDevice,
   SerenitySnapshotPublicData,
   snapshotDerivedKeyContext,
@@ -236,23 +237,28 @@ test("delete a device", async () => {
     sessionKey,
   }).authorization;
 
+  const newWorkspaceKey = {
+    id: generateId(),
+    workspaceKey: sodium.to_base64(sodium.crypto_kdf_keygen()),
+  };
   const workspaceKeyBox1 = encryptWorkspaceKeyForDevice({
     receiverDeviceEncryptionPublicKey: device!.encryptionPublicKey,
     creatorDeviceEncryptionPrivateKey: encryptionPrivateKey,
-    workspaceKey,
     workspaceId,
-    workspaceKeyId: userAndWorkspaceData.workspace.currentWorkspaceKey.id,
+    workspaceKey: newWorkspaceKey.workspaceKey,
+    workspaceKeyId: newWorkspaceKey.id,
   });
   const workspaceKeyBox2 = encryptWorkspaceKeyForDevice({
     receiverDeviceEncryptionPublicKey: webDevice!.encryptionPublicKey,
     creatorDeviceEncryptionPrivateKey: encryptionPrivateKey,
-    workspaceKey,
     workspaceId,
-    workspaceKeyId: userAndWorkspaceData.workspace.currentWorkspaceKey.id,
+    workspaceKey: newWorkspaceKey.workspaceKey,
+    workspaceKeyId: newWorkspaceKey.id,
   });
   const newDeviceWorkspaceKeyBoxes: WorkspaceWithWorkspaceDevicesParing[] = [
     {
       id: workspaceId,
+      workspaceKeyId: newWorkspaceKey.id,
       workspaceDevices: [
         {
           receiverDeviceSigningPublicKey: device!.signingPublicKey,

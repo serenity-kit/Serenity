@@ -1090,6 +1090,7 @@ export type RemoveMemberAndRotateWorkspaceKeyInput = {
   serializedWorkspaceChainEvent: Scalars['String']['input'];
   serializedWorkspaceMemberDevicesProof: Scalars['String']['input'];
   workspaceId: Scalars['String']['input'];
+  workspaceKeyId: Scalars['String']['input'];
 };
 
 export type RemoveMemberAndRotateWorkspaceKeyResult = {
@@ -1485,6 +1486,7 @@ export type WorkspaceMembersByMainDeviceSigningPublicKeyResult = {
 export type WorkspaceWithWorkspaceDevicesParingInput = {
   id: Scalars['String']['input'];
   workspaceDevices: Array<WorkspaceDeviceInput>;
+  workspaceKeyId: Scalars['String']['input'];
 };
 
 export type AcceptWorkspaceInvitationMutationVariables = Exact<{

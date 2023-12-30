@@ -75,6 +75,7 @@ export const WorkspaceWithWorkspaceDevicesParingInput = inputObjectType({
   name: "WorkspaceWithWorkspaceDevicesParingInput",
   definition(t) {
     t.nonNull.string("id");
+    t.nonNull.string("workspaceKeyId");
     t.nonNull.list.nonNull.field("workspaceDevices", {
       type: WorkspaceDeviceInput,
     });

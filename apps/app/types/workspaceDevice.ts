@@ -13,5 +13,6 @@ export type MemberWithWorkspaceKeyBoxes = {
 
 export type WorkspaceWithWorkspaceDevicesParing = {
   id: string; // workspaceId;
+  workspaceKeyId: string;
   workspaceDevices: WorkspaceDeviceParing[];
 };

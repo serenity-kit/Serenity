@@ -4,6 +4,7 @@ import {
   encryptWorkspaceKeyForDevice,
   generateId,
 } from "@serenity-tools/common";
+import sodium from "react-native-libsodium";
 import deleteAllRecords from "../../../../test/helpers/deleteAllRecords";
 import { attachDeviceToWorkspaces } from "../../../../test/helpers/device/attachDeviceToWorkspaces";
 import { deleteDevice } from "../../../../test/helpers/device/deleteDevice";
@@ -139,30 +140,36 @@ test("delete device", async () => {
   });
 
   const user1Device3 = loginResult.webDevice;
+
+  const newWorkspaceKey = {
+    id: generateId(),
+    workspaceKey: sodium.to_base64(sodium.crypto_kdf_keygen()),
+  };
   const workspaceKeyBox1 = encryptWorkspaceKeyForDevice({
     receiverDeviceEncryptionPublicKey: userData1.device.encryptionPublicKey,
     creatorDeviceEncryptionPrivateKey: userData1.encryptionPrivateKey,
-    workspaceKey,
     workspaceId: userData1.workspace.id,
-    workspaceKeyId: userData1.workspace.currentWorkspaceKey.id,
+    workspaceKeyId: newWorkspaceKey.id,
+    workspaceKey: newWorkspaceKey.workspaceKey,
   });
   const workspaceKeyBox2 = encryptWorkspaceKeyForDevice({
     receiverDeviceEncryptionPublicKey: userData1.webDevice.encryptionPublicKey,
     creatorDeviceEncryptionPrivateKey: userData1.encryptionPrivateKey,
-    workspaceKey,
     workspaceId: userData1.workspace.id,
-    workspaceKeyId: userData1.workspace.currentWorkspaceKey.id,
+    workspaceKeyId: newWorkspaceKey.id,
+    workspaceKey: newWorkspaceKey.workspaceKey,
   });
   const workspaceKeyBox3 = encryptWorkspaceKeyForDevice({
     receiverDeviceEncryptionPublicKey: user1Device2.encryptionPublicKey,
     creatorDeviceEncryptionPrivateKey: userData1.encryptionPrivateKey,
-    workspaceKey,
     workspaceId: userData1.workspace.id,
-    workspaceKeyId: userData1.workspace.currentWorkspaceKey.id,
+    workspaceKeyId: newWorkspaceKey.id,
+    workspaceKey: newWorkspaceKey.workspaceKey,
   });
   const newDeviceWorkspaceKeyBoxes: WorkspaceWithWorkspaceDevicesParing[] = [
     {
       id: userData1.workspace.id,
+      workspaceKeyId: newWorkspaceKey.id,
       workspaceDevices: [
         {
           receiverDeviceSigningPublicKey: userData1.device.signingPublicKey,
@@ -220,7 +227,7 @@ test("delete device", async () => {
     );
   }
 
-  const newWorkspaceKey = await prisma.workspaceKey.findFirst({
+  const newWorkspaceKey2 = await prisma.workspaceKey.findFirst({
     where: { workspaceId: userData1.workspace.id },
     orderBy: { generation: "desc" },
   });
@@ -230,13 +237,13 @@ test("delete device", async () => {
   await prisma.document.updateMany({
     where: { workspaceId: userData1.workspace.id },
     data: {
-      workspaceKeyId: newWorkspaceKey?.id,
+      workspaceKeyId: newWorkspaceKey2?.id,
     },
   });
   await prisma.folder.updateMany({
     where: { workspaceId: userData1.workspace.id },
     data: {
-      workspaceKeyId: newWorkspaceKey?.id,
+      workspaceKeyId: newWorkspaceKey2?.id,
     },
   });
 
@@ -250,7 +257,7 @@ test("delete device", async () => {
     resultAfterUpdate.activeWorkspaceKeys.activeWorkspaceKeys;
   expect(updatedWorkspaceKeys.length).toBe(1);
   const updatedWorkspaceKey = updatedWorkspaceKeys[0];
-  expect(updatedWorkspaceKey.id).toBe(newWorkspaceKey?.id);
+  expect(updatedWorkspaceKey.id).toBe(newWorkspaceKey2?.id);
   expect(updatedWorkspaceKey.generation).toBe(1);
   const workspaceKeyBox = updatedWorkspaceKey.workspaceKeyBoxes[0];
   expect(workspaceKeyBox.deviceSigningPublicKey).toBe(

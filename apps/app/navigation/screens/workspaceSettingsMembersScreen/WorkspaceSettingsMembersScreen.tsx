@@ -170,7 +170,7 @@ export default function WorkspaceSettingsMembersScreen(
       throw new Error("Missing workspace chain data");
     }
 
-    const { deviceWorkspaceKeyBoxes } = await rotateWorkspaceKey({
+    const { deviceWorkspaceKeyBoxes, workspaceKey } = await rotateWorkspaceKey({
       workspaceId,
       activeDevice,
       userToRemoveId: userId,
@@ -217,6 +217,7 @@ export default function WorkspaceSettingsMembersScreen(
             creatorDeviceSigningPublicKey: activeDevice.signingPublicKey,
             deviceWorkspaceKeyBoxes,
             workspaceId,
+            workspaceKeyId: workspaceKey.id,
             serializedWorkspaceChainEvent: JSON.stringify(removeMemberEvent),
             serializedWorkspaceMemberDevicesProof: JSON.stringify(
               workspaceMemberDevicesProof

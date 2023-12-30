@@ -88,6 +88,7 @@ test("user cannot remove self", async () => {
       await removeMemberAndRotateWorkspaceKey({
         graphql,
         workspaceId: userData1.workspace.id,
+        workspaceKeyId: userData1.workspace.currentWorkspaceKey.id,
         creatorDeviceSigningPublicKey: userData1.device.signingPublicKey,
         deviceWorkspaceKeyBoxes,
         authorizationHeader: deriveSessionAuthorization({
@@ -168,6 +169,7 @@ test("user cannot revoke own main device", async () => {
       await removeMemberAndRotateWorkspaceKey({
         graphql,
         workspaceId: userData1.workspace.id,
+        workspaceKeyId: userData1.workspace.currentWorkspaceKey.id,
         creatorDeviceSigningPublicKey: userData1.device.signingPublicKey,
         deviceWorkspaceKeyBoxes,
         authorizationHeader: deriveSessionAuthorization({
@@ -264,21 +266,27 @@ test("user can remove another user", async () => {
     }).authorization,
     deviceWorkspaceKeyBoxes: approvedDeviceKeyBoxes,
   });
+
+  const newWorkspaceKey = {
+    id: generateId(),
+    workspaceKey: sodium.to_base64(sodium.crypto_kdf_keygen()),
+  };
+
   const user1MainDeviceGen1 = encryptWorkspaceKeyForDevice({
     receiverDeviceEncryptionPublicKey: userData1.mainDevice.signingPublicKey,
     creatorDeviceEncryptionPrivateKey:
       userData1.mainDevice.encryptionPrivateKey,
-    workspaceKey,
     workspaceId: userData1.workspace.id,
-    workspaceKeyId: userData1.workspace.currentWorkspaceKey.id,
+    workspaceKey: newWorkspaceKey.workspaceKey,
+    workspaceKeyId: newWorkspaceKey.id,
   });
   const user1WebDeviceGen1 = encryptWorkspaceKeyForDevice({
     receiverDeviceEncryptionPublicKey: userData1.webDevice.signingPublicKey,
     creatorDeviceEncryptionPrivateKey:
       userData1.mainDevice.encryptionPrivateKey,
-    workspaceKey,
     workspaceId: userData1.workspace.id,
-    workspaceKeyId: userData1.workspace.currentWorkspaceKey.id,
+    workspaceKey: newWorkspaceKey.workspaceKey,
+    workspaceKeyId: newWorkspaceKey.id,
   });
   const workspaceUsersBefore = await prisma.usersToWorkspaces.findMany({
     where: { workspaceId: userData1.workspace.id },
@@ -322,6 +330,7 @@ test("user can remove another user", async () => {
   const workspaceKeyResult = await removeMemberAndRotateWorkspaceKey({
     graphql,
     workspaceId: userData1.workspace.id,
+    workspaceKeyId: newWorkspaceKey.id,
     creatorDeviceSigningPublicKey: userData1.mainDevice.signingPublicKey,
     deviceWorkspaceKeyBoxes,
     authorizationHeader: deriveSessionAuthorization({
@@ -508,19 +517,25 @@ test("user can rotate key for multiple devices", async () => {
   expect(
     workspaceUserIdsBefore.indexOf(userData2.user.id)
   ).toBeGreaterThanOrEqual(0);
+
+  const newWorkspaceKey = {
+    id: generateId(),
+    workspaceKey: sodium.to_base64(sodium.crypto_kdf_keygen()),
+  };
+
   const keyData1 = encryptWorkspaceKeyForDevice({
     receiverDeviceEncryptionPublicKey: userData1.device.signingPublicKey,
     creatorDeviceEncryptionPrivateKey: userData1.deviceEncryptionPrivateKey,
-    workspaceKey,
     workspaceId: userData1.workspace.id,
-    workspaceKeyId: userData1.workspace.currentWorkspaceKey.id,
+    workspaceKey: newWorkspaceKey.workspaceKey,
+    workspaceKeyId: newWorkspaceKey.id,
   });
   const keyData2 = encryptWorkspaceKeyForDevice({
     receiverDeviceEncryptionPublicKey: userData1.webDevice.signingPublicKey,
     creatorDeviceEncryptionPrivateKey: userData1.deviceEncryptionPrivateKey,
-    workspaceKey,
     workspaceId: userData1.workspace.id,
-    workspaceKeyId: userData1.workspace.currentWorkspaceKey.id,
+    workspaceKey: newWorkspaceKey.workspaceKey,
+    workspaceKeyId: newWorkspaceKey.id,
   });
   const loginResult = await createDeviceAndLogin({
     username: userData1.user.username,
@@ -532,9 +547,9 @@ test("user can rotate key for multiple devices", async () => {
   const keyData3 = encryptWorkspaceKeyForDevice({
     receiverDeviceEncryptionPublicKey: newDevice.signingPublicKey,
     creatorDeviceEncryptionPrivateKey: userData1.deviceEncryptionPrivateKey,
-    workspaceKey,
     workspaceId: userData1.workspace.id,
-    workspaceKeyId: userData1.workspace.currentWorkspaceKey.id,
+    workspaceKey: newWorkspaceKey.workspaceKey,
+    workspaceKeyId: newWorkspaceKey.id,
   });
   const deviceWorkspaceKeyBoxes: WorkspaceDeviceParing[] = [
     {
@@ -570,6 +585,7 @@ test("user can rotate key for multiple devices", async () => {
   const workspaceKeyResult = await removeMemberAndRotateWorkspaceKey({
     graphql,
     workspaceId: userData1.workspace.id,
+    workspaceKeyId: newWorkspaceKey.id,
     creatorDeviceSigningPublicKey: userData1.device.signingPublicKey,
     deviceWorkspaceKeyBoxes,
     authorizationHeader: deriveSessionAuthorization({
