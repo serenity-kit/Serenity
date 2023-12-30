@@ -189,6 +189,10 @@ export default function WorkspaceSettingsMembersScreen(
     const lastWorkspaceMemberDevicesProof =
       await loadRemoteWorkspaceMemberDevicesProofQuery({ workspaceId });
 
+    const newUserChainHashes = {
+      ...lastWorkspaceMemberDevicesProof.data.userChainHashes,
+    };
+    delete newUserChainHashes[userId];
     const workspaceMemberDevicesProof =
       workspaceMemberDevicesProofUtil.createWorkspaceMemberDevicesProof({
         authorKeyPair: {
@@ -198,6 +202,7 @@ export default function WorkspaceSettingsMembersScreen(
         },
         workspaceMemberDevicesProofData: {
           ...lastWorkspaceMemberDevicesProof.data,
+          userChainHashes: newUserChainHashes,
           clock: lastWorkspaceMemberDevicesProof.clock + 1,
           workspaceChainHash: workspaceChain.hashTransaction(
             removeMemberEvent.transaction
