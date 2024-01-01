@@ -241,6 +241,7 @@ test("delete a device", async () => {
     id: generateId(),
     workspaceKey: sodium.to_base64(sodium.crypto_kdf_keygen()),
   };
+
   const workspaceKeyBox1 = encryptWorkspaceKeyForDevice({
     receiverDeviceEncryptionPublicKey: device!.encryptionPublicKey,
     creatorDeviceEncryptionPrivateKey: encryptionPrivateKey,
@@ -433,7 +434,7 @@ test("successfully creates a snapshot", async () => {
       workspaceKeyBox.creatorDevice.encryptionPublicKey,
     receiverDeviceEncryptionPrivateKey: encryptionPrivateKey,
     workspaceId,
-    workspaceKeyId: userAndWorkspaceData.workspace.currentWorkspaceKey.id,
+    workspaceKeyId: workspaceResult.workspace.currentWorkspaceKey.id,
   });
   const folderKeyResult = kdfDeriveFromKey({
     key: workspaceKey,
