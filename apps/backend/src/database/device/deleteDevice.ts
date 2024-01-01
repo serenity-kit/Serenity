@@ -191,8 +191,10 @@ export async function deleteDevice({
             `Missing newWorkspaceDevicekeyBox workspaceDevice for workspace ${workspaceId}`
           );
         }
+
         verifiedDeviceWorkspaceKeyBoxes.push({
           id: workspaceId,
+          workspaceKeyId: newDeviceWorkspaceKeyBox.workspaceKeyId,
           workspaceDevices: addableDeviceWorkspaceKeyBoxes,
         });
       }
@@ -209,6 +211,7 @@ export async function deleteDevice({
           newDeviceWorkspaceKeyBox.workspaceDevices;
         const updatedWorkspaceKey = await rotateWorkspaceKey({
           prisma,
+          workspaceKeyId: newDeviceWorkspaceKeyBox.workspaceKeyId,
           deviceWorkspaceKeyBoxes: addableDeviceWorkspaceKeyBoxes,
           creatorDeviceSigningPublicKey,
           workspaceId,

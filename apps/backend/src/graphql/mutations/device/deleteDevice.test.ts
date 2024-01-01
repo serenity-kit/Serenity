@@ -4,6 +4,7 @@ import {
   generateId,
 } from "@serenity-tools/common";
 import { gql } from "graphql-request";
+import sodium from "react-native-libsodium";
 import deleteAllRecords from "../../../../test/helpers/deleteAllRecords";
 import { deleteDevice } from "../../../../test/helpers/device/deleteDevice";
 import { getDevices } from "../../../../test/helpers/device/getDevices";
@@ -49,16 +50,22 @@ beforeAll(async () => {
 });
 
 test("delete and keep devices mismatch", async () => {
+  const newWorkspaceKey = {
+    id: generateId(),
+    workspaceKey: sodium.to_base64(sodium.crypto_kdf_keygen()),
+  };
+
   const workspaceKeyBox1 = encryptWorkspaceKeyForDevice({
     receiverDeviceEncryptionPublicKey: userData1.device.encryptionPublicKey,
     creatorDeviceEncryptionPrivateKey: userData1.encryptionPrivateKey,
-    workspaceKey,
     workspaceId: userData1.workspace.id,
-    workspaceKeyId: userData1.workspace.currentWorkspaceKey.id,
+    workspaceKey: newWorkspaceKey.workspaceKey,
+    workspaceKeyId: newWorkspaceKey.id,
   });
   const newDeviceWorkspaceKeyBoxes: WorkspaceWithWorkspaceDevicesParing[] = [
     {
       id: userData1.workspace.id,
+      workspaceKeyId: userData1.workspace.currentWorkspaceKey.id,
       workspaceDevices: [
         {
           receiverDeviceSigningPublicKey: userData1.device.signingPublicKey,
@@ -96,6 +103,11 @@ test("delete a device", async () => {
   });
   expect(numDevicesAfterCreate.devices.edges.length).toBe(3);
 
+  const newWorkspaceKey = {
+    id: generateId(),
+    workspaceKey: sodium.to_base64(sodium.crypto_kdf_keygen()),
+  };
+
   // // connected session must exist
   // const session = await prisma.session.findFirst({
   //   where: {
@@ -106,20 +118,21 @@ test("delete a device", async () => {
   const workspaceKeyBox1 = encryptWorkspaceKeyForDevice({
     receiverDeviceEncryptionPublicKey: userData1.device.encryptionPublicKey,
     creatorDeviceEncryptionPrivateKey: userData1.encryptionPrivateKey,
-    workspaceKey,
     workspaceId: userData1.workspace.id,
-    workspaceKeyId: userData1.workspace.currentWorkspaceKey.id,
+    workspaceKey: newWorkspaceKey.workspaceKey,
+    workspaceKeyId: newWorkspaceKey.id,
   });
   const workspaceKeyBox2 = encryptWorkspaceKeyForDevice({
     receiverDeviceEncryptionPublicKey: userData1.webDevice.encryptionPublicKey,
     creatorDeviceEncryptionPrivateKey: userData1.encryptionPrivateKey,
-    workspaceKey,
     workspaceId: userData1.workspace.id,
-    workspaceKeyId: userData1.workspace.currentWorkspaceKey.id,
+    workspaceKey: newWorkspaceKey.workspaceKey,
+    workspaceKeyId: newWorkspaceKey.id,
   });
   const newDeviceWorkspaceKeyBoxes: WorkspaceWithWorkspaceDevicesParing[] = [
     {
       id: userData1.workspace.id,
+      workspaceKeyId: newWorkspaceKey.id,
       workspaceDevices: [
         {
           receiverDeviceSigningPublicKey: userData1.device.signingPublicKey,
@@ -188,16 +201,23 @@ test("delete login device clears session", async () => {
     },
   });
   expect(session).not.toBeNull();
+
+  const newWorkspaceKey = {
+    id: generateId(),
+    workspaceKey: sodium.to_base64(sodium.crypto_kdf_keygen()),
+  };
+
   const workspaceKeyBox1 = encryptWorkspaceKeyForDevice({
     receiverDeviceEncryptionPublicKey: userData1.device.encryptionPublicKey,
     creatorDeviceEncryptionPrivateKey: userData1.encryptionPrivateKey,
-    workspaceKey,
     workspaceId: userData1.workspace.id,
-    workspaceKeyId: userData1.workspace.currentWorkspaceKey.id,
+    workspaceKey: newWorkspaceKey.workspaceKey,
+    workspaceKeyId: newWorkspaceKey.id,
   });
   const newDeviceWorkspaceKeyBoxes: WorkspaceWithWorkspaceDevicesParing[] = [
     {
       id: userData1.workspace.id,
+      workspaceKeyId: newWorkspaceKey.id,
       workspaceDevices: [
         {
           receiverDeviceSigningPublicKey: userData1.device.signingPublicKey,

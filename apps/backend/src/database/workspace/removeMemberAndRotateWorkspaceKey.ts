@@ -12,6 +12,7 @@ export type Props = {
   newDeviceWorkspaceKeyBoxes: WorkspaceDeviceParing[];
   creatorDeviceSigningPublicKey: string;
   workspaceId: string;
+  workspaceKeyId: string;
   userId: string;
   workspaceChainEvent: workspaceChain.RemoveMemberWorkspaceChainEvent;
   workspaceMemberDevicesProof: workspaceMemberDevicesProofUtil.WorkspaceMemberDevicesProof;
@@ -21,6 +22,7 @@ export type Props = {
 export const removeMemberAndRotateWorkspaceKey = async ({
   userId,
   workspaceId,
+  workspaceKeyId,
   creatorDeviceSigningPublicKey,
   newDeviceWorkspaceKeyBoxes,
   workspaceChainEvent,
@@ -149,6 +151,7 @@ export const removeMemberAndRotateWorkspaceKey = async ({
         deviceWorkspaceKeyBoxes: addableDeviceWorkspaceKeyBoxes,
         creatorDeviceSigningPublicKey,
         workspaceId,
+        workspaceKeyId,
         userId,
       });
       return updatedWorkspaceKey;

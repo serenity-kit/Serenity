@@ -10,6 +10,7 @@ export type Props = {
   deviceWorkspaceKeyBoxes: WorkspaceDeviceParing[];
   creatorDeviceSigningPublicKey: string;
   workspaceId: string;
+  workspaceKeyId: string;
   userId: string;
 };
 export const rotateWorkspaceKey = async ({
@@ -17,6 +18,7 @@ export const rotateWorkspaceKey = async ({
   deviceWorkspaceKeyBoxes,
   creatorDeviceSigningPublicKey,
   workspaceId,
+  workspaceKeyId,
   userId,
 }: Props) => {
   // verify that the user belongs to these workspaces
@@ -72,7 +74,7 @@ export const rotateWorkspaceKey = async ({
   }
   const newWorkspaceKey = await prisma.workspaceKey.create({
     data: {
-      id: generateId(),
+      id: workspaceKeyId,
       workspaceId,
       generation: lastGenerationKey.generation + 1,
     },

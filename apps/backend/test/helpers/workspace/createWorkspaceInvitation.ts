@@ -25,7 +25,6 @@ export const createWorkspaceInvitation = async ({
   mainDevice,
   overwritePrevHash,
 }: Params) => {
-  console.log("createWorkspaceInvitation", authorizationHeader);
   const authorizationHeaders = {
     authorization: authorizationHeader,
   };

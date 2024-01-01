@@ -115,14 +115,16 @@ export default function AccountDevicesSettingsScreen(
     for (let workspace of workspaces) {
       const workspaceId = workspace.id;
 
-      const { deviceWorkspaceKeyBoxes } = await rotateWorkspaceKey({
-        workspaceId,
-        activeDevice,
-        deviceToRemoveSigningPublicKey: deviceSigningPublicKey,
-      });
+      const { deviceWorkspaceKeyBoxes, workspaceKey } =
+        await rotateWorkspaceKey({
+          workspaceId,
+          activeDevice,
+          deviceToRemoveSigningPublicKey: deviceSigningPublicKey,
+        });
 
       newDeviceWorkspaceKeyBoxes.push({
         id: workspace.id,
+        workspaceKeyId: workspaceKey.id,
         workspaceDevices: deviceWorkspaceKeyBoxes,
       });
     }

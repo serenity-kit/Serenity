@@ -54,6 +54,7 @@ jobs:
         run: node -v
       - name: Test
         run: yarn test
+        timeout-minutes: 10
   prettier:
     runs-on: ubuntu-latest
     steps:
