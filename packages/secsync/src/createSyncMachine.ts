@@ -906,7 +906,8 @@ export const createSyncMachine = () =>
 
                 try {
                   const isValidClient = await context.isValidClient(
-                    snapshot.publicData.pubKey
+                    snapshot.publicData.pubKey,
+                    snapshot.publicData
                   );
                   if (!isValidClient) {
                     errorNotCausingDocumentToFail = new Error(
@@ -1099,7 +1100,8 @@ export const createSyncMachine = () =>
 
                   try {
                     const isValidClient = await context.isValidClient(
-                      update.publicData.pubKey
+                      update.publicData.pubKey,
+                      update.publicData
                     );
                     if (!isValidClient) {
                       errorNotCausingDocumentToFail = new Error(
@@ -1481,7 +1483,8 @@ export const createSyncMachine = () =>
                       let isValidClient: boolean;
                       try {
                         isValidClient = await context.isValidClient(
-                          ephemeralMessage.publicData.pubKey
+                          ephemeralMessage.publicData.pubKey,
+                          ephemeralMessage.publicData
                         );
                       } catch (err) {
                         if (context.logging === "error") {
