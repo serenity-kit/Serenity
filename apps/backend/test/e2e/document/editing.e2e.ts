@@ -53,7 +53,9 @@ test.describe("Edit document", () => {
     });
     const editor = page.locator("div[class='ProseMirror']");
     const startingContent = await editor.innerHTML();
-    await page.type("div[class='ProseMirror']", newContent);
+    await page
+      .locator("div[class='ProseMirror']")
+      .pressSequentially(newContent);
     await delayForSeconds(2);
     await reloadPage({ page });
     await delayForSeconds(2);
@@ -118,8 +120,11 @@ test.describe("Edit document", () => {
     const user2StartingContent = await user2Editor.innerHTML();
     expect(startingContent).toBe(user2StartingContent);
     // user1 edits document
-    await page.type("div[class='ProseMirror']", newContent1);
-    await delayForSeconds(2);
+    await page
+      .locator("div[class='ProseMirror']")
+      .pressSequentially(newContent1);
+    // TODO check why there is such a long delay to show ephemeral messages
+    await delayForSeconds(3);
     // expect the cursor to show on user2's page
     const user1Cursor = user2Page.locator(
       "xpath=//span[contains(@class,'collaboration-cursor__caret')]"
@@ -135,7 +140,9 @@ test.describe("Edit document", () => {
     await delayForSeconds(2);
     const user2EndingContent = await user2Editor.innerHTML();
     expect(endingContent).toBe(user2EndingContent);
-    await user2Page.type("div[class='ProseMirror']", newContent2);
+    await user2Page
+      .locator("div[class='ProseMirror']")
+      .pressSequentially(newContent2);
     // reload page
 
     await reloadPage({ page });
@@ -178,10 +185,8 @@ test.describe("Edit document", () => {
     const user2AfterLoginContent = await user2EditorAfterLogin.innerHTML();
     expect(user1AfterLoginContent).toBe(user2AfterLoginContent);
   });
-});
 
-test.describe("Edit document in subfolder", () => {
-  test("Add content", async ({ page }) => {
+  test("Add content in a subfolder", async ({ page }) => {
     const newContent = "\nHello World!";
     await login({
       page,
@@ -200,7 +205,9 @@ test.describe("Edit document in subfolder", () => {
     await createDocument(page, folder.id, user1.data.workspace.id);
     const editor = page.locator("div[class='ProseMirror']");
     const startingContent = await editor.innerHTML();
-    await page.type("div[class='ProseMirror']", newContent);
+    await page
+      .locator("div[class='ProseMirror']")
+      .pressSequentially(newContent);
     await delayForSeconds(2);
     await reloadPage({ page });
     await delayForSeconds(2);
@@ -223,7 +230,10 @@ test.describe("Edit document in subfolder", () => {
     expect(afterLoginContent).toBe(endingContent);
   });
 
-  test("Add content shows for shared user", async ({ browser, page }) => {
+  test("Add content in a subfolder shows for shared user", async ({
+    browser,
+    page,
+  }) => {
     await login({
       page,
       username: user1.username,
@@ -253,7 +263,10 @@ test.describe("Edit document in subfolder", () => {
     const user2StartingContent = await user2Editor.innerHTML();
     expect(startingContent).toBe(user2StartingContent);
     // user1 edits document
-    await page.type("div[class='ProseMirror']", newContent1);
+    await page
+      .locator("div[class='ProseMirror']")
+      .pressSequentially(newContent1);
+    await delayForSeconds(4);
     // expect the cursor to show on user2's page
     const user1Cursor = user2Page.locator(
       "xpath=//span[contains(@class,'collaboration-cursor__caret')]"
@@ -269,7 +282,9 @@ test.describe("Edit document in subfolder", () => {
     await delayForSeconds(2);
     const user2EndingContent = await user2Editor.innerHTML();
     expect(endingContent).toBe(user2EndingContent);
-    await user2Page.type("div[class='ProseMirror']", newContent2);
+    await user2Page
+      .locator("div[class='ProseMirror']")
+      .pressSequentially(newContent2);
     // reload page
     await reloadPage({ page });
     await reloadPage({ page: user2Page });

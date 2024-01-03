@@ -356,20 +356,22 @@ export default function Page({
       }
       return false;
     },
-    isValidClient: async (signingPublicKey: string) => {
-      const isValidClientForSigningPublicKey = async () => {
+    isValidClient: async (signingPublicKey, publicData) => {
+      const isValidClientForSigningPublicKey = async (
+        workspaceMemberDevicesProofEntry:
+          | WorkspaceMemberDevicesProofLocalDbEntry
+          | undefined
+      ) => {
         // TODO verify that the users match the entries in the workspaceChain when verifying the proof?
-        if (activeSnapshotWorkspaceMemberDevicesProofEntryRef.current) {
+        if (workspaceMemberDevicesProofEntry) {
           for (const [userId, userChainHash] of Object.entries(
-            activeSnapshotWorkspaceMemberDevicesProofEntryRef.current.data
-              .userChainHashes
+            workspaceMemberDevicesProofEntry.data.userChainHashes
           )) {
             const user = await getLocalOrLoadRemoteUserByUserChainHash({
               userChainHash,
               userId,
               workspaceId,
             });
-            // console.log("user: ", user);
 
             if (user && Object.keys(user.devices).includes(signingPublicKey)) {
               return true;
@@ -380,12 +382,37 @@ export default function Page({
         return false;
       };
 
-      let isValid = await isValidClientForSigningPublicKey();
+      let isValid = await isValidClientForSigningPublicKey(
+        activeSnapshotWorkspaceMemberDevicesProofEntryRef.current
+      );
       if (isValid === false) {
-        activeSnapshotWorkspaceMemberDevicesProofEntryRef.current =
-          await loadRemoteWorkspaceMemberDevicesProofQuery({ workspaceId });
+        let workspaceMemberDevicesProofEntry:
+          | WorkspaceMemberDevicesProofLocalDbEntry
+          | undefined;
+        // @ts-expect-error
+        if (publicData.snapshotId) {
+          // In case of a snapshot the specific workspaceMemberDevicesProof is needed and
+          // it needs to be set as active to work for all following updates.
+          workspaceMemberDevicesProofEntry =
+            await getLocalOrLoadRemoteWorkspaceMemberDevicesProofQueryByHash({
+              workspaceId,
+              // @ts-expect-error
+              hash: publicData.workspaceMemberDevicesProof.hash,
+            });
+          activeSnapshotWorkspaceMemberDevicesProofEntryRef.current =
+            workspaceMemberDevicesProofEntry;
+          // @ts-expect-error
+        } else if (!publicData.snapshotId && !publicData.refSnapshotId) {
+          // In case of a ephemeral message getting the latest workspaceMemberDevicesProof should
+          // be fetched since the other client get the latest state soon and then will retransmit again
+          workspaceMemberDevicesProofEntry =
+            await loadRemoteWorkspaceMemberDevicesProofQuery({ workspaceId });
+        }
+
         await loadRemoteUserChainsForWorkspace({ workspaceId });
-        isValid = await isValidClientForSigningPublicKey();
+        isValid = await isValidClientForSigningPublicKey(
+          workspaceMemberDevicesProofEntry
+        );
       }
 
       return isValid;
