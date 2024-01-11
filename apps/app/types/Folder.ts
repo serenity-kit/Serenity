@@ -5,7 +5,7 @@ export type Folder = {
   nameCiphertext: string;
   nameNonce: string;
   subkeyId: string;
-  idSignature?: string;
+  signature: string;
   parentFolderId: string | null;
   rootFolderId: string | null;
   workspaceId: string;

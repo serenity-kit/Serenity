@@ -56,6 +56,7 @@ const setup = async () => {
     }).authorization,
     workspaceId: userData2.workspace.id,
     workspaceKeyId: userData2.workspace.currentWorkspaceKey.id,
+    userId: userData2.user.id,
   });
 };
 
@@ -90,6 +91,7 @@ test("user should be able to list folders in a workspace with one item", async (
     authorizationHeader: deriveSessionAuthorization({
       sessionKey: userData1.sessionKey,
     }).authorization,
+    userId: userData1.user.id,
   });
 
   const result = await getRootFolders({
@@ -122,6 +124,7 @@ test("user should be able to list folders in a workspace with multiple items", a
     authorizationHeader: deriveSessionAuthorization({
       sessionKey: userData1.sessionKey,
     }).authorization,
+    userId: userData1.user.id,
   });
 
   const result = await getRootFolders({
@@ -154,6 +157,7 @@ test("user should be able to list without showing subfolders", async () => {
     authorizationHeader: deriveSessionAuthorization({
       sessionKey: userData1.sessionKey,
     }).authorization,
+    userId: userData1.user.id,
   });
   const result = await getRootFolders({
     graphql,

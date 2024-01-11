@@ -21,6 +21,12 @@ test("decryptFolderName", () => {
       workspaceKeyId: "workspaceKey",
       trace: [],
     },
+    workspaceMemberDevicesProof: {
+      clock: 0,
+      hash: "abc",
+      hashSignature: "abc",
+      version: 0,
+    },
   });
   const decryptFolderResult = decryptFolderName({
     parentKey: kdfKey,
@@ -28,10 +34,17 @@ test("decryptFolderName", () => {
     nonce: result.nonce,
     subkeyId: result.folderSubkeyId,
     folderId: "abc",
+    signature: result.signature,
     workspaceId: "xyz",
     keyDerivationTrace: {
       workspaceKeyId: "workspaceKey",
       trace: [],
+    },
+    workspaceMemberDevicesProof: {
+      clock: 0,
+      hash: "abc",
+      hashSignature: "abc",
+      version: 0,
     },
   });
   expect(decryptFolderResult).toBe("Getting started");
@@ -49,6 +62,12 @@ test("decryptFolderName with publicData fails for wrong key", () => {
       workspaceKeyId: "workspaceKey",
       trace: [],
     },
+    workspaceMemberDevicesProof: {
+      clock: 0,
+      hash: "abc",
+      hashSignature: "abc",
+      version: 0,
+    },
   });
   expect(() =>
     decryptFolderName({
@@ -56,11 +75,18 @@ test("decryptFolderName with publicData fails for wrong key", () => {
       ciphertext: result.ciphertext,
       nonce: result.nonce,
       subkeyId: result.folderSubkeyId,
+      signature: result.signature,
       folderId: "abc",
       workspaceId: "xyz",
       keyDerivationTrace: {
         workspaceKeyId: "workspaceKey",
         trace: [],
+      },
+      workspaceMemberDevicesProof: {
+        clock: 0,
+        hash: "abc",
+        hashSignature: "abc",
+        version: 0,
       },
     })
   ).toThrowError(/Invalid robustness tag/);
@@ -78,6 +104,12 @@ test("decryptFolderName with publicData fails for wrong public data", () => {
       workspaceKeyId: "workspaceKey",
       trace: [],
     },
+    workspaceMemberDevicesProof: {
+      clock: 0,
+      hash: "abc",
+      hashSignature: "abc",
+      version: 0,
+    },
   });
   expect(() =>
     decryptFolderName({
@@ -85,11 +117,18 @@ test("decryptFolderName with publicData fails for wrong public data", () => {
       ciphertext: result.ciphertext,
       nonce: result.nonce,
       subkeyId: result.folderSubkeyId,
+      signature: result.signature,
       folderId: "WRONG",
       workspaceId: "xyz",
       keyDerivationTrace: {
         workspaceKeyId: "workspaceKey",
         trace: [],
+      },
+      workspaceMemberDevicesProof: {
+        clock: 0,
+        hash: "abc",
+        hashSignature: "abc",
+        version: 0,
       },
     })
   ).toThrowError(/Invalid robustness tag/);

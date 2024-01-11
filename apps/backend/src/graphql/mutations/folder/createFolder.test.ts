@@ -17,6 +17,7 @@ import { createFolder } from "../../../../test/helpers/folder/createFolder";
 import setupGraphql from "../../../../test/helpers/setupGraphql";
 import { prisma } from "../../../database/prisma";
 import createUserWithWorkspace from "../../../database/testHelpers/createUserWithWorkspace";
+import { getWorkspaceMemberDevicesProof } from "../../../database/workspace/getWorkspaceMemberDevicesProof";
 
 const graphql = setupGraphql();
 let userData1: any = undefined;
@@ -62,6 +63,7 @@ test("user should be able to create a root folder", async () => {
     workspaceId: userData1.workspace.id,
     workspaceKeyId: userData1.workspace.currentWorkspaceKey.id,
     authorizationHeader,
+    userId: userData1.user.id,
   });
   const folder = result.createFolder.folder;
   expect(folder.id).toBe(id);
@@ -97,6 +99,7 @@ test("user should be able to create a root folder with a name", async () => {
     workspaceId: userData1.workspace.id,
     workspaceKeyId: userData1.workspace.currentWorkspaceKey.id,
     authorizationHeader,
+    userId: userData1.user.id,
   });
   const folder = result.createFolder.folder;
   expect(folder.id).toBe(id);
@@ -140,6 +143,7 @@ test("user should be able to create a child folder", async () => {
     workspaceId: userData1.workspace.id,
     workspaceKeyId: userData1.workspace.currentWorkspaceKey.id,
     authorizationHeader,
+    userId: userData1.user.id,
   });
   const folder = result.createFolder.folder;
   expect(folder.id).toBe(id);
@@ -181,6 +185,7 @@ test("duplicate ID throws an error", async () => {
     workspaceId: userData1.workspace.id,
     workspaceKeyId: userData1.workspace.currentWorkspaceKey.id,
     authorizationHeader,
+    userId: userData1.user.id,
   });
   await expect(
     (async () =>
@@ -193,6 +198,7 @@ test("duplicate ID throws an error", async () => {
         workspaceId: userData1.workspace.id,
         workspaceKeyId: userData1.workspace.currentWorkspaceKey.id,
         authorizationHeader,
+        userId: userData1.user.id,
       }))()
   ).rejects.toThrow("Invalid input: duplicate id");
 });
@@ -204,6 +210,12 @@ test("Throw error on duplicate subkeyId, workspaceId", async () => {
   const name = "subkey test";
   const workspaceId = userData1.workspace.id;
   const existingSubkeyId = userData1.folder.subkeyId;
+
+  const workspaceMemberDevicesProof = await getWorkspaceMemberDevicesProof({
+    userId: userData1.user.id,
+    workspaceId,
+  });
+
   const encryptedFolderResult = encryptFolderName({
     name,
     parentKey: workspaceKey,
@@ -221,6 +233,7 @@ test("Throw error on duplicate subkeyId, workspaceId", async () => {
         },
       ],
     },
+    workspaceMemberDevicesProof: workspaceMemberDevicesProof.proof,
   });
 
   const nameCiphertext = encryptedFolderResult.ciphertext;
@@ -277,6 +290,7 @@ test("Throw error when the parent folder doesn't exist", async () => {
         workspaceId: addedWorkspace.id,
         workspaceKeyId: addedWorkspace.currentWorkspaceKey.id,
         authorizationHeader,
+        userId: userData1.user.id,
       }))()
   ).rejects.toThrowError(/FORBIDDEN/);
 });
@@ -300,6 +314,7 @@ test("Throw error when user doesn't have access", async () => {
         workspaceKeyId: addedWorkspace.currentWorkspaceKey.id,
         authorizationHeader: deriveSessionAuthorization({ sessionKey })
           .authorization,
+        userId: userData1.user.id,
       }))()
   ).rejects.toThrow("Unauthorized");
 });
@@ -331,6 +346,7 @@ test("Commentor tries to create", async () => {
         authorizationHeader: deriveSessionAuthorization({
           sessionKey: otherUser.sessionKey,
         }).authorization,
+        userId: otherUser.userId,
       }))()
   ).rejects.toThrowError("Unauthorized");
 });
@@ -362,6 +378,7 @@ test("Viewer tries to create", async () => {
         authorizationHeader: deriveSessionAuthorization({
           sessionKey: otherUser.sessionKey,
         }).authorization,
+        userId: otherUser.userId,
       }))()
   ).rejects.toThrowError("Unauthorized");
 });
@@ -379,6 +396,7 @@ test("Unauthenticated", async () => {
         workspaceId: addedWorkspace.id,
         workspaceKeyId: addedWorkspace.currentWorkspaceKey.id,
         authorizationHeader: "badauthheader",
+        userId: userData1.user.id,
       }))()
   ).rejects.toThrowError(/UNAUTHENTICATED/);
 });
@@ -404,6 +422,12 @@ describe("Input errors", () => {
   test("Invalid id", async () => {
     const name = "test";
     const subkeyId = createSubkeyId();
+
+    const workspaceMemberDevicesProof = await getWorkspaceMemberDevicesProof({
+      userId: userData1.user.id,
+      workspaceId: addedWorkspace.id,
+    });
+
     const encryptedFolderResult = encryptFolderName({
       name,
       parentKey: workspaceKey,
@@ -421,6 +445,7 @@ describe("Input errors", () => {
           },
         ],
       },
+      workspaceMemberDevicesProof: workspaceMemberDevicesProof.proof,
     });
     const nameCiphertext = encryptedFolderResult.ciphertext;
     const nameNonce = encryptedFolderResult.nonce;
@@ -446,6 +471,11 @@ describe("Input errors", () => {
   test("Invalid workspaceId", async () => {
     const name = "test";
     const subkeyId = createSubkeyId();
+    const workspaceMemberDevicesProof = await getWorkspaceMemberDevicesProof({
+      userId: userData1.user.id,
+      workspaceId: addedWorkspace.id,
+    });
+
     const encryptedFolderResult = encryptFolderName({
       name,
       parentKey: workspaceKey,
@@ -463,6 +493,7 @@ describe("Input errors", () => {
           },
         ],
       },
+      workspaceMemberDevicesProof: workspaceMemberDevicesProof.proof,
     });
     const nameCiphertext = encryptedFolderResult.ciphertext;
     const nameNonce = encryptedFolderResult.nonce;

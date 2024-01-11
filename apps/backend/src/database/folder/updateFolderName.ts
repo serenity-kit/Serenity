@@ -7,6 +7,8 @@ type Params = {
   id: string;
   nameCiphertext: string;
   nameNonce: string;
+  signature: string;
+  workspaceMemberDevicesProofHash: string;
   workspaceKeyId: string;
   subkeyId: string;
   userId: string;
@@ -18,6 +20,8 @@ export async function updateFolderName({
   nameCiphertext,
   nameNonce,
   workspaceKeyId,
+  signature,
+  workspaceMemberDevicesProofHash,
   subkeyId,
   userId,
   keyDerivationTrace,
@@ -63,6 +67,8 @@ export async function updateFolderName({
         data: {
           nameCiphertext,
           nameNonce,
+          signature,
+          workspaceMemberDevicesProofHash,
           workspaceKeyId,
           subkeyId,
           keyDerivationTrace,

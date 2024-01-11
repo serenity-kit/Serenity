@@ -1,3 +1,4 @@
+import * as workspaceMemberDevicesProofUtil from "@serenity-kit/workspace-member-devices-proof";
 import canonicalize from "canonicalize";
 import sodium from "react-native-libsodium";
 import { decryptAead } from "../decryptAead/decryptAead";
@@ -14,6 +15,8 @@ type Params = {
   folderId: string;
   workspaceId: string;
   keyDerivationTrace: KeyDerivationTrace;
+  signature: string;
+  workspaceMemberDevicesProof: workspaceMemberDevicesProofUtil.WorkspaceMemberDevicesProof;
 };
 
 export const decryptFolderName = ({
@@ -24,11 +27,14 @@ export const decryptFolderName = ({
   nonce,
   parentKey,
   subkeyId,
+  signature,
+  workspaceMemberDevicesProof,
 }: Params) => {
   const publicData = {
     workspaceId,
     folderId,
     keyDerivationTrace: KeyDerivationTrace.parse(keyDerivationTrace),
+    workspaceMemberDevicesProof,
   };
   const canonicalizedPublicData = canonicalize(publicData);
   if (!canonicalizedPublicData) {

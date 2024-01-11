@@ -10,6 +10,7 @@ import {
   DocumentPathQueryVariables,
   Folder,
 } from "../../generated/graphql";
+import { getLocalOrLoadRemoteWorkspaceMemberDevicesProofQueryByHash } from "../../store/workspaceMemberDevicesProofStore";
 import { GetFolderKeyProps } from "../folder/folderKeyStore";
 import { getUrqlClient } from "../urqlClient/urqlClient";
 import { getWorkspace } from "../workspace/getWorkspace";
@@ -104,11 +105,20 @@ export const useDocumentPathStore = create<DocumentPathState>((set, get) => ({
         if (parentKeyTrace.trace.length > 1) {
           parentKey = parentKeyTrace.trace[parentKeyTrace.trace.length - 2].key;
         }
+
+        const workspaceMemberDevicesProof =
+          await getLocalOrLoadRemoteWorkspaceMemberDevicesProofQueryByHash({
+            workspaceId,
+            hash: folder.workspaceMemberDevicesProofHash,
+          });
+
         folderName = decryptFolderName({
           parentKey: parentKey,
           subkeyId: folderSubkeyId,
           ciphertext: folder.nameCiphertext,
           nonce: folder.nameNonce,
+          signature: folder.signature,
+          workspaceMemberDevicesProof: workspaceMemberDevicesProof.proof,
           folderId: folder.id,
           workspaceId,
           keyDerivationTrace: folder.keyDerivationTrace,

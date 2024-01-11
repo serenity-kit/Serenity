@@ -45,7 +45,10 @@ import {
 import { useAuthenticatedAppContext } from "../../hooks/useAuthenticatedAppContext";
 import { getCurrentUserInfo } from "../../store/currentUserInfoStore";
 import { useCanEditDocumentsAndFolders } from "../../store/workspaceChainStore";
-import { loadRemoteWorkspaceMemberDevicesProofQuery } from "../../store/workspaceMemberDevicesProofStore";
+import {
+  getLocalOrLoadRemoteWorkspaceMemberDevicesProofQueryByHash,
+  loadRemoteWorkspaceMemberDevicesProofQuery,
+} from "../../store/workspaceMemberDevicesProofStore";
 import { RootStackScreenProps } from "../../types/navigationProps";
 import { useActiveDocumentStore } from "../../utils/document/activeDocumentStore";
 import {
@@ -68,6 +71,8 @@ type Props = ViewProps & {
   folderName?: string;
   nameCiphertext: string;
   nameNonce: string;
+  signature: string;
+  workspaceMemberDevicesProofHash: string;
   subkeyId: string;
   keyDerivationTrace: KeyDerivationTrace;
   depth?: number;
@@ -184,13 +189,22 @@ export default function SidebarFolder(props: Props) {
         parentKey =
           parentKeyChainData.trace[parentKeyChainData.trace.length - 2].key;
       }
+
+      const workspaceMemberDevicesProof =
+        await getLocalOrLoadRemoteWorkspaceMemberDevicesProofQueryByHash({
+          workspaceId: props.workspaceId,
+          hash: props.workspaceMemberDevicesProofHash,
+        });
+
       const folderName = decryptFolderName({
         parentKey,
         subkeyId: folderSubkeyId,
         ciphertext: props.nameCiphertext,
         nonce: props.nameNonce,
+        workspaceMemberDevicesProof: workspaceMemberDevicesProof.proof,
         folderId: props.folderId,
         workspaceId: props.workspaceId,
+        signature: props.signature,
         keyDerivationTrace: props.keyDerivationTrace,
       });
       setFolderName(folderName);
@@ -242,6 +256,11 @@ export default function SidebarFolder(props: Props) {
       context: folderDerivedKeyContext,
     });
 
+    const workspaceMemberDevicesProof =
+      await loadRemoteWorkspaceMemberDevicesProofQuery({
+        workspaceId: workspace.id,
+      });
+
     const encryptedFolderResult = encryptFolderName({
       name,
       parentKey: parentChainItem.key,
@@ -249,6 +268,7 @@ export default function SidebarFolder(props: Props) {
       keyDerivationTrace,
       subkeyId: folderSubkeyId,
       workspaceId: props.workspaceId,
+      workspaceMemberDevicesProof: workspaceMemberDevicesProof.proof,
     });
 
     let didCreateFolderSucceed = false;
@@ -264,6 +284,9 @@ export default function SidebarFolder(props: Props) {
             workspaceId: props.workspaceId,
             nameCiphertext: encryptedFolderResult.ciphertext,
             nameNonce: encryptedFolderResult.nonce,
+            signature: encryptedFolderResult.signature,
+            workspaceMemberDevicesProofHash:
+              workspaceMemberDevicesProof.proof.hash,
             workspaceKeyId: workspace?.currentWorkspaceKey?.id!,
             subkeyId: encryptedFolderResult.folderSubkeyId,
             parentFolderId: props.folderId,
@@ -489,6 +512,11 @@ export default function SidebarFolder(props: Props) {
     keyDerivationTrace.trace[keyDerivationTrace.trace.length - 1].subkeyId =
       folderSubkeyId;
 
+    const workspaceMemberDevicesProof =
+      await loadRemoteWorkspaceMemberDevicesProofQuery({
+        workspaceId: workspace.id,
+      });
+
     const encryptedFolderResult = encryptFolderName({
       name: newFolderName,
       parentKey,
@@ -496,6 +524,7 @@ export default function SidebarFolder(props: Props) {
       workspaceId: props.workspaceId,
       keyDerivationTrace,
       folderId: props.folderId,
+      workspaceMemberDevicesProof: workspaceMemberDevicesProof.proof,
     });
 
     const updateFolderNameResult = await runUpdateFolderNameMutation(
@@ -504,6 +533,9 @@ export default function SidebarFolder(props: Props) {
           id: props.folderId,
           nameCiphertext: encryptedFolderResult.ciphertext,
           nameNonce: encryptedFolderResult.nonce,
+          signature: encryptedFolderResult.signature,
+          workspaceMemberDevicesProofHash:
+            workspaceMemberDevicesProof.proof.hash,
           workspaceKeyId: workspace?.currentWorkspaceKey?.id!,
           subkeyId: encryptedFolderResult.folderSubkeyId!,
           keyDerivationTrace,
@@ -704,6 +736,10 @@ export default function SidebarFolder(props: Props) {
                     }
                     nameCiphertext={folder.nameCiphertext}
                     nameNonce={folder.nameNonce}
+                    signature={folder.signature}
+                    workspaceMemberDevicesProofHash={
+                      folder.workspaceMemberDevicesProofHash
+                    }
                     keyDerivationTrace={folder.keyDerivationTrace}
                     onStructureChange={props.onStructureChange}
                     depth={depth + 1}

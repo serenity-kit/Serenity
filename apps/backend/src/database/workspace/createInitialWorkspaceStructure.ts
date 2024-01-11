@@ -23,7 +23,7 @@ export type WorkspaceParams = {
 
 export type FolderParams = {
   id: string;
-  idSignature: string;
+  signature: string;
   nameCiphertext: string;
   nameNonce: string;
   keyDerivationTrace: KeyDerivationTrace;
@@ -78,6 +78,8 @@ export async function createInitialWorkspaceStructure({
     id: folder.id,
     nameCiphertext: folder.nameCiphertext,
     nameNonce: folder.nameNonce,
+    signature: folder.signature,
+    workspaceMemberDevicesProofHash: workspaceMemberDevicesProof.hash,
     workspaceKeyId: workspaceKey?.id!,
     subkeyId: "yoW4QaCRujrMdml7q39EqQ", // TODO: remove
     parentFolderId: undefined,

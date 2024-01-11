@@ -17,6 +17,8 @@ export const UpdateFolderNameInput = inputObjectType({
     t.nonNull.string("id");
     t.nonNull.string("nameCiphertext");
     t.nonNull.string("nameNonce");
+    t.nonNull.string("signature");
+    t.nonNull.string("workspaceMemberDevicesProofHash");
     t.nonNull.string("workspaceKeyId");
     t.nonNull.string("subkeyId");
     t.nonNull.field("keyDerivationTrace", { type: KeyDerivationTraceInput });
@@ -47,6 +49,9 @@ export const updateFolderNameMutation = mutationField("updateFolderName", {
       id: args.input.id,
       nameCiphertext: args.input.nameCiphertext,
       nameNonce: args.input.nameNonce,
+      signature: args.input.signature,
+      workspaceMemberDevicesProofHash:
+        args.input.workspaceMemberDevicesProofHash,
       workspaceKeyId: args.input.workspaceKeyId,
       subkeyId: args.input.subkeyId,
       userId: context.user.id,

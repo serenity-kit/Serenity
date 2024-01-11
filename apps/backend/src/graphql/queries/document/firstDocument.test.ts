@@ -49,6 +49,7 @@ const setup = async () => {
     }).authorization,
     workspaceId: userData1.workspace.id,
     workspaceKeyId: userData1.workspace.currentWorkspaceKey.id,
+    userId: userData1.user.id,
   });
   const createFolderResult = await createFolder({
     graphql,
@@ -61,6 +62,7 @@ const setup = async () => {
     }).authorization,
     workspaceId: userData1.workspace.id,
     workspaceKeyId: userData1.workspace.currentWorkspaceKey.id,
+    userId: userData1.user.id,
   });
 };
 

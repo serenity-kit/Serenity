@@ -122,6 +122,20 @@ export function CreateWorkspaceForm(props: CreateWorkspaceFormProps) {
         throw new Error("Could not retrieve workspaceKey!");
       }
 
+      const workspaceMemberDevicesProof =
+        workspaceMemberDevicesProofUtil.createWorkspaceMemberDevicesProof({
+          authorKeyPair: {
+            privateKey: sodium.from_base64(mainDevice.signingPrivateKey),
+            publicKey: sodium.from_base64(mainDevice.signingPublicKey),
+            keyType: "ed25519",
+          },
+          workspaceMemberDevicesProofData: {
+            clock: 0,
+            userChainHashes: { [userChainState.id]: userChainState.eventHash },
+            workspaceChainHash: workspaceChainState.lastEventHash,
+          },
+        });
+
       const folderSubkeyId = createSubkeyId();
       const folderKeyDerivationTrace = {
         workspaceKeyId,
@@ -141,11 +155,8 @@ export function CreateWorkspaceForm(props: CreateWorkspaceFormProps) {
         workspaceId: event.transaction.id,
         keyDerivationTrace: folderKeyDerivationTrace,
         subkeyId: folderSubkeyId,
+        workspaceMemberDevicesProof,
       });
-      const folderIdSignature = sodium.crypto_sign_detached(
-        "folder_id" + folderId,
-        sodium.from_base64(activeDevice.signingPrivateKey!)
-      );
 
       // prepare document snapshot
       const snapshotKey = createSnapshotKey({
@@ -162,20 +173,6 @@ export function CreateWorkspaceForm(props: CreateWorkspaceFormProps) {
         events: [createDocumentChainEvent],
         knownVersion: documentChain.version,
       });
-
-      const workspaceMemberDevicesProof =
-        workspaceMemberDevicesProofUtil.createWorkspaceMemberDevicesProof({
-          authorKeyPair: {
-            privateKey: sodium.from_base64(mainDevice.signingPrivateKey),
-            publicKey: sodium.from_base64(mainDevice.signingPublicKey),
-            keyType: "ed25519",
-          },
-          workspaceMemberDevicesProofData: {
-            clock: 0,
-            userChainHashes: { [userChainState.id]: userChainState.eventHash },
-            workspaceChainHash: workspaceChainState.lastEventHash,
-          },
-        });
 
       const snapshotId = generateId();
       const snapshot = createIntroductionDocumentSnapshot({
@@ -242,7 +239,7 @@ export function CreateWorkspaceForm(props: CreateWorkspaceFormProps) {
             serializedWorkspaceChainEvent: JSON.stringify(event),
             folder: {
               id: folderId,
-              idSignature: sodium.to_base64(folderIdSignature),
+              signature: encryptedFolderResult.signature,
               nameCiphertext: encryptedFolderResult.ciphertext,
               nameNonce: encryptedFolderResult.nonce,
               keyDerivationTrace: folderKeyDerivationTrace,

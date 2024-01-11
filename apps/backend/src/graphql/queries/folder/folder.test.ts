@@ -19,6 +19,7 @@ let workspaceKey = "";
 let folderKey = "";
 let addedFolder: any = null;
 let addedWorkspace: any = null;
+let userId: string = "";
 
 beforeAll(async () => {
   await deleteAllRecords();
@@ -28,6 +29,7 @@ beforeAll(async () => {
   sessionKey = result.sessionKey;
   addedWorkspace = result.workspace;
   workspaceId = addedWorkspace.id;
+  userId = result.user.id;
   const workspaceKeyBox = addedWorkspace.currentWorkspaceKey?.workspaceKeyBox;
   workspaceKey = decryptWorkspaceKey({
     ciphertext: workspaceKeyBox?.ciphertext!,
@@ -61,6 +63,7 @@ test("user should be retrieve a folder", async () => {
     workspaceId: workspaceId,
     authorizationHeader,
     workspaceKeyId: addedWorkspace.currentWorkspaceKey.id,
+    userId,
   });
   const result = await getFolder({
     graphql,

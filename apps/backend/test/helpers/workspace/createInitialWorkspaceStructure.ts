@@ -150,6 +150,26 @@ export const createInitialWorkspaceStructure = async ({
     deviceWorkspaceKeyBoxes,
   };
 
+  const userChainUser = await getAndConstructUserFromUserChainTestHelper({
+    mainDeviceSigningPublicKey: mainDevice.signingPublicKey,
+  });
+
+  const workspaceMemberDevicesProof =
+    workspaceMemberDevicesProofUtil.createWorkspaceMemberDevicesProof({
+      authorKeyPair: {
+        privateKey: sodium.from_base64(mainDevice.signingPrivateKey),
+        publicKey: sodium.from_base64(mainDevice.signingPublicKey),
+        keyType: "ed25519",
+      },
+      workspaceMemberDevicesProofData: {
+        clock: 0,
+        userChainHashes: {
+          [userChainUser.userId]: userChainUser.userChainState.eventHash,
+        },
+        workspaceChainHash: workspaceChainState.lastEventHash,
+      },
+    });
+
   // prepare the folder
 
   const folderSubkeyId = createSubkeyId();
@@ -170,20 +190,21 @@ export const createInitialWorkspaceStructure = async ({
         },
       ],
     },
+    workspaceMemberDevicesProof,
   });
 
   const encryptedFolderName = encryptedFolderResult.ciphertext;
   const encryptedFolderNameNonce = encryptedFolderResult.nonce;
   const folderKey = encryptedFolderResult.folderSubkey;
-  const folderIdSignature = sodium.to_base64(
+  const folderSignature = sodium.to_base64(
     sodium.crypto_sign_detached(
-      "folder_id" + folderId,
+      "folder" + folderId,
       sodium.from_base64(creatorDevice.signingPrivateKey)
     )
   );
   const readyFolder = {
     id: folderId,
-    idSignature: folderIdSignature,
+    signature: folderSignature,
     nameCiphertext: encryptedFolderName,
     nameNonce: encryptedFolderNameNonce,
     // since we haven't created the workspaceKey yet,
@@ -205,7 +226,7 @@ export const createInitialWorkspaceStructure = async ({
   const snapshotKey = createSnapshotKey({
     folderKey,
   });
-  // propare the document key
+  // prepare the document key
   const documentTitleKeyResult = createDocumentTitleKey({
     snapshotKey: snapshotKey.key,
   });
@@ -231,26 +252,6 @@ export const createInitialWorkspaceStructure = async ({
     knownVersion: documentChain.version,
   });
   const snapshotId = generateId();
-
-  const userChainUser = await getAndConstructUserFromUserChainTestHelper({
-    mainDeviceSigningPublicKey: mainDevice.signingPublicKey,
-  });
-
-  const workspaceMemberDevicesProof =
-    workspaceMemberDevicesProofUtil.createWorkspaceMemberDevicesProof({
-      authorKeyPair: {
-        privateKey: sodium.from_base64(mainDevice.signingPrivateKey),
-        publicKey: sodium.from_base64(mainDevice.signingPublicKey),
-        keyType: "ed25519",
-      },
-      workspaceMemberDevicesProofData: {
-        clock: 0,
-        userChainHashes: {
-          [userChainUser.userId]: userChainUser.userChainState.eventHash,
-        },
-        workspaceChainHash: workspaceChainState.lastEventHash,
-      },
-    });
 
   const snapshot = createIntroductionDocumentSnapshot({
     documentId: createDocumentChainEvent.transaction.id,

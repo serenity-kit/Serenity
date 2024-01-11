@@ -9,6 +9,8 @@ type Params = {
   id: string;
   nameCiphertext: string;
   nameNonce: string;
+  signature: string;
+  workspaceMemberDevicesProofHash: string;
   workspaceKeyId: string;
   subkeyId: string;
   parentFolderId?: string;
@@ -21,6 +23,8 @@ export async function createFolder({
   id,
   nameCiphertext,
   nameNonce,
+  signature,
+  workspaceMemberDevicesProofHash,
   workspaceKeyId,
   subkeyId,
   parentFolderId,
@@ -78,9 +82,10 @@ export async function createFolder({
       const rawFolder = await prisma.folder.create({
         data: {
           id,
-          idSignature: "TODO",
+          signature,
           nameCiphertext,
           nameNonce,
+          workspaceMemberDevicesProofHash,
           workspaceKeyId,
           subkeyId,
           parentFolderId,

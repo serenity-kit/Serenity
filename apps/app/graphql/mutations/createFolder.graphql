@@ -4,6 +4,8 @@ mutation createFolder($input: CreateFolderInput!) {
       id
       nameCiphertext
       nameNonce
+      signature
+      workspaceMemberDevicesProofHash
       parentFolderId
       rootFolderId
       workspaceId

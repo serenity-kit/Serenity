@@ -6,6 +6,8 @@ query folderTrace($folderId: ID!) {
     workspaceId
     nameCiphertext
     nameNonce
+    signature
+    workspaceMemberDevicesProofHash
     keyDerivationTrace {
       workspaceKeyId
       trace {

@@ -1,3 +1,4 @@
+import * as workspaceMemberDevicesProofUtil from "@serenity-kit/workspace-member-devices-proof";
 import { encryptFolderName } from "@serenity-tools/common";
 import { createSubkeyId } from "@serenity-tools/common/src/kdfDeriveFromKey/kdfDeriveFromKey";
 import { gql } from "graphql-request";
@@ -12,6 +13,7 @@ type Params = {
   parentFolderId: string | null | undefined;
   authorizationHeader: string;
   workspaceId: string;
+  workspaceMemberDevicesProof: workspaceMemberDevicesProofUtil.WorkspaceMemberDevicesProof;
 };
 
 export const updateFolderName = async ({
@@ -23,6 +25,7 @@ export const updateFolderName = async ({
   parentFolderId,
   authorizationHeader,
   workspaceId,
+  workspaceMemberDevicesProof,
 }: Params) => {
   const authorizationHeaders = {
     authorization: authorizationHeader,
@@ -39,6 +42,7 @@ export const updateFolderName = async ({
     keyDerivationTrace,
     subkeyId,
     workspaceId,
+    workspaceMemberDevicesProof,
   });
 
   const query = gql`
@@ -48,6 +52,8 @@ export const updateFolderName = async ({
           id
           nameCiphertext
           nameNonce
+          signature
+          workspaceMemberDevicesProofHash
           parentFolderId
           rootFolderId
           workspaceId
@@ -71,8 +77,10 @@ export const updateFolderName = async ({
         id,
         nameCiphertext: encryptedFolderResult.ciphertext,
         nameNonce: encryptedFolderResult.nonce,
+        signature: "TODO",
         workspaceKeyId,
         subkeyId: encryptedFolderResult.folderSubkeyId,
+        workspaceMemberDevicesProofHash: workspaceMemberDevicesProof.hash,
         keyDerivationTrace,
       },
     },

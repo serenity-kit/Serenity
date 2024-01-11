@@ -1,3 +1,4 @@
+import * as workspaceMemberDevicesProofUtil from "@serenity-kit/workspace-member-devices-proof";
 import canonicalize from "canonicalize";
 import sodium from "react-native-libsodium";
 import { encryptAead } from "../encryptAead/encryptAead";
@@ -12,6 +13,7 @@ type Params = {
   workspaceId: string;
   keyDerivationTrace: KeyDerivationTrace;
   subkeyId: string;
+  workspaceMemberDevicesProof: workspaceMemberDevicesProofUtil.WorkspaceMemberDevicesProof;
 };
 
 // Having a specific "folder__" context allows us to use have the same subkeyId
@@ -25,11 +27,13 @@ export const encryptFolderName = ({
   parentKey,
   workspaceId,
   subkeyId,
+  workspaceMemberDevicesProof,
 }: Params) => {
   const publicData = {
     workspaceId,
     folderId,
     keyDerivationTrace: KeyDerivationTrace.parse(keyDerivationTrace),
+    workspaceMemberDevicesProof,
   };
   const canonicalizedPublicData = canonicalize(publicData);
   if (!canonicalizedPublicData) {
@@ -45,11 +49,18 @@ export const encryptFolderName = ({
     canonicalizedPublicData,
     sodium.from_base64(folderKey.key)
   );
+
+  // const folderSignature = sodium.crypto_sign_detached(
+  //   "folder" + folderId,
+  //   sodium.from_base64(activeDevice.signingPrivateKey!)
+  // );
+
   return {
     folderSubkey: folderKey.key,
     folderSubkeyId: folderKey.subkeyId,
     ciphertext: result.ciphertext,
     nonce: result.publicNonce,
     publicData,
+    signature: "TODO",
   };
 };

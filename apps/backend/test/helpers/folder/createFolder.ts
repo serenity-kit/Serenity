@@ -4,6 +4,7 @@ import {
 } from "@serenity-tools/common";
 import { createSubkeyId } from "@serenity-tools/common/src/kdfDeriveFromKey/kdfDeriveFromKey";
 import { gql } from "graphql-request";
+import { getWorkspaceMemberDevicesProof } from "../../../src/database/workspace/getWorkspaceMemberDevicesProof";
 import { TestContext } from "../setupGraphql";
 import { createFolderKeyDerivationTrace } from "./createFolderKeyDerivationTrace";
 
@@ -16,6 +17,7 @@ type Params = {
   workspaceKeyId: string;
   parentKey: string;
   authorizationHeader: string;
+  userId: string;
 };
 
 export const createFolder = async ({
@@ -27,6 +29,7 @@ export const createFolder = async ({
   parentFolderId,
   workspaceId,
   authorizationHeader,
+  userId,
 }: Params) => {
   const authorizationHeaders = {
     authorization: authorizationHeader,
@@ -43,6 +46,11 @@ export const createFolder = async ({
     context: folderDerivedKeyContext,
   });
 
+  const workspaceMemberDevicesProof = await getWorkspaceMemberDevicesProof({
+    userId,
+    workspaceId,
+  });
+
   const encryptedFolderResult = encryptFolderName({
     name,
     parentKey,
@@ -50,6 +58,7 @@ export const createFolder = async ({
     keyDerivationTrace,
     subkeyId: folderSubkeyId,
     workspaceId,
+    workspaceMemberDevicesProof: workspaceMemberDevicesProof.proof,
   });
   const nameCiphertext = encryptedFolderResult.ciphertext;
   const nameNonce = encryptedFolderResult.nonce;
@@ -61,6 +70,8 @@ export const createFolder = async ({
           id
           nameCiphertext
           nameNonce
+          signature
+          workspaceMemberDevicesProofHash
           parentFolderId
           rootFolderId
           workspaceId
@@ -84,6 +95,8 @@ export const createFolder = async ({
         id,
         nameCiphertext,
         nameNonce,
+        signature: "TODO",
+        workspaceMemberDevicesProofHash: workspaceMemberDevicesProof.proof.hash,
         parentFolderId,
         workspaceKeyId,
         subkeyId: folderSubkeyId,

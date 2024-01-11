@@ -33,6 +33,7 @@ import {
 import { useAuthenticatedAppContext } from "../../hooks/useAuthenticatedAppContext";
 import { getCurrentUserInfo } from "../../store/currentUserInfoStore";
 import { useCanEditDocumentsAndFolders } from "../../store/workspaceChainStore";
+import { loadRemoteWorkspaceMemberDevicesProofQuery } from "../../store/workspaceMemberDevicesProofStore";
 import { createFolderKeyDerivationTrace } from "../../utils/folder/createFolderKeyDerivationTrace";
 import { retrieveCurrentWorkspaceKey } from "../../utils/workspace/retrieveCurrentWorkspaceKey";
 import AccountMenu from "../accountMenu/AccountMenu";
@@ -97,6 +98,10 @@ export default function Sidebar(props: DrawerContentComponentProps) {
       parentId: null,
       context: folderDerivedKeyContext,
     });
+
+    const workspaceMemberDevicesProof =
+      await loadRemoteWorkspaceMemberDevicesProofQuery({ workspaceId });
+
     const encryptedFolderResult = encryptFolderName({
       name,
       parentKey: workspaceKey,
@@ -104,6 +109,7 @@ export default function Sidebar(props: DrawerContentComponentProps) {
       keyDerivationTrace,
       subkeyId: folderSubkeyId,
       workspaceId,
+      workspaceMemberDevicesProof: workspaceMemberDevicesProof.proof,
     });
 
     const createFolderMutationResult = await runCreateFolderMutation(
@@ -113,6 +119,9 @@ export default function Sidebar(props: DrawerContentComponentProps) {
           workspaceId,
           nameCiphertext: encryptedFolderResult.ciphertext,
           nameNonce: encryptedFolderResult.nonce,
+          signature: encryptedFolderResult.signature,
+          workspaceMemberDevicesProofHash:
+            workspaceMemberDevicesProof.proof.hash,
           workspaceKeyId,
           subkeyId: encryptedFolderResult.folderSubkeyId,
           keyDerivationTrace,
@@ -248,6 +257,10 @@ export default function Sidebar(props: DrawerContentComponentProps) {
                   folderId={folder.id}
                   parentFolderId={folder.parentFolderId}
                   nameCiphertext={folder.nameCiphertext}
+                  signature={folder.signature}
+                  workspaceMemberDevicesProofHash={
+                    folder.workspaceMemberDevicesProofHash
+                  }
                   nameNonce={folder.nameNonce}
                   subkeyId={
                     folder.keyDerivationTrace.trace[

@@ -92,6 +92,7 @@ const setup = async () => {
     authorizationHeader: deriveSessionAuthorization({
       sessionKey: userData1.sessionKey,
     }).authorization,
+    userId: userData1.user.id,
   });
 
   userData2 = await createUserWithWorkspace({
@@ -115,6 +116,7 @@ const setup = async () => {
     authorizationHeader: deriveSessionAuthorization({
       sessionKey: userData2.sessionKey,
     }).authorization,
+    userId: userData2.user.id,
   });
 };
 
@@ -146,6 +148,7 @@ test("user should be able to list folders in a workspace with one item", async (
     authorizationHeader: deriveSessionAuthorization({
       sessionKey: userData1.sessionKey,
     }).authorization,
+    userId: userData1.user.id,
   });
   const result = await getFolders({
     parentFolderId,
@@ -179,6 +182,7 @@ test("user should be able to list folders in a workspace with multiple items", a
     authorizationHeader: deriveSessionAuthorization({
       sessionKey: userData1.sessionKey,
     }).authorization,
+    userId: userData1.user.id,
   });
   const result = await getFolders({
     parentFolderId,
@@ -212,6 +216,7 @@ test("user should be able to list without showing subfolders", async () => {
     authorizationHeader: deriveSessionAuthorization({
       sessionKey: userData1.sessionKey,
     }).authorization,
+    userId: userData1.user.id,
   });
   const result = await getFolders({
     parentFolderId,

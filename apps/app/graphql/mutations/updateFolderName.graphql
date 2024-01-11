@@ -4,6 +4,8 @@ mutation updateFolderName($input: UpdateFolderNameInput!) {
       id
       nameCiphertext
       nameNonce
+      signature
+      workspaceMemberDevicesProofHash
       parentFolderId
       rootFolderId
       keyDerivationTrace {

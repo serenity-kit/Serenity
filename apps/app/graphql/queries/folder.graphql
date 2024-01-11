@@ -3,6 +3,8 @@ query folder($id: ID!) {
     id
     nameCiphertext
     nameNonce
+    signature
+    workspaceMemberDevicesProofHash
     parentFolderId
     workspaceId
     keyDerivationTrace {
