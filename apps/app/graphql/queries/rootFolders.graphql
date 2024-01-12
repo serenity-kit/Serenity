@@ -5,6 +5,7 @@ query rootFolders($workspaceId: ID!, $first: Int!, $after: String) {
       nameCiphertext
       nameNonce
       signature
+      creatorDeviceSigningPublicKey
       workspaceMemberDevicesProofHash
       parentFolderId
       rootFolderId

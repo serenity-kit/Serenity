@@ -73,6 +73,7 @@ type Props = ViewProps & {
   nameNonce: string;
   signature: string;
   workspaceMemberDevicesProofHash: string;
+  creatorDeviceSigningPublicKey: string;
   subkeyId: string;
   keyDerivationTrace: KeyDerivationTrace;
   depth?: number;
@@ -206,6 +207,7 @@ export default function SidebarFolder(props: Props) {
         workspaceId: props.workspaceId,
         signature: props.signature,
         keyDerivationTrace: props.keyDerivationTrace,
+        creatorDeviceSigningPublicKey: props.creatorDeviceSigningPublicKey,
       });
       setFolderName(folderName);
     } catch (error) {
@@ -743,6 +745,9 @@ export default function SidebarFolder(props: Props) {
                       folder.workspaceMemberDevicesProofHash
                     }
                     keyDerivationTrace={folder.keyDerivationTrace}
+                    creatorDeviceSigningPublicKey={
+                      folder.creatorDeviceSigningPublicKey
+                    }
                     onStructureChange={props.onStructureChange}
                     depth={depth + 1}
                   />

@@ -122,6 +122,7 @@ export const useDocumentPathStore = create<DocumentPathState>((set, get) => ({
           folderId: folder.id,
           workspaceId,
           keyDerivationTrace: folder.keyDerivationTrace,
+          creatorDeviceSigningPublicKey: folder.creatorDeviceSigningPublicKey,
         });
       } catch (error) {
         console.error(error);

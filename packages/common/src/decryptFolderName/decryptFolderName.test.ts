@@ -51,6 +51,7 @@ test("decryptFolderName", () => {
       hashSignature: "abc",
       version: 0,
     },
+    creatorDeviceSigningPublicKey: device.signingPublicKey,
   });
   expect(decryptFolderResult).toBe("Getting started");
 });
@@ -94,6 +95,7 @@ test("decryptFolderName with publicData fails for wrong key", () => {
         hashSignature: "abc",
         version: 0,
       },
+      creatorDeviceSigningPublicKey: device.signingPublicKey,
     })
   ).toThrowError(/Invalid robustness tag/);
 });
@@ -137,6 +139,7 @@ test("decryptFolderName with publicData fails for wrong public data", () => {
         hashSignature: "abc",
         version: 0,
       },
+      creatorDeviceSigningPublicKey: device.signingPublicKey,
     })
-  ).toThrowError(/Invalid robustness tag/);
+  ).toThrowError(/Invalid folder name signature/);
 });

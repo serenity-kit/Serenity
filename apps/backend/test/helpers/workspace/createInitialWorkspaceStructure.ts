@@ -69,6 +69,8 @@ const query = gql`
         parentFolderId
         rootFolderId
         workspaceId
+        creatorDeviceSigningPublicKey
+        signature
         keyDerivationTrace {
           workspaceKeyId
           trace {

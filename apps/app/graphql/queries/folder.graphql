@@ -4,6 +4,7 @@ query folder($id: ID!) {
     nameCiphertext
     nameNonce
     signature
+    creatorDeviceSigningPublicKey
     workspaceMemberDevicesProofHash
     parentFolderId
     workspaceId

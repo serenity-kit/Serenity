@@ -5,6 +5,7 @@ mutation createFolder($input: CreateFolderInput!) {
       nameCiphertext
       nameNonce
       signature
+      creatorDeviceSigningPublicKey
       workspaceMemberDevicesProofHash
       parentFolderId
       rootFolderId

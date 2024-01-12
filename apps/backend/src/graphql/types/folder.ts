@@ -10,6 +10,7 @@ export const Folder = objectType({
     t.nonNull.string("nameNonce");
     t.nonNull.string("signature");
     t.nonNull.string("workspaceMemberDevicesProofHash");
+    t.nonNull.string("creatorDeviceSigningPublicKey");
     t.string("parentFolderId");
     t.string("rootFolderId");
     t.string("workspaceId");

@@ -455,6 +455,7 @@ test("user can remove another user", async () => {
     workspaceId: workspace.id,
     keyDerivationTrace: firstFolder.keyDerivationTrace,
     workspaceMemberDevicesProof: workspaceMemberDevicesProof.proof,
+    creatorDeviceSigningPublicKey: firstFolder.creatorDeviceSigningPublicKey,
   });
   expect(decryptedFolderName).toBe("Getting Started");
 });

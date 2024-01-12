@@ -103,6 +103,7 @@ test("create initial workspace structure", async () => {
     workspaceId: workspace.id,
     signature: folder.signature,
     workspaceMemberDevicesProof: workspaceMemberDevicesProof.proof,
+    creatorDeviceSigningPublicKey: folder.creatorDeviceSigningPublicKey,
   });
   // TODO: derive document key from trace
   expect(decryptedFolderName).toBe("Getting Started");

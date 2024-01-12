@@ -262,6 +262,9 @@ export default function Sidebar(props: DrawerContentComponentProps) {
                   workspaceMemberDevicesProofHash={
                     folder.workspaceMemberDevicesProofHash
                   }
+                  creatorDeviceSigningPublicKey={
+                    folder.creatorDeviceSigningPublicKey
+                  }
                   nameNonce={folder.nameNonce}
                   subkeyId={
                     folder.keyDerivationTrace.trace[

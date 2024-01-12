@@ -4,6 +4,7 @@ import sodium from "react-native-libsodium";
 import { decryptAead } from "../decryptAead/decryptAead";
 import { folderDerivedKeyContext } from "../encryptFolderName/encryptFolderName";
 import { kdfDeriveFromKey } from "../kdfDeriveFromKey/kdfDeriveFromKey";
+import { verifyFolderNameSignature } from "../verifyFolderNameSignature/verifyFolderNameSignature";
 import { KeyDerivationTrace } from "../zodTypes";
 
 type Params = {
@@ -17,6 +18,7 @@ type Params = {
   keyDerivationTrace: KeyDerivationTrace;
   signature: string;
   workspaceMemberDevicesProof: workspaceMemberDevicesProofUtil.WorkspaceMemberDevicesProof;
+  creatorDeviceSigningPublicKey: string;
 };
 
 export const decryptFolderName = ({
@@ -29,7 +31,22 @@ export const decryptFolderName = ({
   subkeyId,
   signature,
   workspaceMemberDevicesProof,
+  creatorDeviceSigningPublicKey,
 }: Params) => {
+  const isValid = verifyFolderNameSignature({
+    signature,
+    folderId,
+    workspaceId,
+    keyDerivationTrace,
+    workspaceMemberDevicesProof,
+    authorSigningPublicKey: creatorDeviceSigningPublicKey,
+    ciphertext,
+    nonce,
+  });
+  if (!isValid) {
+    throw new Error("Invalid folder name signature");
+  }
+
   const publicData = {
     workspaceId,
     folderId,
