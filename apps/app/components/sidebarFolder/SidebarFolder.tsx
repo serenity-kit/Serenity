@@ -58,6 +58,7 @@ import {
 import { createFolderKeyDerivationTrace } from "../../utils/folder/createFolderKeyDerivationTrace";
 import { useFolderKeyStore } from "../../utils/folder/folderKeyStore";
 import { useOpenFolderStore } from "../../utils/folder/openFolderStore";
+import { isValidDeviceSigningPublicKey } from "../../utils/isValidDeviceSigningPublicKey/isValidDeviceSigningPublicKey";
 import { OS } from "../../utils/platform/platform";
 import { getWorkspace } from "../../utils/workspace/getWorkspace";
 import { retrieveWorkspaceKey } from "../../utils/workspace/retrieveWorkspaceKey";
@@ -196,7 +197,24 @@ export default function SidebarFolder(props: Props) {
           workspaceId: props.workspaceId,
           hash: props.workspaceMemberDevicesProofHash,
         });
+      if (!workspaceMemberDevicesProof) {
+        throw new Error("workspaceMemberDevicesProof not found");
+      }
 
+      const isValid = isValidDeviceSigningPublicKey({
+        signingPublicKey: props.creatorDeviceSigningPublicKey,
+        workspaceMemberDevicesProofEntry: workspaceMemberDevicesProof,
+        workspaceId: props.workspaceId,
+        minimumRole: "EDITOR",
+      });
+      if (!isValid) {
+        throw new Error(
+          "Invalid signing public key for the workspaceMemberDevicesProof"
+        );
+      }
+
+      // check that the creatorDeviceSigningPublicKey was a valid device of the workspaceMemberDevicesProof
+      // check that this user had the permissions to create this folder
       const folderName = decryptFolderName({
         parentKey,
         subkeyId: folderSubkeyId,

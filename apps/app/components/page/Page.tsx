@@ -40,7 +40,6 @@ import {
   getLocalDocument,
 } from "../../store/documentStore";
 import { loadRemoteUserChainsForWorkspace } from "../../store/userChainStore";
-import { getLocalOrLoadRemoteUserByUserChainHash } from "../../store/userStore";
 import {
   useCanComment,
   useCanEditDocumentsAndFolders,
@@ -60,6 +59,7 @@ import { getDocument } from "../../utils/document/getDocument";
 import { updateDocumentName } from "../../utils/document/updateDocumentName";
 import { useEditorStore } from "../../utils/editorStore/editorStore";
 import { getEnvironmentUrls } from "../../utils/getEnvironmentUrls/getEnvironmentUrls";
+import { isValidDeviceSigningPublicKey } from "../../utils/isValidDeviceSigningPublicKey/isValidDeviceSigningPublicKey";
 import { OS } from "../../utils/platform/platform";
 import { showToast } from "../../utils/toast/showToast";
 import { getWorkspace } from "../../utils/workspace/getWorkspace";
@@ -357,65 +357,56 @@ export default function Page({
       return false;
     },
     isValidClient: async (signingPublicKey, publicData) => {
-      const isValidClientForSigningPublicKey = async (
-        workspaceMemberDevicesProofEntry:
-          | WorkspaceMemberDevicesProofLocalDbEntry
-          | undefined
-      ) => {
-        // TODO verify that the users match the entries in the workspaceChain when verifying the proof?
-        if (workspaceMemberDevicesProofEntry) {
-          for (const [userId, userChainHash] of Object.entries(
-            workspaceMemberDevicesProofEntry.data.userChainHashes
-          )) {
-            const user = await getLocalOrLoadRemoteUserByUserChainHash({
-              userChainHash,
-              userId,
-              workspaceId,
-            });
-
-            if (user && Object.keys(user.devices).includes(signingPublicKey)) {
-              return true;
-            }
-          }
-        }
-
-        return false;
-      };
-
-      let isValid = await isValidClientForSigningPublicKey(
-        activeSnapshotWorkspaceMemberDevicesProofEntryRef.current
-      );
-      if (isValid === false) {
-        let workspaceMemberDevicesProofEntry:
-          | WorkspaceMemberDevicesProofLocalDbEntry
-          | undefined;
+      let workspaceMemberDevicesProofEntry:
+        | WorkspaceMemberDevicesProofLocalDbEntry
+        | undefined;
+      // @ts-expect-error
+      if (publicData.snapshotId) {
+        // In case of a snapshot the specific workspaceMemberDevicesProof is needed and
+        // it needs to be set as active to work for all following updates.
+        workspaceMemberDevicesProofEntry =
+          await getLocalOrLoadRemoteWorkspaceMemberDevicesProofQueryByHash({
+            workspaceId,
+            // @ts-expect-error
+            hash: publicData.workspaceMemberDevicesProof.hash,
+          });
+        activeSnapshotWorkspaceMemberDevicesProofEntryRef.current =
+          workspaceMemberDevicesProofEntry;
         // @ts-expect-error
-        if (publicData.snapshotId) {
-          // In case of a snapshot the specific workspaceMemberDevicesProof is needed and
-          // it needs to be set as active to work for all following updates.
-          workspaceMemberDevicesProofEntry =
-            await getLocalOrLoadRemoteWorkspaceMemberDevicesProofQueryByHash({
-              workspaceId,
-              // @ts-expect-error
-              hash: publicData.workspaceMemberDevicesProof.hash,
-            });
-          activeSnapshotWorkspaceMemberDevicesProofEntryRef.current =
-            workspaceMemberDevicesProofEntry;
-          // @ts-expect-error
-        } else if (!publicData.snapshotId && !publicData.refSnapshotId) {
-          // In case of a ephemeral message getting the latest workspaceMemberDevicesProof should
-          // be fetched since the other client get the latest state soon and then will retransmit again
-          workspaceMemberDevicesProofEntry =
-            await loadRemoteWorkspaceMemberDevicesProofQuery({ workspaceId });
-        }
-
-        await loadRemoteUserChainsForWorkspace({ workspaceId });
-        isValid = await isValidClientForSigningPublicKey(
-          workspaceMemberDevicesProofEntry
-        );
+      } else if (publicData.refSnapshotId) {
+        // this is an update and uses the same workspaceMemberDevicesProof as the snapshot it is based on
+        workspaceMemberDevicesProofEntry =
+          activeSnapshotWorkspaceMemberDevicesProofEntryRef.current;
+        // @ts-expect-error
+      } else if (!publicData.snapshotId && !publicData.refSnapshotId) {
+        // In case of a ephemeral message getting the latest workspaceMemberDevicesProof should
+        // be fetched since the other client get the latest state soon and then will retransmit again
+        workspaceMemberDevicesProofEntry =
+          await loadRemoteWorkspaceMemberDevicesProofQuery({ workspaceId });
       }
 
-      return isValid;
+      if (!workspaceMemberDevicesProofEntry) {
+        return false;
+      }
+
+      const isValid = await isValidDeviceSigningPublicKey({
+        workspaceMemberDevicesProofEntry,
+        signingPublicKey,
+        workspaceId,
+        minimumRole: "EDITOR",
+      });
+      if (isValid) {
+        return true;
+      }
+
+      await loadRemoteUserChainsForWorkspace({ workspaceId });
+
+      return await isValidDeviceSigningPublicKey({
+        workspaceMemberDevicesProofEntry,
+        signingPublicKey,
+        workspaceId,
+        minimumRole: "EDITOR",
+      });
     },
     additionalAuthenticationDataValidations: {
       snapshot: SerenitySnapshotPublicData,

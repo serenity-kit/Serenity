@@ -85,18 +85,37 @@ export const getWorkspaceChainEventByHash = ({
 }) => {
   // TODO create helper to get one
   const workspaceChainEventResult = sql.execute(
-    `SELECT * FROM ${table} WHERE workspaceId = ? AND hash  = ? LIMIT 1`,
+    `SELECT * FROM ${table} WHERE workspaceId = ? AND hash = ? LIMIT 1`,
     [workspaceId, hash]
   ) as any;
   const workspaceChainEvent =
     workspaceChainEventResult.length > 0
-      ? {
+      ? ({
           position: workspaceChainEventResult[0].position,
           event: JSON.parse(workspaceChainEventResult[0].content),
           state: JSON.parse(workspaceChainEventResult[0].state),
-        }
+        } as {
+          position: number;
+          event: workspaceChain.WorkspaceChainEvent;
+          state: workspaceChain.WorkspaceChainState;
+        })
       : undefined;
   return workspaceChainEvent;
+};
+
+export const getLocalOrLoadRemoteWorkspaceChainEntryByHash = async ({
+  workspaceId,
+  hash,
+}: {
+  workspaceId: string;
+  hash: string;
+}) => {
+  const entry = getWorkspaceChainEventByHash({ workspaceId, hash });
+  if (entry) {
+    return entry;
+  }
+  await loadRemoteWorkspaceChain({ workspaceId });
+  return getWorkspaceChainEventByHash({ workspaceId, hash });
 };
 
 export const createWorkspaceChainEvent = ({

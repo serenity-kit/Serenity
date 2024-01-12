@@ -3,6 +3,9 @@ query documentPath($id: ID!) {
     id
     nameCiphertext
     nameNonce
+    signature
+    creatorDeviceSigningPublicKey
+    workspaceMemberDevicesProofHash
     parentFolderId
     rootFolderId
     workspaceId

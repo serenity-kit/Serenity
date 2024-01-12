@@ -45,6 +45,7 @@ export const updateFolderNameMutation = mutationField("updateFolderName", {
     if (!context.user) {
       throw new AuthenticationError("Not authenticated");
     }
+
     const folder = await updateFolderName({
       id: args.input.id,
       nameCiphertext: args.input.nameCiphertext,
@@ -56,6 +57,8 @@ export const updateFolderNameMutation = mutationField("updateFolderName", {
       subkeyId: args.input.subkeyId,
       userId: context.user.id,
       keyDerivationTrace: args.input.keyDerivationTrace,
+      sessionDeviceSigningPublicKey: context.session.deviceSigningPublicKey,
+      userMainDeviceSigningPublicKey: context.user.mainDeviceSigningPublicKey,
     });
     return {
       folder: formatFolder(folder),

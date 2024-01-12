@@ -1752,7 +1752,7 @@ export type DocumentPathQueryVariables = Exact<{
 }>;
 
 
-export type DocumentPathQuery = { __typename?: 'Query', documentPath?: Array<{ __typename?: 'Folder', id: string, nameCiphertext: string, nameNonce: string, parentFolderId?: string | null, rootFolderId?: string | null, workspaceId?: string | null, keyDerivationTrace: { __typename?: 'KeyDerivationTrace', workspaceKeyId: string, trace: Array<{ __typename?: 'KeyDerivationTraceEntry', entryId: string, subkeyId: string, parentId?: string | null, context: string }> } } | null> | null };
+export type DocumentPathQuery = { __typename?: 'Query', documentPath?: Array<{ __typename?: 'Folder', id: string, nameCiphertext: string, nameNonce: string, signature: string, creatorDeviceSigningPublicKey: string, workspaceMemberDevicesProofHash: string, parentFolderId?: string | null, rootFolderId?: string | null, workspaceId?: string | null, keyDerivationTrace: { __typename?: 'KeyDerivationTrace', workspaceKeyId: string, trace: Array<{ __typename?: 'KeyDerivationTraceEntry', entryId: string, subkeyId: string, parentId?: string | null, context: string }> } } | null> | null };
 
 export type DocumentShareLinkQueryVariables = Exact<{
   token: Scalars['ID']['input'];
@@ -2586,6 +2586,9 @@ export const DocumentPathDocument = gql`
     id
     nameCiphertext
     nameNonce
+    signature
+    creatorDeviceSigningPublicKey
+    workspaceMemberDevicesProofHash
     parentFolderId
     rootFolderId
     workspaceId
