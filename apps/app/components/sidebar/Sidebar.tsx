@@ -110,6 +110,7 @@ export default function Sidebar(props: DrawerContentComponentProps) {
       subkeyId: folderSubkeyId,
       workspaceId,
       workspaceMemberDevicesProof: workspaceMemberDevicesProof.proof,
+      device: activeDevice,
     });
 
     const createFolderMutationResult = await runCreateFolderMutation(

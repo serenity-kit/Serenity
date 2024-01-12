@@ -156,6 +156,7 @@ export function CreateWorkspaceForm(props: CreateWorkspaceFormProps) {
         keyDerivationTrace: folderKeyDerivationTrace,
         subkeyId: folderSubkeyId,
         workspaceMemberDevicesProof,
+        device: activeDevice,
       });
 
       // prepare document snapshot

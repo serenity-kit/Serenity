@@ -1,4 +1,5 @@
 import sodium from "react-native-libsodium";
+import { createDevice } from "../createDevice/createDevice";
 import { createSubkeyId } from "../kdfDeriveFromKey/kdfDeriveFromKey";
 import { encryptFolderName } from "./encryptFolderName";
 
@@ -26,6 +27,7 @@ test("encryptFolderName", () => {
       hashSignature: "abc",
       version: 0,
     },
+    device: createDevice("user"),
   });
   expect(typeof result.folderSubkey).toBe("string");
   expect(result.folderSubkey.length).toBe(43);

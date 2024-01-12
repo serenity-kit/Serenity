@@ -1,5 +1,5 @@
 import * as workspaceMemberDevicesProofUtil from "@serenity-kit/workspace-member-devices-proof";
-import canonicalize from "canonicalize";
+import { canonicalizeAndToBase64 } from "@serenity-tools/secsync/src/utils/canonicalizeAndToBase64";
 import sodium from "react-native-libsodium";
 import { decryptAead } from "../decryptAead/decryptAead";
 import { folderDerivedKeyContext } from "../encryptFolderName/encryptFolderName";
@@ -36,8 +36,8 @@ export const decryptFolderName = ({
     keyDerivationTrace: KeyDerivationTrace.parse(keyDerivationTrace),
     workspaceMemberDevicesProof,
   };
-  const canonicalizedPublicData = canonicalize(publicData);
-  if (!canonicalizedPublicData) {
+  const publicDataAsBase64 = canonicalizeAndToBase64(publicData, sodium);
+  if (!publicDataAsBase64) {
     throw new Error("Invalid public data for decrypting the folder.");
   }
   const folderKey = kdfDeriveFromKey({
@@ -47,7 +47,7 @@ export const decryptFolderName = ({
   });
   const result = decryptAead(
     sodium.from_base64(ciphertext),
-    canonicalizedPublicData,
+    publicDataAsBase64,
     sodium.from_base64(folderKey.key),
     nonce
   );

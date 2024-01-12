@@ -269,6 +269,7 @@ export default function SidebarFolder(props: Props) {
       subkeyId: folderSubkeyId,
       workspaceId: props.workspaceId,
       workspaceMemberDevicesProof: workspaceMemberDevicesProof.proof,
+      device: activeDevice,
     });
 
     let didCreateFolderSucceed = false;
@@ -525,6 +526,7 @@ export default function SidebarFolder(props: Props) {
       keyDerivationTrace,
       folderId: props.folderId,
       workspaceMemberDevicesProof: workspaceMemberDevicesProof.proof,
+      device: activeDevice,
     });
 
     const updateFolderNameResult = await runUpdateFolderNameMutation(

@@ -109,6 +109,7 @@ const setup = async () => {
     workspaceId: userData1.workspace.id,
     workspaceKeyId: userData1.workspace.currentWorkspaceKey.id,
     userId: userData1.user.id,
+    device: userData1.webDevice,
   });
   const createFolderResult = await createFolder({
     graphql,
@@ -122,6 +123,7 @@ const setup = async () => {
     workspaceId: userData1.workspace.id,
     workspaceKeyId: userData1.workspace.currentWorkspaceKey.id,
     userId: userData1.user.id,
+    device: userData1.webDevice,
   });
   const createChildFolderResult = await createFolder({
     graphql,
@@ -135,6 +137,7 @@ const setup = async () => {
     workspaceId: userData1.workspace.id,
     workspaceKeyId: userData1.workspace.currentWorkspaceKey.id,
     userId: userData1.user.id,
+    device: userData1.webDevice,
   });
 
   userData2 = await createUserWithWorkspace({
@@ -160,6 +163,7 @@ const setup = async () => {
     workspaceId: userData2.workspace.id,
     workspaceKeyId: userData2.workspace.currentWorkspaceKey.id,
     userId: userData2.user.id,
+    device: userData2.webDevice,
   });
 };
 

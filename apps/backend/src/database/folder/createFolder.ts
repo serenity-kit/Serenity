@@ -2,6 +2,7 @@ import { KeyDerivationTrace } from "@serenity-tools/common";
 import { ForbiddenError, UserInputError } from "apollo-server-express";
 import { Prisma, Role } from "../../../prisma/generated/output";
 import { Folder } from "../../types/folder";
+import { getOrCreateCreatorDevice } from "../../utils/device/getOrCreateCreatorDevice";
 import { prisma } from "../prisma";
 
 type Params = {
@@ -16,6 +17,7 @@ type Params = {
   parentFolderId?: string;
   workspaceId: string;
   keyDerivationTrace: KeyDerivationTrace;
+  authorDeviceSigningPublicKey: string;
 };
 
 export async function createFolder({
@@ -30,6 +32,7 @@ export async function createFolder({
   parentFolderId,
   workspaceId,
   keyDerivationTrace,
+  authorDeviceSigningPublicKey,
 }: Params) {
   const allowedRoles = [Role.ADMIN, Role.EDITOR];
   return await prisma.$transaction(
@@ -79,6 +82,14 @@ export async function createFolder({
           rootFolderId = parentFolder.id;
         }
       }
+
+      // convert the user's device into a creatorDevice
+      const creatorDevice = await getOrCreateCreatorDevice({
+        prisma,
+        userId,
+        signingPublicKey: authorDeviceSigningPublicKey,
+      });
+
       const rawFolder = await prisma.folder.create({
         data: {
           id,
@@ -92,6 +103,7 @@ export async function createFolder({
           rootFolderId,
           workspaceId,
           keyDerivationTrace,
+          creatorDeviceSigningPublicKey: creatorDevice.signingPublicKey,
         },
       });
       const folder: Folder = {

@@ -140,12 +140,6 @@ export default async function createUserWithWorkspace({
       workspaceId: createWorkspaceChainEvent.transaction.id,
     });
   const folderName = "Getting Started";
-  const folderSignature = sodium.to_base64(
-    sodium.crypto_sign_detached(
-      "folder" + folderId,
-      sodium.from_base64(mainDevice.signingPrivateKey)
-    )
-  );
 
   const workspaceMemberDevicesProof =
     workspaceMemberDevicesProofUtil.createWorkspaceMemberDevicesProof({
@@ -183,7 +177,9 @@ export default async function createUserWithWorkspace({
       ],
     },
     workspaceMemberDevicesProof,
+    device: mainDevice,
   });
+
   const folderKey = encryptedFolderResult.folderSubkey;
   const snapshotKey = createSnapshotKey({
     folderKey,
@@ -258,7 +254,7 @@ export default async function createUserWithWorkspace({
     workspaceChainEvent: createWorkspaceChainEvent,
     folder: {
       id: folderId,
-      signature: folderSignature,
+      signature: encryptedFolderResult.signature,
       nameCiphertext: encryptedFolderResult.ciphertext,
       nameNonce: encryptedFolderResult.nonce,
       keyDerivationTrace: {

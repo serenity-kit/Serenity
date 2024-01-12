@@ -64,6 +64,7 @@ test("user should be able to create a root folder", async () => {
     workspaceKeyId: userData1.workspace.currentWorkspaceKey.id,
     authorizationHeader,
     userId: userData1.user.id,
+    device: userData1.webDevice,
   });
   const folder = result.createFolder.folder;
   expect(folder.id).toBe(id);
@@ -100,6 +101,7 @@ test("user should be able to create a root folder with a name", async () => {
     workspaceKeyId: userData1.workspace.currentWorkspaceKey.id,
     authorizationHeader,
     userId: userData1.user.id,
+    device: userData1.webDevice,
   });
   const folder = result.createFolder.folder;
   expect(folder.id).toBe(id);
@@ -144,6 +146,7 @@ test("user should be able to create a child folder", async () => {
     workspaceKeyId: userData1.workspace.currentWorkspaceKey.id,
     authorizationHeader,
     userId: userData1.user.id,
+    device: userData1.webDevice,
   });
   const folder = result.createFolder.folder;
   expect(folder.id).toBe(id);
@@ -186,6 +189,7 @@ test("duplicate ID throws an error", async () => {
     workspaceKeyId: userData1.workspace.currentWorkspaceKey.id,
     authorizationHeader,
     userId: userData1.user.id,
+    device: userData1.webDevice,
   });
   await expect(
     (async () =>
@@ -199,6 +203,7 @@ test("duplicate ID throws an error", async () => {
         workspaceKeyId: userData1.workspace.currentWorkspaceKey.id,
         authorizationHeader,
         userId: userData1.user.id,
+        device: userData1.webDevice,
       }))()
   ).rejects.toThrow("Invalid input: duplicate id");
 });
@@ -234,6 +239,7 @@ test("Throw error on duplicate subkeyId, workspaceId", async () => {
       ],
     },
     workspaceMemberDevicesProof: workspaceMemberDevicesProof.proof,
+    device: userData1.webDevice,
   });
 
   const nameCiphertext = encryptedFolderResult.ciphertext;
@@ -291,6 +297,7 @@ test("Throw error when the parent folder doesn't exist", async () => {
         workspaceKeyId: addedWorkspace.currentWorkspaceKey.id,
         authorizationHeader,
         userId: userData1.user.id,
+        device: userData1.webDevice,
       }))()
   ).rejects.toThrowError(/FORBIDDEN/);
 });
@@ -315,6 +322,7 @@ test("Throw error when user doesn't have access", async () => {
         authorizationHeader: deriveSessionAuthorization({ sessionKey })
           .authorization,
         userId: userData1.user.id,
+        device: userData1.webDevice,
       }))()
   ).rejects.toThrow("Unauthorized");
 });
@@ -347,6 +355,7 @@ test("Commentor tries to create", async () => {
           sessionKey: otherUser.sessionKey,
         }).authorization,
         userId: otherUser.userId,
+        device: otherUser.webDevice,
       }))()
   ).rejects.toThrowError("Unauthorized");
 });
@@ -379,6 +388,7 @@ test("Viewer tries to create", async () => {
           sessionKey: otherUser.sessionKey,
         }).authorization,
         userId: otherUser.userId,
+        device: otherUser.webDevice,
       }))()
   ).rejects.toThrowError("Unauthorized");
 });
@@ -397,6 +407,7 @@ test("Unauthenticated", async () => {
         workspaceKeyId: addedWorkspace.currentWorkspaceKey.id,
         authorizationHeader: "badauthheader",
         userId: userData1.user.id,
+        device: userData1.webDevice,
       }))()
   ).rejects.toThrowError(/UNAUTHENTICATED/);
 });
@@ -446,6 +457,7 @@ describe("Input errors", () => {
         ],
       },
       workspaceMemberDevicesProof: workspaceMemberDevicesProof.proof,
+      device: userData1.webDevice,
     });
     const nameCiphertext = encryptedFolderResult.ciphertext;
     const nameNonce = encryptedFolderResult.nonce;
@@ -494,6 +506,7 @@ describe("Input errors", () => {
         ],
       },
       workspaceMemberDevicesProof: workspaceMemberDevicesProof.proof,
+      device: userData1.webDevice,
     });
     const nameCiphertext = encryptedFolderResult.ciphertext;
     const nameNonce = encryptedFolderResult.nonce;

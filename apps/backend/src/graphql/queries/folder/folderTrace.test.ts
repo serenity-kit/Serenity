@@ -36,6 +36,7 @@ const setup = async () => {
     workspaceId: userData1.workspace.id,
     workspaceKeyId: userData1.workspace.currentWorkspaceKey.id,
     userId: userData1.user.id,
+    device: userData1.webDevice,
   });
   childFolder = childFolderResult.createFolder.folder;
   const grandChildFolderResult = await createFolder({
@@ -50,6 +51,7 @@ const setup = async () => {
     workspaceId: userData1.workspace.id,
     workspaceKeyId: userData1.workspace.currentWorkspaceKey.id,
     userId: userData1.user.id,
+    device: userData1.webDevice,
   });
   grandChildFolder = grandChildFolderResult.createFolder.folder;
 

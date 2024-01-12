@@ -1,4 +1,5 @@
 import {
+  LocalDevice,
   encryptFolderName,
   folderDerivedKeyContext,
 } from "@serenity-tools/common";
@@ -18,6 +19,7 @@ type Params = {
   parentKey: string;
   authorizationHeader: string;
   userId: string;
+  device: LocalDevice;
 };
 
 export const createFolder = async ({
@@ -30,6 +32,7 @@ export const createFolder = async ({
   workspaceId,
   authorizationHeader,
   userId,
+  device,
 }: Params) => {
   const authorizationHeaders = {
     authorization: authorizationHeader,
@@ -59,6 +62,7 @@ export const createFolder = async ({
     subkeyId: folderSubkeyId,
     workspaceId,
     workspaceMemberDevicesProof: workspaceMemberDevicesProof.proof,
+    device,
   });
   const nameCiphertext = encryptedFolderResult.ciphertext;
   const nameNonce = encryptedFolderResult.nonce;
@@ -95,7 +99,7 @@ export const createFolder = async ({
         id,
         nameCiphertext,
         nameNonce,
-        signature: "TODO",
+        signature: encryptedFolderResult.signature,
         workspaceMemberDevicesProofHash: workspaceMemberDevicesProof.proof.hash,
         parentFolderId,
         workspaceKeyId,

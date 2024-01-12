@@ -44,6 +44,7 @@ const setup = async () => {
       sessionKey: userData1.sessionKey,
     }).authorization,
     userId: userData1.user.id,
+    device: userData1.webDevice,
   });
   addedFolder = createFolderResult.createFolder.folder;
   addedFolderId = createFolderResult.createFolder.folder.id;
@@ -74,6 +75,7 @@ test("user should be able to change a folder name", async () => {
     }).authorization,
     workspaceId: userData1.workspace.id,
     workspaceMemberDevicesProof: workspaceMemberDevicesProof.proof,
+    device: userData1.webDevice,
   });
   const updatedFolder = result.updateFolderName.folder;
   expect(updatedFolder.id).toBe(userData1.folder.id);
@@ -107,6 +109,7 @@ test("throw error when folder doesn't exist", async () => {
         }).authorization,
         workspaceId: userData1.workspace.id,
         workspaceMemberDevicesProof: workspaceMemberDevicesProof.proof,
+        device: userData1.webDevice,
       }))()
   ).rejects.toThrow("Unauthorized");
 });
@@ -130,6 +133,7 @@ test("throw error when user doesn't have access", async () => {
       sessionKey: userData1.sessionKey,
     }).authorization,
     userId: userData1.user.id,
+    device: userData1.webDevice,
   });
   const authorizationHeader = deriveSessionAuthorization({
     sessionKey,
@@ -156,6 +160,7 @@ test("throw error when user doesn't have access", async () => {
         }).authorization,
         workspaceId: userData1.workspace.id,
         workspaceMemberDevicesProof: workspaceMemberDevicesProof.proof,
+        device: userData1.webDevice,
       }))()
   ).rejects.toThrow("Unauthorized");
 });
@@ -193,6 +198,7 @@ test("Commentor tries to update", async () => {
         }).authorization,
         workspaceId: addedWorkspace.id,
         workspaceMemberDevicesProof: workspaceMemberDevicesProof.proof,
+        device: userData1.webDevice,
       }))()
   ).rejects.toThrowError("Unauthorized");
 });
@@ -230,6 +236,7 @@ test("Viewer tries to update", async () => {
         }).authorization,
         workspaceId: addedWorkspace.id,
         workspaceMemberDevicesProof: workspaceMemberDevicesProof.proof,
+        device: userData1.webDevice,
       }))()
   ).rejects.toThrowError("Unauthorized");
 });
@@ -252,6 +259,7 @@ test("Unauthenticated", async () => {
         authorizationHeader: "badauthheader",
         workspaceId: addedWorkspace.id,
         workspaceMemberDevicesProof: workspaceMemberDevicesProof.proof,
+        device: userData1.webDevice,
       }))()
   ).rejects.toThrowError(/UNAUTHENTICATED/);
 });

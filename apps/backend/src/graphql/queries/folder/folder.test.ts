@@ -1,4 +1,5 @@
 import {
+  LocalDevice,
   decryptWorkspaceKey,
   deriveSessionAuthorization,
   folderDerivedKeyContext,
@@ -20,6 +21,7 @@ let folderKey = "";
 let addedFolder: any = null;
 let addedWorkspace: any = null;
 let userId: string = "";
+let webDevice: LocalDevice;
 
 beforeAll(async () => {
   await deleteAllRecords();
@@ -30,6 +32,7 @@ beforeAll(async () => {
   addedWorkspace = result.workspace;
   workspaceId = addedWorkspace.id;
   userId = result.user.id;
+  webDevice = result.webDevice;
   const workspaceKeyBox = addedWorkspace.currentWorkspaceKey?.workspaceKeyBox;
   workspaceKey = decryptWorkspaceKey({
     ciphertext: workspaceKeyBox?.ciphertext!,
@@ -64,6 +67,7 @@ test("user should be retrieve a folder", async () => {
     authorizationHeader,
     workspaceKeyId: addedWorkspace.currentWorkspaceKey.id,
     userId,
+    device: webDevice,
   });
   const result = await getFolder({
     graphql,

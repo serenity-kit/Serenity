@@ -1,8 +1,10 @@
 import * as workspaceMemberDevicesProofUtil from "@serenity-kit/workspace-member-devices-proof";
-import canonicalize from "canonicalize";
+import { sign } from "@serenity-tools/secsync";
+import { canonicalizeAndToBase64 } from "@serenity-tools/secsync/src/utils/canonicalizeAndToBase64";
 import sodium from "react-native-libsodium";
 import { encryptAead } from "../encryptAead/encryptAead";
 import { kdfDeriveFromKey } from "../kdfDeriveFromKey/kdfDeriveFromKey";
+import { LocalDevice } from "../types";
 import { KeyDerivationTrace } from "../zodTypes";
 
 type Params = {
@@ -14,6 +16,7 @@ type Params = {
   keyDerivationTrace: KeyDerivationTrace;
   subkeyId: string;
   workspaceMemberDevicesProof: workspaceMemberDevicesProofUtil.WorkspaceMemberDevicesProof;
+  device: LocalDevice;
 };
 
 // Having a specific "folder__" context allows us to use have the same subkeyId
@@ -28,6 +31,7 @@ export const encryptFolderName = ({
   workspaceId,
   subkeyId,
   workspaceMemberDevicesProof,
+  device,
 }: Params) => {
   const publicData = {
     workspaceId,
@@ -35,10 +39,7 @@ export const encryptFolderName = ({
     keyDerivationTrace: KeyDerivationTrace.parse(keyDerivationTrace),
     workspaceMemberDevicesProof,
   };
-  const canonicalizedPublicData = canonicalize(publicData);
-  if (!canonicalizedPublicData) {
-    throw new Error("Invalid public data for encrypting the name.");
-  }
+  const publicDataAsBase64 = canonicalizeAndToBase64(publicData, sodium);
   const folderKey = kdfDeriveFromKey({
     key: parentKey,
     context: folderDerivedKeyContext,
@@ -46,14 +47,19 @@ export const encryptFolderName = ({
   });
   const result = encryptAead(
     name,
-    canonicalizedPublicData,
+    publicDataAsBase64,
     sodium.from_base64(folderKey.key)
   );
 
-  // const folderSignature = sodium.crypto_sign_detached(
-  //   "folder" + folderId,
-  //   sodium.from_base64(activeDevice.signingPrivateKey!)
-  // );
+  const signature = sign(
+    {
+      nonce: result.publicNonce,
+      ciphertext: result.ciphertext,
+      publicData: publicDataAsBase64,
+    },
+    sodium.from_base64(device.signingPrivateKey),
+    sodium
+  );
 
   return {
     folderSubkey: folderKey.key,
@@ -61,6 +67,6 @@ export const encryptFolderName = ({
     ciphertext: result.ciphertext,
     nonce: result.publicNonce,
     publicData,
-    signature: "TODO",
+    signature,
   };
 };

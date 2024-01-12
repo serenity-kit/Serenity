@@ -1,12 +1,16 @@
 import sodium from "react-native-libsodium";
+import { createDevice } from "../createDevice/createDevice";
 import { encryptFolderName } from "../encryptFolderName/encryptFolderName";
 import { createSubkeyId } from "../kdfDeriveFromKey/kdfDeriveFromKey";
+import { LocalDevice } from "../types";
 import { decryptFolderName } from "./decryptFolderName";
 
 const kdfKey = "3NmUk0ywlom5Re-ShkR_nE3lKLxq5FSJxm56YdbOJto";
+let device: LocalDevice;
 
 beforeAll(async () => {
   await sodium.ready;
+  device = createDevice("user");
 });
 
 test("decryptFolderName", () => {
@@ -27,6 +31,7 @@ test("decryptFolderName", () => {
       hashSignature: "abc",
       version: 0,
     },
+    device,
   });
   const decryptFolderResult = decryptFolderName({
     parentKey: kdfKey,
@@ -68,6 +73,7 @@ test("decryptFolderName with publicData fails for wrong key", () => {
       hashSignature: "abc",
       version: 0,
     },
+    device,
   });
   expect(() =>
     decryptFolderName({
@@ -110,6 +116,7 @@ test("decryptFolderName with publicData fails for wrong public data", () => {
       hashSignature: "abc",
       version: 0,
     },
+    device,
   });
   expect(() =>
     decryptFolderName({

@@ -191,20 +191,15 @@ export const createInitialWorkspaceStructure = async ({
       ],
     },
     workspaceMemberDevicesProof,
+    device: creatorDevice,
   });
 
   const encryptedFolderName = encryptedFolderResult.ciphertext;
   const encryptedFolderNameNonce = encryptedFolderResult.nonce;
   const folderKey = encryptedFolderResult.folderSubkey;
-  const folderSignature = sodium.to_base64(
-    sodium.crypto_sign_detached(
-      "folder" + folderId,
-      sodium.from_base64(creatorDevice.signingPrivateKey)
-    )
-  );
   const readyFolder = {
     id: folderId,
-    signature: folderSignature,
+    signature: encryptedFolderResult.signature,
     nameCiphertext: encryptedFolderName,
     nameNonce: encryptedFolderNameNonce,
     // since we haven't created the workspaceKey yet,
