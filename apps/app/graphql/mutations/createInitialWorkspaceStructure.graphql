@@ -6,6 +6,9 @@ mutation createInitialWorkspaceStructure(
       id
       infoCiphertext
       infoNonce
+      infoSignature
+      infoWorkspaceMemberDevicesProofHash
+      infoCreatorDeviceSigningPublicKey
       infoWorkspaceKey {
         id
         workspaceId

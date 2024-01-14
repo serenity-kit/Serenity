@@ -8,6 +8,7 @@ import deleteAllRecords from "../../../../test/helpers/deleteAllRecords";
 import setupGraphql from "../../../../test/helpers/setupGraphql";
 import { updateWorkspaceName } from "../../../../test/helpers/workspace/updateWorkspaceName";
 import createUserWithWorkspace from "../../../database/testHelpers/createUserWithWorkspace";
+import { getWorkspaceMemberDevicesProof } from "../../../database/workspace/getWorkspaceMemberDevicesProof";
 
 const graphql = setupGraphql();
 let userData1: any = undefined;
@@ -37,6 +38,10 @@ beforeAll(async () => {
 
 test("user can change workspace name", async () => {
   const name = "workspace 2";
+  const workspaceMemberDevicesProof = await getWorkspaceMemberDevicesProof({
+    userId: userData1.user.id,
+    workspaceId: userData1.workspace.id,
+  });
   const result = await updateWorkspaceName({
     graphql,
     id: userData1.workspace.id,
@@ -46,12 +51,19 @@ test("user can change workspace name", async () => {
     authorizationHeader: deriveSessionAuthorization({
       sessionKey: userData1.sessionKey,
     }).authorization,
+    device: userData1.webDevice,
+    workspaceMemberDevicesProof: workspaceMemberDevicesProof.proof,
   });
   const workspace = result.updateWorkspaceName.workspace;
   const decryptedWorkspaceInfo = decryptWorkspaceInfo({
     ciphertext: workspace.infoCiphertext,
     nonce: workspace.infoNonce,
     key: userData1.workspaceKey,
+    creatorDeviceSigningPublicKey: userData1.webDevice.signingPublicKey,
+    workspaceId: userData1.workspace.id,
+    workspaceKeyId: userData1.workspaceKeyId,
+    workspaceMemberDevicesProof: workspaceMemberDevicesProof.proof,
+    signature: workspace.infoSignature,
   });
   expect(decryptedWorkspaceInfo.name).toBe(name);
 });
@@ -63,6 +75,10 @@ test("user should not be able to update a workspace they don't own", async () =>
   }).authorization;
   const id = "abc";
   const name = "unauthorized workspace";
+  const workspaceMemberDevicesProof = await getWorkspaceMemberDevicesProof({
+    userId: userData1.user.id,
+    workspaceId: userData1.workspace.id,
+  });
   await expect(
     (async () =>
       await updateWorkspaceName({
@@ -72,6 +88,8 @@ test("user should not be able to update a workspace they don't own", async () =>
         workspaceKey: userData1.workspaceKey,
         workspaceKeyId: userData1.workspaceKeyId,
         authorizationHeader,
+        device: userData1.webDevice,
+        workspaceMemberDevicesProof: workspaceMemberDevicesProof.proof,
       }))()
   ).rejects.toThrow("Unauthorized");
 });
@@ -83,6 +101,10 @@ test("user should not be able to update a workspace for a workspace that doesn't
   }).authorization;
   const id = "hahahaha";
   const name = "nonexistent workspace";
+  const workspaceMemberDevicesProof = await getWorkspaceMemberDevicesProof({
+    userId: userData1.user.id,
+    workspaceId: userData1.workspace.id,
+  });
   await expect(
     (async () =>
       await updateWorkspaceName({
@@ -92,6 +114,8 @@ test("user should not be able to update a workspace for a workspace that doesn't
         workspaceKey: userData1.workspaceKey,
         workspaceKeyId: userData1.workspaceKeyId,
         authorizationHeader,
+        device: userData1.webDevice,
+        workspaceMemberDevicesProof: workspaceMemberDevicesProof.proof,
       }))()
   ).rejects.toThrow("Unauthorized");
 });
@@ -99,6 +123,10 @@ test("user should not be able to update a workspace for a workspace that doesn't
 test("Unauthenticated", async () => {
   const id = userData1.workspace.id;
   const name = "unautharized workspace";
+  const workspaceMemberDevicesProof = await getWorkspaceMemberDevicesProof({
+    userId: userData1.user.id,
+    workspaceId: userData1.workspace.id,
+  });
   await expect(
     (async () =>
       await updateWorkspaceName({
@@ -108,6 +136,8 @@ test("Unauthenticated", async () => {
         workspaceKey: userData1.workspaceKey,
         workspaceKeyId: userData1.workspaceKeyId,
         authorizationHeader: "badauthheader",
+        device: userData1.webDevice,
+        workspaceMemberDevicesProof: workspaceMemberDevicesProof.proof,
       }))()
   ).rejects.toThrowError(/UNAUTHENTICATED/);
 });
@@ -120,6 +150,9 @@ describe("Input errors", () => {
           id
           infoCiphertext
           infoNonce
+          infoSignature
+          infoWorkspaceMemberDevicesProofHash
+          infoCreatorDeviceSigningPublicKey
           infoWorkspaceKey {
             id
             workspaceId

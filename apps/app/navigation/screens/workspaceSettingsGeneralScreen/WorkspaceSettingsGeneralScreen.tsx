@@ -29,6 +29,7 @@ import { useAuthenticatedAppContext } from "../../../hooks/useAuthenticatedAppCo
 import { workspaceSettingsLoadWorkspaceMachine } from "../../../machines/workspaceSettingsLoadWorkspaceMachine";
 import { getCurrentUserInfo } from "../../../store/currentUserInfoStore";
 import { useCanEditWorkspace } from "../../../store/workspaceChainStore";
+import { loadRemoteWorkspaceMemberDevicesProofQuery } from "../../../store/workspaceMemberDevicesProofStore";
 import { WorkspaceStackScreenProps } from "../../../types/navigationProps";
 import { prefixPngImageUri } from "../../../utils/prefixPngImageUri/prefixPngImageUri";
 import { showToast } from "../../../utils/toast/showToast";
@@ -101,14 +102,17 @@ export default function WorkspaceSettingsGeneralScreen(
       throw new Error("currentWorkspaceKey is missing");
     }
 
-    console.log(
-      "updateWorkspaceInfo avatar",
-      avatarStringAsBase64 || imageContent
-    );
+    const workspaceMemberDevicesProof =
+      await loadRemoteWorkspaceMemberDevicesProofQuery({ workspaceId });
+
     const encryptedWorkspaceInfo = encryptWorkspaceInfo({
       name: workspaceName,
       avatar: avatarStringAsBase64 || imageContent,
       key: state.context.currentWorkspaceKey.key,
+      device: activeDevice,
+      workspaceId,
+      workspaceKeyId: state.context.currentWorkspaceKey.id,
+      workspaceMemberDevicesProof: workspaceMemberDevicesProof.proof,
     });
 
     const updateWorkspaceResult = await updateWorkspaceNameMutation({

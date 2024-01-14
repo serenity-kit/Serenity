@@ -223,6 +223,10 @@ export function CreateWorkspaceForm(props: CreateWorkspaceFormProps) {
       const encryptedWorkspaceInfo = encryptWorkspaceInfo({
         name,
         key: workspaceKey,
+        device: activeDevice,
+        workspaceId: event.transaction.id,
+        workspaceKeyId,
+        workspaceMemberDevicesProof,
       });
 
       const createInitialWorkspaceStructureResult =
@@ -231,6 +235,7 @@ export function CreateWorkspaceForm(props: CreateWorkspaceFormProps) {
             workspace: {
               infoCiphertext: encryptedWorkspaceInfo.ciphertext,
               infoNonce: encryptedWorkspaceInfo.nonce,
+              infoSignature: encryptedWorkspaceInfo.signature,
               workspaceKeyId,
               deviceWorkspaceKeyBoxes,
             },

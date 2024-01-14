@@ -18,6 +18,7 @@ export type WorkspaceParams = {
   id: string;
   infoCiphertext: string;
   infoNonce: string;
+  infoSignature: string;
   deviceWorkspaceKeyBoxes: DeviceWorkspaceKeyBoxParams[];
   workspaceKeyId: string;
 };
@@ -86,6 +87,7 @@ export async function createInitialWorkspaceStructure({
     workspaceKeyId: workspace.workspaceKeyId,
     workspaceChainEvent,
     workspaceMemberDevicesProof,
+    infoSignature: workspace.infoSignature,
   });
   const workspaceKey = createdWorkspace.currentWorkspaceKey;
   const createdFolder = await createFolder({

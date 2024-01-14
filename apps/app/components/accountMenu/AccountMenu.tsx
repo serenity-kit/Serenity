@@ -21,11 +21,13 @@ import {
 } from "@serenity-tools/ui";
 import { useMachine } from "@xstate/react";
 import { HStack } from "native-base";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useAppContext } from "../../context/AppContext";
 import { initiateLogout } from "../../navigation/screens/logoutInProgressScreen/LogoutInProgressScreen";
 import { getMainDevice } from "../../store/mainDeviceMemoryStore";
+import { getLocalOrLoadRemoteWorkspaceMemberDevicesProofQueryByHash } from "../../store/workspaceMemberDevicesProofStore";
 import * as workspaceStore from "../../store/workspaceStore";
+import { isValidDeviceSigningPublicKey } from "../../utils/isValidDeviceSigningPublicKey/isValidDeviceSigningPublicKey";
 import { OS } from "../../utils/platform/platform";
 import { prefixPngImageUri } from "../../utils/prefixPngImageUri/prefixPngImageUri";
 import { VerifyPasswordModal } from "../verifyPasswordModal/VerifyPasswordModal";
@@ -54,6 +56,8 @@ export default function AccountMenu({
   });
   const [isPasswordModalVisible, setIsPasswordModalVisible] = useState(false);
   const { workspaces } = workspaceStore.useLocalWorkspaces();
+  const [workspaceName, setWorkspaceName] = useState("");
+  const [workspaceAvatar, setWorkspaceAvatar] = useState<undefined | string>();
 
   const logout = () => {
     initiateLogout();
@@ -75,48 +79,80 @@ export default function AccountMenu({
     setIsPasswordModalVisible(true);
   };
 
-  let workspaceName = "";
-  let workspaceAvatar: undefined | string;
-  if (state.context.workspaceQueryResult?.data?.workspace) {
-    const workspaceData = state.context.workspaceQueryResult.data.workspace;
+  const decryptAndSetWorkspaceInfo = async () => {
+    if (state.context.workspaceQueryResult?.data?.workspace) {
+      const workspaceData = state.context.workspaceQueryResult.data.workspace;
 
-    if (
-      workspaceData.infoCiphertext &&
-      workspaceData.infoNonce &&
-      workspaceData.infoWorkspaceKey?.workspaceKeyBox &&
-      activeDevice
-    ) {
-      // TODO verify that creator
-      // needs a workspace key chain with a main device!
-      const workspaceKey = decryptWorkspaceKey({
-        ciphertext: workspaceData.infoWorkspaceKey?.workspaceKeyBox?.ciphertext,
-        nonce: workspaceData.infoWorkspaceKey?.workspaceKeyBox?.nonce,
-        creatorDeviceEncryptionPublicKey:
-          workspaceData.infoWorkspaceKey?.workspaceKeyBox?.creatorDevice
-            .encryptionPublicKey,
-        receiverDeviceEncryptionPrivateKey: activeDevice?.encryptionPrivateKey,
-        workspaceId: workspaceData.id,
-        workspaceKeyId: workspaceData.infoWorkspaceKey?.id,
-      });
-      const decryptedWorkspaceInfo = decryptWorkspaceInfo({
-        ciphertext: workspaceData.infoCiphertext,
-        nonce: workspaceData.infoNonce,
-        key: workspaceKey,
-      });
       if (
-        decryptedWorkspaceInfo &&
-        typeof decryptedWorkspaceInfo.name === "string"
+        workspaceData.infoCiphertext &&
+        workspaceData.infoNonce &&
+        workspaceData.infoWorkspaceKey?.workspaceKeyBox &&
+        activeDevice
       ) {
-        workspaceName = decryptedWorkspaceInfo.name as string;
-      }
-      if (
-        decryptedWorkspaceInfo &&
-        typeof decryptedWorkspaceInfo.avatar === "string"
-      ) {
-        workspaceAvatar = decryptedWorkspaceInfo.avatar as string;
+        const workspaceKey = decryptWorkspaceKey({
+          ciphertext:
+            workspaceData.infoWorkspaceKey?.workspaceKeyBox?.ciphertext,
+          nonce: workspaceData.infoWorkspaceKey?.workspaceKeyBox?.nonce,
+          creatorDeviceEncryptionPublicKey:
+            workspaceData.infoWorkspaceKey?.workspaceKeyBox?.creatorDevice
+              .encryptionPublicKey,
+          receiverDeviceEncryptionPrivateKey:
+            activeDevice?.encryptionPrivateKey,
+          workspaceId: workspaceData.id,
+          workspaceKeyId: workspaceData.infoWorkspaceKey?.id,
+        });
+
+        const workspaceMemberDevicesProof =
+          await getLocalOrLoadRemoteWorkspaceMemberDevicesProofQueryByHash({
+            workspaceId: workspaceData.id,
+            hash: workspaceData.infoWorkspaceMemberDevicesProofHash,
+          });
+        if (!workspaceMemberDevicesProof) {
+          throw new Error("workspaceMemberDevicesProof not found");
+        }
+
+        const isValid = isValidDeviceSigningPublicKey({
+          signingPublicKey: workspaceData.infoCreatorDeviceSigningPublicKey,
+          workspaceMemberDevicesProofEntry: workspaceMemberDevicesProof,
+          workspaceId: workspaceData.id,
+          minimumRole: "ADMIN",
+        });
+        if (!isValid) {
+          throw new Error(
+            "Invalid signing public key for the workspaceMemberDevicesProof for decryptWorkspaceInfo"
+          );
+        }
+
+        const decryptedWorkspaceInfo = decryptWorkspaceInfo({
+          ciphertext: workspaceData.infoCiphertext,
+          nonce: workspaceData.infoNonce,
+          signature: workspaceData.infoSignature,
+          key: workspaceKey,
+          workspaceId: workspaceData.id,
+          workspaceKeyId: workspaceData.infoWorkspaceKey.id,
+          workspaceMemberDevicesProof: workspaceMemberDevicesProof.proof,
+          creatorDeviceSigningPublicKey:
+            workspaceData.infoCreatorDeviceSigningPublicKey,
+        });
+        if (
+          decryptedWorkspaceInfo &&
+          typeof decryptedWorkspaceInfo.name === "string"
+        ) {
+          setWorkspaceName(decryptedWorkspaceInfo.name as string);
+        }
+        if (
+          decryptedWorkspaceInfo &&
+          typeof decryptedWorkspaceInfo.avatar === "string"
+        ) {
+          setWorkspaceAvatar(decryptedWorkspaceInfo.avatar as string);
+        }
       }
     }
-  }
+  };
+
+  useEffect(() => {
+    decryptAndSetWorkspaceInfo();
+  }, [state.context.workspaceQueryResult?.data?.workspace?.infoCiphertext]);
 
   return (
     <>

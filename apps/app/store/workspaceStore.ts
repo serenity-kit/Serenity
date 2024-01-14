@@ -8,11 +8,15 @@ import {
 import canonicalize from "canonicalize";
 import { useSyncExternalStore } from "react";
 import { runWorkspacesQuery } from "../generated/graphql";
+import { isValidDeviceSigningPublicKey } from "../utils/isValidDeviceSigningPublicKey/isValidDeviceSigningPublicKey";
 import { showToast } from "../utils/toast/showToast";
 import * as sql from "./sql/sql";
 import { getLocalUsersByIds } from "./userStore";
 import { loadRemoteWorkspaceChain } from "./workspaceChainStore";
-import { useLocalLastWorkspaceMemberDevicesProof } from "./workspaceMemberDevicesProofStore";
+import {
+  getLocalOrLoadRemoteWorkspaceMemberDevicesProofQueryByHash,
+  useLocalLastWorkspaceMemberDevicesProof,
+} from "./workspaceMemberDevicesProofStore";
 
 export const table = "workspace_v2";
 
@@ -144,7 +148,7 @@ export const loadRemoteWorkspaces = async ({
     });
 
     // decrypt workspace info and update local db
-    workspacesQueryResult.data.workspaces.nodes.map((workspace) => {
+    workspacesQueryResult.data.workspaces.nodes.map(async (workspace) => {
       if (workspace === null || workspace === undefined) return null;
 
       let workspaceListName = "";
@@ -154,8 +158,6 @@ export const loadRemoteWorkspaces = async ({
         workspace.infoWorkspaceKey?.workspaceKeyBox &&
         activeDevice
       ) {
-        // TODO verify that creator
-        // needs a workspace key chain with a main device!
         const workspaceKey = decryptWorkspaceKey({
           ciphertext: workspace.infoWorkspaceKey?.workspaceKeyBox?.ciphertext,
           nonce: workspace.infoWorkspaceKey?.workspaceKeyBox?.nonce,
@@ -167,10 +169,38 @@ export const loadRemoteWorkspaces = async ({
           workspaceId: workspace.id,
           workspaceKeyId: workspace.infoWorkspaceKey?.id,
         });
+
+        const workspaceMemberDevicesProof =
+          await getLocalOrLoadRemoteWorkspaceMemberDevicesProofQueryByHash({
+            workspaceId: workspace.id,
+            hash: workspace.infoWorkspaceMemberDevicesProofHash,
+          });
+        if (!workspaceMemberDevicesProof) {
+          throw new Error("workspaceMemberDevicesProof not found");
+        }
+
+        const isValid = isValidDeviceSigningPublicKey({
+          signingPublicKey: workspace.infoCreatorDeviceSigningPublicKey,
+          workspaceMemberDevicesProofEntry: workspaceMemberDevicesProof,
+          workspaceId: workspace.id,
+          minimumRole: "ADMIN",
+        });
+        if (!isValid) {
+          throw new Error(
+            "Invalid signing public key for the workspaceMemberDevicesProof for decryptWorkspaceInfo"
+          );
+        }
+
         const decryptedWorkspaceInfo = decryptWorkspaceInfo({
           ciphertext: workspace.infoCiphertext,
           nonce: workspace.infoNonce,
+          signature: workspace.infoSignature,
           key: workspaceKey,
+          workspaceId: workspace.id,
+          workspaceKeyId: workspace.infoWorkspaceKey.id,
+          workspaceMemberDevicesProof: workspaceMemberDevicesProof.proof,
+          creatorDeviceSigningPublicKey:
+            workspace.infoCreatorDeviceSigningPublicKey,
         });
         if (
           decryptedWorkspaceInfo &&

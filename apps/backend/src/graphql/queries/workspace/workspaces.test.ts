@@ -86,6 +86,9 @@ const getWorkspaces = async ({
           id
           infoCiphertext
           infoNonce
+          infoSignature
+          infoWorkspaceMemberDevicesProofHash
+          infoCreatorDeviceSigningPublicKey
           infoWorkspaceKey {
             id
             workspaceId
