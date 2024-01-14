@@ -2,6 +2,7 @@ import { KeyDerivationTrace } from "@serenity-tools/common";
 import { ForbiddenError, UserInputError } from "apollo-server-express";
 import { Prisma, Role } from "../../../prisma/generated/output";
 import { Folder } from "../../types/folder";
+import { getOrCreateCreatorDevice } from "../../utils/device/getOrCreateCreatorDevice";
 import { prisma } from "../prisma";
 
 type Params = {
@@ -9,11 +10,14 @@ type Params = {
   id: string;
   nameCiphertext: string;
   nameNonce: string;
+  signature: string;
+  workspaceMemberDevicesProofHash: string;
   workspaceKeyId: string;
   subkeyId: string;
   parentFolderId?: string;
   workspaceId: string;
   keyDerivationTrace: KeyDerivationTrace;
+  authorDeviceSigningPublicKey: string;
 };
 
 export async function createFolder({
@@ -21,11 +25,14 @@ export async function createFolder({
   id,
   nameCiphertext,
   nameNonce,
+  signature,
+  workspaceMemberDevicesProofHash,
   workspaceKeyId,
   subkeyId,
   parentFolderId,
   workspaceId,
   keyDerivationTrace,
+  authorDeviceSigningPublicKey,
 }: Params) {
   const allowedRoles = [Role.ADMIN, Role.EDITOR];
   return await prisma.$transaction(
@@ -75,18 +82,28 @@ export async function createFolder({
           rootFolderId = parentFolder.id;
         }
       }
+
+      // convert the user's device into a creatorDevice
+      const creatorDevice = await getOrCreateCreatorDevice({
+        prisma,
+        userId,
+        signingPublicKey: authorDeviceSigningPublicKey,
+      });
+
       const rawFolder = await prisma.folder.create({
         data: {
           id,
-          idSignature: "TODO",
+          signature,
           nameCiphertext,
           nameNonce,
+          workspaceMemberDevicesProofHash,
           workspaceKeyId,
           subkeyId,
           parentFolderId,
           rootFolderId,
           workspaceId,
           keyDerivationTrace,
+          creatorDeviceSigningPublicKey: creatorDevice.signingPublicKey,
         },
       });
       const folder: Folder = {

@@ -40,7 +40,7 @@ export const CreateInitialFolderInput = inputObjectType({
   name: "CreateInitialFolderInput",
   definition(t) {
     t.nonNull.string("id");
-    t.nonNull.string("idSignature");
+    t.nonNull.string("signature");
     t.nonNull.string("nameCiphertext");
     t.nonNull.string("nameNonce");
     t.nonNull.field("keyDerivationTrace", {

@@ -22,6 +22,7 @@ import { removeMemberAndRotateWorkspaceKey } from "../../../../test/helpers/work
 import { prisma } from "../../../database/prisma";
 import { createDeviceAndLogin } from "../../../database/testHelpers/createDeviceAndLogin";
 import createUserWithWorkspace from "../../../database/testHelpers/createUserWithWorkspace";
+import { getWorkspaceMemberDevicesProof } from "../../../database/workspace/getWorkspaceMemberDevicesProof";
 import { WorkspaceDeviceParing } from "../../../types/workspaceDevice";
 
 const graphql = setupGraphql();
@@ -437,14 +438,24 @@ test("user can remove another user", async () => {
   }
   const folderSubkeyId =
     folderKeyTrace.trace[folderKeyTrace.trace.length - 1].subkeyId;
+
+  const workspaceMemberDevicesProof = await getWorkspaceMemberDevicesProof({
+    userId: userData1.user.id,
+    workspaceId: workspace.id,
+    hash: firstFolder.workspaceMemberDevicesProofHash,
+  });
+
   const decryptedFolderName = decryptFolderName({
     parentKey: parentKey,
     subkeyId: folderSubkeyId,
     ciphertext: firstFolder.nameCiphertext,
     nonce: firstFolder.nameNonce,
+    signature: firstFolder.signature,
     folderId: firstFolder.id,
     workspaceId: workspace.id,
     keyDerivationTrace: firstFolder.keyDerivationTrace,
+    workspaceMemberDevicesProof: workspaceMemberDevicesProof.proof,
+    creatorDeviceSigningPublicKey: firstFolder.creatorDeviceSigningPublicKey,
   });
   expect(decryptedFolderName).toBe("Getting Started");
 });

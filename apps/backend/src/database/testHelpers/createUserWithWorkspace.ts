@@ -140,12 +140,23 @@ export default async function createUserWithWorkspace({
       workspaceId: createWorkspaceChainEvent.transaction.id,
     });
   const folderName = "Getting Started";
-  const folderIdSignature = sodium.to_base64(
-    sodium.crypto_sign_detached(
-      "folder_id" + folderId,
-      sodium.from_base64(mainDevice.signingPrivateKey)
-    )
-  );
+
+  const workspaceMemberDevicesProof =
+    workspaceMemberDevicesProofUtil.createWorkspaceMemberDevicesProof({
+      authorKeyPair: {
+        privateKey: sodium.from_base64(mainDevice.signingPrivateKey),
+        publicKey: sodium.from_base64(mainDevice.signingPublicKey),
+        keyType: "ed25519",
+      },
+      workspaceMemberDevicesProofData: {
+        clock: 0,
+        userChainHashes: {
+          [userChainState.currentState.id]:
+            userChainState.currentState.eventHash,
+        },
+        workspaceChainHash: workspaceChainState.lastEventHash,
+      },
+    });
 
   const folderSubkeyId = createSubkeyId();
   const encryptedFolderResult = encryptFolderName({
@@ -165,7 +176,10 @@ export default async function createUserWithWorkspace({
         },
       ],
     },
+    workspaceMemberDevicesProof,
+    device: mainDevice,
   });
+
   const folderKey = encryptedFolderResult.folderSubkey;
   const snapshotKey = createSnapshotKey({
     folderKey,
@@ -190,23 +204,6 @@ export default async function createUserWithWorkspace({
     events: [createDocumentChainEvent],
     knownVersion: documentChain.version,
   });
-
-  const workspaceMemberDevicesProof =
-    workspaceMemberDevicesProofUtil.createWorkspaceMemberDevicesProof({
-      authorKeyPair: {
-        privateKey: sodium.from_base64(mainDevice.signingPrivateKey),
-        publicKey: sodium.from_base64(mainDevice.signingPublicKey),
-        keyType: "ed25519",
-      },
-      workspaceMemberDevicesProofData: {
-        clock: 0,
-        userChainHashes: {
-          [userChainState.currentState.id]:
-            userChainState.currentState.eventHash,
-        },
-        workspaceChainHash: workspaceChainState.lastEventHash,
-      },
-    });
 
   const snapshot = createIntroductionDocumentSnapshot({
     documentId: createDocumentChainEvent.transaction.id,
@@ -257,7 +254,7 @@ export default async function createUserWithWorkspace({
     workspaceChainEvent: createWorkspaceChainEvent,
     folder: {
       id: folderId,
-      idSignature: folderIdSignature,
+      signature: encryptedFolderResult.signature,
       nameCiphertext: encryptedFolderResult.ciphertext,
       nameNonce: encryptedFolderResult.nonce,
       keyDerivationTrace: {

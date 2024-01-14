@@ -42,6 +42,9 @@ mutation createInitialWorkspaceStructure(
       id
       nameCiphertext
       nameNonce
+      signature
+      creatorDeviceSigningPublicKey
+      workspaceMemberDevicesProofHash
       parentFolderId
       rootFolderId
       workspaceId

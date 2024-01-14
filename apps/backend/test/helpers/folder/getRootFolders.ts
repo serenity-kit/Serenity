@@ -24,6 +24,9 @@ export const getRootFolders = async ({
             workspaceId
             nameCiphertext
             nameNonce
+            signature
+            creatorDeviceSigningPublicKey
+            workspaceMemberDevicesProofHash
             keyDerivationTrace {
               workspaceKeyId
               trace {

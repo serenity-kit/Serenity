@@ -10,7 +10,9 @@ import {
   DocumentPathQueryVariables,
   Folder,
 } from "../../generated/graphql";
+import { getLocalOrLoadRemoteWorkspaceMemberDevicesProofQueryByHash } from "../../store/workspaceMemberDevicesProofStore";
 import { GetFolderKeyProps } from "../folder/folderKeyStore";
+import { isValidDeviceSigningPublicKey } from "../isValidDeviceSigningPublicKey/isValidDeviceSigningPublicKey";
 import { getUrqlClient } from "../urqlClient/urqlClient";
 import { getWorkspace } from "../workspace/getWorkspace";
 import { retrieveWorkspaceKey } from "../workspace/retrieveWorkspaceKey";
@@ -104,14 +106,39 @@ export const useDocumentPathStore = create<DocumentPathState>((set, get) => ({
         if (parentKeyTrace.trace.length > 1) {
           parentKey = parentKeyTrace.trace[parentKeyTrace.trace.length - 2].key;
         }
+
+        const workspaceMemberDevicesProof =
+          await getLocalOrLoadRemoteWorkspaceMemberDevicesProofQueryByHash({
+            workspaceId,
+            hash: folder.workspaceMemberDevicesProofHash,
+          });
+        if (!workspaceMemberDevicesProof) {
+          throw new Error("workspaceMemberDevicesProof not found");
+        }
+
+        const isValid = isValidDeviceSigningPublicKey({
+          signingPublicKey: folder.creatorDeviceSigningPublicKey,
+          workspaceMemberDevicesProofEntry: workspaceMemberDevicesProof,
+          workspaceId,
+          minimumRole: "EDITOR",
+        });
+        if (!isValid) {
+          throw new Error(
+            "Invalid signing public key for the workspaceMemberDevicesProof"
+          );
+        }
+
         folderName = decryptFolderName({
           parentKey: parentKey,
           subkeyId: folderSubkeyId,
           ciphertext: folder.nameCiphertext,
           nonce: folder.nameNonce,
+          signature: folder.signature,
+          workspaceMemberDevicesProof: workspaceMemberDevicesProof.proof,
           folderId: folder.id,
           workspaceId,
           keyDerivationTrace: folder.keyDerivationTrace,
+          creatorDeviceSigningPublicKey: folder.creatorDeviceSigningPublicKey,
         });
       } catch (error) {
         console.error(error);

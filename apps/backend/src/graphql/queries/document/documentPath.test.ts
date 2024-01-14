@@ -55,6 +55,8 @@ const setup = async () => {
     }).authorization,
     workspaceId: userData1.workspace.id,
     workspaceKeyId: userData1.workspace.currentWorkspaceKey.id,
+    userId: userData1.user.id,
+    device: userData1.webDevice,
   });
   const createFolderResult = await createFolder({
     graphql,
@@ -67,6 +69,8 @@ const setup = async () => {
     authorizationHeader: deriveSessionAuthorization({
       sessionKey: userData1.sessionKey,
     }).authorization,
+    userId: userData1.user.id,
+    device: userData1.webDevice,
   });
   const createChildFolderResult = await createFolder({
     graphql,
@@ -79,6 +83,8 @@ const setup = async () => {
     authorizationHeader: deriveSessionAuthorization({
       sessionKey: userData1.sessionKey,
     }).authorization,
+    userId: userData1.user.id,
+    device: userData1.webDevice,
   });
   const createDocumentResult = await createDocument({
     graphql,
@@ -125,6 +131,8 @@ const setup = async () => {
     authorizationHeader: deriveSessionAuthorization({
       sessionKey: userData2.sessionKey,
     }).authorization,
+    userId: userData2.user.id,
+    device: userData2.webDevice,
   });
   const createDocumentResult3 = await createDocument({
     graphql,

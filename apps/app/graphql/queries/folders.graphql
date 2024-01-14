@@ -4,6 +4,9 @@ query folders($parentFolderId: ID!, $first: Int!, $after: String) {
       id
       nameCiphertext
       nameNonce
+      signature
+      creatorDeviceSigningPublicKey
+      workspaceMemberDevicesProofHash
       parentFolderId
       rootFolderId
       workspaceId

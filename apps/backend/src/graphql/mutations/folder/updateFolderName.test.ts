@@ -9,6 +9,7 @@ import { updateFolderName } from "../../../../test/helpers/folder/updateFolderNa
 import setupGraphql from "../../../../test/helpers/setupGraphql";
 import { prisma } from "../../../database/prisma";
 import createUserWithWorkspace from "../../../database/testHelpers/createUserWithWorkspace";
+import { getWorkspaceMemberDevicesProof } from "../../../database/workspace/getWorkspaceMemberDevicesProof";
 
 const graphql = setupGraphql();
 let userData1: any = undefined;
@@ -42,6 +43,8 @@ const setup = async () => {
     authorizationHeader: deriveSessionAuthorization({
       sessionKey: userData1.sessionKey,
     }).authorization,
+    userId: userData1.user.id,
+    device: userData1.webDevice,
   });
   addedFolder = createFolderResult.createFolder.folder;
   addedFolderId = createFolderResult.createFolder.folder.id;
@@ -54,6 +57,12 @@ beforeAll(async () => {
 
 test("user should be able to change a folder name", async () => {
   const name = "Updated Name";
+
+  const workspaceMemberDevicesProof = await getWorkspaceMemberDevicesProof({
+    userId: userData1.user.id,
+    workspaceId: userData1.workspace.id,
+  });
+
   const result = await updateFolderName({
     graphql,
     id: userData1.folder.id,
@@ -65,6 +74,8 @@ test("user should be able to change a folder name", async () => {
       sessionKey: userData1.sessionKey,
     }).authorization,
     workspaceId: userData1.workspace.id,
+    workspaceMemberDevicesProof: workspaceMemberDevicesProof.proof,
+    device: userData1.webDevice,
   });
   const updatedFolder = result.updateFolderName.folder;
   expect(updatedFolder.id).toBe(userData1.folder.id);
@@ -78,6 +89,12 @@ test("user should be able to change a folder name", async () => {
 test("throw error when folder doesn't exist", async () => {
   const id = "bad-id";
   const name = "Doesn't Exist Name";
+
+  const workspaceMemberDevicesProof = await getWorkspaceMemberDevicesProof({
+    userId: userData1.user.id,
+    workspaceId: userData1.workspace.id,
+  });
+
   await expect(
     (async () =>
       await updateFolderName({
@@ -91,6 +108,8 @@ test("throw error when folder doesn't exist", async () => {
           sessionKey: userData1.sessionKey,
         }).authorization,
         workspaceId: userData1.workspace.id,
+        workspaceMemberDevicesProof: workspaceMemberDevicesProof.proof,
+        device: userData1.webDevice,
       }))()
   ).rejects.toThrow("Unauthorized");
 });
@@ -113,12 +132,20 @@ test("throw error when user doesn't have access", async () => {
     authorizationHeader: deriveSessionAuthorization({
       sessionKey: userData1.sessionKey,
     }).authorization,
+    userId: userData1.user.id,
+    device: userData1.webDevice,
   });
   const authorizationHeader = deriveSessionAuthorization({
     sessionKey,
   }).authorization;
   const id = otherUserFolderResult.createFolder.folder.id;
   const name = "Unauthorized Name";
+
+  const workspaceMemberDevicesProof = await getWorkspaceMemberDevicesProof({
+    userId: userData1.user.id,
+    workspaceId: userData1.workspace.id,
+  });
+
   await expect(
     (async () =>
       await updateFolderName({
@@ -132,6 +159,8 @@ test("throw error when user doesn't have access", async () => {
           sessionKey: userData2.sessionKey,
         }).authorization,
         workspaceId: userData1.workspace.id,
+        workspaceMemberDevicesProof: workspaceMemberDevicesProof.proof,
+        device: userData1.webDevice,
       }))()
   ).rejects.toThrow("Unauthorized");
 });
@@ -149,6 +178,12 @@ test("Commentor tries to update", async () => {
       role: Role.COMMENTER,
     },
   });
+
+  const workspaceMemberDevicesProof = await getWorkspaceMemberDevicesProof({
+    userId: userData1.user.id,
+    workspaceId: userData1.workspace.id,
+  });
+
   await expect(
     (async () =>
       await updateFolderName({
@@ -162,6 +197,8 @@ test("Commentor tries to update", async () => {
           sessionKey: otherUser.sessionKey,
         }).authorization,
         workspaceId: addedWorkspace.id,
+        workspaceMemberDevicesProof: workspaceMemberDevicesProof.proof,
+        device: userData1.webDevice,
       }))()
   ).rejects.toThrowError("Unauthorized");
 });
@@ -179,6 +216,12 @@ test("Viewer tries to update", async () => {
       role: Role.VIEWER,
     },
   });
+
+  const workspaceMemberDevicesProof = await getWorkspaceMemberDevicesProof({
+    userId: userData1.user.id,
+    workspaceId: userData1.workspace.id,
+  });
+
   await expect(
     (async () =>
       await updateFolderName({
@@ -192,11 +235,18 @@ test("Viewer tries to update", async () => {
           sessionKey: otherUser.sessionKey,
         }).authorization,
         workspaceId: addedWorkspace.id,
+        workspaceMemberDevicesProof: workspaceMemberDevicesProof.proof,
+        device: userData1.webDevice,
       }))()
   ).rejects.toThrowError("Unauthorized");
 });
 
 test("Unauthenticated", async () => {
+  const workspaceMemberDevicesProof = await getWorkspaceMemberDevicesProof({
+    userId: userData1.user.id,
+    workspaceId: userData1.workspace.id,
+  });
+
   await expect(
     (async () =>
       await updateFolderName({
@@ -208,6 +258,8 @@ test("Unauthenticated", async () => {
         parentFolderId: null,
         authorizationHeader: "badauthheader",
         workspaceId: addedWorkspace.id,
+        workspaceMemberDevicesProof: workspaceMemberDevicesProof.proof,
+        device: userData1.webDevice,
       }))()
   ).rejects.toThrowError(/UNAUTHENTICATED/);
 });

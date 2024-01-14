@@ -33,7 +33,6 @@ export const initialize = () => {
 
 export const wipeCaches = () => {
   getLastWorkspaceMemberDevicesProofCache = {};
-  getWorkspaceMemberDevicesProofByHashCache = {};
 };
 
 export type WorkspaceMemberDevicesProofLocalDbEntry = {
@@ -246,12 +245,14 @@ export const loadRemoteWorkspaceMemberDevicesProofQuery = async ({
 
 export const getLocalOrLoadRemoteWorkspaceMemberDevicesProofQueryByHash =
   async ({ workspaceId, hash }: { workspaceId: string; hash: string }) => {
+    // get the local entry if it exists
     const localWorkspaceMemberDevicesProof =
       getWorkspaceMemberDevicesProofByHash({ workspaceId, hash });
     if (localWorkspaceMemberDevicesProof) {
       return localWorkspaceMemberDevicesProof;
     }
 
+    // get the remove entry
     const workspaceMemberDevicesProofQueryResult =
       await runWorkspaceMemberDevicesProofQuery({ workspaceId, hash });
 
@@ -295,12 +296,13 @@ export const getLocalOrLoadRemoteWorkspaceMemberDevicesProofQueryByHash =
         ? workspaceMemberDevicesProofEntry.proof
         : undefined;
 
-      // we ignore the entry if it is already in the database
+      // ignore the incoming entry if it is already in the database (e.g. due concurrency) and
+      // return the local entry
       if (
         workspaceMemberDevicesProof &&
         workspaceMemberDevicesProof.clock === proof.clock
       ) {
-        return getLastWorkspaceMemberDevicesProof({ workspaceId });
+        return getWorkspaceMemberDevicesProofByHash({ workspaceId, hash });
       }
 
       if (
@@ -362,9 +364,6 @@ export const getLastWorkspaceMemberDevicesProof = ({
   return getLastWorkspaceMemberDevicesProofCache[workspaceId];
 };
 
-let getWorkspaceMemberDevicesProofByHashCache: {
-  [workspaceId: string]: WorkspaceMemberDevicesProofLocalDbEntry;
-} = {};
 export const getWorkspaceMemberDevicesProofByHash = ({
   workspaceId,
   hash,
@@ -385,17 +384,7 @@ export const getWorkspaceMemberDevicesProofByHash = ({
           data: JSON.parse(workspaceMemberDevicesProofResult[0].data),
         }
       : undefined;
-
-  // write a helper to canonicalize the input params and create a cache based on them
-  if (
-    workspaceMemberDevicesProof &&
-    canonicalize(workspaceMemberDevicesProof) !==
-      canonicalize(getWorkspaceMemberDevicesProofByHashCache[workspaceId])
-  ) {
-    getWorkspaceMemberDevicesProofByHashCache[workspaceId] =
-      workspaceMemberDevicesProof;
-  }
-  return getWorkspaceMemberDevicesProofByHashCache[workspaceId];
+  return workspaceMemberDevicesProof;
 };
 
 const getLastWorkspaceMemberDevicesProofListeners: {

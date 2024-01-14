@@ -209,6 +209,7 @@ model CreatorDevice {
   snapshotKeyBoxes             SnapshotKeyBox[]
   comment                      Comment[]
   commentReplies               CommentReply[]
+  Folder                       Folder[]
 }
 
 model Workspace {
@@ -302,26 +303,29 @@ model WorkspaceKeyBox {
 }
 
 model Folder {
-  id                 String       @id @unique
-  idSignature        String
-  nameCiphertext     String
-  nameNonce          String
-  subkeyId           String
-  workspace          Workspace    @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
-  workspaceId        String
-  workspaceKey       WorkspaceKey @relation(fields: [workspaceKeyId], references: [id], onDelete: SetDefault)
-  workspaceKeyId     String
+  id                              String        @id @unique
+  nameCiphertext                  String
+  nameNonce                       String
+  signature                       String
+  workspaceMemberDevicesProofHash String
+  subkeyId                        String
+  workspace                       Workspace     @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  workspaceId                     String
+  workspaceKey                    WorkspaceKey  @relation(fields: [workspaceKeyId], references: [id], onDelete: SetDefault)
+  workspaceKeyId                  String
   // a root folder has no parent folder
-  parentFolder       Folder?      @relation(name: "parentFolder", fields: [parentFolderId], references: [id], onDelete: Cascade)
-  parentFolderId     String?
-  keyDerivationTrace Json         @default("{}")
+  parentFolder                    Folder?       @relation(name: "parentFolder", fields: [parentFolderId], references: [id], onDelete: Cascade)
+  parentFolderId                  String?
+  keyDerivationTrace              Json          @default("{}")
   // a root folder has no reference to another folder
-  rootFolder         Folder?      @relation(name: "rootFolder", fields: [rootFolderId], references: [id], onDelete: Cascade)
-  rootFolderId       String?
-  createdAt          DateTime     @default(now())
-  childFolders       Folder[]     @relation("parentFolder")
-  descendent         Folder[]     @relation("rootFolder")
-  documents          Document[]
+  rootFolder                      Folder?       @relation(name: "rootFolder", fields: [rootFolderId], references: [id], onDelete: Cascade)
+  rootFolderId                    String?
+  createdAt                       DateTime      @default(now())
+  childFolders                    Folder[]      @relation("parentFolder")
+  descendent                      Folder[]      @relation("rootFolder")
+  documents                       Document[]
+  creatorDeviceSigningPublicKey   String
+  creatorDevice                   CreatorDevice @relation(fields: [creatorDeviceSigningPublicKey], references: [signingPublicKey], onDelete: SetDefault)
 
   @@unique([subkeyId, workspaceId])
 }

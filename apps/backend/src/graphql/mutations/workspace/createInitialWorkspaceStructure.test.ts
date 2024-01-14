@@ -14,6 +14,7 @@ import deleteAllRecords from "../../../../test/helpers/deleteAllRecords";
 import setupGraphql from "../../../../test/helpers/setupGraphql";
 import { getSnapshot } from "../../../../test/helpers/snapshot/getSnapshot";
 import { createInitialWorkspaceStructure } from "../../../../test/helpers/workspace/createInitialWorkspaceStructure";
+import { getWorkspaceMemberDevicesProof } from "../../../database/workspace/getWorkspaceMemberDevicesProof";
 
 const graphql = setupGraphql();
 let userData1: any = undefined;
@@ -85,6 +86,13 @@ test("create initial workspace structure", async () => {
     workspaceKeyId: workspace.currentWorkspaceKey.id,
   });
   expect(typeof workspaceKey).toBe("string");
+
+  const workspaceMemberDevicesProof = await getWorkspaceMemberDevicesProof({
+    userId: userData1.userId,
+    workspaceId: workspace.id,
+    hash: folder.workspaceMemberDevicesProofHash,
+  });
+
   const decryptedFolderName = decryptFolderName({
     parentKey: workspaceKey,
     subkeyId: folder.keyDerivationTrace.trace[0].subkeyId,
@@ -93,6 +101,9 @@ test("create initial workspace structure", async () => {
     folderId: folder.id,
     keyDerivationTrace: folder.keyDerivationTrace,
     workspaceId: workspace.id,
+    signature: folder.signature,
+    workspaceMemberDevicesProof: workspaceMemberDevicesProof.proof,
+    creatorDeviceSigningPublicKey: folder.creatorDeviceSigningPublicKey,
   });
   // TODO: derive document key from trace
   expect(decryptedFolderName).toBe("Getting Started");
