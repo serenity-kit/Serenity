@@ -13,6 +13,7 @@ export const logout = async ({
   throwIfPasswordVerifyNotOpen,
 }: Props) => {
   await page.locator("data-testid=general__account-menu--trigger").click();
+  await delayForSeconds(4);
   await page.locator("data-testid=general__account-menu--logout").click();
   await delayForSeconds(1);
   await verifyPassword({
