@@ -45,6 +45,7 @@ export const encryptWorkspaceInfo = ({
       ciphertext: result.ciphertext,
       publicData: publicDataAsBase64,
     },
+    "workspace_info",
     sodium.from_base64(device.signingPrivateKey),
     sodium
   );

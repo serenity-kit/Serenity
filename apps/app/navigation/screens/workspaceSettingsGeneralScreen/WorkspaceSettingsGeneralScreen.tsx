@@ -121,6 +121,7 @@ export default function WorkspaceSettingsGeneralScreen(
         infoCiphertext: encryptedWorkspaceInfo.ciphertext,
         infoNonce: encryptedWorkspaceInfo.nonce,
         infoWorkspaceKeyId: state.context.currentWorkspaceKey.id,
+        infoSignature: encryptedWorkspaceInfo.signature,
       },
     });
     if (

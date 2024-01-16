@@ -2,7 +2,6 @@ import * as workspaceMemberDevicesProofUtil from "@serenity-kit/workspace-member
 import { verifySignature } from "@serenity-tools/secsync";
 import { canonicalizeAndToBase64 } from "@serenity-tools/secsync/src/utils/canonicalizeAndToBase64";
 import sodium from "react-native-libsodium";
-import { KeyDerivationTrace } from "../zodTypes";
 
 type Params = {
   ciphertext: string;
@@ -10,28 +9,27 @@ type Params = {
   signature: string;
   authorSigningPublicKey: string;
   workspaceId: string;
-  folderId: string;
-  keyDerivationTrace: KeyDerivationTrace;
+  workspaceKeyId: string;
   workspaceMemberDevicesProof: workspaceMemberDevicesProofUtil.WorkspaceMemberDevicesProof;
 };
 
-export const verifyFolderNameSignature = ({
+export const verifyWorkspaceInfoSignature = ({
   signature,
   nonce,
   ciphertext,
   authorSigningPublicKey,
   workspaceId,
-  folderId,
-  keyDerivationTrace,
+  workspaceKeyId,
   workspaceMemberDevicesProof,
 }: Params) => {
-  const publicData = {
-    workspaceId,
-    folderId,
-    keyDerivationTrace: KeyDerivationTrace.parse(keyDerivationTrace),
-    workspaceMemberDevicesProof,
-  };
-  const publicDataAsBase64 = canonicalizeAndToBase64(publicData, sodium);
+  const publicDataAsBase64 = canonicalizeAndToBase64(
+    {
+      workspaceId,
+      workspaceKeyId,
+      workspaceMemberDevicesProof,
+    },
+    sodium
+  );
 
   return verifySignature(
     {
@@ -39,7 +37,7 @@ export const verifyFolderNameSignature = ({
       ciphertext,
       publicData: publicDataAsBase64,
     },
-    "folder",
+    "workspace_info",
     signature,
     sodium.from_base64(authorSigningPublicKey),
     sodium

@@ -2,6 +2,7 @@ import * as workspaceMemberDevicesProofUtil from "@serenity-kit/workspace-member
 import { canonicalizeAndToBase64 } from "@serenity-tools/secsync/src/utils/canonicalizeAndToBase64";
 import sodium from "react-native-libsodium";
 import { decryptAead } from "../decryptAead/decryptAead";
+import { verifyWorkspaceInfoSignature } from "../verifyWorkspaceInfoSignature/verifyWorkspaceInfoSignature";
 
 type Params = {
   key: string;
@@ -24,8 +25,19 @@ export const decryptWorkspaceInfo = ({
   workspaceKeyId,
   workspaceMemberDevicesProof,
 }: Params) => {
-  // TODO verify permissions outside via workspaceMemberDevicesProof
-  // TODO verify signature
+  const isValid = verifyWorkspaceInfoSignature({
+    signature,
+    workspaceId,
+    workspaceKeyId,
+    workspaceMemberDevicesProof,
+    authorSigningPublicKey: creatorDeviceSigningPublicKey,
+    ciphertext,
+    nonce,
+  });
+  if (!isValid) {
+    throw new Error("Invalid workspace info signature");
+  }
+
   const publicDataAsBase64 = canonicalizeAndToBase64(
     {
       workspaceId,

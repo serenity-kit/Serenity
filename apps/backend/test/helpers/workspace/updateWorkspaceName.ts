@@ -75,6 +75,7 @@ export const updateWorkspaceName = async ({
         infoCiphertext: workspaceInfo.ciphertext,
         infoNonce: workspaceInfo.nonce,
         infoWorkspaceKeyId: workspaceKeyId,
+        infoSignature: workspaceInfo.signature,
       },
     },
     authorizationHeaders
