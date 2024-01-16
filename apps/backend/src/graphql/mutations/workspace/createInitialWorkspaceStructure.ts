@@ -29,6 +29,7 @@ export const CreateInitialWorkspaceInput = inputObjectType({
   definition(t) {
     t.nonNull.string("infoCiphertext");
     t.nonNull.string("infoNonce");
+    t.nonNull.string("infoSignature");
     t.nonNull.string("workspaceKeyId");
     t.nonNull.list.nonNull.field("deviceWorkspaceKeyBoxes", {
       type: DeviceWorkspaceKeyBoxInput,

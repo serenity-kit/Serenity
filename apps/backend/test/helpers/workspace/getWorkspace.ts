@@ -20,6 +20,9 @@ export const getWorkspace = async ({
         id
         infoCiphertext
         infoNonce
+        infoSignature
+        infoWorkspaceMemberDevicesProofHash
+        infoCreatorDeviceSigningPublicKey
         infoWorkspaceKey {
           id
           workspaceId

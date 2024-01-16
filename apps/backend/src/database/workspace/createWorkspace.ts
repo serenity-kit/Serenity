@@ -21,6 +21,7 @@ type Params = {
   id: string;
   infoCiphertext: string;
   infoNonce: string;
+  infoSignature: string;
   userId: string;
   creatorDeviceSigningPublicKey: string;
   userMainDeviceSigningPublicKey: string;
@@ -34,6 +35,7 @@ export async function createWorkspace({
   id,
   infoCiphertext,
   infoNonce,
+  infoSignature,
   userId,
   creatorDeviceSigningPublicKey,
   userMainDeviceSigningPublicKey,
@@ -102,11 +104,21 @@ export async function createWorkspace({
         );
       }
 
+      // make sure the user controls this creatorDevice
+      const creatorDevice = await getOrCreateCreatorDevice({
+        prisma,
+        userId,
+        signingPublicKey: creatorDeviceSigningPublicKey,
+      });
+
       const rawWorkspace = await prisma.workspace.create({
         data: {
           id,
           infoCiphertext,
           infoNonce,
+          infoSignature,
+          infoWorkspaceMemberDevicesProofHash: workspaceMemberDevicesProof.hash,
+          infoCreatorDeviceSigningPublicKey: creatorDeviceSigningPublicKey,
           usersToWorkspaces: {
             create: {
               userId,
@@ -158,13 +170,6 @@ export async function createWorkspace({
         },
       });
 
-      // make sure the user controls this creatorDevice
-      const creatorDevice = await getOrCreateCreatorDevice({
-        prisma,
-        userId,
-        signingPublicKey: creatorDeviceSigningPublicKey,
-      });
-
       const currentWorkspaceKey = await prisma.workspaceKey.findFirst({
         where: {
           workspaceId: rawWorkspace.id,
@@ -205,6 +210,11 @@ export async function createWorkspace({
         infoCiphertext: rawWorkspace.infoCiphertext,
         infoNonce: rawWorkspace.infoNonce,
         infoWorkspaceKey: rawWorkspace.infoWorkspaceKey,
+        infoSignature: rawWorkspace.infoSignature,
+        infoWorkspaceMemberDevicesProofHash:
+          rawWorkspace.infoWorkspaceMemberDevicesProofHash,
+        infoCreatorDeviceSigningPublicKey:
+          rawWorkspace.infoCreatorDeviceSigningPublicKey,
         currentWorkspaceKey: returningWorkspaceKey,
         workspaceKeys: [returningWorkspaceKey],
       };

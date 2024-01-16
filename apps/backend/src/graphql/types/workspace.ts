@@ -54,6 +54,9 @@ export const Workspace = objectType({
     t.nonNull.string("id");
     t.string("infoCiphertext");
     t.string("infoNonce");
+    t.nonNull.string("infoSignature");
+    t.nonNull.string("infoWorkspaceMemberDevicesProofHash");
+    t.nonNull.string("infoCreatorDeviceSigningPublicKey");
     t.string("infoWorkspaceKeyId");
     t.field("infoWorkspaceKey", { type: WorkspaceKey });
     t.list.nonNull.field("workspaceKeys", { type: WorkspaceKey });

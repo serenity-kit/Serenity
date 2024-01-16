@@ -29,6 +29,9 @@ const query = gql`
         id
         infoCiphertext
         infoNonce
+        infoSignature
+        infoWorkspaceMemberDevicesProofHash
+        infoCreatorDeviceSigningPublicKey
         infoWorkspaceKey {
           id
           workspaceId
@@ -140,18 +143,6 @@ export const createInitialWorkspaceStructure = async ({
     });
   }
 
-  const workspaceInfo = encryptWorkspaceInfo({
-    name: workspaceName,
-    key: workspaceKey,
-  });
-
-  const readyWorkspace = {
-    infoCiphertext: workspaceInfo.ciphertext,
-    infoNonce: workspaceInfo.nonce,
-    workspaceKeyId,
-    deviceWorkspaceKeyBoxes,
-  };
-
   const userChainUser = await getAndConstructUserFromUserChainTestHelper({
     mainDeviceSigningPublicKey: mainDevice.signingPublicKey,
   });
@@ -171,6 +162,23 @@ export const createInitialWorkspaceStructure = async ({
         workspaceChainHash: workspaceChainState.lastEventHash,
       },
     });
+
+  const workspaceInfo = encryptWorkspaceInfo({
+    name: workspaceName,
+    key: workspaceKey,
+    device: mainDevice,
+    workspaceId: event.transaction.id,
+    workspaceKeyId,
+    workspaceMemberDevicesProof,
+  });
+
+  const readyWorkspace = {
+    infoCiphertext: workspaceInfo.ciphertext,
+    infoNonce: workspaceInfo.nonce,
+    infoSignature: workspaceInfo.signature,
+    workspaceKeyId,
+    deviceWorkspaceKeyBoxes,
+  };
 
   // prepare the folder
 

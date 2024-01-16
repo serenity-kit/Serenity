@@ -3,8 +3,8 @@
 export interface Typegen0 {
   "@@xstate/typegen": true;
   internalEvents: {
-    "done.invoke.fetchWorkspace": {
-      type: "done.invoke.fetchWorkspace";
+    "done.invoke.fetchWorkspaceAndDecryptInfo": {
+      type: "done.invoke.fetchWorkspaceAndDecryptInfo";
       data: unknown;
       __tip: "See the XState TS docs to learn how to strongly type this.";
     };
@@ -13,8 +13,8 @@ export interface Typegen0 {
       data: unknown;
       __tip: "See the XState TS docs to learn how to strongly type this.";
     };
-    "error.platform.fetchWorkspace": {
-      type: "error.platform.fetchWorkspace";
+    "error.platform.fetchWorkspaceAndDecryptInfo": {
+      type: "error.platform.fetchWorkspaceAndDecryptInfo";
       data: unknown;
     };
     "error.platform.loadInitialDataMachine": {
@@ -24,7 +24,7 @@ export interface Typegen0 {
     "xstate.init": { type: "xstate.init" };
   };
   invokeSrcNameMap: {
-    fetchWorkspace: "done.invoke.fetchWorkspace";
+    fetchWorkspaceAndDecryptInfo: "done.invoke.fetchWorkspaceAndDecryptInfo";
     loadInitialDataMachine: "done.invoke.loadInitialDataMachine";
   };
   missingImplementations: {
@@ -36,10 +36,10 @@ export interface Typegen0 {
   eventsCausingActions: {};
   eventsCausingDelays: {};
   eventsCausingGuards: {
-    hasNoNetworkErrorAndWorkspaceFound: "done.invoke.fetchWorkspace";
+    hasNoNetworkErrorAndWorkspaceFound: "done.invoke.fetchWorkspaceAndDecryptInfo";
   };
   eventsCausingServices: {
-    fetchWorkspace: "done.invoke.loadInitialDataMachine";
+    fetchWorkspaceAndDecryptInfo: "done.invoke.loadInitialDataMachine";
     loadInitialDataMachine: "xstate.init";
   };
   matchesStates:

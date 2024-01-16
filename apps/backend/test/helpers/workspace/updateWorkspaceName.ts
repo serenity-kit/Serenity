@@ -1,4 +1,5 @@
-import { encryptWorkspaceInfo } from "@serenity-tools/common";
+import * as workspaceMemberDevicesProofUtil from "@serenity-kit/workspace-member-devices-proof";
+import { LocalDevice, encryptWorkspaceInfo } from "@serenity-tools/common";
 import { gql } from "graphql-request";
 
 type Params = {
@@ -8,6 +9,8 @@ type Params = {
   workspaceKey: string;
   workspaceKeyId: string;
   authorizationHeader: string;
+  device: LocalDevice;
+  workspaceMemberDevicesProof: workspaceMemberDevicesProofUtil.WorkspaceMemberDevicesProof;
 };
 
 export const updateWorkspaceName = async ({
@@ -17,6 +20,8 @@ export const updateWorkspaceName = async ({
   workspaceKey,
   workspaceKeyId,
   authorizationHeader,
+  device,
+  workspaceMemberDevicesProof,
 }: Params) => {
   const authorizationHeaders = {
     authorization: authorizationHeader,
@@ -29,6 +34,9 @@ export const updateWorkspaceName = async ({
           id
           infoCiphertext
           infoNonce
+          infoSignature
+          infoWorkspaceMemberDevicesProofHash
+          infoCreatorDeviceSigningPublicKey
           infoWorkspaceKey {
             id
             workspaceId
@@ -50,7 +58,14 @@ export const updateWorkspaceName = async ({
     }
   `;
 
-  const workspaceInfo = encryptWorkspaceInfo({ name, key: workspaceKey });
+  const workspaceInfo = encryptWorkspaceInfo({
+    name,
+    key: workspaceKey,
+    device,
+    workspaceId: id,
+    workspaceKeyId,
+    workspaceMemberDevicesProof,
+  });
 
   const result = await graphql.client.request(
     query,

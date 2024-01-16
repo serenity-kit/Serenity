@@ -233,6 +233,10 @@ export default async function createUserWithWorkspace({
   const workspaceInfo = await encryptWorkspaceInfo({
     name: "My Workspace",
     key: workspaceKey,
+    device: mainDevice,
+    workspaceId: createWorkspaceChainEvent.transaction.id,
+    workspaceKeyId,
+    workspaceMemberDevicesProof,
   });
 
   const createWorkspaceResult = await createInitialWorkspaceStructure({
@@ -241,6 +245,7 @@ export default async function createUserWithWorkspace({
       id: createWorkspaceChainEvent.transaction.id,
       infoCiphertext: workspaceInfo.ciphertext,
       infoNonce: workspaceInfo.nonce,
+      infoSignature: workspaceInfo.signature,
       workspaceKeyId,
       deviceWorkspaceKeyBoxes: [
         {

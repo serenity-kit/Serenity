@@ -210,23 +210,28 @@ model CreatorDevice {
   comment                      Comment[]
   commentReplies               CommentReply[]
   Folder                       Folder[]
+  Workspace                    Workspace[]
 }
 
 model Workspace {
-  id                           String                        @id
-  infoCiphertext               String
-  infoNonce                    String
+  id                                  String                        @id
+  folders                             Folder[]
+  documents                           Document[]
+  usersToWorkspaces                   UsersToWorkspaces[]
+  invitations                         WorkspaceInvitations[]
+  workspaceKeys                       WorkspaceKey[]                @relation(name: "workspace")
+  createdAt                           DateTime                      @default(now())
+  chain                               WorkspaceChainEvent[]
+  workspaceMemberDevicesProofs        WorkspaceMemberDevicesProof[]
+  infoCiphertext                      String
+  infoNonce                           String
   // TODO not sure how to create the workspaceKey and reference it here at the same time
-  infoWorkspaceKeyId           String?                       @unique
-  folders                      Folder[]
-  documents                    Document[]
-  usersToWorkspaces            UsersToWorkspaces[]
-  invitations                  WorkspaceInvitations[]
-  workspaceKeys                WorkspaceKey[]                @relation(name: "workspace")
-  infoWorkspaceKey             WorkspaceKey?                 @relation(name: "infoWorkspaceKey", fields: [infoWorkspaceKeyId], references: [id])
-  createdAt                    DateTime                      @default(now())
-  chain                        WorkspaceChainEvent[]
-  workspaceMemberDevicesProofs WorkspaceMemberDevicesProof[]
+  infoWorkspaceKeyId                  String?                       @unique
+  infoWorkspaceKey                    WorkspaceKey?                 @relation(name: "infoWorkspaceKey", fields: [infoWorkspaceKeyId], references: [id])
+  infoSignature                       String
+  infoWorkspaceMemberDevicesProofHash String
+  infoCreatorDeviceSigningPublicKey   String
+  infoCreatorDevice                   CreatorDevice                 @relation(fields: [infoCreatorDeviceSigningPublicKey], references: [signingPublicKey], onDelete: SetDefault)
 
   @@index([createdAt(sort: Desc)])
 }

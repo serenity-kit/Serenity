@@ -4,6 +4,9 @@ query workspaces($deviceSigningPublicKey: String!) {
       id
       infoCiphertext
       infoNonce
+      infoSignature
+      infoWorkspaceMemberDevicesProofHash
+      infoCreatorDeviceSigningPublicKey
       infoWorkspaceKey {
         id
         workspaceId

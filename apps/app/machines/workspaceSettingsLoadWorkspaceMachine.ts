@@ -9,6 +9,8 @@ import {
   WorkspaceQuery,
   WorkspaceQueryVariables,
 } from "../generated/graphql";
+import { getLocalOrLoadRemoteWorkspaceMemberDevicesProofQueryByHash } from "../store/workspaceMemberDevicesProofStore";
+import { isValidDeviceSigningPublicKey } from "../utils/isValidDeviceSigningPublicKey/isValidDeviceSigningPublicKey";
 import { getUrqlClient } from "../utils/urqlClient/urqlClient";
 import {
   MeWithWorkspaceLoadingInfoQueryResult,
@@ -40,7 +42,7 @@ type Context = {
   };
 };
 
-const fetchWorkspace = async (context) => {
+const fetchWorkspaceAndDecryptInfo = async (context) => {
   const result = await getUrqlClient()
     .query<WorkspaceQuery, WorkspaceQueryVariables>(
       WorkspaceDocument,
@@ -54,7 +56,77 @@ const fetchWorkspace = async (context) => {
       }
     )
     .toPromise();
-  return result;
+
+  let workspaceName = "";
+  let workspaceAvatar: string | undefined;
+
+  if (result?.data?.workspace) {
+    const workspaceData = result.data.workspace;
+
+    if (
+      workspaceData.infoCiphertext &&
+      workspaceData.infoNonce &&
+      workspaceData.infoWorkspaceKey?.workspaceKeyBox
+    ) {
+      const workspaceMemberDevicesProof =
+        await getLocalOrLoadRemoteWorkspaceMemberDevicesProofQueryByHash({
+          workspaceId: workspaceData.id,
+          hash: workspaceData.infoWorkspaceMemberDevicesProofHash,
+        });
+      if (!workspaceMemberDevicesProof) {
+        throw new Error("workspaceMemberDevicesProof not found");
+      }
+
+      const isValid = isValidDeviceSigningPublicKey({
+        signingPublicKey: workspaceData.infoCreatorDeviceSigningPublicKey,
+        workspaceMemberDevicesProofEntry: workspaceMemberDevicesProof,
+        workspaceId: workspaceData.id,
+        minimumRole: "ADMIN",
+      });
+      if (!isValid) {
+        throw new Error(
+          "Invalid signing public key for the workspaceMemberDevicesProof for decryptWorkspaceInfo"
+        );
+      }
+
+      const workspaceKey = decryptWorkspaceKey({
+        ciphertext: workspaceData.infoWorkspaceKey?.workspaceKeyBox?.ciphertext,
+        nonce: workspaceData.infoWorkspaceKey?.workspaceKeyBox?.nonce,
+        creatorDeviceEncryptionPublicKey:
+          workspaceData.infoWorkspaceKey?.workspaceKeyBox?.creatorDevice
+            .encryptionPublicKey,
+        receiverDeviceEncryptionPrivateKey:
+          context.activeDevice.encryptionPrivateKey,
+        workspaceKeyId: workspaceData.infoWorkspaceKey?.id,
+        workspaceId: context.workspaceId,
+      });
+      const decryptedWorkspaceInfo = decryptWorkspaceInfo({
+        ciphertext: workspaceData.infoCiphertext,
+        nonce: workspaceData.infoNonce,
+        key: workspaceKey,
+        signature: workspaceData.infoSignature,
+        workspaceId: workspaceData.id,
+        workspaceKeyId: workspaceData.infoWorkspaceKey.id,
+        workspaceMemberDevicesProof: workspaceMemberDevicesProof.proof,
+        creatorDeviceSigningPublicKey:
+          workspaceData.infoCreatorDeviceSigningPublicKey,
+      });
+      if (
+        decryptedWorkspaceInfo &&
+        typeof decryptedWorkspaceInfo.name === "string"
+      ) {
+        workspaceName = decryptedWorkspaceInfo.name as string;
+      }
+      if (
+        decryptedWorkspaceInfo &&
+        typeof decryptedWorkspaceInfo.avatar === "string"
+      ) {
+        workspaceAvatar = decryptedWorkspaceInfo.avatar as string;
+      }
+    }
+  }
+
+  return { name: workspaceName, avatar: workspaceAvatar, result };
 };
 
 export const workspaceSettingsLoadWorkspaceMachine =
@@ -98,12 +170,18 @@ export const workspaceSettingsLoadWorkspaceMachine =
 
         loadWorkspace: {
           invoke: {
-            src: "fetchWorkspace",
-            id: "fetchWorkspace",
+            src: "fetchWorkspaceAndDecryptInfo",
+            id: "fetchWorkspaceAndDecryptInfo",
             onDone: [
               {
                 actions: assign({
-                  workspaceQueryResult: (_, event) => event.data,
+                  workspaceQueryResult: (_, event) => event.data.result,
+                  workspaceInfo: (_, event) => {
+                    return {
+                      name: event.data.name,
+                      avatar: event.data.avatar,
+                    };
+                  },
                 }),
                 cond: "hasNoNetworkErrorAndWorkspaceFound",
                 target: "loadWorkspaceSuccess",
@@ -153,60 +231,6 @@ export const workspaceSettingsLoadWorkspaceMachine =
               }
               return undefined;
             },
-            workspaceInfo: (context) => {
-              let workspaceName = "";
-              let workspaceAvatar: string | undefined;
-
-              if (
-                context.workspaceQueryResult?.data?.workspace &&
-                context.workspaceId
-              ) {
-                const workspaceData =
-                  context.workspaceQueryResult.data.workspace;
-
-                if (
-                  workspaceData.infoCiphertext &&
-                  workspaceData.infoNonce &&
-                  workspaceData.infoWorkspaceKey?.workspaceKeyBox
-                ) {
-                  // TODO verify that creator
-                  // needs a workspace key chain with a main device!
-                  const workspaceKey = decryptWorkspaceKey({
-                    ciphertext:
-                      workspaceData.infoWorkspaceKey?.workspaceKeyBox
-                        ?.ciphertext,
-                    nonce:
-                      workspaceData.infoWorkspaceKey?.workspaceKeyBox?.nonce,
-                    creatorDeviceEncryptionPublicKey:
-                      workspaceData.infoWorkspaceKey?.workspaceKeyBox
-                        ?.creatorDevice.encryptionPublicKey,
-                    receiverDeviceEncryptionPrivateKey:
-                      context.activeDevice.encryptionPrivateKey,
-                    workspaceKeyId: workspaceData.infoWorkspaceKey?.id,
-                    workspaceId: context.workspaceId,
-                  });
-                  const decryptedWorkspaceInfo = decryptWorkspaceInfo({
-                    ciphertext: workspaceData.infoCiphertext,
-                    nonce: workspaceData.infoNonce,
-                    key: workspaceKey,
-                  });
-                  if (
-                    decryptedWorkspaceInfo &&
-                    typeof decryptedWorkspaceInfo.name === "string"
-                  ) {
-                    workspaceName = decryptedWorkspaceInfo.name as string;
-                  }
-                  if (
-                    decryptedWorkspaceInfo &&
-                    typeof decryptedWorkspaceInfo.avatar === "string"
-                  ) {
-                    workspaceAvatar = decryptedWorkspaceInfo.avatar as string;
-                  }
-                }
-              }
-
-              return { name: workspaceName, avatar: workspaceAvatar };
-            },
           }),
           type: "final",
         },
@@ -221,18 +245,18 @@ export const workspaceSettingsLoadWorkspaceMachine =
       guards: {
         hasNoNetworkErrorAndWorkspaceFound: (_, event) => {
           // @ts-ignore
-          if (event.data?.error?.networkError) {
+          if (event.data?.result?.error?.networkError) {
             return false;
           }
           // @ts-ignore
-          if (event.data?.data?.workspace?.id) {
+          if (event.data?.result?.data?.workspace?.id) {
             return true;
           }
           return false;
         },
       },
       services: {
-        fetchWorkspace,
+        fetchWorkspaceAndDecryptInfo,
         loadInitialDataMachine,
       },
     }

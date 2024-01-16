@@ -45,6 +45,9 @@ export type Workspace = {
   infoNonce: string | undefined | null;
   infoWorkspaceKeyId?: string | undefined | null;
   infoWorkspaceKey?: WorkspaceKey | undefined | null;
+  infoSignature: string;
+  infoWorkspaceMemberDevicesProofHash: string;
+  infoCreatorDeviceSigningPublicKey: string;
   workspaceKeys?: WorkspaceKey[];
   currentWorkspaceKey?: WorkspaceKey;
   chain?: ChainEntry[];
