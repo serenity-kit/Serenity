@@ -1,4 +1,5 @@
-import canonicalize from "canonicalize";
+import { sign } from "@serenity-tools/secsync";
+import { canonicalizeAndToBase64 } from "@serenity-tools/secsync/src/utils/canonicalizeAndToBase64";
 import sodium from "react-native-libsodium";
 import { encryptAead } from "../encryptAead/encryptAead";
 import { generateId } from "../generateId/generateId";
@@ -38,27 +39,20 @@ export const encryptAndSignCommentReply = ({
     subkeyId,
     signingPublicKey: device.signingPublicKey,
   };
-  const canonicalizedPublicData = canonicalize(publicData);
-  if (!canonicalizedPublicData) {
-    throw new Error("Invalid public data for encrypting a comment.");
-  }
+  const publicDataAsBase64 = canonicalizeAndToBase64(publicData, sodium);
   const encryptedComment = encryptAead(
     content,
-    canonicalizedPublicData,
+    publicDataAsBase64,
     sodium.from_base64(key)
   );
-  const canonicalizedEncryptedComment = canonicalize({
-    ciphertext: encryptedComment.ciphertext,
-    nonce: encryptedComment.publicNonce,
-  });
-  if (!canonicalizedPublicData) {
-    throw new Error("Invalid encrypted data to canonicalize.");
-  }
-  const signature = sodium.to_base64(
-    sodium.crypto_sign_detached(
-      commentReplyDomainContext + canonicalizedEncryptedComment,
-      sodium.from_base64(device.signingPrivateKey)
-    )
+  const signature = sign(
+    {
+      ciphertext: encryptedComment.ciphertext,
+      nonce: encryptedComment.publicNonce,
+    },
+    commentReplyDomainContext,
+    sodium.from_base64(device.signingPrivateKey),
+    sodium
   );
 
   return {
