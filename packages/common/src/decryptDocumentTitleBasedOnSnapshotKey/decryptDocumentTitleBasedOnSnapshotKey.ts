@@ -1,4 +1,4 @@
-import canonicalize from "canonicalize";
+import { canonicalizeAndToBase64 } from "@serenity-tools/secsync/src/utils/canonicalizeAndToBase64";
 import sodium from "react-native-libsodium";
 import { decryptAead } from "../decryptAead/decryptAead";
 import { recreateDocumentTitleKey } from "../recreateDocumentTitleKey/recreateDocumentTitleKey";
@@ -8,7 +8,6 @@ type Params = {
   subkeyId: string;
   ciphertext: string;
   nonce: string;
-  publicData?: any;
 };
 
 export const decryptDocumentTitleBasedOnSnapshotKey = ({
@@ -16,20 +15,16 @@ export const decryptDocumentTitleBasedOnSnapshotKey = ({
   subkeyId,
   ciphertext,
   nonce,
-  publicData,
 }: Params) => {
   const documentTitleKeyData = recreateDocumentTitleKey({
     snapshotKey: snapshotKey,
     subkeyId: subkeyId,
   });
 
-  const canonicalizedPublicData = canonicalize(publicData || {});
-  if (!canonicalizedPublicData) {
-    throw new Error("Invalid public data for decrypting the document.");
-  }
+  const publicDataAsBase64 = canonicalizeAndToBase64({}, sodium);
   const result = decryptAead(
     sodium.from_base64(ciphertext),
-    canonicalizedPublicData,
+    publicDataAsBase64,
     sodium.from_base64(documentTitleKeyData.key),
     nonce
   );
