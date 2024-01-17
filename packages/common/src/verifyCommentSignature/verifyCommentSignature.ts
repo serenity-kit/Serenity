@@ -1,4 +1,4 @@
-import canonicalize from "canonicalize";
+import { verifySignature } from "@serenity-tools/secsync";
 import sodium from "react-native-libsodium";
 import { commentDomainContext } from "../encryptAndSignComment/encryptAndSignComment";
 
@@ -15,18 +15,11 @@ export const verifyCommentSignature = ({
   ciphertext,
   authorSigningPublicKey,
 }: Params) => {
-  const canonicalizedEncryptedComment = canonicalize({
-    ciphertext,
-    nonce,
-  });
-  if (!canonicalizedEncryptedComment) {
-    throw new Error(
-      "Invalid encrypted data to canonicalize for verifying a comment."
-    );
-  }
-  return sodium.crypto_sign_verify_detached(
-    sodium.from_base64(signature),
-    commentDomainContext + canonicalizedEncryptedComment,
-    sodium.from_base64(authorSigningPublicKey)
+  return verifySignature(
+    { ciphertext, nonce },
+    commentDomainContext,
+    signature,
+    sodium.from_base64(authorSigningPublicKey),
+    sodium
   );
 };

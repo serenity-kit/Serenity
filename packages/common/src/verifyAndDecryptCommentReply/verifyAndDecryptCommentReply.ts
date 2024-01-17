@@ -1,4 +1,4 @@
-import canonicalize from "canonicalize";
+import { canonicalizeAndToBase64 } from "@serenity-tools/secsync/src/utils/canonicalizeAndToBase64";
 import sodium from "react-native-libsodium";
 import { decryptAead } from "../decryptAead/decryptAead";
 import { verifyCommentReplySignature } from "../verifyCommentReplySignature/verifyCommentReplySignature";
@@ -46,13 +46,10 @@ export const verifyAndDecryptCommentReply = ({
     snapshotId,
     subkeyId,
   };
-  const canonicalizedPublicData = canonicalize(publicData);
-  if (!canonicalizedPublicData) {
-    throw new Error("Invalid public data for decrypting the comment.");
-  }
+  const publicDataAsBase64 = canonicalizeAndToBase64(publicData, sodium);
   const result = decryptAead(
     sodium.from_base64(ciphertext),
-    canonicalizedPublicData,
+    publicDataAsBase64,
     sodium.from_base64(key),
     nonce
   );
