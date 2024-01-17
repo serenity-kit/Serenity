@@ -1,6 +1,6 @@
 import * as userChain from "@serenity-kit/user-chain";
 import * as workspaceMemberDevicesProofUtil from "@serenity-kit/workspace-member-devices-proof";
-import { equalStringArrays } from "@serenity-tools/common";
+import { equalUnorderedStringArrays } from "@serenity-tools/common";
 import { UserInputError } from "apollo-server-express";
 import { Prisma, WorkspaceKey } from "../../../prisma/generated/output";
 import {
@@ -231,12 +231,14 @@ export async function deleteDevice({
       );
 
       if (
-        !equalStringArrays(
+        !equalUnorderedStringArrays(
           workspaceMemberDevicesProofEntries.map((entry) => entry.workspaceId),
           workspaceIds
         )
       ) {
-        throw new Error("Invalid workspaceMemberDevicesProofEntries");
+        throw new Error(
+          "Invalid workspaceMemberDevicesProofEntries on delete device"
+        );
       }
 
       for (const entry of workspaceMemberDevicesProofEntries) {

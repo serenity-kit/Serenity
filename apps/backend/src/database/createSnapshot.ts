@@ -2,7 +2,7 @@ import {
   DocumentShareLinkDeviceBox,
   KeyDerivationTrace,
   SerenitySnapshotWithClientData,
-  equalStringArrays,
+  equalUnorderedStringArrays,
   hash,
 } from "@serenity-tools/common";
 import {
@@ -106,7 +106,7 @@ export async function createSnapshot({
     }
 
     if (
-      !equalStringArrays(
+      !equalUnorderedStringArrays(
         document.documentShareLinks
           .map((entry) => entry.deviceSigningPublicKey)
           .sort(),

@@ -27,7 +27,7 @@ export * from "./encryptWorkspaceInfo/encryptWorkspaceInfo";
 export * from "./encryptWorkspaceInvitationKey/encryptWorkspaceInvitationKey";
 export * from "./encryptWorkspaceKeyForDevice/encryptWorkspaceKeyForDevice";
 export * from "./equalArrayContent/equalArrayContent";
-export * from "./equalStringArrays/equalStringArrays";
+export * from "./equalUnorderedStringArrays/equalUnorderedStringArrays";
 export * from "./generateId/generateId";
 export * from "./getExpiredTextFromString/getExpiredTextFromString";
 export * from "./hash/hash";

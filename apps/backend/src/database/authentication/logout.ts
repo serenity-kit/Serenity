@@ -1,6 +1,6 @@
 import * as userChain from "@serenity-kit/user-chain";
 import * as workspaceMemberDevicesProofUtil from "@serenity-kit/workspace-member-devices-proof";
-import { equalStringArrays } from "@serenity-tools/common";
+import { equalUnorderedStringArrays } from "@serenity-tools/common";
 import { Prisma } from "../../../prisma/generated/output";
 import { prisma } from "../prisma";
 import { getLastUserChainEventWithState } from "../userChain/getLastUserChainEventWithState";
@@ -66,14 +66,16 @@ export const logout = async ({
         );
 
         if (
-          !equalStringArrays(
+          !equalUnorderedStringArrays(
             workspaceMemberDevicesProofEntries.map(
               (entry) => entry.workspaceId
             ),
             workspaceIds
           )
         ) {
-          throw new Error("Invalid workspaceMemberDevicesProofEntries");
+          throw new Error(
+            "Invalid workspaceMemberDevicesProofEntries on logout"
+          );
         }
 
         for (const entry of workspaceMemberDevicesProofEntries) {
