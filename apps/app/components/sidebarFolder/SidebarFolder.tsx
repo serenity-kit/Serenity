@@ -213,8 +213,6 @@ export default function SidebarFolder(props: Props) {
         );
       }
 
-      // check that the creatorDeviceSigningPublicKey was a valid device of the workspaceMemberDevicesProof
-      // check that this user had the permissions to create this folder
       const folderName = decryptFolderName({
         parentKey,
         subkeyId: folderSubkeyId,
