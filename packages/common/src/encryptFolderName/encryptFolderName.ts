@@ -57,6 +57,7 @@ export const encryptFolderName = ({
       ciphertext: result.ciphertext,
       publicData: publicDataAsBase64,
     },
+    "folder",
     sodium.from_base64(device.signingPrivateKey),
     sodium
   );

@@ -1,7 +1,7 @@
+import { getUrqlClient } from '../utils/urqlClient/urqlClient';
 import canonicalize from 'canonicalize';
 import gql from 'graphql-tag';
 import * as Urql from 'urql';
-import { getUrqlClient } from '../utils/urqlClient/urqlClient';
 export type Maybe<T> = T | null;
 export type InputMaybe<T> = Maybe<T>;
 export type Exact<T extends { [key: string]: unknown }> = { [K in keyof T]: T[K] };
@@ -1229,6 +1229,7 @@ export type UpdateWorkspaceNameInput = {
   id: Scalars['String']['input'];
   infoCiphertext: Scalars['String']['input'];
   infoNonce: Scalars['String']['input'];
+  infoSignature: Scalars['String']['input'];
   infoWorkspaceKeyId: Scalars['String']['input'];
 };
 
