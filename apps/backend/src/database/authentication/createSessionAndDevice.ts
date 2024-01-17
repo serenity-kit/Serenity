@@ -3,7 +3,7 @@ import * as workspaceMemberDevicesProofUtil from "@serenity-kit/workspace-member
 import {
   Device,
   deriveSessionAuthorization,
-  equalStringArrays,
+  equalUnorderedStringArrays,
   generateId,
 } from "@serenity-tools/common";
 import { z } from "zod";
@@ -122,12 +122,14 @@ export async function createSessionAndDevice({
       );
 
       if (
-        !equalStringArrays(
+        !equalUnorderedStringArrays(
           workspaceMemberDevicesProofEntries.map((entry) => entry.workspaceId),
           workspaceIds
         )
       ) {
-        throw new Error("Invalid workspaceMemberDevicesProofEntries");
+        throw new Error(
+          "Invalid workspaceMemberDevicesProofEntries on create session and device"
+        );
       }
 
       for (const entry of workspaceMemberDevicesProofEntries) {

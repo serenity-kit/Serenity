@@ -253,6 +253,7 @@ test.describe("Edit document", () => {
     await delayForSeconds(2);
     const user1Url = page.url();
     const user2Url = user2Page.url();
+
     expect(user1Url).toBe(user2Url);
 
     const newContent1 = "\nHi User 2!";
