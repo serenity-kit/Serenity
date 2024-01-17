@@ -104,7 +104,6 @@ test("user should be retrieve a document", async () => {
   const decryptedName = decryptDocumentTitleBasedOnSnapshotKey({
     ciphertext: retrievedDocument.nameCiphertext,
     nonce: retrievedDocument.nameNonce,
-    publicData: null,
     snapshotKey,
     subkeyId: retrievedDocument.subkeyId,
   });

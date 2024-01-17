@@ -108,7 +108,6 @@ test("user should be able to change a document name", async () => {
     subkeyId: updatedDocument.subkeyId,
     ciphertext: updatedDocument.nameCiphertext,
     nonce: updatedDocument.nameNonce,
-    publicData: null,
   });
   expect(decryptedName).toBe(name);
 });

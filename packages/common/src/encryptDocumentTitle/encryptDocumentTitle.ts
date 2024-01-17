@@ -1,4 +1,4 @@
-import canonicalize from "canonicalize";
+import { canonicalizeAndToBase64 } from "@serenity-tools/secsync/src/utils/canonicalizeAndToBase64";
 import sodium from "react-native-libsodium";
 import { createDocumentTitleKey } from "../createDocumentTitleKey/createDocumentTitleKey";
 import { deriveKeysFromKeyDerivationTrace } from "../deriveKeysFromKeyDerivationTrace/deriveKeysFromKeyDerivationTrace";
@@ -19,40 +19,28 @@ type Params = {
   activeDevice: LocalDevice;
   workspaceKeyBox: WorkspaceKeyBox;
   title: string;
-  publicData?: any;
   workspaceId: string;
   workspaceKeyId: string;
 };
 
 type EncryptDocumentTitleByKeyParams = {
   title: string;
-  publicData?: any;
   key: string;
 };
 
 export const encryptDocumentTitleByKey = (
   params: EncryptDocumentTitleByKeyParams
 ) => {
-  const publicData = params.publicData || {};
-  const canonicalizedPublicData = canonicalize(publicData);
-  if (!canonicalizedPublicData) {
-    throw new Error("Invalid public data for encrypting the title.");
-  }
+  const publicDataAsBase64 = canonicalizeAndToBase64({}, sodium);
   return encryptAead(
     params.title,
-    canonicalizedPublicData,
+    publicDataAsBase64,
     sodium.from_base64(params.key)
   );
 };
 
 export const encryptDocumentTitle = (params: Params) => {
-  const {
-    activeDevice,
-    workspaceKeyBox,
-
-    workspaceId,
-    workspaceKeyId,
-  } = params;
+  const { activeDevice, workspaceKeyBox, workspaceId, workspaceKeyId } = params;
   const snapshotFolderKeyData = deriveKeysFromKeyDerivationTrace({
     keyDerivationTrace: params.snapshot.keyDerivationTrace,
     activeDevice: {
@@ -71,10 +59,9 @@ export const encryptDocumentTitle = (params: Params) => {
   const documentTitleKeyData = createDocumentTitleKey({
     snapshotKey: snapshotKeyData.key,
   });
-  const publicData = params.publicData || {};
+  const publicData = {};
   const result = encryptDocumentTitleByKey({
     title: params.title,
-    publicData,
     key: documentTitleKeyData.key,
   });
   return {

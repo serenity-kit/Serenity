@@ -6,7 +6,6 @@ import { KeyDerivationTrace } from "../zodTypes";
 type Params = {
   ciphertext: string;
   nonce: string;
-  publicData?: any;
   activeDevice: LocalDevice;
   snapshot: {
     keyDerivationTrace: KeyDerivationTrace;
@@ -28,7 +27,6 @@ export const decryptDocumentTitle = ({
   subkeyId,
   ciphertext,
   nonce,
-  publicData,
   workspaceId,
   workspaceKeyId,
 }: Params) => {
@@ -52,6 +50,5 @@ export const decryptDocumentTitle = ({
     subkeyId,
     ciphertext,
     nonce,
-    publicData,
   });
 };
