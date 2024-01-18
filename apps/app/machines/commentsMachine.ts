@@ -75,7 +75,7 @@ interface Context {
 }
 
 export const commentsMachine =
-  /** @xstate-layout N4IgpgJg5mDOIC5QGMD2BbdYB2AXWAsgIbIAWAltmAMQDCGWesAQgJ4AiqyAro7gJIQAitzAAnVgDoAqgAV2AQQAqAUQD6AJRUBlaQBklAbQAMAXUSgADqljlc5VNgsgAHogDMANgAckgEyeAJwArH7B7n4A7JHu3gA0IKyI3sbGkt4AjH4ALJ7BntmBmdnuAL6lCWiYOPjEZJQ09NVMbJw8fIIi4lIqGhoA8hom5kgg1rb2js5uCNnG2el+S7Huxn4Z3pHBCUkInpG+gX7uGe5e6+uR2eWVDDWEJBRU1HKKqpoqsnoAmmqqABpGMzOcZ2BxOUYzXKRSRHbLZA4pOGeYyRHaIYLedySAreOZraHBA43EBVPgPerPAAS-AA4lS9HSqUo1LR+gQCCoAHIsgBiAwIahU7H4SkGwxBNjBU0hiDmnkkMU8XmMwVV2RSwW2iTl3l87iVnh8kSWRQy1wqpLuTDqTxoNPpjPpLLZHO5fIFam0-HYKmYCiGwNGoMmENAULWkmMESJ+LWy3RCHcgWxxiKKfchQOsWCJLJ91tDWo2hULIUtCU-AAauptFyFLJtFT+mWuexWezOTy1ABpFTfbQS4NS0PTDyRDKSErRjJHWJZNPZRN+QIw7w5PypLJnA6BPPW2qPIv9WTcr0+v0BodWEfgsezQJpbJE+bR6PZTfuZeR4KFXL7DVAlnAJ92aQ9KUaPR+hLc9fX9QMRhvCY71lWZvAVTxZ3NGIvGfdclx1BAMlRfwrhwg14WCQJlVA8lC2eMVaVpPRawveDrzGW8ZXDXU0kyLEtVOWdf3mRMslogsjyoSQAHciDBbAoF5VAxAUZB7AANzAbRsCISxYFIVBcGLUs1HLSsay9etG2bVt21dLsWT7AcOJDFCeNmc0owyDJImMDJwm8FMEUTQJVyjHIjRiREzQkm0pLASRyAgAAbRotGUdQHPdVyuLDVxEE8TdJDOCIQmjc54kI2c8lhVESj8PFAizbw4vAu0ktSmhfRY95sp5XLkO4gq9iWEqshKDIgiuOYCN2KbMSjaiTlWbJiNCVrLXzeKIM6tK6Ay94tC+b5BulfKZjybFM0ifYDVSLEgOXVY0lK4SsXNeE2opDrkv2nrS3UY6fjO0dULyYISoCTJowKPIArEtM-H8ML8S2M4iU224wJ+hpJAgMA0vsRSmj4agIEcRLKA01AAGtEoJomwFJmpQfcka1oWfzfP8wLgrRar8UkHzVRiXytWo3MtoPXHpMZsBiagFm8HJymkuwGn6fxwmFeZg9DAyRDOKGi65S87m-IC2J+bE4INlhIoqMxZ9Re++iGZ1xXleM8QxBUyRLBSohcAAMxU9BtaZ722eGqFzZ8y2+Zu23avXRqkROFdqLdhLI4VygoA0MBA9YVXpOpumPaZouS5j03PK5hPeet5PqvNZGJr1KjjmCnPdvlxWa5S0uKfLjXK7z3AwCH1gDaNtzY7NxueatoLW-mgJJ38ldjG8KizmaqXsbo3OB4LmfqF9-3A+DsOxAjgfp+L4e6-vTnvJXpOQuq1Y1wNc1iJ5DxO4I+Vocbu0kMgMQYBg4F29mXKm48tZQJgVPaOQYkLnTfvHT+Ldv7zT8jCI4vkijrCmiuMo0twG5xQbAkmB4EHq01olWhaD9aG0lCbbBy9E54IFvNdcCokTrl3jDIKWMwEn12qwuBDCr5iADkHUO4dIHQODnrMCr9ULvwts3Ne+DEAbBiDiTMqRUTJhmhI7a7U8YyMUhfUeiDmGqNQU-WuGDjZYO0Tg3h+j+GIE3AFRUZw1gmmapsGIfcOp2MLs-EeasK7ILUVPGec9OFeI8jopuq8baEXWJhfwICCiqhyPMcIUTbHJPPnEy+Yg-YKJvso++Lj1GpI8QveuWTcF+OXJuXwqpVzKhNFNIC5RLTYFQATeAoxrGyzAOksGHkAC0GRQppkVP5W64RUhBF8hU6SckFJKRUmpTS2ldL6UMrgBZ7MZjmmxHqFIAQGqrkfH4RGs5YS+TCJEaie8th7ioVI36XUbmLwQEFGEVwLjUW3GEMSypkaZhCDkM465vn7KrvnehYEwWdKIcqDagk0wrTmoYkoRDHzRFnOVaImLJ7VJLni+8YUUaZABZseExEvzVRJcLDUpjwj7HEkCyS0iqk4r4My7R-iiJXEhk8-yKRbpFS2PSmJM9pUeSKCVTMmE1SYiKv878RpYSbkKJsFcKRNrlCAA */
+  /** @xstate-layout N4IgpgJg5mDOIC5QGMD2BbdYB2AXWAsgIbIAWAltmAMQDCGWesAQgJ4AiqyAro7gJIQAitzAAnVgDoAqgAV2AQQAqAUQD6AJRUBlaQBklAbQAMAXUSgADqljlc5VNgsgAHogDMANgAckgEyeAJwArD7Bwd4A7Mbu7gA0IKyI3sbGkt4AjH4ALMae7n7RfgEAviUJaJg4+MRklDT0VUxsnDx8giLiUioaGgDyGibmSCDWtvaOzm4IudnpxYXe2dnBfhkZ2QlJCJ6RvoF+7saRGZ4ZS96efmUVDNWEJBRU1HKKqpoqsnoAmmqqABpGMzOMZ2BxOEbTbK7SQHZaRHLGULRYJbRARdySTzZbyxQoBbIbDI3ECVPgPOrPAAS-AA4lS9HSqUo1LQ+gQCCoAHIsgBi-QIahU7H4SgGQxBNjBk0hiFynkkkS87gygRxB0CWVRiTl3l87iVwUC7lx2Xc2T8SJJZPutSeNBp9MZ9JZbI53L5ArU2n47BUzAUg2BI1BEwhoChxj8khiflCfhCARy3jRCHcxpjgT1wWyauKQUC1ruTDt9Wo2hULIUtCU-AAauptFyFLJtFS+lWuexWezOTy1ABpFTfbQSkNSsNTDwnSRmmLponrEKphORea5SLBSKBQLbqNFpo1R5lvqybne33+wNjqwT8FTmaBNIraIFbyBfJHTwrqOSHPG3FLk8VYfAPclS2eWg9D6CsLz9AMg2GW9xnvWUZkuLFVQyUIc0OHFPG-HUEAyY5-EiaFNWNAp8myMDbWPZ4xVpWk9EbS8EJvUY7xlCNdTSTJcXCKMzQOSJUyyOiSwYsBJAAdyIMFsCgXlUDEBRkHsAA3MBtGwIhLFgUhUFwctKzUatawbb1m1bdtO27N0+xZIcR040NUN4mYNhjdYTmTD9gJTIidzXYSjRSYxvDWApJKPSkZPICAABsGi0ZR1Ecj03O48NXEQK40liPEn1jaExKI1VgNhY5LSi5YUmCYlylJYs4vtSREpS6g-VY95Mp5bKUJ4vKdmKSQVWTDI9izdNyu2U4IkzTwo3cUJsVCdxYopdrOtSlR0o+L5vkG6VcumYDMXNSJgMREi9TmxBDlScbYhiUIswtAitoghLkpoHrK3ULQjpOyc0OA4JxoCBrzmuzIHuI4wDn8HcDROYI8g1b7pMkCAwBS+wlMaPhqAgRwEuwTTUAAaxkvGCbAYnqlBjyRsJOZjF8rJ1QIiJxNyNJ1mMbI-OAq4Rex+LcfxsBCagJm8FJ8mOspmm6Zl3BGdawwMiQrihrOuVvM5qbuffXmgvmxr9g+3Y4wiK1mptKSpfp2XKHl1rqHEMRVMkSwkqIXAADNVPQaWGYV3AWeGqFja5-yLfEnD5jjXENkOApCyd1rtvqCP3aUjQwAD1glaoFWqdpgvNeL0uY8NryOYTnnAvEjPJDNlVN3Ca7Ikl9q3bluukrLsmK8oKv1YZkfWB1vX3Njo3m9NxO24qgIMh8vwosicity3Af86Hj3Z+9sRfbEf3A5DsOa7AWeG4fdmfNX1u+Yqo411xV9IsJDGmq3EPHnCuyAxBgCDh7KO5cKZT0kGAiBmso5PzQi-E2fl36W0QFNUiBxsIXQamtI+oDwGQKJl7cesC1bwNIUg7WutJQG2fvHN+5t17zSigqFIapyKnGwpaYIxCZIILIZ7Q859L7XyDqHMQ4cRF0MPCgzyaCW5sI-hwpUWJYh9yinkTItEc7AJ+jQxBp8S6jxgZXah8iH7mLnsGZCp1mErwwWorBCBLTYUVAUTcqQIhPkEYY8CON5FmNLpYye1jaG2Prgw8cTDUEsNcQFdRj0+H+FWkcPhjULRCJMaIs+Ps-YB2kXfGxj8HH6ycYklxZsUnuOKJFGMRoWmFDnJtEk2BUB43gCMZ2bV6iMOqZ5AAtBkVMT5AiKk5rwt64R3x5PkopZSql1JaR0npAyRlcBDLBp5DYmI9QpBwWaXemwKqcymZqE4ap-54WzkA4JUtdq7NZtMd8a5yJrD2BaTIO53GnAKONXMAQjQJgmgYx59FXYayga1V5S8Zhrg-KtXYeDgLbnCPzA0sIny7AIqC5a3g8knyLnYhFjcdwo0yEaF8BQ8TiSRpiDY6dzjnCzHkPJoTyGHgpc-BGU0VjpBmZFTJXhAEtSMSE2hYTR58rQlmF60IViWh3puNYP4CKwlVRsQkxpoRlDKEAA */
   createMachine(
     {
       schema: {
@@ -131,8 +131,8 @@ export const commentsMachine =
                 commentsByDocumentIdQueryResult: event.result,
               };
             }),
-            "verifyAndDecryptComments",
           ],
+          target: "decryptingComments",
         },
         "CommentsByDocumentIdQuery.ERROR": {
           actions: [
@@ -179,17 +179,40 @@ export const commentsMachine =
           on: {
             SET_ACTIVE_SNAPSHOT_AND_COMMENT_KEYS: {
               actions: ["setActiveSnapshotAndCommentAndReplyKeys"],
-              target: "idle",
+              target: "startFetching",
             },
           },
         },
-        idle: {
+        startFetching: {
           entry: ["spawnActors"],
+          always: {
+            target: "idle",
+          },
+        },
+        idle: {
           on: {
             CREATE_COMMENT: "creatingComment",
             DELETE_COMMENT: "deletingComment",
             CREATE_REPLY: "creatingReply",
             DELETE_REPLY: "deletingReply",
+          },
+        },
+        decryptingComments: {
+          invoke: {
+            src: "verifyAndDecryptComments",
+            id: "verifyAndDecryptComments",
+            onDone: {
+              target: "idle",
+              actions: assign((context, event) => {
+                return {
+                  decryptedComments: event.data,
+                };
+              }),
+            },
+            onError: {
+              actions: ["showErrorToast"],
+              target: "idle",
+            },
           },
         },
         deletingComment: {
@@ -365,7 +388,9 @@ export const commentsMachine =
             yCommentReplyKeys: event.yCommentReplyKeys,
           };
         }),
-        verifyAndDecryptComments: assign((context, event) => {
+      },
+      services: {
+        verifyAndDecryptComments: async (context, event) => {
           const activeSnapshot = context.activeSnapshot;
           if (!activeSnapshot) return {};
 
@@ -493,12 +518,8 @@ export const commentsMachine =
                 };
               });
 
-          return {
-            decryptedComments,
-          };
-        }),
-      },
-      services: {
+          return decryptedComments;
+        },
         createComment: async (context, event) => {
           try {
             const activeSnapshot = context.activeSnapshot;
