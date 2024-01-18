@@ -94,6 +94,7 @@ export type Comment = {
   signature: Scalars['String']['output'];
   snapshotId: Scalars['String']['output'];
   subkeyId: Scalars['String']['output'];
+  workspaceMemberDevicesProofHash: Scalars['String']['output'];
 };
 
 export type CommentConnection = {
@@ -126,6 +127,7 @@ export type CommentReply = {
   signature: Scalars['String']['output'];
   snapshotId: Scalars['String']['output'];
   subkeyId: Scalars['String']['output'];
+  workspaceMemberDevicesProofHash: Scalars['String']['output'];
 };
 
 export type CreateCommentInput = {
@@ -1050,6 +1052,7 @@ export type QueryWorkspaceKeyByDocumentIdArgs = {
 
 
 export type QueryWorkspaceMemberDevicesProofArgs = {
+  documentShareLinkToken?: InputMaybe<Scalars['String']['input']>;
   hash?: InputMaybe<Scalars['String']['input']>;
   invitationId?: InputMaybe<Scalars['ID']['input']>;
   workspaceId: Scalars['ID']['input'];
@@ -1726,7 +1729,7 @@ export type CommentsByDocumentIdQueryVariables = Exact<{
 }>;
 
 
-export type CommentsByDocumentIdQuery = { __typename?: 'Query', commentsByDocumentId?: { __typename?: 'CommentConnection', nodes?: Array<{ __typename?: 'Comment', id: string, documentId: string, snapshotId: string, subkeyId: string, contentCiphertext: string, contentNonce: string, signature: string, createdAt: any, creatorDevice: { __typename?: 'CreatorDevice', signingPublicKey: string, encryptionPublicKey: string, encryptionPublicKeySignature: string }, commentReplies?: Array<{ __typename?: 'CommentReply', id: string, snapshotId: string, subkeyId: string, contentCiphertext: string, contentNonce: string, signature: string, createdAt: any, creatorDevice: { __typename?: 'CreatorDevice', signingPublicKey: string, encryptionPublicKey: string, encryptionPublicKeySignature: string } } | null> | null } | null> | null, pageInfo: { __typename?: 'PageInfo', hasNextPage: boolean, hasPreviousPage: boolean, startCursor?: string | null, endCursor?: string | null } } | null };
+export type CommentsByDocumentIdQuery = { __typename?: 'Query', commentsByDocumentId?: { __typename?: 'CommentConnection', nodes?: Array<{ __typename?: 'Comment', id: string, documentId: string, snapshotId: string, subkeyId: string, contentCiphertext: string, contentNonce: string, signature: string, workspaceMemberDevicesProofHash: string, createdAt: any, creatorDevice: { __typename?: 'CreatorDevice', signingPublicKey: string, encryptionPublicKey: string, encryptionPublicKeySignature: string }, commentReplies?: Array<{ __typename?: 'CommentReply', id: string, snapshotId: string, subkeyId: string, contentCiphertext: string, contentNonce: string, signature: string, workspaceMemberDevicesProofHash: string, createdAt: any, creatorDevice: { __typename?: 'CreatorDevice', signingPublicKey: string, encryptionPublicKey: string, encryptionPublicKeySignature: string } } | null> | null } | null> | null, pageInfo: { __typename?: 'PageInfo', hasNextPage: boolean, hasPreviousPage: boolean, startCursor?: string | null, endCursor?: string | null } } | null };
 
 export type DevicesQueryVariables = Exact<{
   onlyNotExpired: Scalars['Boolean']['input'];
@@ -1940,6 +1943,7 @@ export type WorkspaceMemberDevicesProofQueryVariables = Exact<{
   workspaceId: Scalars['ID']['input'];
   invitationId?: InputMaybe<Scalars['ID']['input']>;
   hash?: InputMaybe<Scalars['String']['input']>;
+  documentShareLinkToken?: InputMaybe<Scalars['String']['input']>;
 }>;
 
 
@@ -2505,6 +2509,7 @@ export const CommentsByDocumentIdDocument = gql`
       contentCiphertext
       contentNonce
       signature
+      workspaceMemberDevicesProofHash
       createdAt
       creatorDevice {
         signingPublicKey
@@ -2518,6 +2523,7 @@ export const CommentsByDocumentIdDocument = gql`
         contentCiphertext
         contentNonce
         signature
+        workspaceMemberDevicesProofHash
         createdAt
         creatorDevice {
           signingPublicKey
@@ -3118,11 +3124,12 @@ export function useWorkspaceInvitationsQuery(options: Omit<Urql.UseQueryArgs<Wor
   return Urql.useQuery<WorkspaceInvitationsQuery, WorkspaceInvitationsQueryVariables>({ query: WorkspaceInvitationsDocument, ...options });
 };
 export const WorkspaceMemberDevicesProofDocument = gql`
-    query workspaceMemberDevicesProof($workspaceId: ID!, $invitationId: ID, $hash: String) {
+    query workspaceMemberDevicesProof($workspaceId: ID!, $invitationId: ID, $hash: String, $documentShareLinkToken: String) {
   workspaceMemberDevicesProof(
     workspaceId: $workspaceId
     invitationId: $invitationId
     hash: $hash
+    documentShareLinkToken: $documentShareLinkToken
   ) {
     proof {
       hash

@@ -37,6 +37,8 @@ const setup = async () => {
       sessionKey: userData1.sessionKey,
     }).authorization,
     documentId: userData1.document.id,
+    workspaceId: userData1.workspace.id,
+    userId: userData1.user.id,
   });
   comment1 = comment1Result.createComment.comment;
   const comment2Result = await createComment({
@@ -51,6 +53,8 @@ const setup = async () => {
       sessionKey: userData1.sessionKey,
     }).authorization,
     documentId: userData1.document.id,
+    workspaceId: userData1.workspace.id,
+    userId: userData1.user.id,
   });
   comment2 = comment2Result.createComment.comment;
 };

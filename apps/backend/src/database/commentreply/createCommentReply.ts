@@ -1,7 +1,9 @@
+import * as workspaceMemberDevicesProofUtil from "@serenity-kit/workspace-member-devices-proof";
 import { ForbiddenError, UserInputError } from "apollo-server-express";
 import { Role, ShareDocumentRole } from "../../../prisma/generated/output";
 import { getOrCreateCreatorDevice } from "../../utils/device/getOrCreateCreatorDevice";
 import { prisma } from "../prisma";
+import { getWorkspaceMemberDevicesProof } from "../workspace/getWorkspaceMemberDevicesProof";
 
 type Params = {
   userId: string;
@@ -28,6 +30,9 @@ export async function createCommentReply({
   contentNonce,
   signature,
 }: Params) {
+  let workspaceMemberDevicesProof: null | workspaceMemberDevicesProofUtil.WorkspaceMemberDevicesProof =
+    null;
+
   // verify the document exists
   const document = await prisma.document.findFirst({
     where: { activeSnapshotId: snapshotId },
@@ -72,6 +77,13 @@ export async function createCommentReply({
     if (!user2Workspace) {
       throw new ForbiddenError("Unauthorized");
     }
+
+    const workspaceMemberDevicesProofEntry =
+      await getWorkspaceMemberDevicesProof({
+        workspaceId: user2Workspace.workspaceId,
+        userId,
+      });
+    workspaceMemberDevicesProof = workspaceMemberDevicesProofEntry.proof;
   }
 
   // convert the user's device into a creatorDevice
@@ -93,6 +105,7 @@ export async function createCommentReply({
         contentCiphertext,
         contentNonce,
         signature,
+        workspaceMemberDevicesProofHash: workspaceMemberDevicesProof?.hash,
       },
     });
     return {

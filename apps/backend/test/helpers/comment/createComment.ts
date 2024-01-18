@@ -4,22 +4,42 @@ import {
   LocalDevice,
 } from "@serenity-tools/common";
 import { gql } from "graphql-request";
+import { getWorkspaceMemberDevicesProof } from "../../../src/database/workspace/getWorkspaceMemberDevicesProof";
 
-type Params = {
-  graphql: any;
-  documentId: string;
-  snapshotId: string;
-  snapshotKey: string;
-  documentShareLinkToken?: string | null | undefined;
-  comment: string;
-  authorizationHeader: string;
-  creatorDevice: LocalDevice;
-  creatorDeviceEncryptionPrivateKey: string;
-  creatorDeviceSigningPrivateKey: string;
-};
+type Params =
+  | {
+      graphql: any;
+      documentId: string;
+      workspaceId?: undefined;
+      userId?: undefined;
+      snapshotId: string;
+      snapshotKey: string;
+      documentShareLinkToken: string;
+      comment: string;
+      authorizationHeader: string;
+      creatorDevice: LocalDevice;
+      creatorDeviceEncryptionPrivateKey: string;
+      creatorDeviceSigningPrivateKey: string;
+    }
+  | {
+      graphql: any;
+      documentId: string;
+      workspaceId: string;
+      userId: string;
+      snapshotId: string;
+      snapshotKey: string;
+      documentShareLinkToken?: undefined;
+      comment: string;
+      authorizationHeader: string;
+      creatorDevice: LocalDevice;
+      creatorDeviceEncryptionPrivateKey: string;
+      creatorDeviceSigningPrivateKey: string;
+    };
 
 export const createComment = async ({
   graphql,
+  userId,
+  workspaceId,
   documentId,
   snapshotId,
   snapshotKey,
@@ -33,6 +53,14 @@ export const createComment = async ({
   const authorizationHeaders = {
     authorization: authorizationHeader,
   };
+
+  const workspaceMemberDevicesProof = userId
+    ? await getWorkspaceMemberDevicesProof({
+        userId,
+        workspaceId,
+      })
+    : undefined;
+
   const commentKey = createCommentKey({ snapshotKey });
   const { ciphertext, nonce, commentId, signature } = encryptAndSignComment({
     text: comment,
@@ -43,6 +71,7 @@ export const createComment = async ({
     to: 10,
     snapshotId,
     subkeyId: commentKey.subkeyId,
+    workspaceMemberDevicesProof: workspaceMemberDevicesProof?.proof,
   });
 
   const query = gql`

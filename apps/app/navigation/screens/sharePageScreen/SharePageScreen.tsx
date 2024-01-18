@@ -52,6 +52,7 @@ const SharePageContainer: React.FC<SharePageContainerProps> = ({
   const commentsService = useInterpret(commentsMachine, {
     context: {
       params: {
+        workspaceId,
         pageId: route.params.pageId,
         shareLinkToken: route.params.token,
         activeDevice: shareDevice,

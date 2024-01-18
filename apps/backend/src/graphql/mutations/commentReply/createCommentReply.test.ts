@@ -41,6 +41,8 @@ const setup = async () => {
       sessionKey: userData1.sessionKey,
     }).authorization,
     documentId: userData1.document.id,
+    workspaceId: userData1.workspace.id,
+    userId: userData1.user.id,
   });
   comment = createCommentResult.createComment.comment;
 };
@@ -64,6 +66,8 @@ test("commenter responds to comment", async () => {
       sessionKey: userData1.sessionKey,
     }).authorization,
     documentId: userData1.document.id,
+    workspaceId: userData1.workspace.id,
+    userId: userData1.user.id,
   });
   const commentReply = createCommentReplyResult.createCommentReply.commentReply;
   expect(typeof commentReply.id).toBe("string");
@@ -235,6 +239,8 @@ test("admin replies to comment", async () => {
       sessionKey: userData1.sessionKey,
     }).authorization,
     documentId: userData1.document.id,
+    workspaceId: userData1.workspace.id,
+    userId: userData1.user.id,
   });
   const commentReply = createCommentReplyResult.createCommentReply.commentReply;
   expect(typeof commentReply.id).toBe("string");
@@ -274,6 +280,8 @@ test("editor replies to comment", async () => {
       sessionKey: userData1.sessionKey,
     }).authorization,
     documentId: userData1.document.id,
+    workspaceId: userData1.workspace.id,
+    userId: userData1.user.id,
   });
   const commentReply = createCommentReplyResult.createCommentReply.commentReply;
   expect(typeof commentReply.id).toBe("string");
@@ -313,6 +321,8 @@ test("commenter replies to comment", async () => {
       sessionKey: userData1.sessionKey,
     }).authorization,
     documentId: userData1.document.id,
+    workspaceId: userData1.workspace.id,
+    userId: userData1.user.id,
   });
   const commentReply = createCommentReplyResult.createCommentReply.commentReply;
   expect(typeof commentReply.id).toBe("string");
@@ -355,6 +365,8 @@ test("viewer tries to comment", async () => {
           sessionKey: userData1.sessionKey,
         }).authorization,
         documentId: userData1.document.id,
+        workspaceId: userData1.workspace.id,
+        userId: userData1.user.id,
       }))()
   ).rejects.toThrowError("Unauthorized");
 });
@@ -379,6 +391,8 @@ test("unauthorized document", async () => {
           sessionKey: otherUser.sessionKey,
         }).authorization,
         documentId: userData1.document.id,
+        workspaceId: userData1.workspace.id,
+        userId: userData1.user.id,
       }))()
   ).rejects.toThrowError("Unauthorized");
 });
@@ -401,6 +415,8 @@ test("invalid document", async () => {
           sessionKey: userData1.sessionKey,
         }).authorization,
         documentId: userData1.document.id,
+        workspaceId: userData1.workspace.id,
+        userId: userData1.user.id,
       }))()
   ).rejects.toThrowError("Unauthorized");
 });
@@ -423,6 +439,8 @@ test("invalid commentId", async () => {
           sessionKey: userData1.sessionKey,
         }).authorization,
         documentId: userData1.document.id,
+        workspaceId: userData1.workspace.id,
+        userId: userData1.user.id,
       }))()
   ).rejects.toThrowError(/BAD_USER_INPUT/);
 });
@@ -442,6 +460,8 @@ test("Unauthenticated", async () => {
         creatorDeviceSigningPrivateKey: userData1.webDevice.signingPrivateKey,
         authorizationHeader: "badauthkey",
         documentId: userData1.document.id,
+        workspaceId: userData1.workspace.id,
+        userId: userData1.user.id,
       }))()
   ).rejects.toThrowError(/UNAUTHENTICATED/);
 });

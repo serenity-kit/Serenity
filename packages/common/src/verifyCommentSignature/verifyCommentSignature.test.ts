@@ -21,6 +21,12 @@ test("verify comment signature", () => {
     documentId: "123",
     snapshotId: "456",
     subkeyId: commentKey.subkeyId,
+    workspaceMemberDevicesProof: {
+      clock: 0,
+      hash: "abc",
+      hashSignature: "abc",
+      version: 0,
+    },
   });
   const verified = verifyCommentSignature({
     ciphertext: result.ciphertext,

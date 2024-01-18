@@ -1,3 +1,4 @@
+import * as workspaceMemberDevicesProofUtil from "@serenity-kit/workspace-member-devices-proof";
 import { sign } from "@serenity-tools/secsync";
 import { canonicalizeAndToBase64 } from "@serenity-tools/secsync/src/utils/canonicalizeAndToBase64";
 import sodium from "react-native-libsodium";
@@ -13,6 +14,8 @@ type Params = {
   documentId: string;
   snapshotId: string;
   subkeyId: string;
+  // optional for documentShareLinks
+  workspaceMemberDevicesProof?: workspaceMemberDevicesProofUtil.WorkspaceMemberDevicesProof;
   device: LocalDevice;
 };
 
@@ -26,6 +29,7 @@ export const encryptAndSignComment = ({
   documentId,
   snapshotId,
   subkeyId,
+  workspaceMemberDevicesProof,
   device,
 }: Params) => {
   const commentId = generateId();
@@ -41,6 +45,7 @@ export const encryptAndSignComment = ({
     snapshotId,
     subkeyId,
     signingPublicKey: device.signingPublicKey,
+    workspaceMemberDevicesProof,
   };
   const publicDataAsBase64 = canonicalizeAndToBase64(publicData, sodium);
   const encryptedComment = encryptAead(

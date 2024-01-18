@@ -1,3 +1,4 @@
+import * as workspaceMemberDevicesProofUtil from "@serenity-kit/workspace-member-devices-proof";
 import { canonicalizeAndToBase64 } from "@serenity-tools/secsync/src/utils/canonicalizeAndToBase64";
 import sodium from "react-native-libsodium";
 import { decryptAead } from "../decryptAead/decryptAead";
@@ -14,6 +15,7 @@ type Params = {
   signature: string;
   authorSigningPublicKey: string;
   subkeyId: string;
+  workspaceMemberDevicesProof: workspaceMemberDevicesProofUtil.WorkspaceMemberDevicesProof;
 };
 
 export const verifyAndDecryptCommentReply = ({
@@ -27,6 +29,7 @@ export const verifyAndDecryptCommentReply = ({
   documentId,
   snapshotId,
   subkeyId,
+  workspaceMemberDevicesProof,
 }: Params) => {
   const isValid = verifyCommentReplySignature({
     authorSigningPublicKey,
@@ -45,6 +48,7 @@ export const verifyAndDecryptCommentReply = ({
     signingPublicKey: authorSigningPublicKey,
     snapshotId,
     subkeyId,
+    workspaceMemberDevicesProof,
   };
   const publicDataAsBase64 = canonicalizeAndToBase64(publicData, sodium);
   const result = decryptAead(

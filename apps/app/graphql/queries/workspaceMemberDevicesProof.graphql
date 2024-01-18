@@ -2,11 +2,13 @@ query workspaceMemberDevicesProof(
   $workspaceId: ID!
   $invitationId: ID
   $hash: String
+  $documentShareLinkToken: String
 ) {
   workspaceMemberDevicesProof(
     workspaceId: $workspaceId
     invitationId: $invitationId
     hash: $hash
+    documentShareLinkToken: $documentShareLinkToken
   ) {
     proof {
       hash

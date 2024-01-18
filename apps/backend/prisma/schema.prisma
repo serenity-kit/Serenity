@@ -366,36 +366,38 @@ model SnapshotKeyBox {
 }
 
 model Comment {
-  id                            String         @id @unique
-  document                      Document       @relation(fields: [documentId], references: [id], onDelete: Cascade)
-  documentId                    String
-  createdAt                     DateTime       @default(now())
-  contentCiphertext             String
-  contentNonce                  String
-  creatorDevice                 CreatorDevice  @relation(fields: [creatorDeviceSigningPublicKey], references: [signingPublicKey], onDelete: SetDefault)
-  creatorDeviceSigningPublicKey String
-  commentReplies                CommentReply[]
-  snapshot                      Snapshot       @relation(fields: [snapshotId], references: [id], onDelete: Cascade)
-  snapshotId                    String
-  subkeyId                      String
-  signature                     String
+  id                              String         @id @unique
+  document                        Document       @relation(fields: [documentId], references: [id], onDelete: Cascade)
+  documentId                      String
+  createdAt                       DateTime       @default(now())
+  contentCiphertext               String
+  contentNonce                    String
+  creatorDevice                   CreatorDevice  @relation(fields: [creatorDeviceSigningPublicKey], references: [signingPublicKey], onDelete: SetDefault)
+  creatorDeviceSigningPublicKey   String
+  commentReplies                  CommentReply[]
+  snapshot                        Snapshot       @relation(fields: [snapshotId], references: [id], onDelete: Cascade)
+  snapshotId                      String
+  subkeyId                        String
+  signature                       String
+  workspaceMemberDevicesProofHash String? // only needed for workspace members
 }
 
 model CommentReply {
-  id                            String        @id @unique
-  document                      Document      @relation(fields: [documentId], references: [id], onDelete: Cascade)
-  documentId                    String
-  comment                       Comment       @relation(fields: [commentId], references: [id], onDelete: Cascade)
-  commentId                     String
-  createdAt                     DateTime      @default(now())
-  contentCiphertext             String
-  contentNonce                  String
-  creatorDevice                 CreatorDevice @relation(fields: [creatorDeviceSigningPublicKey], references: [signingPublicKey], onDelete: SetDefault)
-  creatorDeviceSigningPublicKey String
-  snapshot                      Snapshot      @relation(fields: [snapshotId], references: [id], onDelete: Cascade)
-  snapshotId                    String
-  subkeyId                      String
-  signature                     String
+  id                              String        @id @unique
+  document                        Document      @relation(fields: [documentId], references: [id], onDelete: Cascade)
+  documentId                      String
+  comment                         Comment       @relation(fields: [commentId], references: [id], onDelete: Cascade)
+  commentId                       String
+  createdAt                       DateTime      @default(now())
+  contentCiphertext               String
+  contentNonce                    String
+  creatorDevice                   CreatorDevice @relation(fields: [creatorDeviceSigningPublicKey], references: [signingPublicKey], onDelete: SetDefault)
+  creatorDeviceSigningPublicKey   String
+  snapshot                        Snapshot      @relation(fields: [snapshotId], references: [id], onDelete: Cascade)
+  snapshotId                      String
+  subkeyId                        String
+  signature                       String
+  workspaceMemberDevicesProofHash String? // only needed for workspace members
 }
 
 model LoginAttempt {

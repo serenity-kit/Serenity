@@ -43,6 +43,8 @@ test("owner comments", async () => {
       sessionKey: userData1.sessionKey,
     }).authorization,
     documentId: documentId1,
+    workspaceId: userData1.workspace.id,
+    userId: userData1.user.id,
   });
   const comment = createCommentResult.createComment.comment;
   expect(typeof comment.id).toBe("string");
@@ -210,6 +212,8 @@ test("admin comments", async () => {
       sessionKey: userData1.sessionKey,
     }).authorization,
     documentId: userData1.document.id,
+    workspaceId: userData1.workspace.id,
+    userId: userData1.user.id,
   });
   const comment = createCommentResult.createComment.comment;
   expect(typeof comment.id).toBe("string");
@@ -247,6 +251,8 @@ test("editor comments", async () => {
       sessionKey: userData1.sessionKey,
     }).authorization,
     documentId: userData1.document.id,
+    workspaceId: userData1.workspace.id,
+    userId: userData1.user.id,
   });
   const comment = createCommentResult.createComment.comment;
   expect(typeof comment.id).toBe("string");
@@ -284,6 +290,8 @@ test("commenter comment", async () => {
       sessionKey: userData1.sessionKey,
     }).authorization,
     documentId: userData1.document.id,
+    workspaceId: userData1.workspace.id,
+    userId: userData1.user.id,
   });
   const comment = createCommentResult.createComment.comment;
   expect(typeof comment.id).toBe("string");
@@ -324,6 +332,8 @@ test("viewer tries to comment", async () => {
           sessionKey: userData1.sessionKey,
         }).authorization,
         documentId: userData1.document.id,
+        workspaceId: userData1.workspace.id,
+        userId: userData1.user.id,
       }))()
   ).rejects.toThrowError("Unauthorized");
 });
@@ -347,6 +357,8 @@ test("unauthorized document", async () => {
           sessionKey: otherUser.sessionKey,
         }).authorization,
         documentId: userData1.document.id,
+        workspaceId: userData1.workspace.id,
+        userId: userData1.user.id,
       }))()
   ).rejects.toThrowError("Unauthorized");
 });
@@ -368,6 +380,8 @@ test("invalid document", async () => {
           sessionKey: userData1.sessionKey,
         }).authorization,
         documentId: userData1.document.id,
+        workspaceId: userData1.workspace.id,
+        userId: userData1.user.id,
       }))()
   ).rejects.toThrowError("Unauthorized");
 });
@@ -386,6 +400,8 @@ test("Unauthenticated", async () => {
         creatorDeviceSigningPrivateKey: userData1.webDevice.signingPrivateKey,
         authorizationHeader: "badauthkey",
         documentId: userData1.document.id,
+        workspaceId: userData1.workspace.id,
+        userId: userData1.user.id,
       }))()
   ).rejects.toThrowError(/UNAUTHENTICATED/);
 });

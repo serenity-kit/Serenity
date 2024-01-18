@@ -22,10 +22,16 @@ import {
   runDeleteCommentRepliesMutation,
   runDeleteCommentsMutation,
 } from "../generated/graphql";
+import {
+  getLocalOrLoadRemoteWorkspaceMemberDevicesProofQueryByHash,
+  loadRemoteWorkspaceMemberDevicesProofQuery,
+} from "../store/workspaceMemberDevicesProofStore";
+import { isValidDeviceSigningPublicKey } from "../utils/isValidDeviceSigningPublicKey/isValidDeviceSigningPublicKey";
 import { showToast } from "../utils/toast/showToast";
 
 type Params = {
   // these won't change
+  workspaceId: string;
   pageId: string;
   shareLinkToken?: string;
   activeDevice: LocalDevice | null;
@@ -109,6 +115,7 @@ export const commentsMachine =
         params: {
           pageId: "",
           activeDevice: null,
+          workspaceId: "",
         },
         commentsByDocumentIdQueryError: false,
         decryptedComments: [],
@@ -411,10 +418,10 @@ export const commentsMachine =
           //   console.log("commentReplyId", commentId, key);
           // });
 
-          const decryptedComments =
+          const decryptedComments = await Promise.all(
             context.commentsByDocumentIdQueryResult.data.commentsByDocumentId.nodes
               .filter(notNull)
-              .map((encryptedComment) => {
+              .map(async (encryptedComment) => {
                 let commentKey: string;
                 const maybeCommentKey = context.yCommentKeys.get(
                   encryptedComment.id
@@ -442,6 +449,37 @@ export const commentsMachine =
                   commentKey = sodium.to_base64(maybeCommentKey);
                 }
 
+                const workspaceMemberDevicesProof =
+                  await getLocalOrLoadRemoteWorkspaceMemberDevicesProofQueryByHash(
+                    {
+                      workspaceId: context.params.workspaceId,
+                      hash: encryptedComment.workspaceMemberDevicesProofHash,
+                      documentShareLinkToken: context.params.shareLinkToken,
+                    }
+                  );
+                if (!workspaceMemberDevicesProof) {
+                  throw new Error(
+                    "workspaceMemberDevicesProof for decrypting a comment is not found"
+                  );
+                }
+
+                // this check should not be done if a shareLinkToken is provided because a share link user does not have access to the workspaceChain
+                if (!context.params.shareLinkToken) {
+                  const isValid = isValidDeviceSigningPublicKey({
+                    signingPublicKey:
+                      encryptedComment.creatorDevice.signingPublicKey,
+                    workspaceMemberDevicesProofEntry:
+                      workspaceMemberDevicesProof,
+                    workspaceId: context.params.workspaceId,
+                    minimumRole: "COMMENTER",
+                  });
+                  if (!isValid) {
+                    throw new Error(
+                      "Invalid signing public key for the workspaceMemberDevicesProof"
+                    );
+                  }
+                }
+
                 const decryptedComment = verifyAndDecryptComment({
                   commentId: encryptedComment.id,
                   key: commentKey,
@@ -453,60 +491,98 @@ export const commentsMachine =
                   signature: encryptedComment.signature,
                   snapshotId: encryptedComment.snapshotId,
                   subkeyId: encryptedComment.subkeyId,
+                  workspaceMemberDevicesProof:
+                    workspaceMemberDevicesProof.proof,
                 });
 
                 const replies = encryptedComment.commentReplies
-                  ? encryptedComment.commentReplies
-                      .filter(notNull)
-                      .map((encryptedReply) => {
-                        let replyKey: string;
-                        const maybeReplyKey = context.yCommentReplyKeys.get(
-                          encryptedReply.id
-                        );
-                        if (encryptedReply.snapshotId === activeSnapshot.id) {
-                          const recreatedReplyKey = recreateCommentKey({
-                            snapshotKey: activeSnapshot.key,
-                            subkeyId: encryptedReply.subkeyId,
-                          });
-                          replyKey = recreatedReplyKey.key;
-                          // key is missing in the yjs document so we add it
-                          // this is the case in case the comment was produced by
-                          // a user with the role commenter who doesn't have write
-                          // access to the document
-                          if (!maybeReplyKey) {
-                            context.yCommentReplyKeys.set(
-                              encryptedReply.id,
-                              sodium.from_base64(replyKey)
+                  ? await Promise.all(
+                      encryptedComment.commentReplies
+                        .filter(notNull)
+                        .map(async (encryptedReply) => {
+                          let replyKey: string;
+                          const maybeReplyKey = context.yCommentReplyKeys.get(
+                            encryptedReply.id
+                          );
+                          if (encryptedReply.snapshotId === activeSnapshot.id) {
+                            const recreatedReplyKey = recreateCommentKey({
+                              snapshotKey: activeSnapshot.key,
+                              subkeyId: encryptedReply.subkeyId,
+                            });
+                            replyKey = recreatedReplyKey.key;
+                            // key is missing in the yjs document so we add it
+                            // this is the case in case the comment was produced by
+                            // a user with the role commenter who doesn't have write
+                            // access to the document
+                            if (!maybeReplyKey) {
+                              context.yCommentReplyKeys.set(
+                                encryptedReply.id,
+                                sodium.from_base64(replyKey)
+                              );
+                            }
+                          } else {
+                            if (!maybeReplyKey) {
+                              throw new Error("No comment reply key found.");
+                            }
+                            replyKey = sodium.to_base64(maybeReplyKey);
+                          }
+
+                          const workspaceMemberDevicesProof =
+                            await getLocalOrLoadRemoteWorkspaceMemberDevicesProofQueryByHash(
+                              {
+                                workspaceId: context.params.workspaceId,
+                                hash: encryptedReply.workspaceMemberDevicesProofHash,
+                                documentShareLinkToken:
+                                  context.params.shareLinkToken,
+                              }
+                            );
+                          if (!workspaceMemberDevicesProof) {
+                            throw new Error(
+                              "workspaceMemberDevicesProof for decrypting a comment is not found"
                             );
                           }
-                        } else {
-                          if (!maybeReplyKey) {
-                            throw new Error("No comment reply key found.");
+
+                          // this check should not be done if a shareLinkToken is provided because a share link user does not have access to the workspaceChain
+                          if (!context.params.shareLinkToken) {
+                            const isValid = isValidDeviceSigningPublicKey({
+                              signingPublicKey:
+                                encryptedReply.creatorDevice.signingPublicKey,
+                              workspaceMemberDevicesProofEntry:
+                                workspaceMemberDevicesProof,
+                              workspaceId: context.params.workspaceId,
+                              minimumRole: "COMMENTER",
+                            });
+                            if (!isValid) {
+                              throw new Error(
+                                "Invalid signing public key for the workspaceMemberDevicesProof"
+                              );
+                            }
                           }
-                          replyKey = sodium.to_base64(maybeReplyKey);
-                        }
 
-                        const decryptedReply = verifyAndDecryptCommentReply({
-                          key: replyKey,
-                          ciphertext: encryptedReply.contentCiphertext,
-                          nonce: encryptedReply.contentNonce,
-                          commentId: encryptedComment.id,
-                          commentReplyId: encryptedReply.id,
-                          authorSigningPublicKey:
-                            encryptedReply.creatorDevice.signingPublicKey,
-                          documentId: context.params.pageId,
-                          signature: encryptedReply.signature,
-                          snapshotId: encryptedReply.snapshotId,
-                          subkeyId: encryptedReply.subkeyId,
-                        });
+                          const decryptedReply = verifyAndDecryptCommentReply({
+                            key: replyKey,
+                            ciphertext: encryptedReply.contentCiphertext,
+                            nonce: encryptedReply.contentNonce,
+                            commentId: encryptedComment.id,
+                            commentReplyId: encryptedReply.id,
+                            authorSigningPublicKey:
+                              encryptedReply.creatorDevice.signingPublicKey,
+                            documentId: context.params.pageId,
+                            signature: encryptedReply.signature,
+                            snapshotId: encryptedReply.snapshotId,
+                            subkeyId: encryptedReply.subkeyId,
+                            workspaceMemberDevicesProof:
+                              workspaceMemberDevicesProof.proof,
+                          });
 
-                        return {
-                          ...decryptedReply,
-                          id: encryptedReply.id,
-                          createdAt: encryptedReply.createdAt,
-                          creatorDevice: encryptedReply.creatorDevice,
-                        };
-                      })
+                          return {
+                            ...decryptedReply,
+                            id: encryptedReply.id,
+                            createdAt: encryptedReply.createdAt,
+                            creatorDevice: encryptedReply.creatorDevice,
+                          };
+                        })
+                    )
                   : [];
 
                 return {
@@ -516,7 +592,8 @@ export const commentsMachine =
                   replies,
                   creatorDevice: encryptedComment.creatorDevice,
                 };
-              });
+              })
+          );
 
           return decryptedComments;
         },
@@ -533,6 +610,11 @@ export const commentsMachine =
               snapshotKey: activeSnapshot.key,
             });
 
+            const workspaceMemberDevicesProof =
+              await loadRemoteWorkspaceMemberDevicesProofQuery({
+                workspaceId: context.params.workspaceId,
+              });
+
             const result = encryptAndSignComment({
               key: commentKey.key,
               text: event.text,
@@ -542,6 +624,7 @@ export const commentsMachine =
               documentId: context.params.pageId,
               snapshotId: activeSnapshot.id,
               subkeyId: commentKey.subkeyId,
+              workspaceMemberDevicesProof: workspaceMemberDevicesProof.proof,
             });
 
             const createCommentMutationResult = await runCreateCommentMutation({
@@ -577,6 +660,11 @@ export const commentsMachine =
             snapshotKey: activeSnapshot.key,
           });
 
+          const workspaceMemberDevicesProof =
+            await loadRemoteWorkspaceMemberDevicesProofQuery({
+              workspaceId: context.params.workspaceId,
+            });
+
           const result = encryptAndSignCommentReply({
             key: replyKey.key,
             commentId: event.commentId,
@@ -585,6 +673,7 @@ export const commentsMachine =
             documentId: context.params.pageId,
             snapshotId: activeSnapshot.id,
             subkeyId: replyKey.subkeyId,
+            workspaceMemberDevicesProof: workspaceMemberDevicesProof.proof,
           });
           const createCommentReplyMutation =
             await runCreateCommentReplyMutation({
