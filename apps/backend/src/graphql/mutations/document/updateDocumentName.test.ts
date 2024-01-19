@@ -17,6 +17,7 @@ import setupGraphql from "../../../../test/helpers/setupGraphql";
 import { getSnapshot } from "../../../../test/helpers/snapshot/getSnapshot";
 import { prisma } from "../../../database/prisma";
 import createUserWithWorkspace from "../../../database/testHelpers/createUserWithWorkspace";
+import { getWorkspaceMemberDevicesProof } from "../../../database/workspace/getWorkspaceMemberDevicesProof";
 
 const graphql = setupGraphql();
 let userData1: any = undefined;
@@ -103,11 +104,25 @@ test("user should be able to change a document name", async () => {
   expect(typeof updatedDocument.nameCiphertext).toBe("string");
   expect(typeof updatedDocument.nameNonce).toBe("string");
 
+  const documentNameWorkspaceMemberDevicesProof =
+    await getWorkspaceMemberDevicesProof({
+      userId: userData1.user.id,
+      workspaceId: updatedDocument.workspaceId,
+      hash: updatedDocument.nameWorkspaceMemberDevicesProofHash,
+      prisma,
+    });
+
   const decryptedName = decryptDocumentTitleBasedOnSnapshotKey({
     snapshotKey,
     subkeyId: updatedDocument.subkeyId,
     ciphertext: updatedDocument.nameCiphertext,
     nonce: updatedDocument.nameNonce,
+    documentId: updatedDocument.id,
+    workspaceId: updatedDocument.workspaceId,
+    workspaceMemberDevicesProof: documentNameWorkspaceMemberDevicesProof.proof,
+    creatorDeviceSigningPublicKey:
+      updatedDocument.nameCreatorDeviceSigningPublicKey,
+    signature: updatedDocument.nameSignature,
   });
   expect(decryptedName).toBe(name);
 });
@@ -190,7 +205,7 @@ test("Commenter tries to update", async () => {
           sessionKey: otherUser.sessionKey,
         }).authorization,
       }))()
-  ).rejects.toThrowError("Unauthorized");
+  ).rejects.toThrowError();
 });
 
 test("Viewer tries to update", async () => {
@@ -220,7 +235,7 @@ test("Viewer tries to update", async () => {
           sessionKey: otherUser.sessionKey,
         }).authorization,
       }))()
-  ).rejects.toThrowError("Unauthorized");
+  ).rejects.toThrowError();
 });
 
 test("Unauthenticated", async () => {

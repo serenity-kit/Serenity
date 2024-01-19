@@ -5,6 +5,7 @@ import {
 } from "@serenity-tools/common";
 import { createSubkeyId } from "@serenity-tools/common/src/kdfDeriveFromKey/kdfDeriveFromKey";
 import { gql } from "graphql-request";
+import { prisma } from "../../../src/database/prisma";
 import { getWorkspaceMemberDevicesProof } from "../../../src/database/workspace/getWorkspaceMemberDevicesProof";
 import { TestContext } from "../setupGraphql";
 import { createFolderKeyDerivationTrace } from "./createFolderKeyDerivationTrace";
@@ -52,6 +53,7 @@ export const createFolder = async ({
   const workspaceMemberDevicesProof = await getWorkspaceMemberDevicesProof({
     userId,
     workspaceId,
+    prisma,
   });
 
   const encryptedFolderResult = encryptFolderName({

@@ -1,3 +1,4 @@
+import { verifyDocumentNameSignature } from "@serenity-tools/common";
 import { AuthenticationError } from "apollo-server-express";
 import {
   arg,
@@ -15,6 +16,8 @@ export const UpdateDocumentNameInput = inputObjectType({
     t.nonNull.string("id");
     t.nonNull.string("nameCiphertext");
     t.nonNull.string("nameNonce");
+    t.nonNull.string("nameSignature");
+    t.nonNull.string("nameWorkspaceMemberDevicesProofHash");
     t.nonNull.string("workspaceKeyId");
     t.nonNull.string("subkeyId");
   },
@@ -40,10 +43,25 @@ export const updateDocumentNameMutation = mutationField("updateDocumentName", {
     if (!context.user) {
       throw new AuthenticationError("Not authenticated");
     }
+
+    const isValid = verifyDocumentNameSignature({
+      authorSigningPublicKey: context.session.deviceSigningPublicKey,
+      ciphertext: args.input.nameCiphertext,
+      nonce: args.input.nameNonce,
+      signature: args.input.nameSignature,
+    });
+    if (!isValid) {
+      throw new Error("Invalid document name signature on update name");
+    }
+
     const document = await updateDocumentName({
       id: args.input.id,
       nameCiphertext: args.input.nameCiphertext,
       nameNonce: args.input.nameNonce,
+      nameSignature: args.input.nameSignature,
+      nameWorkspaceMemberDevicesProofHash:
+        args.input.nameWorkspaceMemberDevicesProofHash,
+      nameCreatorDeviceSigningPublicKey: context.session.deviceSigningPublicKey,
       workspaceKeyId: args.input.workspaceKeyId,
       subkeyId: args.input.subkeyId,
       userId: context.user.id,

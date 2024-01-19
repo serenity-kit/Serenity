@@ -219,6 +219,7 @@ test("Throw error on duplicate subkeyId, workspaceId", async () => {
   const workspaceMemberDevicesProof = await getWorkspaceMemberDevicesProof({
     userId: userData1.user.id,
     workspaceId,
+    prisma,
   });
 
   const encryptedFolderResult = encryptFolderName({
@@ -437,6 +438,7 @@ describe("Input errors", () => {
     const workspaceMemberDevicesProof = await getWorkspaceMemberDevicesProof({
       userId: userData1.user.id,
       workspaceId: addedWorkspace.id,
+      prisma,
     });
 
     const encryptedFolderResult = encryptFolderName({
@@ -486,6 +488,7 @@ describe("Input errors", () => {
     const workspaceMemberDevicesProof = await getWorkspaceMemberDevicesProof({
       userId: userData1.user.id,
       workspaceId: addedWorkspace.id,
+      prisma,
     });
 
     const encryptedFolderResult = encryptFolderName({

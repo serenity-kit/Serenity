@@ -61,6 +61,7 @@ export async function updateFolderName({
       const workspaceMemberDevicesProof = await getWorkspaceMemberDevicesProof({
         workspaceId: folder.workspaceId,
         userId,
+        prisma,
       });
 
       let authorDeviceSigningPublicKey = sessionDeviceSigningPublicKey;

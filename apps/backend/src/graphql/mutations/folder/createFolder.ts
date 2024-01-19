@@ -7,6 +7,7 @@ import {
   nonNull,
   objectType,
 } from "nexus";
+import { prisma } from "../../../../src/database/prisma";
 import { createFolder } from "../../../database/folder/createFolder";
 import { getWorkspaceMemberDevicesProof } from "../../../database/workspace/getWorkspaceMemberDevicesProof";
 import { formatFolder } from "../../../types/folder";
@@ -53,6 +54,7 @@ export const createFolderMutation = mutationField("createFolder", {
     const workspaceMemberDevicesProof = await getWorkspaceMemberDevicesProof({
       workspaceId: args.input.workspaceId,
       userId: context.user.id,
+      prisma,
     });
 
     let authorDeviceSigningPublicKey = context.session.deviceSigningPublicKey;

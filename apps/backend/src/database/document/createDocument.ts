@@ -2,13 +2,18 @@ import * as documentChain from "@serenity-kit/document-chain";
 import { SerenitySnapshotWithClientData } from "@serenity-tools/common";
 import { ForbiddenError } from "apollo-server-express";
 import { Prisma, Role } from "../../../prisma/generated/output";
+import { getOrCreateCreatorDevice } from "../../utils/device/getOrCreateCreatorDevice";
 import { createSnapshot } from "../createSnapshot";
 import { prisma } from "../prisma";
+import { getWorkspaceMemberDevicesProof } from "../workspace/getWorkspaceMemberDevicesProof";
 
 type Params = {
   userId: string;
   nameCiphertext: string;
   nameNonce: string;
+  nameSignature: string;
+  nameWorkspaceMemberDevicesProofHash: string;
+  nameCreatorDeviceSigningPublicKey: string;
   workspaceKeyId?: string | null;
   subkeyId: string; // name/title subkey id
   parentFolderId: string;
@@ -21,6 +26,9 @@ export async function createDocument({
   userId,
   nameCiphertext,
   nameNonce,
+  nameSignature,
+  nameWorkspaceMemberDevicesProofHash,
+  nameCreatorDeviceSigningPublicKey,
   workspaceKeyId,
   subkeyId,
   parentFolderId,
@@ -65,11 +73,35 @@ export async function createDocument({
         knownVersion: documentChain.version,
       });
 
+      const workspaceMemberDevicesProof = await getWorkspaceMemberDevicesProof({
+        workspaceId,
+        userId,
+        prisma,
+      });
+      if (
+        workspaceMemberDevicesProof.proof.hash !==
+        nameWorkspaceMemberDevicesProofHash
+      ) {
+        throw new Error(
+          "Outdated workspace member devices proof hash for creating a document"
+        );
+      }
+
+      // convert the user's device into a creatorDevice
+      const creatorDevice = await getOrCreateCreatorDevice({
+        prisma,
+        userId,
+        signingPublicKey: nameCreatorDeviceSigningPublicKey,
+      });
+
       const document = await prisma.document.create({
         data: {
           id: documentChainState.currentState.id,
           nameCiphertext,
           nameNonce,
+          nameSignature,
+          nameWorkspaceMemberDevicesProofHash,
+          nameCreatorDeviceSigningPublicKey: creatorDevice.signingPublicKey,
           subkeyId,
           workspaceKeyId,
           parentFolderId,

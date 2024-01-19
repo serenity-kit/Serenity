@@ -23,27 +23,31 @@ model DocumentChainEvent {
 }
 
 model Document {
-  id                 String               @id
+  id                                  String               @id
   // can be optional because a document is created without a snapshot at first
   // TODO check if this is still true since on workspace and document create a snapshot is provided
-  activeSnapshot     Snapshot?            @relation(name: "activeSnapshot", fields: [activeSnapshotId], references: [id], onDelete: Cascade)
-  activeSnapshotId   String?              @unique
-  snapshots          Snapshot[]
-  createdAt          DateTime             @default(now())
-  workspace          Workspace            @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
-  workspaceId        String
-  workspaceKey       WorkspaceKey?        @relation(fields: [workspaceKeyId], references: [id], onDelete: SetNull)
-  workspaceKeyId     String?
-  parentFolder       Folder               @relation(fields: [parentFolderId], references: [id], onDelete: Cascade)
-  parentFolderId     String
-  nameCiphertext     String
-  nameNonce          String
-  subkeyId           String
-  documentShareLinks DocumentShareLink[]
-  requiresSnapshot   Boolean              @default(false)
-  comments           Comment[]
-  commentReplies     CommentReply[]
-  chain              DocumentChainEvent[]
+  activeSnapshot                      Snapshot?            @relation(name: "activeSnapshot", fields: [activeSnapshotId], references: [id], onDelete: Cascade)
+  activeSnapshotId                    String?              @unique
+  snapshots                           Snapshot[]
+  createdAt                           DateTime             @default(now())
+  workspace                           Workspace            @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  workspaceId                         String
+  workspaceKey                        WorkspaceKey?        @relation(fields: [workspaceKeyId], references: [id], onDelete: SetNull)
+  workspaceKeyId                      String?
+  parentFolder                        Folder               @relation(fields: [parentFolderId], references: [id], onDelete: Cascade)
+  parentFolderId                      String
+  nameCiphertext                      String
+  nameNonce                           String
+  nameSignature                       String
+  nameWorkspaceMemberDevicesProofHash String
+  nameCreatorDeviceSigningPublicKey   String
+  nameCreatorDevice                   CreatorDevice        @relation(fields: [nameCreatorDeviceSigningPublicKey], references: [signingPublicKey], onDelete: SetDefault)
+  subkeyId                            String
+  documentShareLinks                  DocumentShareLink[]
+  requiresSnapshot                    Boolean              @default(false)
+  comments                            Comment[]
+  commentReplies                      CommentReply[]
+  chain                               DocumentChainEvent[]
 
   @@unique([subkeyId, workspaceId])
 }
@@ -211,6 +215,7 @@ model CreatorDevice {
   commentReplies               CommentReply[]
   Folder                       Folder[]
   Workspace                    Workspace[]
+  Document                     Document[]
 }
 
 model Workspace {

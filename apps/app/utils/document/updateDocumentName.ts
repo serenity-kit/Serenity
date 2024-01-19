@@ -4,6 +4,7 @@ import {
   runSnapshotQuery,
   runUpdateDocumentNameMutation,
 } from "../../generated/graphql";
+import { loadRemoteWorkspaceMemberDevicesProofQuery } from "../../store/workspaceMemberDevicesProofStore";
 import { getWorkspace } from "../workspace/getWorkspace";
 
 export type Props = {
@@ -32,6 +33,11 @@ export const updateDocumentName = async ({
     throw new Error(snapshotResult.error?.message || "Could not get snapshot");
   }
 
+  const workspaceMemberDevicesProof =
+    await loadRemoteWorkspaceMemberDevicesProofQuery({
+      workspaceId,
+    });
+
   const encryptedDocumentTitle = encryptDocumentTitle({
     title: name,
     activeDevice,
@@ -39,6 +45,8 @@ export const updateDocumentName = async ({
     snapshot: snapshotResult.data.snapshot,
     workspaceId,
     workspaceKeyId: workspace.currentWorkspaceKey.id,
+    documentId,
+    workspaceMemberDevicesProof: workspaceMemberDevicesProof.proof,
   });
   const updateDocumentNameResult = await runUpdateDocumentNameMutation(
     {
@@ -48,6 +56,9 @@ export const updateDocumentName = async ({
         nameNonce: encryptedDocumentTitle.nonce,
         workspaceKeyId: workspace?.currentWorkspaceKey?.id!,
         subkeyId: encryptedDocumentTitle.subkeyId,
+        nameSignature: encryptedDocumentTitle.signature,
+        nameWorkspaceMemberDevicesProofHash:
+          workspaceMemberDevicesProof.proof.hash,
       },
     },
     {}

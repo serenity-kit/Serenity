@@ -1,5 +1,6 @@
 import { AuthenticationError } from "apollo-server-express";
 import { idArg, nonNull, queryField, stringArg } from "nexus";
+import { prisma } from "../../../database/prisma";
 import { getWorkspaceMemberDevicesProof } from "../../../database/workspace/getWorkspaceMemberDevicesProof";
 import { WorkspaceMemberDevicesProof } from "../../types/workspaceMemberDevicesProof";
 
@@ -23,6 +24,7 @@ export const workspaceMemberDevicesProofQuery = queryField((t) => {
         documentShareLinkToken: args.documentShareLinkToken || undefined,
         hash: args.hash || undefined,
         userId: context.user?.id,
+        prisma,
       });
     },
   });

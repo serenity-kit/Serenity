@@ -73,6 +73,7 @@ export async function createComment({
       await getWorkspaceMemberDevicesProof({
         workspaceId: user2Workspace.workspaceId,
         userId,
+        prisma,
       });
     workspaceMemberDevicesProof = workspaceMemberDevicesProofEntry.proof;
   }
@@ -84,26 +85,21 @@ export async function createComment({
     signingPublicKey: creatorDeviceSigningPublicKey,
   });
 
-  try {
-    const comment = await prisma.comment.create({
-      data: {
-        id: commentId,
-        documentId: document.id,
-        snapshotId,
-        creatorDeviceSigningPublicKey: creatorDevice.signingPublicKey,
-        contentCiphertext,
-        contentNonce,
-        subkeyId,
-        signature,
-        workspaceMemberDevicesProofHash: workspaceMemberDevicesProof?.hash,
-      },
-    });
-    return {
-      ...comment,
-      creatorDevice,
-    };
-  } catch (e) {
-    console.log(e);
-    throw e;
-  }
+  const comment = await prisma.comment.create({
+    data: {
+      id: commentId,
+      documentId: document.id,
+      snapshotId,
+      creatorDeviceSigningPublicKey: creatorDevice.signingPublicKey,
+      contentCiphertext,
+      contentNonce,
+      subkeyId,
+      signature,
+      workspaceMemberDevicesProofHash: workspaceMemberDevicesProof?.hash,
+    },
+  });
+  return {
+    ...comment,
+    creatorDevice,
+  };
 }

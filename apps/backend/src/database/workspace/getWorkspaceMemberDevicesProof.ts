@@ -1,6 +1,6 @@
 import * as workspaceMemberDevicesProofUtil from "@serenity-kit/workspace-member-devices-proof";
 import { ForbiddenError } from "apollo-server-express";
-import { prisma } from "../prisma";
+import { Prisma } from "../../../prisma/generated/output";
 
 type Params = {
   workspaceId: string;
@@ -8,6 +8,7 @@ type Params = {
   hash?: string;
   invitationId?: string;
   documentShareLinkToken?: string;
+  prisma: Prisma.TransactionClient;
 };
 export async function getWorkspaceMemberDevicesProof({
   workspaceId,
@@ -15,6 +16,7 @@ export async function getWorkspaceMemberDevicesProof({
   hash,
   invitationId,
   documentShareLinkToken,
+  prisma,
 }: Params) {
   const invitation = invitationId
     ? await prisma.workspaceInvitations.findFirstOrThrow({

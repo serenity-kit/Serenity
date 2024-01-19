@@ -4,6 +4,9 @@ query documents($parentFolderId: ID!, $first: Int! = 100, $after: String) {
       id
       nameCiphertext
       nameNonce
+      nameSignature
+      nameWorkspaceMemberDevicesProofHash
+      nameCreatorDeviceSigningPublicKey
       parentFolderId
       rootFolderId
       workspaceId

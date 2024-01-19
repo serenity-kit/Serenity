@@ -4,6 +4,7 @@ import {
   encryptAndSignCommentReply,
 } from "@serenity-tools/common";
 import { gql } from "graphql-request";
+import { prisma } from "../../../src/database/prisma";
 import { getWorkspaceMemberDevicesProof } from "../../../src/database/workspace/getWorkspaceMemberDevicesProof";
 
 type Params =
@@ -62,6 +63,7 @@ export const createCommentReply = async ({
     ? await getWorkspaceMemberDevicesProof({
         userId,
         workspaceId,
+        prisma,
       })
     : undefined;
 

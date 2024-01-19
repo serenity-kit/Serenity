@@ -175,15 +175,17 @@ export default function Page({
         snapshotId,
         activeDevice,
       });
+
+      const workspaceMemberDevicesProof =
+        await loadRemoteWorkspaceMemberDevicesProofQuery({ workspaceId });
+
       snapshotInFlightDataRef.current = {
         snapshotKey: {
           keyDerivationTrace: snapshotKeyData.keyDerivationTrace,
           key: sodium.from_base64(snapshotKeyData.key),
         },
         documentChainState: latestDocumentChainState,
-        workspaceMemberDevicesProofEntry: getLastWorkspaceMemberDevicesProof({
-          workspaceId,
-        }),
+        workspaceMemberDevicesProofEntry: workspaceMemberDevicesProof,
       };
 
       const workspace = await getWorkspace({
@@ -195,15 +197,43 @@ export default function Page({
         throw new Error("Workspace or workspaceKeys not found");
       }
 
+      const documentTitleWorkspaceMemberDevicesProof =
+        await getLocalOrLoadRemoteWorkspaceMemberDevicesProofQueryByHash({
+          workspaceId,
+          hash: document.nameWorkspaceMemberDevicesProofHash,
+        });
+      if (!documentTitleWorkspaceMemberDevicesProof) {
+        throw new Error(
+          "documentTitleWorkspaceMemberDevicesProof not found for document"
+        );
+      }
+
+      const isValid = isValidDeviceSigningPublicKey({
+        signingPublicKey: document.nameCreatorDeviceSigningPublicKey,
+        workspaceMemberDevicesProofEntry:
+          documentTitleWorkspaceMemberDevicesProof,
+        workspaceId,
+        minimumRole: "EDITOR",
+      });
+      if (!isValid) {
+        throw new Error(
+          "Invalid signing public key for the workspaceMemberDevicesProof for decryptDocumentTitleBasedOnSnapshotKey"
+        );
+      }
+
       const documentTitle = decryptDocumentTitleBasedOnSnapshotKey({
         snapshotKey: sodium.to_base64(snapshotKeyRef.current!.key),
         ciphertext: document.nameCiphertext,
         nonce: document.nameNonce,
         subkeyId: document.subkeyId,
+        documentId: docId,
+        workspaceId,
+        workspaceMemberDevicesProof:
+          documentTitleWorkspaceMemberDevicesProof.proof,
+        signature: document.nameSignature,
+        creatorDeviceSigningPublicKey:
+          document.nameCreatorDeviceSigningPublicKey,
       });
-
-      const workspaceMemberDevicesProof =
-        await loadRemoteWorkspaceMemberDevicesProofQuery({ workspaceId });
 
       const documentTitleData = encryptDocumentTitle({
         title: documentTitle,
@@ -214,6 +244,8 @@ export default function Page({
         workspaceKeyBox: workspace.currentWorkspaceKey.workspaceKeyBox!,
         workspaceId,
         workspaceKeyId: workspace.currentWorkspaceKey.id,
+        workspaceMemberDevicesProof: workspaceMemberDevicesProof.proof,
+        documentId: docId,
       });
 
       let documentShareLinkDeviceBoxes: DocumentShareLinkDeviceBox[] = [];
@@ -257,7 +289,14 @@ export default function Page({
           documentChainEventHash: latestDocumentChainState.eventHash,
         },
         additionalServerData: {
-          documentTitleData,
+          documentTitleData: {
+            ciphertext: documentTitleData.ciphertext,
+            nonce: documentTitleData.nonce,
+            subkeyId: documentTitleData.subkeyId,
+            signature: documentTitleData.signature,
+            workspaceMemberDevicesProofHash:
+              workspaceMemberDevicesProof.proof.hash,
+          },
           documentShareLinkDeviceBoxes,
         },
       };

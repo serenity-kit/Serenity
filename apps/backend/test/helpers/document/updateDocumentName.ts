@@ -4,8 +4,11 @@ import {
   encryptDocumentTitleByKey,
   LocalDevice,
 } from "@serenity-tools/common";
+import { sign } from "@serenity-tools/secsync";
 import { gql } from "graphql-request";
+import sodium from "react-native-libsodium";
 import { prisma } from "../../../src/database/prisma";
+import { getWorkspaceMemberDevicesProofByWorkspaceId } from "../../../src/database/workspace/getWorkspaceMemberDevicesProofByWorkspaceId";
 import { getSnapshot } from "../snapshot/getSnapshot";
 
 type RunUpdateDocumentNameMutationParams = {
@@ -13,6 +16,8 @@ type RunUpdateDocumentNameMutationParams = {
   id: string;
   nameCiphertext: string;
   nameNonce: string;
+  nameSignature: string;
+  nameWorkspaceMemberDevicesProofHash: string;
   subkeyId: string;
   workspaceKeyId: string;
   authorizationHeader: string;
@@ -22,6 +27,8 @@ const runUpdateDocumentNameMutation = async ({
   id,
   nameCiphertext,
   nameNonce,
+  nameSignature,
+  nameWorkspaceMemberDevicesProofHash,
   subkeyId,
   workspaceKeyId,
   authorizationHeader,
@@ -35,6 +42,8 @@ const runUpdateDocumentNameMutation = async ({
         document {
           nameCiphertext
           nameNonce
+          nameCreatorDeviceSigningPublicKey
+          nameSignature
           id
           parentFolderId
           workspaceId
@@ -50,6 +59,8 @@ const runUpdateDocumentNameMutation = async ({
         id,
         nameCiphertext,
         nameNonce,
+        nameSignature,
+        nameWorkspaceMemberDevicesProofHash,
         workspaceKeyId,
         subkeyId,
       },
@@ -75,6 +86,16 @@ export const updateDocumentName = async ({
   workspaceKeyId,
   authorizationHeader,
 }: Params) => {
+  const mockSignature = sign(
+    {
+      nonce: "",
+      ciphertext: "",
+    },
+    "document_name",
+    sodium.from_base64(activeDevice.signingPrivateKey),
+    sodium
+  );
+
   const document = await prisma.document.findFirst({
     where: { id },
   });
@@ -85,6 +106,8 @@ export const updateDocumentName = async ({
       id,
       nameCiphertext: "",
       nameNonce: "",
+      nameSignature: mockSignature,
+      nameWorkspaceMemberDevicesProofHash: "",
       subkeyId: "AAAAAAAAAAAAAAAAAAAAAA",
       workspaceKeyId,
       authorizationHeader,
@@ -114,6 +137,8 @@ export const updateDocumentName = async ({
       id,
       nameCiphertext: "",
       nameNonce: "",
+      nameSignature: mockSignature,
+      nameWorkspaceMemberDevicesProofHash: "",
       subkeyId: "AAAAAAAAAAAAAAAAAAAAAA",
       workspaceKeyId,
       authorizationHeader,
@@ -134,6 +159,8 @@ export const updateDocumentName = async ({
       id,
       nameCiphertext: "",
       nameNonce: "",
+      nameSignature: mockSignature,
+      nameWorkspaceMemberDevicesProofHash: "",
       subkeyId: "AAAAAAAAAAAAAAAAAAAAAA",
       workspaceKeyId,
       authorizationHeader,
@@ -152,9 +179,20 @@ export const updateDocumentName = async ({
   const documentTitleKeyData = createDocumentTitleKey({
     snapshotKey,
   });
+
+  const workspaceMemberDevicesProofEntry =
+    await getWorkspaceMemberDevicesProofByWorkspaceId({
+      prisma,
+      workspaceId: workspace.id,
+    });
+
   const encryptedDocumentResult = encryptDocumentTitleByKey({
     title: name,
     key: documentTitleKeyData.key,
+    documentId: id,
+    workspaceId: workspace.id,
+    workspaceMemberDevicesProof: workspaceMemberDevicesProofEntry.proof,
+    activeDevice,
   });
 
   return runUpdateDocumentNameMutation({
@@ -162,6 +200,9 @@ export const updateDocumentName = async ({
     id,
     nameCiphertext: encryptedDocumentResult.ciphertext,
     nameNonce: encryptedDocumentResult.publicNonce,
+    nameSignature: encryptedDocumentResult.signature,
+    nameWorkspaceMemberDevicesProofHash:
+      workspaceMemberDevicesProofEntry.proof.hash,
     subkeyId: documentTitleKeyData.subkeyId,
     workspaceKeyId,
     authorizationHeader,

@@ -26,6 +26,8 @@ type RunCreateDocumentMutationParams = {
   graphql: any;
   nameCiphertext: string;
   nameNonce: string;
+  nameSignature: string;
+  nameWorkspaceMemberDevicesProofHash: string;
   subkeyId: string;
   parentFolderId: string | null;
   workspaceId: string;
@@ -37,6 +39,8 @@ const runCreateDocumentMutation = async ({
   graphql,
   nameCiphertext,
   nameNonce,
+  nameSignature,
+  nameWorkspaceMemberDevicesProofHash,
   subkeyId,
   parentFolderId,
   workspaceId,
@@ -60,6 +64,8 @@ const runCreateDocumentMutation = async ({
       input: {
         nameCiphertext,
         nameNonce,
+        nameSignature,
+        nameWorkspaceMemberDevicesProofHash,
         subkeyId,
         parentFolderId,
         workspaceId,
@@ -126,6 +132,8 @@ export const createDocument = async ({
       graphql,
       nameCiphertext: "",
       nameNonce: "",
+      nameSignature: "",
+      nameWorkspaceMemberDevicesProofHash: "",
       subkeyId: "AAAAAAAAAAAAAAAAAAAAAA",
       parentFolderId,
       workspaceId,
@@ -148,6 +156,8 @@ export const createDocument = async ({
       graphql,
       nameCiphertext: "",
       nameNonce: "",
+      nameSignature: "",
+      nameWorkspaceMemberDevicesProofHash: "",
       subkeyId: "AAAAAAAAAAAAAAAAAAAAAA",
       parentFolderId,
       workspaceId,
@@ -222,12 +232,19 @@ export const createDocument = async ({
   const documentNameData = encryptDocumentTitleByKey({
     title: useName,
     key: documentNameKey.key,
+    documentId: id,
+    workspaceId,
+    workspaceMemberDevicesProof: workspaceMemberDevicesProofEntry.proof,
+    activeDevice,
   });
 
   return runCreateDocumentMutation({
     graphql,
     nameCiphertext: documentNameData.ciphertext,
     nameNonce: documentNameData.publicNonce,
+    nameSignature: documentNameData.signature,
+    nameWorkspaceMemberDevicesProofHash:
+      workspaceMemberDevicesProofEntry.proof.hash,
     subkeyId: documentNameKey.subkeyId,
     parentFolderId,
     workspaceId,

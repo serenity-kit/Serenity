@@ -4,6 +4,9 @@ mutation updateDocumentName($input: UpdateDocumentNameInput!) {
       id
       nameCiphertext
       nameNonce
+      nameSignature
+      nameWorkspaceMemberDevicesProofHash
+      nameCreatorDeviceSigningPublicKey
       parentFolderId
       workspaceId
       subkeyId

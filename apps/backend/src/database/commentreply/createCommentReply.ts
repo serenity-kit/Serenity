@@ -82,6 +82,7 @@ export async function createCommentReply({
       await getWorkspaceMemberDevicesProof({
         workspaceId: user2Workspace.workspaceId,
         userId,
+        prisma,
       });
     workspaceMemberDevicesProof = workspaceMemberDevicesProofEntry.proof;
   }

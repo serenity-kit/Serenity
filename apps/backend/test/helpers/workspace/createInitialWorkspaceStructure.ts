@@ -88,6 +88,9 @@ const query = gql`
         id
         nameCiphertext
         nameNonce
+        nameSignature
+        nameWorkspaceMemberDevicesProofHash
+        nameCreatorDeviceSigningPublicKey
         parentFolderId
         workspaceId
         subkeyId
@@ -238,13 +241,6 @@ export const createInitialWorkspaceStructure = async ({
   const documentTitleKey = documentTitleKeyResult.key;
   const documentSubkeyId = documentTitleKeyResult.subkeyId;
 
-  const encryptedDocumentTitleResult = encryptDocumentTitleByKey({
-    title: documentName,
-    key: documentTitleKey,
-  });
-  const encryptedDocumentName = encryptedDocumentTitleResult.ciphertext;
-  const encryptedDocumentNameNonce = encryptedDocumentTitleResult.publicNonce;
-
   const createDocumentChainEvent = documentChain.createDocumentChain({
     authorKeyPair: {
       // devices[0] is the main device, devices[1] is the web device
@@ -252,6 +248,16 @@ export const createInitialWorkspaceStructure = async ({
       publicKey: devices[1].signingPublicKey,
     },
   });
+
+  const encryptedDocumentTitleResult = encryptDocumentTitleByKey({
+    title: documentName,
+    key: documentTitleKey,
+    documentId: createDocumentChainEvent.transaction.id,
+    workspaceId: event.transaction.id,
+    workspaceMemberDevicesProof,
+    activeDevice: creatorDevice,
+  });
+
   const documentChainState = documentChain.resolveState({
     events: [createDocumentChainEvent],
     knownVersion: documentChain.version,
@@ -285,8 +291,9 @@ export const createInitialWorkspaceStructure = async ({
 
   // prepare the document
   const readyDocument = {
-    nameCiphertext: encryptedDocumentName,
-    nameNonce: encryptedDocumentNameNonce,
+    nameCiphertext: encryptedDocumentTitleResult.ciphertext,
+    nameNonce: encryptedDocumentTitleResult.publicNonce,
+    nameSignature: encryptedDocumentTitleResult.signature,
     subkeyId: documentSubkeyId,
     snapshot,
     serializedDocumentChainEvent: JSON.stringify(createDocumentChainEvent),

@@ -7,6 +7,7 @@ import { gql } from "graphql-request";
 import deleteAllRecords from "../../../../test/helpers/deleteAllRecords";
 import setupGraphql from "../../../../test/helpers/setupGraphql";
 import { updateWorkspaceName } from "../../../../test/helpers/workspace/updateWorkspaceName";
+import { prisma } from "../../../database/prisma";
 import createUserWithWorkspace from "../../../database/testHelpers/createUserWithWorkspace";
 import { getWorkspaceMemberDevicesProof } from "../../../database/workspace/getWorkspaceMemberDevicesProof";
 
@@ -41,6 +42,7 @@ test("user can change workspace name", async () => {
   const workspaceMemberDevicesProof = await getWorkspaceMemberDevicesProof({
     userId: userData1.user.id,
     workspaceId: userData1.workspace.id,
+    prisma,
   });
   const result = await updateWorkspaceName({
     graphql,
@@ -78,6 +80,7 @@ test("user should not be able to update a workspace they don't own", async () =>
   const workspaceMemberDevicesProof = await getWorkspaceMemberDevicesProof({
     userId: userData1.user.id,
     workspaceId: userData1.workspace.id,
+    prisma,
   });
   await expect(
     (async () =>
@@ -104,6 +107,7 @@ test("user should not be able to update a workspace for a workspace that doesn't
   const workspaceMemberDevicesProof = await getWorkspaceMemberDevicesProof({
     userId: userData1.user.id,
     workspaceId: userData1.workspace.id,
+    prisma,
   });
   await expect(
     (async () =>
@@ -126,6 +130,7 @@ test("Unauthenticated", async () => {
   const workspaceMemberDevicesProof = await getWorkspaceMemberDevicesProof({
     userId: userData1.user.id,
     workspaceId: userData1.workspace.id,
+    prisma,
   });
   await expect(
     (async () =>

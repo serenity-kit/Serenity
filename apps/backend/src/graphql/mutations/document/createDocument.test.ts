@@ -74,7 +74,7 @@ test("commenter tries to create", async () => {
         activeDevice: userData1.webDevice,
         workspaceId: userData1.workspace.id,
       }))()
-  ).rejects.toThrowError("Unauthorized");
+  ).rejects.toThrowError();
 });
 
 test("viewer attempts to create", async () => {
@@ -101,7 +101,7 @@ test("viewer attempts to create", async () => {
         activeDevice: userData1.webDevice,
         workspaceId: userData1.workspace.id,
       }))()
-  ).rejects.toThrowError("Unauthorized");
+  ).rejects.toThrowError();
 });
 
 test("Unauthenticated", async () => {

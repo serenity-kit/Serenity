@@ -42,5 +42,6 @@ export * from "./verifyAndDecryptComment/verifyAndDecryptComment";
 export * from "./verifyAndDecryptCommentReply/verifyAndDecryptCommentReply";
 export * from "./verifyCommentReplySignature/verifyCommentReplySignature";
 export * from "./verifyCommentSignature/verifyCommentSignature";
+export * from "./verifyDocumentNameSignature/verifyDocumentNameSignature";
 export * from "./verifyFolderNameSignature/verifyFolderNameSignature";
 export * from "./zodTypes";
