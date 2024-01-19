@@ -68,6 +68,7 @@ const ActualPageScreen = (
   const commentsService = useInterpret(commentsMachine, {
     context: {
       params: {
+        workspaceId,
         pageId: props.route.params.pageId,
         activeDevice: activeDevice as LocalDevice,
       },

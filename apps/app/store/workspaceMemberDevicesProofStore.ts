@@ -244,7 +244,15 @@ export const loadRemoteWorkspaceMemberDevicesProofQuery = async ({
 };
 
 export const getLocalOrLoadRemoteWorkspaceMemberDevicesProofQueryByHash =
-  async ({ workspaceId, hash }: { workspaceId: string; hash: string }) => {
+  async ({
+    workspaceId,
+    hash,
+    documentShareLinkToken,
+  }: {
+    workspaceId: string;
+    hash: string;
+    documentShareLinkToken?: string;
+  }) => {
     // get the local entry if it exists
     const localWorkspaceMemberDevicesProof =
       getWorkspaceMemberDevicesProofByHash({ workspaceId, hash });
@@ -254,7 +262,11 @@ export const getLocalOrLoadRemoteWorkspaceMemberDevicesProofQueryByHash =
 
     // get the remove entry
     const workspaceMemberDevicesProofQueryResult =
-      await runWorkspaceMemberDevicesProofQuery({ workspaceId, hash });
+      await runWorkspaceMemberDevicesProofQuery({
+        workspaceId,
+        hash,
+        documentShareLinkToken,
+      });
 
     if (workspaceMemberDevicesProofQueryResult.error) {
       showToast("Failed to load the workspace data.", "error");
@@ -274,17 +286,20 @@ export const getLocalOrLoadRemoteWorkspaceMemberDevicesProofQueryByHash =
           entry.proof
         );
 
-      // load latest workspace chain entries and check if the workspace chain event is included
-      // to verify that the server is providing this or a newer workspace chain
-      await loadRemoteWorkspaceChain({ workspaceId });
-      const workspaceChainEvent = getWorkspaceChainEventByHash({
-        hash: data.workspaceChainHash,
-        workspaceId,
-      });
-      if (!workspaceChainEvent) {
-        throw new Error(
-          "Workspace chain event not found in the current workspace chain"
-        );
+      // this check should not be done if a documentShareLinkToken is provided
+      if (!documentShareLinkToken) {
+        // load latest workspace chain entries and check if the workspace chain event is included
+        // to verify that the server is providing this or a newer workspace chain
+        await loadRemoteWorkspaceChain({ workspaceId });
+        const workspaceChainEvent = getWorkspaceChainEventByHash({
+          hash: data.workspaceChainHash,
+          workspaceId,
+        });
+        if (!workspaceChainEvent) {
+          throw new Error(
+            "Workspace chain event not found in the current workspace chain"
+          );
+        }
       }
 
       const workspaceMemberDevicesProofEntry =
@@ -318,6 +333,7 @@ export const getLocalOrLoadRemoteWorkspaceMemberDevicesProofQueryByHash =
           "Invalid workspaceMemberDevicesProof in updateWorkspaceMemberDevicesProof"
         );
       }
+
       createWorkspaceMemberDevicesProof({
         authorMainDeviceSigningPublicKey:
           entry.authorMainDeviceSigningPublicKey,

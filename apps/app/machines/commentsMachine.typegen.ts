@@ -23,6 +23,11 @@ export interface Typegen0 {
       data: unknown;
       __tip: "See the XState TS docs to learn how to strongly type this.";
     };
+    "done.invoke.verifyAndDecryptComments": {
+      type: "done.invoke.verifyAndDecryptComments";
+      data: unknown;
+      __tip: "See the XState TS docs to learn how to strongly type this.";
+    };
     "error.platform.createComment": {
       type: "error.platform.createComment";
       data: unknown;
@@ -39,6 +44,10 @@ export interface Typegen0 {
       type: "error.platform.deleteReply";
       data: unknown;
     };
+    "error.platform.verifyAndDecryptComments": {
+      type: "error.platform.verifyAndDecryptComments";
+      data: unknown;
+    };
     "xstate.init": { type: "xstate.init" };
   };
   invokeSrcNameMap: {
@@ -46,6 +55,7 @@ export interface Typegen0 {
     createReply: "done.invoke.createReply";
     deleteComment: "done.invoke.deleteComment";
     deleteReply: "done.invoke.deleteReply";
+    verifyAndDecryptComments: "done.invoke.verifyAndDecryptComments";
   };
   missingImplementations: {
     actions: never;
@@ -64,24 +74,21 @@ export interface Typegen0 {
     showDeleteErrorToast:
       | "error.platform.deleteComment"
       | "error.platform.deleteReply";
-    showErrorToast: "CommentsByDocumentIdQuery.ERROR";
+    showErrorToast:
+      | "CommentsByDocumentIdQuery.ERROR"
+      | "error.platform.verifyAndDecryptComments";
     spawnActors:
       | "SET_ACTIVE_SNAPSHOT_AND_COMMENT_KEYS"
       | "done.invoke.createComment"
       | "done.invoke.createReply"
       | "done.invoke.deleteComment"
-      | "done.invoke.deleteReply"
-      | "error.platform.createComment"
-      | "error.platform.createReply"
-      | "error.platform.deleteComment"
-      | "error.platform.deleteReply";
+      | "done.invoke.deleteReply";
     stopActors:
       | "done.invoke.createComment"
       | "done.invoke.createReply"
       | "done.invoke.deleteComment"
       | "done.invoke.deleteReply";
     updateReplyText: "UPDATE_REPLY_TEXT";
-    verifyAndDecryptComments: "CommentsByDocumentIdQuery.UPDATE_RESULT";
   };
   eventsCausingDelays: {};
   eventsCausingGuards: {
@@ -96,13 +103,16 @@ export interface Typegen0 {
     createReply: "CREATE_REPLY";
     deleteComment: "DELETE_COMMENT";
     deleteReply: "DELETE_REPLY";
+    verifyAndDecryptComments: "CommentsByDocumentIdQuery.UPDATE_RESULT";
   };
   matchesStates:
     | "creatingComment"
     | "creatingReply"
+    | "decryptingComments"
     | "deletingComment"
     | "deletingReply"
     | "idle"
+    | "startFetching"
     | "waitingForActiveSnapshot";
   tags: never;
 }

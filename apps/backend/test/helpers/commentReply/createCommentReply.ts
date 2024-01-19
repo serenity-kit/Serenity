@@ -4,23 +4,44 @@ import {
   encryptAndSignCommentReply,
 } from "@serenity-tools/common";
 import { gql } from "graphql-request";
+import { getWorkspaceMemberDevicesProof } from "../../../src/database/workspace/getWorkspaceMemberDevicesProof";
 
-type Params = {
-  graphql: any;
-  commentId: string;
-  snapshotId: string;
-  documentId: string;
-  documentShareLinkToken?: string | null | undefined;
-  snapshotKey: string;
-  comment: string;
-  authorizationHeader: string;
-  creatorDevice: LocalDevice;
-  creatorDeviceEncryptionPrivateKey: string;
-  creatorDeviceSigningPrivateKey: string;
-};
+type Params =
+  | {
+      graphql: any;
+      userId?: undefined;
+      workspaceId?: undefined;
+      commentId: string;
+      snapshotId: string;
+      documentId: string;
+      documentShareLinkToken: string;
+      snapshotKey: string;
+      comment: string;
+      authorizationHeader: string;
+      creatorDevice: LocalDevice;
+      creatorDeviceEncryptionPrivateKey: string;
+      creatorDeviceSigningPrivateKey: string;
+    }
+  | {
+      graphql: any;
+      userId: string;
+      workspaceId: string;
+      commentId: string;
+      snapshotId: string;
+      documentId: string;
+      documentShareLinkToken?: undefined;
+      snapshotKey: string;
+      comment: string;
+      authorizationHeader: string;
+      creatorDevice: LocalDevice;
+      creatorDeviceEncryptionPrivateKey: string;
+      creatorDeviceSigningPrivateKey: string;
+    };
 
 export const createCommentReply = async ({
   graphql,
+  workspaceId,
+  userId,
   commentId,
   documentId,
   snapshotId,
@@ -36,6 +57,14 @@ export const createCommentReply = async ({
     authorization: authorizationHeader,
   };
   const commentKey = createCommentKey({ snapshotKey });
+
+  const workspaceMemberDevicesProof = userId
+    ? await getWorkspaceMemberDevicesProof({
+        userId,
+        workspaceId,
+      })
+    : undefined;
+
   const { ciphertext, nonce, commentReplyId, signature } =
     encryptAndSignCommentReply({
       text: comment,
@@ -45,6 +74,7 @@ export const createCommentReply = async ({
       documentId,
       snapshotId,
       subkeyId: commentKey.subkeyId,
+      workspaceMemberDevicesProof: workspaceMemberDevicesProof?.proof,
     });
 
   const query = gql`

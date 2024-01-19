@@ -12,6 +12,7 @@ export const CommentReply = objectType({
     t.nonNull.string("subkeyId");
     t.nonNull.string("contentCiphertext");
     t.nonNull.string("contentNonce");
+    t.nonNull.string("workspaceMemberDevicesProofHash");
     t.nonNull.field("createdAt", { type: "Date" });
     t.nonNull.field("creatorDevice", { type: CreatorDevice });
   },

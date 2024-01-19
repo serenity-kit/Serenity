@@ -53,6 +53,8 @@ const setup = async () => {
       sessionKey: userData1.sessionKey,
     }).authorization,
     documentId: userData1.document.id,
+    workspaceId: userData1.workspace.id,
+    userId: userData1.user.id,
   });
   user1Comment = user1CommentResult.createComment.comment;
   const user2CommentResult = await createComment({
@@ -67,6 +69,8 @@ const setup = async () => {
       sessionKey: userData2.sessionKey,
     }).authorization,
     documentId: userData1.document.id,
+    workspaceId: userData1.workspace.id,
+    userId: userData1.user.id,
   });
   user2Comment = user2CommentResult.createComment.comment;
 };
@@ -90,6 +94,8 @@ test("commenter deletes own reply", async () => {
       sessionKey: userData1.sessionKey,
     }).authorization,
     documentId: userData1.document.id,
+    workspaceId: userData1.workspace.id,
+    userId: userData1.user.id,
   });
   const commentReply = commentReplyResult.createCommentReply.commentReply;
   const numCommentsBeforeDelete = await prisma.commentReply.count({
@@ -135,6 +141,8 @@ test("admin deletes reply", async () => {
       sessionKey: userData2.sessionKey,
     }).authorization,
     documentId: userData1.document.id,
+    workspaceId: userData1.workspace.id,
+    userId: userData2.user.id,
   });
   const commentReply = commentReplyResult.createCommentReply.commentReply;
   const numCommentsBeforeDelete = await prisma.commentReply.count({
@@ -180,6 +188,8 @@ test("editor deletes reply", async () => {
       sessionKey: userData2.sessionKey,
     }).authorization,
     documentId: userData1.document.id,
+    workspaceId: userData1.workspace.id,
+    userId: userData2.user.id,
   });
   const commentReply = commentReplyResult.createCommentReply.commentReply;
   const numCommentsBeforeDelete = await prisma.commentReply.count({
@@ -225,6 +235,8 @@ test("commentor tries to delete other reply", async () => {
       sessionKey: userData2.sessionKey,
     }).authorization,
     documentId: userData1.document.id,
+    workspaceId: userData1.workspace.id,
+    userId: userData2.user.id,
   });
   const commentReply = commentReplyResult.createCommentReply.commentReply;
   expect(
@@ -263,6 +275,8 @@ test("viewer tries to delete other reply", async () => {
       sessionKey: userData2.sessionKey,
     }).authorization,
     documentId: userData1.document.id,
+    workspaceId: userData1.workspace.id,
+    userId: userData2.user.id,
   });
   const commentReply = commentReplyResult.createCommentReply.commentReply;
   expect(
@@ -292,6 +306,8 @@ test("delete some replies", async () => {
       sessionKey: userData2.sessionKey,
     }).authorization,
     documentId: userData1.document.id,
+    workspaceId: userData1.workspace.id,
+    userId: userData2.user.id,
   });
   const commentReply = commentReplyResult.createCommentReply.commentReply;
   const numCommentsBeforeDelete = await prisma.commentReply.count({
@@ -329,6 +345,8 @@ test("cant delete replies on outside document", async () => {
       sessionKey: userData2.sessionKey,
     }).authorization,
     documentId: userData1.document.id,
+    workspaceId: userData1.workspace.id,
+    userId: userData2.user.id,
   });
   await prisma.usersToWorkspaces.deleteMany({
     where: {

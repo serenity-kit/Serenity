@@ -18,6 +18,7 @@ query commentsByDocumentId(
       contentCiphertext
       contentNonce
       signature
+      workspaceMemberDevicesProofHash
       createdAt
       creatorDevice {
         signingPublicKey
@@ -31,6 +32,7 @@ query commentsByDocumentId(
         contentCiphertext
         contentNonce
         signature
+        workspaceMemberDevicesProofHash
         createdAt
         creatorDevice {
           signingPublicKey

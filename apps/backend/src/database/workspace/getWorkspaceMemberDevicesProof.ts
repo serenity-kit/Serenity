@@ -4,15 +4,17 @@ import { prisma } from "../prisma";
 
 type Params = {
   workspaceId: string;
-  userId: string;
+  userId?: string;
   hash?: string;
   invitationId?: string;
+  documentShareLinkToken?: string;
 };
 export async function getWorkspaceMemberDevicesProof({
   workspaceId,
   userId,
   hash,
   invitationId,
+  documentShareLinkToken,
 }: Params) {
   const invitation = invitationId
     ? await prisma.workspaceInvitations.findFirstOrThrow({
@@ -20,14 +22,25 @@ export async function getWorkspaceMemberDevicesProof({
         select: { workspaceId: true },
       })
     : undefined;
-  const userWorkspace = await prisma.usersToWorkspaces.findFirst({
-    where: {
-      userId,
-      workspaceId,
-    },
-    select: { workspace: true },
-  });
-  if (!userWorkspace && !invitation) {
+  const userWorkspace = userId
+    ? await prisma.usersToWorkspaces.findFirst({
+        where: { userId, workspaceId },
+        select: { workspace: true },
+      })
+    : undefined;
+  const documentShareLink = documentShareLinkToken
+    ? await prisma.documentShareLink.findFirst({
+        where: { token: documentShareLinkToken },
+        include: { document: true },
+      })
+    : undefined;
+  if (documentShareLink) {
+    if (documentShareLink.document.workspaceId !== workspaceId) {
+      throw new ForbiddenError("Unauthorized");
+    }
+  }
+
+  if (!userWorkspace && !invitation && !documentShareLink) {
     throw new ForbiddenError("Unauthorized");
   }
   const workspaceMemberDevicesProof =
