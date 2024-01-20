@@ -61,6 +61,7 @@ test("user should be able to change a folder name", async () => {
   const workspaceMemberDevicesProof = await getWorkspaceMemberDevicesProof({
     userId: userData1.user.id,
     workspaceId: userData1.workspace.id,
+    prisma,
   });
 
   const result = await updateFolderName({
@@ -93,6 +94,7 @@ test("throw error when folder doesn't exist", async () => {
   const workspaceMemberDevicesProof = await getWorkspaceMemberDevicesProof({
     userId: userData1.user.id,
     workspaceId: userData1.workspace.id,
+    prisma,
   });
 
   await expect(
@@ -144,6 +146,7 @@ test("throw error when user doesn't have access", async () => {
   const workspaceMemberDevicesProof = await getWorkspaceMemberDevicesProof({
     userId: userData1.user.id,
     workspaceId: userData1.workspace.id,
+    prisma,
   });
 
   await expect(
@@ -182,6 +185,7 @@ test("Commentor tries to update", async () => {
   const workspaceMemberDevicesProof = await getWorkspaceMemberDevicesProof({
     userId: userData1.user.id,
     workspaceId: userData1.workspace.id,
+    prisma,
   });
 
   await expect(
@@ -220,6 +224,7 @@ test("Viewer tries to update", async () => {
   const workspaceMemberDevicesProof = await getWorkspaceMemberDevicesProof({
     userId: userData1.user.id,
     workspaceId: userData1.workspace.id,
+    prisma,
   });
 
   await expect(
@@ -245,6 +250,7 @@ test("Unauthenticated", async () => {
   const workspaceMemberDevicesProof = await getWorkspaceMemberDevicesProof({
     userId: userData1.user.id,
     workspaceId: userData1.workspace.id,
+    prisma,
   });
 
   await expect(

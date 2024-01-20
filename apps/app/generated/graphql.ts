@@ -164,6 +164,8 @@ export type CreateCommentResult = {
 export type CreateDocumentInput = {
   nameCiphertext: Scalars['String']['input'];
   nameNonce: Scalars['String']['input'];
+  nameSignature: Scalars['String']['input'];
+  nameWorkspaceMemberDevicesProofHash: Scalars['String']['input'];
   parentFolderId: Scalars['String']['input'];
   serializedDocumentChainEvent: Scalars['String']['input'];
   snapshot: DocumentSnapshotInput;
@@ -210,6 +212,7 @@ export type CreateFolderResult = {
 export type CreateInitialDocumentInput = {
   nameCiphertext: Scalars['String']['input'];
   nameNonce: Scalars['String']['input'];
+  nameSignature: Scalars['String']['input'];
   serializedDocumentChainEvent: Scalars['String']['input'];
   snapshot: DocumentSnapshotInput;
   subkeyId: Scalars['String']['input'];
@@ -371,7 +374,10 @@ export type Document = {
   __typename?: 'Document';
   id: Scalars['String']['output'];
   nameCiphertext: Scalars['String']['output'];
+  nameCreatorDeviceSigningPublicKey: Scalars['String']['output'];
   nameNonce: Scalars['String']['output'];
+  nameSignature: Scalars['String']['output'];
+  nameWorkspaceMemberDevicesProofHash: Scalars['String']['output'];
   parentFolderId?: Maybe<Scalars['String']['output']>;
   rootFolderId?: Maybe<Scalars['String']['output']>;
   subkeyId: Scalars['String']['output'];
@@ -1192,6 +1198,8 @@ export type UpdateDocumentNameInput = {
   id: Scalars['String']['input'];
   nameCiphertext: Scalars['String']['input'];
   nameNonce: Scalars['String']['input'];
+  nameSignature: Scalars['String']['input'];
+  nameWorkspaceMemberDevicesProofHash: Scalars['String']['input'];
   subkeyId: Scalars['String']['input'];
   workspaceKeyId: Scalars['String']['input'];
 };
@@ -1691,7 +1699,7 @@ export type UpdateDocumentNameMutationVariables = Exact<{
 }>;
 
 
-export type UpdateDocumentNameMutation = { __typename?: 'Mutation', updateDocumentName?: { __typename?: 'UpdateDocumentNameResult', document?: { __typename?: 'Document', id: string, nameCiphertext: string, nameNonce: string, parentFolderId?: string | null, workspaceId: string, subkeyId: string } | null } | null };
+export type UpdateDocumentNameMutation = { __typename?: 'Mutation', updateDocumentName?: { __typename?: 'UpdateDocumentNameResult', document?: { __typename?: 'Document', id: string, nameCiphertext: string, nameNonce: string, nameSignature: string, nameWorkspaceMemberDevicesProofHash: string, nameCreatorDeviceSigningPublicKey: string, parentFolderId?: string | null, workspaceId: string, subkeyId: string } | null } | null };
 
 export type UpdateFolderNameMutationVariables = Exact<{
   input: UpdateFolderNameInput;
@@ -1745,7 +1753,7 @@ export type DocumentQueryVariables = Exact<{
 }>;
 
 
-export type DocumentQuery = { __typename?: 'Query', document?: { __typename?: 'Document', id: string, nameCiphertext: string, nameNonce: string, parentFolderId?: string | null, workspaceId: string, subkeyId: string } | null };
+export type DocumentQuery = { __typename?: 'Query', document?: { __typename?: 'Document', id: string, nameCiphertext: string, nameNonce: string, nameSignature: string, nameWorkspaceMemberDevicesProofHash: string, nameCreatorDeviceSigningPublicKey: string, parentFolderId?: string | null, workspaceId: string, subkeyId: string } | null };
 
 export type DocumentChainQueryVariables = Exact<{
   documentId: Scalars['ID']['input'];
@@ -1793,7 +1801,7 @@ export type DocumentsQueryVariables = Exact<{
 }>;
 
 
-export type DocumentsQuery = { __typename?: 'Query', documents?: { __typename?: 'DocumentConnection', nodes?: Array<{ __typename?: 'Document', id: string, nameCiphertext: string, nameNonce: string, parentFolderId?: string | null, rootFolderId?: string | null, workspaceId: string, subkeyId: string } | null> | null, pageInfo: { __typename?: 'PageInfo', hasNextPage: boolean, hasPreviousPage: boolean, startCursor?: string | null, endCursor?: string | null } } | null };
+export type DocumentsQuery = { __typename?: 'Query', documents?: { __typename?: 'DocumentConnection', nodes?: Array<{ __typename?: 'Document', id: string, nameCiphertext: string, nameNonce: string, nameSignature: string, nameWorkspaceMemberDevicesProofHash: string, nameCreatorDeviceSigningPublicKey: string, parentFolderId?: string | null, rootFolderId?: string | null, workspaceId: string, subkeyId: string } | null> | null, pageInfo: { __typename?: 'PageInfo', hasNextPage: boolean, hasPreviousPage: boolean, startCursor?: string | null, endCursor?: string | null } } | null };
 
 export type EncryptedWebDeviceQueryVariables = Exact<{
   accessToken: Scalars['String']['input'];
@@ -2416,6 +2424,9 @@ export const UpdateDocumentNameDocument = gql`
       id
       nameCiphertext
       nameNonce
+      nameSignature
+      nameWorkspaceMemberDevicesProofHash
+      nameCreatorDeviceSigningPublicKey
       parentFolderId
       workspaceId
       subkeyId
@@ -2570,6 +2581,9 @@ export const DocumentDocument = gql`
     id
     nameCiphertext
     nameNonce
+    nameSignature
+    nameWorkspaceMemberDevicesProofHash
+    nameCreatorDeviceSigningPublicKey
     parentFolderId
     workspaceId
     subkeyId
@@ -2691,6 +2705,9 @@ export const DocumentsDocument = gql`
       id
       nameCiphertext
       nameNonce
+      nameSignature
+      nameWorkspaceMemberDevicesProofHash
+      nameCreatorDeviceSigningPublicKey
       parentFolderId
       rootFolderId
       workspaceId

@@ -9,7 +9,9 @@ import {
   runSnapshotQuery,
   runWorkspaceQuery,
 } from "../generated/graphql";
+import { isValidDeviceSigningPublicKey } from "../utils/isValidDeviceSigningPublicKey/isValidDeviceSigningPublicKey";
 import * as sql from "./sql/sql";
+import { getLocalOrLoadRemoteWorkspaceMemberDevicesProofQueryByHash } from "./workspaceMemberDevicesProofStore";
 
 export const table = "document_v2";
 
@@ -162,6 +164,27 @@ export const loadRemoteDocumentName = async ({
       }
     }
 
+    const workspaceMemberDevicesProof =
+      await getLocalOrLoadRemoteWorkspaceMemberDevicesProofQueryByHash({
+        workspaceId,
+        hash: document.nameWorkspaceMemberDevicesProofHash,
+      });
+    if (!workspaceMemberDevicesProof) {
+      throw new Error("workspaceMemberDevicesProof not found");
+    }
+
+    const isValid = isValidDeviceSigningPublicKey({
+      signingPublicKey: document.nameCreatorDeviceSigningPublicKey,
+      workspaceMemberDevicesProofEntry: workspaceMemberDevicesProof,
+      workspaceId,
+      minimumRole: "EDITOR",
+    });
+    if (!isValid) {
+      throw new Error(
+        "Invalid signing public key for the workspaceMemberDevicesProof for decryptDocumentTitle"
+      );
+    }
+
     name = decryptDocumentTitle({
       ciphertext: document.nameCiphertext,
       nonce: document.nameNonce,
@@ -173,6 +196,10 @@ export const loadRemoteDocumentName = async ({
       workspaceKeyBox: documentWorkspaceKey.workspaceKeyBox,
       workspaceId,
       workspaceKeyId: documentWorkspaceKey.id,
+      documentId,
+      workspaceMemberDevicesProof: workspaceMemberDevicesProof.proof,
+      signature: document.nameSignature,
+      creatorDeviceSigningPublicKey: document.nameCreatorDeviceSigningPublicKey,
     });
     createOrReplaceDocument({ documentId, name });
   }

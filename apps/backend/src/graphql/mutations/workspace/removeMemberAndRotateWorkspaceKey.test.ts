@@ -443,6 +443,7 @@ test("user can remove another user", async () => {
     userId: userData1.user.id,
     workspaceId: workspace.id,
     hash: firstFolder.workspaceMemberDevicesProofHash,
+    prisma,
   });
 
   const decryptedFolderName = decryptFolderName({

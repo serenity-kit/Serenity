@@ -7,6 +7,7 @@ import {
   nonNull,
   objectType,
 } from "nexus";
+import { prisma } from "../../../database/prisma";
 import { getWorkspaceMemberDevicesProof } from "../../../database/workspace/getWorkspaceMemberDevicesProof";
 import { updateWorkspaceName } from "../../../database/workspace/updateWorkspaceName";
 import { Workspace } from "../../types/workspace";
@@ -48,6 +49,7 @@ export const updateWorkspaceNameMutation = mutationField(
       const workspaceMemberDevicesProof = await getWorkspaceMemberDevicesProof({
         workspaceId: args.input.id,
         userId: context.user.id,
+        prisma,
       });
 
       let authorDeviceSigningPublicKey = context.session.deviceSigningPublicKey;

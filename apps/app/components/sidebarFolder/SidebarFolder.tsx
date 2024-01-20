@@ -412,6 +412,7 @@ export default function SidebarFolder(props: Props) {
       signatureKeyPair,
       sodium
     );
+
     const documentNameData = encryptDocumentTitle({
       title: documentName,
       activeDevice,
@@ -421,12 +422,17 @@ export default function SidebarFolder(props: Props) {
       workspaceKeyBox: workspace.currentWorkspaceKey.workspaceKeyBox!,
       workspaceId: workspace.id,
       workspaceKeyId: workspace.currentWorkspaceKey.id,
+      documentId,
+      workspaceMemberDevicesProof: workspaceMemberDevicesProof.proof,
     });
     const result = await runCreateDocumentMutation(
       {
         input: {
           nameCiphertext: documentNameData.ciphertext,
           nameNonce: documentNameData.nonce,
+          nameSignature: documentNameData.signature,
+          nameWorkspaceMemberDevicesProofHash:
+            workspaceMemberDevicesProof.proof.hash,
           subkeyId: documentNameData.subkeyId,
           workspaceId: props.workspaceId,
           parentFolderId: props.folderId,

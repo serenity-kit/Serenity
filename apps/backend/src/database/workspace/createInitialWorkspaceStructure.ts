@@ -4,6 +4,7 @@ import * as workspaceMemberDevicesProofUtil from "@serenity-kit/workspace-member
 import {
   KeyDerivationTrace,
   SerenitySnapshotWithClientData,
+  verifyDocumentNameSignature,
   verifyFolderNameSignature,
 } from "@serenity-tools/common";
 import { verifyWorkspaceInfoSignature } from "@serenity-tools/common/src/verifyWorkspaceInfoSignature/verifyWorkspaceInfoSignature";
@@ -35,6 +36,7 @@ export type FolderParams = {
 export type DocumentParams = {
   nameCiphertext: string;
   nameNonce: string;
+  nameSignature: string;
   subkeyId: string;
   snapshot: SerenitySnapshotWithClientData;
 };
@@ -90,6 +92,18 @@ export async function createInitialWorkspaceStructure({
     throw new Error("Invalid folder signature");
   }
 
+  const isValidDocumentNameSignature = verifyDocumentNameSignature({
+    authorSigningPublicKey: creatorDeviceSigningPublicKey,
+    ciphertext: document.nameCiphertext,
+    nonce: document.nameNonce,
+    signature: document.nameSignature,
+  });
+  if (!isValidDocumentNameSignature) {
+    throw new Error(
+      "Invalid document name signature on createInitialWorkspaceStructure"
+    );
+  }
+
   const createdWorkspace = await createWorkspace({
     id: workspace.id,
     infoCiphertext: workspace.infoCiphertext,
@@ -123,6 +137,9 @@ export async function createInitialWorkspaceStructure({
     userId,
     nameCiphertext: document.nameCiphertext,
     nameNonce: document.nameNonce,
+    nameSignature: document.nameSignature,
+    nameWorkspaceMemberDevicesProofHash: workspaceMemberDevicesProof.hash,
+    nameCreatorDeviceSigningPublicKey: creatorDeviceSigningPublicKey,
     workspaceKeyId: createdWorkspace.currentWorkspaceKey?.id,
     subkeyId: document.subkeyId,
     parentFolderId: folder.id,

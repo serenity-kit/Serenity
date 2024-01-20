@@ -9,6 +9,7 @@ import {
 } from "@serenity-tools/common";
 import { decryptDocumentTitleBasedOnSnapshotKey } from "@serenity-tools/common/src/decryptDocumentTitleBasedOnSnapshotKey/decryptDocumentTitleBasedOnSnapshotKey";
 import { gql } from "graphql-request";
+import { prisma } from "../../../../src/database/prisma";
 import { registerUser } from "../../../../test/helpers/authentication/registerUser";
 import deleteAllRecords from "../../../../test/helpers/deleteAllRecords";
 import setupGraphql from "../../../../test/helpers/setupGraphql";
@@ -91,6 +92,7 @@ test("create initial workspace structure", async () => {
     userId: userData1.userId,
     workspaceId: workspace.id,
     hash: folder.workspaceMemberDevicesProofHash,
+    prisma,
   });
 
   const decryptedFolderName = decryptFolderName({
@@ -128,11 +130,24 @@ test("create initial workspace structure", async () => {
   const snapshotKey =
     snapshotKeyTrace.trace[snapshotKeyTrace.trace.length - 1].key;
 
+  const documentNameWorkspaceMemberDevicesProof =
+    await getWorkspaceMemberDevicesProof({
+      userId: userData1.userId,
+      workspaceId: workspace.id,
+      hash: document.nameWorkspaceMemberDevicesProofHash,
+      prisma,
+    });
+
   const decryptedDocumentName = decryptDocumentTitleBasedOnSnapshotKey({
     snapshotKey,
     subkeyId: document.subkeyId,
     ciphertext: document.nameCiphertext,
     nonce: document.nameNonce,
+    documentId: document.id,
+    workspaceId: document.workspaceId,
+    workspaceMemberDevicesProof: documentNameWorkspaceMemberDevicesProof.proof,
+    signature: document.nameSignature,
+    creatorDeviceSigningPublicKey: document.nameCreatorDeviceSigningPublicKey,
   });
   expect(decryptedDocumentName).toBe("Introduction");
 });

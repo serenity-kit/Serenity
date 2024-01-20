@@ -1,3 +1,4 @@
+import * as workspaceMemberDevicesProofUtil from "@serenity-kit/workspace-member-devices-proof";
 import { decryptDocumentTitleBasedOnSnapshotKey } from "../decryptDocumentTitleBasedOnSnapshotKey/decryptDocumentTitleBasedOnSnapshotKey";
 import { deriveKeysFromKeyDerivationTrace } from "../deriveKeysFromKeyDerivationTrace/deriveKeysFromKeyDerivationTrace";
 import { Device, LocalDevice } from "../types";
@@ -6,6 +7,8 @@ import { KeyDerivationTrace } from "../zodTypes";
 type Params = {
   ciphertext: string;
   nonce: string;
+  signature: string;
+  creatorDeviceSigningPublicKey: string;
   activeDevice: LocalDevice;
   snapshot: {
     keyDerivationTrace: KeyDerivationTrace;
@@ -18,6 +21,8 @@ type Params = {
   };
   workspaceId: string;
   workspaceKeyId: string;
+  documentId: string;
+  workspaceMemberDevicesProof: workspaceMemberDevicesProofUtil.WorkspaceMemberDevicesProof;
 };
 
 export const decryptDocumentTitle = ({
@@ -29,6 +34,10 @@ export const decryptDocumentTitle = ({
   nonce,
   workspaceId,
   workspaceKeyId,
+  documentId,
+  workspaceMemberDevicesProof,
+  signature,
+  creatorDeviceSigningPublicKey,
 }: Params) => {
   const snapshotFolderKeyData = deriveKeysFromKeyDerivationTrace({
     keyDerivationTrace: snapshot.keyDerivationTrace,
@@ -50,5 +59,10 @@ export const decryptDocumentTitle = ({
     subkeyId,
     ciphertext,
     nonce,
+    documentId,
+    workspaceMemberDevicesProof,
+    workspaceId,
+    signature,
+    creatorDeviceSigningPublicKey,
   });
 };

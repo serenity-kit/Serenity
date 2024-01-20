@@ -20,6 +20,9 @@ export const getDocument = async ({
         id
         nameCiphertext
         nameNonce
+        nameSignature
+        nameWorkspaceMemberDevicesProofHash
+        nameCreatorDeviceSigningPublicKey
         parentFolderId
         workspaceId
         subkeyId

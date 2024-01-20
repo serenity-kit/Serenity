@@ -1,5 +1,8 @@
 import * as documentChain from "@serenity-kit/document-chain";
-import { SerenitySnapshotWithClientData } from "@serenity-tools/common";
+import {
+  SerenitySnapshotWithClientData,
+  verifyDocumentNameSignature,
+} from "@serenity-tools/common";
 import { AuthenticationError, UserInputError } from "apollo-server-express";
 import {
   arg,
@@ -16,6 +19,8 @@ export const CreateDocumentInput = inputObjectType({
   definition(t) {
     t.nonNull.string("nameCiphertext");
     t.nonNull.string("nameNonce");
+    t.nonNull.string("nameSignature");
+    t.nonNull.string("nameWorkspaceMemberDevicesProofHash");
     t.nonNull.string("subkeyId");
     t.nonNull.string("parentFolderId");
     t.nonNull.string("workspaceId");
@@ -48,6 +53,16 @@ export const createDocumentMutation = mutationField("createDocument", {
       throw new UserInputError("Invalid input: snapshotId cannot be null");
     }
 
+    const isValid = verifyDocumentNameSignature({
+      authorSigningPublicKey: context.session.deviceSigningPublicKey,
+      ciphertext: args.input.nameCiphertext,
+      nonce: args.input.nameNonce,
+      signature: args.input.nameSignature,
+    });
+    if (!isValid) {
+      throw new Error("Invalid document name signature on document create");
+    }
+
     const documentChainEvent = documentChain.CreateDocumentChainEvent.parse(
       JSON.parse(args.input.serializedDocumentChainEvent)
     );
@@ -57,6 +72,10 @@ export const createDocumentMutation = mutationField("createDocument", {
       userId: context.user.id,
       nameCiphertext: args.input.nameCiphertext,
       nameNonce: args.input.nameNonce,
+      nameSignature: args.input.nameSignature,
+      nameWorkspaceMemberDevicesProofHash:
+        args.input.nameWorkspaceMemberDevicesProofHash,
+      nameCreatorDeviceSigningPublicKey: context.session.deviceSigningPublicKey,
       workspaceKeyId: null,
       subkeyId: args.input.subkeyId,
       parentFolderId: args.input.parentFolderId,

@@ -188,11 +188,6 @@ export default async function createUserWithWorkspace({
     snapshotKey: snapshotKey.key,
   });
   const documentTitleKey = documentTitleKeyResult.key;
-  const encryptedDocumentTitleResult = encryptDocumentTitleByKey({
-    title: documentName,
-    key: documentTitleKey,
-  });
-  const snapshotId = generateId();
 
   const createDocumentChainEvent = documentChain.createDocumentChain({
     authorKeyPair: {
@@ -200,6 +195,18 @@ export default async function createUserWithWorkspace({
       publicKey: mainDevice.signingPublicKey,
     },
   });
+
+  const encryptedDocumentTitleResult = encryptDocumentTitleByKey({
+    title: documentName,
+    key: documentTitleKey,
+    documentId: createDocumentChainEvent.transaction.id,
+    workspaceId: createWorkspaceChainEvent.transaction.id,
+    workspaceMemberDevicesProof,
+    activeDevice: mainDevice,
+  });
+
+  const snapshotId = generateId();
+
   const documentChainState = documentChain.resolveState({
     events: [createDocumentChainEvent],
     knownVersion: documentChain.version,
@@ -277,6 +284,7 @@ export default async function createUserWithWorkspace({
     document: {
       nameCiphertext: encryptedDocumentTitleResult.ciphertext,
       nameNonce: encryptedDocumentTitleResult.publicNonce,
+      nameSignature: encryptedDocumentTitleResult.signature,
       subkeyId: documentTitleKeyResult.subkeyId,
       // @ts-expect-error due the documentTitleData missing in additionalServerData
       snapshot,

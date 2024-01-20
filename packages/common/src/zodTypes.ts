@@ -77,6 +77,8 @@ export type SerenitySnapshotWithClientData = SnapshotWithClientData & {
       nonce: string;
       subkeyId: string;
       workspaceKeyId: string;
+      signature: string;
+      workspaceMemberDevicesProofHash: string;
     };
     documentShareLinkDeviceBoxes: DocumentShareLinkDeviceBox[];
   };

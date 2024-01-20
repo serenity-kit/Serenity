@@ -9,6 +9,9 @@ export const Document = objectType({
     t.nonNull.string("id");
     t.nonNull.string("nameCiphertext");
     t.nonNull.string("nameNonce");
+    t.nonNull.string("nameSignature");
+    t.nonNull.string("nameWorkspaceMemberDevicesProofHash");
+    t.nonNull.string("nameCreatorDeviceSigningPublicKey");
     t.nonNull.string("subkeyId");
     t.string("parentFolderId");
     t.string("rootFolderId");

@@ -12,14 +12,18 @@ import {
   compareUpdateClocks,
 } from "@serenity-tools/secsync";
 import { Prisma } from "../../prisma/generated/output";
+import { getOrCreateCreatorDevice } from "../utils/device/getOrCreateCreatorDevice";
 import { serializeSnapshot } from "../utils/serialize";
 import { prisma } from "./prisma";
+import { getWorkspaceMemberDevicesProof } from "./workspace/getWorkspaceMemberDevicesProof";
 
 export type CreateSnapshotDocumentTitleData = {
   ciphertext: string;
   nonce: string;
   workspaceKeyId: string;
   subkeyId: string;
+  signature: string;
+  workspaceMemberDevicesProofHash: string;
 };
 
 type Params = {
@@ -124,11 +128,44 @@ export async function createSnapshot({
     }
 
     if (documentTitleData) {
+      const device = await prisma.device.findUniqueOrThrow({
+        where: { signingPublicKey: snapshot.publicData.pubKey },
+        select: { userId: true },
+      });
+      if (!device.userId) {
+        throw new Error("Device has no userId");
+      }
+
+      const workspaceMemberDevicesProof = await getWorkspaceMemberDevicesProof({
+        workspaceId: document.workspaceId,
+        userId: device.userId,
+        prisma,
+      });
+      if (
+        workspaceMemberDevicesProof.proof.hash !==
+        documentTitleData.workspaceMemberDevicesProofHash
+      ) {
+        throw new Error(
+          "Outdated workspace member devices proof hash for updating the document name on snapshot creation"
+        );
+      }
+
+      // convert the user's device into a creatorDevice
+      const creatorDevice = await getOrCreateCreatorDevice({
+        prisma,
+        signingPublicKey: snapshot.publicData.pubKey,
+        userId: device.userId,
+      });
+
       await prisma.document.update({
         where: { id: snapshot.publicData.docId },
         data: {
           nameCiphertext: documentTitleData.ciphertext,
           nameNonce: documentTitleData.nonce,
+          nameSignature: documentTitleData.signature,
+          nameWorkspaceMemberDevicesProofHash:
+            documentTitleData.workspaceMemberDevicesProofHash,
+          nameCreatorDeviceSigningPublicKey: creatorDevice.signingPublicKey,
           workspaceKeyId: documentTitleData.workspaceKeyId,
           subkeyId: documentTitleData.subkeyId,
         },

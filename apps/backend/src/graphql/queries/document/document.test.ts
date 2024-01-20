@@ -5,6 +5,7 @@ import {
   generateId,
 } from "@serenity-tools/common";
 import { decryptDocumentTitleBasedOnSnapshotKey } from "@serenity-tools/common/src/decryptDocumentTitleBasedOnSnapshotKey/decryptDocumentTitleBasedOnSnapshotKey";
+import { prisma } from "../../../../src/database/prisma";
 import deleteAllRecords from "../../../../test/helpers/deleteAllRecords";
 import { createDocument } from "../../../../test/helpers/document/createDocument";
 import { getDocument } from "../../../../test/helpers/document/getDocument";
@@ -12,6 +13,7 @@ import { updateDocumentName } from "../../../../test/helpers/document/updateDocu
 import setupGraphql from "../../../../test/helpers/setupGraphql";
 import { getSnapshot } from "../../../../test/helpers/snapshot/getSnapshot";
 import createUserWithWorkspace from "../../../database/testHelpers/createUserWithWorkspace";
+import { getWorkspaceMemberDevicesProof } from "../../../database/workspace/getWorkspaceMemberDevicesProof";
 
 const graphql = setupGraphql();
 let userData1: any = null;
@@ -101,11 +103,25 @@ test("user should be retrieve a document", async () => {
   const snapshotKey =
     snapshotKeyTrace.trace[snapshotKeyTrace.trace.length - 1].key;
 
+  const documentNameWorkspaceMemberDevicesProof =
+    await getWorkspaceMemberDevicesProof({
+      userId: userData1.user.id,
+      workspaceId: userData1.workspace.id,
+      hash: retrievedDocument.nameWorkspaceMemberDevicesProofHash,
+      prisma,
+    });
+
   const decryptedName = decryptDocumentTitleBasedOnSnapshotKey({
     ciphertext: retrievedDocument.nameCiphertext,
     nonce: retrievedDocument.nameNonce,
     snapshotKey,
     subkeyId: retrievedDocument.subkeyId,
+    documentId: retrievedDocument.id,
+    workspaceId: retrievedDocument.workspaceId,
+    workspaceMemberDevicesProof: documentNameWorkspaceMemberDevicesProof.proof,
+    signature: retrievedDocument.nameSignature,
+    creatorDeviceSigningPublicKey:
+      retrievedDocument.nameCreatorDeviceSigningPublicKey,
   });
   expect(decryptedName).toBe(documentName);
 });

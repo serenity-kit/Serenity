@@ -218,6 +218,8 @@ export function CreateWorkspaceForm(props: CreateWorkspaceFormProps) {
         },
         workspaceId: event.transaction.id,
         workspaceKeyId,
+        workspaceMemberDevicesProof,
+        documentId: createDocumentChainEvent.transaction.id,
       });
 
       const encryptedWorkspaceInfo = encryptWorkspaceInfo({
@@ -253,6 +255,7 @@ export function CreateWorkspaceForm(props: CreateWorkspaceFormProps) {
             document: {
               nameCiphertext: encryptedDocumentTitle.ciphertext,
               nameNonce: encryptedDocumentTitle.nonce,
+              nameSignature: encryptedDocumentTitle.signature,
               subkeyId: encryptedDocumentTitle.subkeyId,
               snapshot,
               serializedDocumentChainEvent: JSON.stringify(
