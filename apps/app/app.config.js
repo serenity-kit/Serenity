@@ -5,7 +5,7 @@ export default {
     slug: "serenity",
     version: "0.0.5",
     orientation: "portrait",
-    plugins: [["react-native-libsodium", {}]],
+    plugins: ["expo-font", "expo-secure-store", ["react-native-libsodium", {}]],
     icon: "./assets/images/icon.png",
     scheme: "myapp",
     userInterfaceStyle: "automatic",

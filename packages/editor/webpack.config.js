@@ -42,6 +42,9 @@ module.exports = {
       "react-native$": "react-native-web",
       "normalize-css-color": "@react-native/normalize-color",
     },
+    fallback: {
+      crypto: false,
+    },
   },
   module: {
     rules: [
