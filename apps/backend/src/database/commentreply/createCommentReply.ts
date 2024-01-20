@@ -30,91 +30,93 @@ export async function createCommentReply({
   contentNonce,
   signature,
 }: Params) {
-  let workspaceMemberDevicesProof: null | workspaceMemberDevicesProofUtil.WorkspaceMemberDevicesProof =
-    null;
+  return await prisma.$transaction(async (prisma) => {
+    let workspaceMemberDevicesProof: null | workspaceMemberDevicesProofUtil.WorkspaceMemberDevicesProof =
+      null;
 
-  // verify the document exists
-  const document = await prisma.document.findFirst({
-    where: { activeSnapshotId: snapshotId },
-  });
-  if (!document) {
-    throw new ForbiddenError("Unauthorized");
-  }
-  // ensure this comment exists also
-  const comment = await prisma.comment.findFirst({
-    where: { id: commentId },
-  });
-  if (!comment) {
-    throw new UserInputError("Invalid comment id");
-  }
-  const allowedRoles = [Role.ADMIN, Role.EDITOR, Role.COMMENTER];
-  const allowedShareDocumentRoles = [
-    ShareDocumentRole.EDITOR,
-    ShareDocumentRole.COMMENTER,
-  ];
-  // if the user has a documentShareLinkToken, verify it
-  let documentShareLink: any = null;
-  if (documentShareLinkToken) {
-    documentShareLink = await prisma.documentShareLink.findFirst({
-      where: {
-        token: documentShareLinkToken,
-        documentId: document.id,
-        role: { in: allowedShareDocumentRoles },
-      },
+    // verify the document exists
+    const document = await prisma.document.findFirst({
+      where: { activeSnapshotId: snapshotId },
     });
-    if (!documentShareLink) {
-      throw new UserInputError("Invalid documentShareLinkToken");
-    }
-  } else {
-    // if no documentShareLinkToken, the user must have access to the workspace
-    const user2Workspace = await prisma.usersToWorkspaces.findFirst({
-      where: {
-        userId,
-        workspaceId: document.workspaceId,
-        role: { in: allowedRoles },
-      },
-    });
-    if (!user2Workspace) {
+    if (!document) {
       throw new ForbiddenError("Unauthorized");
     }
-
-    const workspaceMemberDevicesProofEntry =
-      await getWorkspaceMemberDevicesProof({
-        workspaceId: user2Workspace.workspaceId,
-        userId,
-        prisma,
-      });
-    workspaceMemberDevicesProof = workspaceMemberDevicesProofEntry.proof;
-  }
-
-  // convert the user's device into a creatorDevice
-  const creatorDevice = await getOrCreateCreatorDevice({
-    prisma,
-    userId,
-    signingPublicKey: creatorDeviceSigningPublicKey,
-  });
-
-  try {
-    const commentReply = await prisma.commentReply.create({
-      data: {
-        id: commentReplyId,
-        commentId,
-        documentId: document.id,
-        snapshotId,
-        subkeyId,
-        creatorDeviceSigningPublicKey: creatorDevice.signingPublicKey,
-        contentCiphertext,
-        contentNonce,
-        signature,
-        workspaceMemberDevicesProofHash: workspaceMemberDevicesProof?.hash,
-      },
+    // ensure this comment exists also
+    const comment = await prisma.comment.findFirst({
+      where: { id: commentId },
     });
-    return {
-      ...commentReply,
-      creatorDevice,
-    };
-  } catch (e) {
-    console.log(e);
-    throw e;
-  }
+    if (!comment) {
+      throw new UserInputError("Invalid comment id");
+    }
+    const allowedRoles = [Role.ADMIN, Role.EDITOR, Role.COMMENTER];
+    const allowedShareDocumentRoles = [
+      ShareDocumentRole.EDITOR,
+      ShareDocumentRole.COMMENTER,
+    ];
+    // if the user has a documentShareLinkToken, verify it
+    let documentShareLink: any = null;
+    if (documentShareLinkToken) {
+      documentShareLink = await prisma.documentShareLink.findFirst({
+        where: {
+          token: documentShareLinkToken,
+          documentId: document.id,
+          role: { in: allowedShareDocumentRoles },
+        },
+      });
+      if (!documentShareLink) {
+        throw new UserInputError("Invalid documentShareLinkToken");
+      }
+    } else {
+      // if no documentShareLinkToken, the user must have access to the workspace
+      const user2Workspace = await prisma.usersToWorkspaces.findFirst({
+        where: {
+          userId,
+          workspaceId: document.workspaceId,
+          role: { in: allowedRoles },
+        },
+      });
+      if (!user2Workspace) {
+        throw new ForbiddenError("Unauthorized");
+      }
+
+      const workspaceMemberDevicesProofEntry =
+        await getWorkspaceMemberDevicesProof({
+          workspaceId: user2Workspace.workspaceId,
+          userId,
+          prisma,
+        });
+      workspaceMemberDevicesProof = workspaceMemberDevicesProofEntry.proof;
+    }
+
+    // convert the user's device into a creatorDevice
+    const creatorDevice = await getOrCreateCreatorDevice({
+      prisma,
+      userId,
+      signingPublicKey: creatorDeviceSigningPublicKey,
+    });
+
+    try {
+      const commentReply = await prisma.commentReply.create({
+        data: {
+          id: commentReplyId,
+          commentId,
+          documentId: document.id,
+          snapshotId,
+          subkeyId,
+          creatorDeviceSigningPublicKey: creatorDevice.signingPublicKey,
+          contentCiphertext,
+          contentNonce,
+          signature,
+          workspaceMemberDevicesProofHash: workspaceMemberDevicesProof?.hash,
+        },
+      });
+      return {
+        ...commentReply,
+        creatorDevice,
+      };
+    } catch (e) {
+      console.log(e);
+      throw e;
+    }
+  });
 }
