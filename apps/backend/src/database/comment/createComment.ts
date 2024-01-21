@@ -5,17 +5,31 @@ import { getOrCreateCreatorDevice } from "../../utils/device/getOrCreateCreatorD
 import { prisma } from "../prisma";
 import { getWorkspaceMemberDevicesProof } from "../workspace/getWorkspaceMemberDevicesProof";
 
-type Params = {
-  commentId: string;
-  userId: string;
-  documentShareLinkToken?: string | null | undefined;
-  creatorDeviceSigningPublicKey: string;
-  snapshotId: string;
-  subkeyId: string;
-  contentCiphertext: string;
-  contentNonce: string;
-  signature: string;
-};
+type Params =
+  | {
+      commentId: string;
+      userId: string;
+      documentShareLinkToken: string;
+      creatorDeviceSigningPublicKey: string;
+      snapshotId: string;
+      subkeyId: string;
+      contentCiphertext: string;
+      contentNonce: string;
+      signature: string;
+      workspaceMemberDevicesProofHash: undefined;
+    }
+  | {
+      commentId: string;
+      userId: string;
+      documentShareLinkToken?: undefined;
+      creatorDeviceSigningPublicKey: string;
+      snapshotId: string;
+      subkeyId: string;
+      contentCiphertext: string;
+      contentNonce: string;
+      signature: string;
+      workspaceMemberDevicesProofHash: string;
+    };
 
 export async function createComment({
   commentId,
@@ -27,6 +41,7 @@ export async function createComment({
   contentCiphertext,
   contentNonce,
   signature,
+  workspaceMemberDevicesProofHash,
 }: Params) {
   return await prisma.$transaction(async (prisma) => {
     let workspaceMemberDevicesProof: null | workspaceMemberDevicesProofUtil.WorkspaceMemberDevicesProof =
@@ -77,6 +92,15 @@ export async function createComment({
           prisma,
         });
       workspaceMemberDevicesProof = workspaceMemberDevicesProofEntry.proof;
+
+      // check that the provided workspaceMemberDevicesProofHash is the current one
+      if (
+        workspaceMemberDevicesProof.hash !== workspaceMemberDevicesProofHash
+      ) {
+        throw new Error(
+          "Invalid workspaceMemberDevicesProofHash for creating a comment"
+        );
+      }
     }
 
     // convert the user's device into a creatorDevice

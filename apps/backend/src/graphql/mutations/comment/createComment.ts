@@ -1,5 +1,5 @@
 import { verifyCommentSignature } from "@serenity-tools/common";
-import { AuthenticationError } from "apollo-server-express";
+import { AuthenticationError, UserInputError } from "apollo-server-express";
 import {
   arg,
   inputObjectType,
@@ -16,6 +16,7 @@ export const CreateCommentInput = inputObjectType({
     t.nonNull.string("commentId");
     t.nonNull.string("contentCiphertext");
     t.nonNull.string("contentNonce");
+    t.string("workspaceMemberDevicesProofHash"); // either this or documentShareLinkToken has to be provided
     t.nonNull.string("signature");
     t.nonNull.string("snapshotId");
     t.string("documentShareLinkToken");
@@ -56,16 +57,38 @@ export const createCommentMutation = mutationField("createComment", {
       throw new Error("Invalid comment signature.");
     }
 
+    if (args.input.documentShareLinkToken) {
+      const comment = await createComment({
+        commentId: args.input.commentId,
+        userId: context.user.id,
+        creatorDeviceSigningPublicKey: context.session.deviceSigningPublicKey,
+        snapshotId: args.input.snapshotId,
+        documentShareLinkToken: args.input.documentShareLinkToken,
+        subkeyId: args.input.subkeyId,
+        contentCiphertext: args.input.contentCiphertext,
+        contentNonce: args.input.contentNonce,
+        signature: args.input.signature,
+        workspaceMemberDevicesProofHash: undefined,
+      });
+      return { comment };
+    } else if (!args.input.workspaceMemberDevicesProofHash) {
+      throw new UserInputError(
+        "Either documentShareLinkToken or workspaceMemberDevicesProofHash has to be provided."
+      );
+    }
+
     const comment = await createComment({
       commentId: args.input.commentId,
       userId: context.user.id,
       creatorDeviceSigningPublicKey: context.session.deviceSigningPublicKey,
       snapshotId: args.input.snapshotId,
-      documentShareLinkToken: args.input.documentShareLinkToken,
+      documentShareLinkToken: undefined,
       subkeyId: args.input.subkeyId,
       contentCiphertext: args.input.contentCiphertext,
       contentNonce: args.input.contentNonce,
       signature: args.input.signature,
+      workspaceMemberDevicesProofHash:
+        args.input.workspaceMemberDevicesProofHash,
     });
     return { comment };
   },

@@ -1,5 +1,5 @@
 import { verifyCommentReplySignature } from "@serenity-tools/common";
-import { AuthenticationError } from "apollo-server-express";
+import { AuthenticationError, UserInputError } from "apollo-server-express";
 import {
   arg,
   inputObjectType,
@@ -17,6 +17,7 @@ export const CreateCommentReplyInput = inputObjectType({
     t.nonNull.string("commentId");
     t.nonNull.string("snapshotId");
     t.nonNull.string("signature");
+    t.string("workspaceMemberDevicesProofHash"); // either this or documentShareLinkToken has to be provided
     t.string("documentShareLinkToken");
     t.nonNull.string("subkeyId");
     t.nonNull.string("contentCiphertext");
@@ -57,17 +58,40 @@ export const createCommentReplyMutation = mutationField("createCommentReply", {
       throw new Error("Invalid comment reply signature.");
     }
 
+    if (args.input.documentShareLinkToken) {
+      const commentReply = await createCommentReply({
+        commentReplyId: args.input.commentReplyId,
+        userId: context.user.id,
+        creatorDeviceSigningPublicKey: context.session.deviceSigningPublicKey,
+        commentId: args.input.commentId,
+        snapshotId: args.input.snapshotId,
+        documentShareLinkToken: args.input.documentShareLinkToken,
+        subkeyId: args.input.subkeyId,
+        contentCiphertext: args.input.contentCiphertext,
+        contentNonce: args.input.contentNonce,
+        signature: args.input.signature,
+        workspaceMemberDevicesProofHash: undefined,
+      });
+      return { commentReply };
+    } else if (!args.input.workspaceMemberDevicesProofHash) {
+      throw new UserInputError(
+        "Either documentShareLinkToken or workspaceMemberDevicesProofHash has to be provided."
+      );
+    }
+
     const commentReply = await createCommentReply({
       commentReplyId: args.input.commentReplyId,
       userId: context.user.id,
       creatorDeviceSigningPublicKey: context.session.deviceSigningPublicKey,
       commentId: args.input.commentId,
       snapshotId: args.input.snapshotId,
-      documentShareLinkToken: args.input.documentShareLinkToken,
+      documentShareLinkToken: undefined,
       subkeyId: args.input.subkeyId,
       contentCiphertext: args.input.contentCiphertext,
       contentNonce: args.input.contentNonce,
       signature: args.input.signature,
+      workspaceMemberDevicesProofHash:
+        args.input.workspaceMemberDevicesProofHash,
     });
     return { commentReply };
   },

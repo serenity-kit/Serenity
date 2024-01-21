@@ -108,6 +108,8 @@ export const createComment = async ({
         contentNonce: nonce,
         commentId,
         signature,
+        workspaceMemberDevicesProofHash:
+          workspaceMemberDevicesProof?.proof.hash,
       },
     },
     authorizationHeaders

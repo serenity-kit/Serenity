@@ -635,6 +635,8 @@ export const commentsMachine =
                 contentCiphertext: result.ciphertext,
                 contentNonce: result.nonce,
                 signature: result.signature,
+                workspaceMemberDevicesProofHash:
+                  workspaceMemberDevicesProof.proof.hash,
               },
             });
             // this adds the comment key to the Yjs document
@@ -685,6 +687,8 @@ export const commentsMachine =
                 contentNonce: result.nonce,
                 commentReplyId: result.commentReplyId,
                 signature: result.signature,
+                workspaceMemberDevicesProofHash:
+                  workspaceMemberDevicesProof.proof.hash,
               },
             });
           // this adds the comment key to the Yjs document

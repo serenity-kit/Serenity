@@ -138,6 +138,7 @@ export type CreateCommentInput = {
   signature: Scalars['String']['input'];
   snapshotId: Scalars['String']['input'];
   subkeyId: Scalars['String']['input'];
+  workspaceMemberDevicesProofHash?: InputMaybe<Scalars['String']['input']>;
 };
 
 export type CreateCommentReplyInput = {
@@ -149,6 +150,7 @@ export type CreateCommentReplyInput = {
   signature: Scalars['String']['input'];
   snapshotId: Scalars['String']['input'];
   subkeyId: Scalars['String']['input'];
+  workspaceMemberDevicesProofHash?: InputMaybe<Scalars['String']['input']>;
 };
 
 export type CreateCommentReplyResult = {
