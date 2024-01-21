@@ -25,7 +25,10 @@ CREATE TABLE "Document" (
     "parentFolderId" TEXT NOT NULL,
     "nameCiphertext" TEXT NOT NULL,
     "nameNonce" TEXT NOT NULL,
-    "subkeyId" INTEGER NOT NULL,
+    "nameSignature" TEXT NOT NULL,
+    "nameWorkspaceMemberDevicesProofHash" TEXT NOT NULL,
+    "nameCreatorDeviceSigningPublicKey" TEXT NOT NULL,
+    "subkeyId" TEXT NOT NULL,
     "requiresSnapshot" BOOLEAN NOT NULL DEFAULT false,
 
     CONSTRAINT "Document_pkey" PRIMARY KEY ("id")
@@ -72,7 +75,7 @@ CREATE TABLE "UnverifiedUser" (
     "mainDeviceEncryptionPublicKey" TEXT NOT NULL,
     "mainDeviceEncryptionPublicKeySignature" TEXT NOT NULL,
     "pendingWorkspaceInvitationId" TEXT,
-    "pendingWorkspaceInvitationKeySubkeyId" INTEGER,
+    "pendingWorkspaceInvitationKeySubkeyId" TEXT,
     "pendingWorkspaceInvitationKeyCiphertext" TEXT,
     "pendingWorkspaceInvitationKeyPublicNonce" TEXT,
     "createChainEvent" JSONB NOT NULL,
@@ -89,7 +92,7 @@ CREATE TABLE "User" (
     "mainDeviceNonce" TEXT NOT NULL,
     "mainDeviceSigningPublicKey" TEXT NOT NULL,
     "pendingWorkspaceInvitationId" TEXT,
-    "pendingWorkspaceInvitationKeySubkeyId" INTEGER,
+    "pendingWorkspaceInvitationKeySubkeyId" TEXT,
     "pendingWorkspaceInvitationKeyCiphertext" TEXT,
     "pendingWorkspaceInvitationKeyPublicNonce" TEXT,
 
@@ -109,13 +112,14 @@ CREATE TABLE "UserChainEvent" (
 
 -- CreateTable
 CREATE TABLE "Session" (
+    "sessionToken" TEXT NOT NULL,
     "sessionKey" TEXT NOT NULL,
     "expiresAt" TIMESTAMP(3) NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "userId" TEXT NOT NULL,
     "deviceSigningPublicKey" TEXT NOT NULL,
 
-    CONSTRAINT "Session_pkey" PRIMARY KEY ("sessionKey")
+    CONSTRAINT "Session_pkey" PRIMARY KEY ("sessionToken")
 );
 
 -- CreateTable
@@ -153,6 +157,9 @@ CREATE TABLE "Device" (
     "info" TEXT,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "expiresAt" TIMESTAMP(3),
+    "webDeviceCiphertext" TEXT,
+    "webDeviceNonce" TEXT,
+    "webDeviceAccessToken" TEXT,
 
     CONSTRAINT "Device_pkey" PRIMARY KEY ("signingPublicKey")
 );
@@ -171,12 +178,13 @@ CREATE TABLE "CreatorDevice" (
 -- CreateTable
 CREATE TABLE "Workspace" (
     "id" TEXT NOT NULL,
-    "idSignature" TEXT NOT NULL,
-    "name" TEXT NOT NULL,
-    "infoCiphertext" TEXT,
-    "infoNonce" TEXT,
-    "infoWorkspaceKeyId" TEXT,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "infoCiphertext" TEXT NOT NULL,
+    "infoNonce" TEXT NOT NULL,
+    "infoWorkspaceKeyId" TEXT,
+    "infoSignature" TEXT NOT NULL,
+    "infoWorkspaceMemberDevicesProofHash" TEXT NOT NULL,
+    "infoCreatorDeviceSigningPublicKey" TEXT NOT NULL,
 
     CONSTRAINT "Workspace_pkey" PRIMARY KEY ("id")
 );
@@ -190,6 +198,18 @@ CREATE TABLE "WorkspaceChainEvent" (
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
     CONSTRAINT "WorkspaceChainEvent_pkey" PRIMARY KEY ("workspaceId","position")
+);
+
+-- CreateTable
+CREATE TABLE "WorkspaceMemberDevicesProof" (
+    "hash" TEXT NOT NULL,
+    "proof" JSONB NOT NULL,
+    "data" JSONB NOT NULL,
+    "clock" INTEGER NOT NULL,
+    "workspaceId" TEXT NOT NULL,
+    "authorMainDeviceSigningPublicKey" TEXT NOT NULL,
+
+    CONSTRAINT "WorkspaceMemberDevicesProof_pkey" PRIMARY KEY ("workspaceId","clock")
 );
 
 -- CreateTable
@@ -226,16 +246,18 @@ CREATE TABLE "WorkspaceKeyBox" (
 -- CreateTable
 CREATE TABLE "Folder" (
     "id" TEXT NOT NULL,
-    "idSignature" TEXT NOT NULL,
     "nameCiphertext" TEXT NOT NULL,
     "nameNonce" TEXT NOT NULL,
-    "subkeyId" INTEGER NOT NULL,
+    "signature" TEXT NOT NULL,
+    "workspaceMemberDevicesProofHash" TEXT NOT NULL,
+    "subkeyId" TEXT NOT NULL,
     "workspaceId" TEXT NOT NULL,
     "workspaceKeyId" TEXT NOT NULL,
     "parentFolderId" TEXT,
     "keyDerivationTrace" JSONB NOT NULL DEFAULT '{}',
     "rootFolderId" TEXT,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "creatorDeviceSigningPublicKey" TEXT NOT NULL,
 
     CONSTRAINT "Folder_pkey" PRIMARY KEY ("id")
 );
@@ -277,7 +299,9 @@ CREATE TABLE "Comment" (
     "contentNonce" TEXT NOT NULL,
     "creatorDeviceSigningPublicKey" TEXT NOT NULL,
     "snapshotId" TEXT NOT NULL,
-    "subkeyId" INTEGER NOT NULL,
+    "subkeyId" TEXT NOT NULL,
+    "signature" TEXT NOT NULL,
+    "workspaceMemberDevicesProofHash" TEXT,
 
     CONSTRAINT "Comment_pkey" PRIMARY KEY ("id")
 );
@@ -292,7 +316,9 @@ CREATE TABLE "CommentReply" (
     "contentNonce" TEXT NOT NULL,
     "creatorDeviceSigningPublicKey" TEXT NOT NULL,
     "snapshotId" TEXT NOT NULL,
-    "subkeyId" INTEGER NOT NULL,
+    "subkeyId" TEXT NOT NULL,
+    "signature" TEXT NOT NULL,
+    "workspaceMemberDevicesProofHash" TEXT,
 
     CONSTRAINT "CommentReply_pkey" PRIMARY KEY ("id")
 );
@@ -304,6 +330,7 @@ CREATE TABLE "LoginAttempt" (
     "startLoginServerData" TEXT NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "sessionKey" TEXT,
+    "sessionToken" TEXT,
 
     CONSTRAINT "LoginAttempt_pkey" PRIMARY KEY ("id")
 );
@@ -351,6 +378,9 @@ CREATE UNIQUE INDEX "User_mainDeviceSigningPublicKey_key" ON "User"("mainDeviceS
 CREATE INDEX "UserChainEvent_userId_position_idx" ON "UserChainEvent"("userId", "position" ASC);
 
 -- CreateIndex
+CREATE UNIQUE INDEX "Session_sessionKey_key" ON "Session"("sessionKey");
+
+-- CreateIndex
 CREATE UNIQUE INDEX "RecoveryDevice_nonce_key" ON "RecoveryDevice"("nonce");
 
 -- CreateIndex
@@ -358,6 +388,12 @@ CREATE UNIQUE INDEX "RecoveryDevice_userId_key" ON "RecoveryDevice"("userId");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "Device_signingPublicKey_key" ON "Device"("signingPublicKey");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "Device_webDeviceNonce_key" ON "Device"("webDeviceNonce");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "Device_webDeviceAccessToken_key" ON "Device"("webDeviceAccessToken");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "CreatorDevice_signingPublicKey_key" ON "CreatorDevice"("signingPublicKey");
@@ -370,6 +406,12 @@ CREATE INDEX "Workspace_createdAt_idx" ON "Workspace"("createdAt" DESC);
 
 -- CreateIndex
 CREATE INDEX "WorkspaceChainEvent_workspaceId_position_idx" ON "WorkspaceChainEvent"("workspaceId", "position" ASC);
+
+-- CreateIndex
+CREATE UNIQUE INDEX "WorkspaceMemberDevicesProof_hash_key" ON "WorkspaceMemberDevicesProof"("hash");
+
+-- CreateIndex
+CREATE INDEX "WorkspaceMemberDevicesProof_workspaceId_clock_idx" ON "WorkspaceMemberDevicesProof"("workspaceId", "clock" ASC);
 
 -- CreateIndex
 CREATE UNIQUE INDEX "WorkspaceKey_id_key" ON "WorkspaceKey"("id");
@@ -416,6 +458,9 @@ CREATE UNIQUE INDEX "LoginAttempt_id_key" ON "LoginAttempt"("id");
 -- CreateIndex
 CREATE UNIQUE INDEX "LoginAttempt_sessionKey_key" ON "LoginAttempt"("sessionKey");
 
+-- CreateIndex
+CREATE UNIQUE INDEX "LoginAttempt_sessionToken_key" ON "LoginAttempt"("sessionToken");
+
 -- AddForeignKey
 ALTER TABLE "DocumentChainEvent" ADD CONSTRAINT "DocumentChainEvent_documentId_fkey" FOREIGN KEY ("documentId") REFERENCES "Document"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
@@ -430,6 +475,9 @@ ALTER TABLE "Document" ADD CONSTRAINT "Document_workspaceKeyId_fkey" FOREIGN KEY
 
 -- AddForeignKey
 ALTER TABLE "Document" ADD CONSTRAINT "Document_parentFolderId_fkey" FOREIGN KEY ("parentFolderId") REFERENCES "Folder"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Document" ADD CONSTRAINT "Document_nameCreatorDeviceSigningPublicKey_fkey" FOREIGN KEY ("nameCreatorDeviceSigningPublicKey") REFERENCES "CreatorDevice"("signingPublicKey") ON DELETE SET DEFAULT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "Snapshot" ADD CONSTRAINT "Snapshot_documentId_fkey" FOREIGN KEY ("documentId") REFERENCES "Document"("id") ON DELETE CASCADE ON UPDATE CASCADE;
@@ -471,7 +519,13 @@ ALTER TABLE "CreatorDevice" ADD CONSTRAINT "CreatorDevice_userId_fkey" FOREIGN K
 ALTER TABLE "Workspace" ADD CONSTRAINT "Workspace_infoWorkspaceKeyId_fkey" FOREIGN KEY ("infoWorkspaceKeyId") REFERENCES "WorkspaceKey"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
+ALTER TABLE "Workspace" ADD CONSTRAINT "Workspace_infoCreatorDeviceSigningPublicKey_fkey" FOREIGN KEY ("infoCreatorDeviceSigningPublicKey") REFERENCES "CreatorDevice"("signingPublicKey") ON DELETE SET DEFAULT ON UPDATE CASCADE;
+
+-- AddForeignKey
 ALTER TABLE "WorkspaceChainEvent" ADD CONSTRAINT "WorkspaceChainEvent_workspaceId_fkey" FOREIGN KEY ("workspaceId") REFERENCES "Workspace"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "WorkspaceMemberDevicesProof" ADD CONSTRAINT "WorkspaceMemberDevicesProof_workspaceId_fkey" FOREIGN KEY ("workspaceId") REFERENCES "Workspace"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "UsersToWorkspaces" ADD CONSTRAINT "UsersToWorkspaces_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
@@ -499,6 +553,9 @@ ALTER TABLE "Folder" ADD CONSTRAINT "Folder_parentFolderId_fkey" FOREIGN KEY ("p
 
 -- AddForeignKey
 ALTER TABLE "Folder" ADD CONSTRAINT "Folder_rootFolderId_fkey" FOREIGN KEY ("rootFolderId") REFERENCES "Folder"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Folder" ADD CONSTRAINT "Folder_creatorDeviceSigningPublicKey_fkey" FOREIGN KEY ("creatorDeviceSigningPublicKey") REFERENCES "CreatorDevice"("signingPublicKey") ON DELETE SET DEFAULT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "DocumentShareLink" ADD CONSTRAINT "DocumentShareLink_sharerUserId_fkey" FOREIGN KEY ("sharerUserId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
