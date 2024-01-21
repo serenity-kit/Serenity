@@ -5,18 +5,33 @@ import { getOrCreateCreatorDevice } from "../../utils/device/getOrCreateCreatorD
 import { prisma } from "../prisma";
 import { getWorkspaceMemberDevicesProof } from "../workspace/getWorkspaceMemberDevicesProof";
 
-type Params = {
-  userId: string;
-  documentShareLinkToken?: string | null | undefined;
-  creatorDeviceSigningPublicKey: string;
-  commentReplyId: string;
-  commentId: string;
-  snapshotId: string;
-  subkeyId: string;
-  contentCiphertext: string;
-  contentNonce: string;
-  signature: string;
-};
+type Params =
+  | {
+      userId: string;
+      documentShareLinkToken: string;
+      creatorDeviceSigningPublicKey: string;
+      commentReplyId: string;
+      commentId: string;
+      snapshotId: string;
+      subkeyId: string;
+      contentCiphertext: string;
+      contentNonce: string;
+      signature: string;
+      workspaceMemberDevicesProofHash?: undefined;
+    }
+  | {
+      userId: string;
+      documentShareLinkToken?: undefined;
+      creatorDeviceSigningPublicKey: string;
+      commentReplyId: string;
+      commentId: string;
+      snapshotId: string;
+      subkeyId: string;
+      contentCiphertext: string;
+      contentNonce: string;
+      signature: string;
+      workspaceMemberDevicesProofHash: string;
+    };
 
 export async function createCommentReply({
   userId,
@@ -29,6 +44,7 @@ export async function createCommentReply({
   contentCiphertext,
   contentNonce,
   signature,
+  workspaceMemberDevicesProofHash,
 }: Params) {
   return await prisma.$transaction(async (prisma) => {
     let workspaceMemberDevicesProof: null | workspaceMemberDevicesProofUtil.WorkspaceMemberDevicesProof =
@@ -86,6 +102,15 @@ export async function createCommentReply({
           prisma,
         });
       workspaceMemberDevicesProof = workspaceMemberDevicesProofEntry.proof;
+
+      // check that the provided workspaceMemberDevicesProofHash is the current one
+      if (
+        workspaceMemberDevicesProof.hash !== workspaceMemberDevicesProofHash
+      ) {
+        throw new Error(
+          "Invalid workspaceMemberDevicesProofHash for creating a comment reply"
+        );
+      }
     }
 
     // convert the user's device into a creatorDevice

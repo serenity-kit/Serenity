@@ -111,6 +111,8 @@ export const createCommentReply = async ({
         contentNonce: nonce,
         commentReplyId,
         signature,
+        workspaceMemberDevicesProofHash:
+          workspaceMemberDevicesProof?.proof.hash,
       },
     },
     authorizationHeaders
