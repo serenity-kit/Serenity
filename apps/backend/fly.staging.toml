@@ -1,9 +1,9 @@
-# fly.toml app configuration file generated for serenity-dev on 2023-10-10T18:13:03+02:00
+# fly.toml app configuration file generated for serenity-api-staging on 2024-01-01T08:13:03+02:00
 #
 # See https://fly.io/docs/reference/configuration/ for information about how to use this file.
 #
 
-app = "serenity-dev"
+app = "serenity-api-staging"
 primary_region = "ams"
 
 [build]
