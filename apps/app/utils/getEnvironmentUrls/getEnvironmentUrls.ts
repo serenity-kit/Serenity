@@ -16,8 +16,8 @@ export const getEnvironmentUrls = () => {
     graphqlEndpoint = "http://localhost:4001/graphql";
   }
   if (env === "staging") {
-    websocketOrigin = "wss://serenity-dev.fly.dev";
-    graphqlEndpoint = "https://serenity-dev.fly.dev/graphql";
+    websocketOrigin = "wss://serenity-api-staging.fly.dev";
+    graphqlEndpoint = "https://serenity-api-staging.fly.dev/graphql";
     frontendOrigin = "https://www.serenity.li";
   }
   if (env === "production") {

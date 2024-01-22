@@ -230,7 +230,7 @@ Update DATABASE_URL in Github secrets with <db_connection_url>/serenity
 ```sh
 cd apps/backend
 
-flyctl postgres connect --app serenity-dev-db
+flyctl postgres connect --app serenity-api-staging-db
 # in the psql console run
 SELECT pg_terminate_backend(pg_stat_activity.pid)
 FROM pg_stat_activity
