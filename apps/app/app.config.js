@@ -3,7 +3,7 @@ export default {
     name: "Serenity",
     owner: "serenity-app",
     slug: "serenity",
-    version: "0.0.5",
+    version: "0.0.6",
     orientation: "portrait",
     plugins: ["expo-font", "expo-secure-store", ["react-native-libsodium", {}]],
     icon: "./assets/images/icon.png",
