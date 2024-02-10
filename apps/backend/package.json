@@ -42,7 +42,7 @@
     "zod": "^3.22.4"
   },
   "devDependencies": {
-    "@playwright/test": "^1.40.1",
+    "@playwright/test": "^1.41.2",
     "@types/libsodium-wrappers": "^0.7.13",
     "@types/node": "^18.19.3",
     "@types/ws": "^8.2.1",
