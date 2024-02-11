@@ -42,7 +42,6 @@
     "@serenity-tools/editor-file-extension": "*",
     "@serenity-tools/secsync": "*",
     "@serenity-tools/ui": "*",
-    "@tiptap/extension-placeholder": "^2.0.0-beta.217",
     "@urql/devtools": "^2.0.3",
     "@urql/exchange-auth": "^2.1.6",
     "@urql/exchange-graphcache": "^6.3.3",
@@ -96,7 +95,7 @@
     "urql": "^4.0.6",
     "xstate": "^4.36.0",
     "y-protocols": "^1.0.6",
-    "yjs": "^13.6.10",
+    "yjs": "^13.6.11",
     "zod": "^3.22.4",
     "zustand": "^4.1.1"
   },

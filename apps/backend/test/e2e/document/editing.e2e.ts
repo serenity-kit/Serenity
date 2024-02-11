@@ -51,10 +51,10 @@ test.describe("Edit document", () => {
       password: user1.password,
       stayLoggedIn: true,
     });
-    const editor = page.locator("div[class='ProseMirror']");
+    const editor = page.locator("div[class='tiptap ProseMirror']");
     const startingContent = await editor.innerHTML();
     await page
-      .locator("div[class='ProseMirror']")
+      .locator("div[class='tiptap ProseMirror']")
       .pressSequentially(newContent);
     await delayForSeconds(2);
     await reloadPage({ page });
@@ -73,7 +73,7 @@ test.describe("Edit document", () => {
       stayLoggedIn: true,
     });
     await delayForSeconds(2); // wait a bit until the editor loads
-    const editorAfterLogin = page.locator("div[class='ProseMirror']");
+    const editorAfterLogin = page.locator("div[class='tiptap ProseMirror']");
     const afterLoginContent = await editorAfterLogin.innerHTML();
     expect(afterLoginContent).toBe(endingContent);
   });
@@ -114,14 +114,14 @@ test.describe("Edit document", () => {
 
     const newContent1 = "\nHello User 2!";
     const newContent2 = "\nHello User 1!";
-    const user1Editor = page.locator("div[class='ProseMirror']");
+    const user1Editor = page.locator("div[class='tiptap ProseMirror']");
     const startingContent = await user1Editor.innerHTML();
-    const user2Editor = user2Page.locator("div[class='ProseMirror']");
+    const user2Editor = user2Page.locator("div[class='tiptap ProseMirror']");
     const user2StartingContent = await user2Editor.innerHTML();
     expect(startingContent).toBe(user2StartingContent);
     // user1 edits document
     await page
-      .locator("div[class='ProseMirror']")
+      .locator("div[class='tiptap ProseMirror']")
       .pressSequentially(newContent1);
     // TODO check why there is such a long delay to show ephemeral messages
     await delayForSeconds(3);
@@ -141,7 +141,7 @@ test.describe("Edit document", () => {
     const user2EndingContent = await user2Editor.innerHTML();
     expect(endingContent).toBe(user2EndingContent);
     await user2Page
-      .locator("div[class='ProseMirror']")
+      .locator("div[class='tiptap ProseMirror']")
       .pressSequentially(newContent2);
     // reload page
 
@@ -149,9 +149,13 @@ test.describe("Edit document", () => {
 
     await reloadPage({ page: user2Page });
     // verify content for both users
-    const user1EditorAfterReload = page.locator("div[class='ProseMirror']");
+    const user1EditorAfterReload = page.locator(
+      "div[class='tiptap ProseMirror']"
+    );
     const user1AfterReloadContent = await user1EditorAfterReload.innerHTML();
-    const user2EditorAfterReload = page.locator("div[class='ProseMirror']");
+    const user2EditorAfterReload = page.locator(
+      "div[class='tiptap ProseMirror']"
+    );
     const user2AfterReloadContent = await user2EditorAfterReload.innerHTML();
     expect(user1AfterReloadContent).toBe(user2AfterReloadContent);
     // re-login
@@ -179,9 +183,13 @@ test.describe("Edit document", () => {
       stayLoggedIn: true,
     });
 
-    const user1EditorAfterLogin = page.locator("div[class='ProseMirror']");
+    const user1EditorAfterLogin = page.locator(
+      "div[class='tiptap ProseMirror']"
+    );
     const user1AfterLoginContent = await user1EditorAfterLogin.innerHTML();
-    const user2EditorAfterLogin = page.locator("div[class='ProseMirror']");
+    const user2EditorAfterLogin = page.locator(
+      "div[class='tiptap ProseMirror']"
+    );
     const user2AfterLoginContent = await user2EditorAfterLogin.innerHTML();
     expect(user1AfterLoginContent).toBe(user2AfterLoginContent);
   });
@@ -203,10 +211,10 @@ test.describe("Edit document", () => {
       throw new Error("Could not create folder");
     }
     await createDocument(page, folder.id, user1.data.workspace.id);
-    const editor = page.locator("div[class='ProseMirror']");
+    const editor = page.locator("div[class='tiptap ProseMirror']");
     const startingContent = await editor.innerHTML();
     await page
-      .locator("div[class='ProseMirror']")
+      .locator("div[class='tiptap ProseMirror']")
       .pressSequentially(newContent);
     await delayForSeconds(2);
     await reloadPage({ page });
@@ -225,7 +233,7 @@ test.describe("Edit document", () => {
       stayLoggedIn: true,
     });
     await delayForSeconds(2); // wait a bit until the editor loads
-    const editorAfterLogin = page.locator("div[class='ProseMirror']");
+    const editorAfterLogin = page.locator("div[class='tiptap ProseMirror']");
     const afterLoginContent = await editorAfterLogin.innerHTML();
     expect(afterLoginContent).toBe(endingContent);
   });
@@ -258,14 +266,14 @@ test.describe("Edit document", () => {
 
     const newContent1 = "\nHi User 2!";
     const newContent2 = "\nHi User 1!";
-    const user1Editor = page.locator("div[class='ProseMirror']");
+    const user1Editor = page.locator("div[class='tiptap ProseMirror']");
     const startingContent = await user1Editor.innerHTML();
-    const user2Editor = user2Page.locator("div[class='ProseMirror']");
+    const user2Editor = user2Page.locator("div[class='tiptap ProseMirror']");
     const user2StartingContent = await user2Editor.innerHTML();
     expect(startingContent).toBe(user2StartingContent);
     // user1 edits document
     await page
-      .locator("div[class='ProseMirror']")
+      .locator("div[class='tiptap ProseMirror']")
       .pressSequentially(newContent1);
     await delayForSeconds(4);
     // expect the cursor to show on user2's page
@@ -284,15 +292,19 @@ test.describe("Edit document", () => {
     const user2EndingContent = await user2Editor.innerHTML();
     expect(endingContent).toBe(user2EndingContent);
     await user2Page
-      .locator("div[class='ProseMirror']")
+      .locator("div[class='tiptap ProseMirror']")
       .pressSequentially(newContent2);
     // reload page
     await reloadPage({ page });
     await reloadPage({ page: user2Page });
     // verify content for both users
-    const user1EditorAfterReload = page.locator("div[class='ProseMirror']");
+    const user1EditorAfterReload = page.locator(
+      "div[class='tiptap ProseMirror']"
+    );
     const user1AfterReloadContent = await user1EditorAfterReload.innerHTML();
-    const user2EditorAfterReload = page.locator("div[class='ProseMirror']");
+    const user2EditorAfterReload = page.locator(
+      "div[class='tiptap ProseMirror']"
+    );
     const user2AfterReloadContent = await user2EditorAfterReload.innerHTML();
     expect(user1AfterReloadContent).toBe(user2AfterReloadContent);
     // re-login
@@ -320,9 +332,13 @@ test.describe("Edit document", () => {
       stayLoggedIn: true,
     });
 
-    const user1EditorAfterLogin = page.locator("div[class='ProseMirror']");
+    const user1EditorAfterLogin = page.locator(
+      "div[class='tiptap ProseMirror']"
+    );
     const user1AfterLoginContent = await user1EditorAfterLogin.innerHTML();
-    const user2EditorAfterLogin = page.locator("div[class='ProseMirror']");
+    const user2EditorAfterLogin = page.locator(
+      "div[class='tiptap ProseMirror']"
+    );
     const user2AfterLoginContent = await user2EditorAfterLogin.innerHTML();
     expect(user1AfterLoginContent).toBe(user2AfterLoginContent);
   });

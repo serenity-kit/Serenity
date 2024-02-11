@@ -47,10 +47,10 @@ test.describe("Share links", () => {
 
     await delayForSeconds(3);
 
-    const pageContent = page.locator("div[class='ProseMirror']");
+    const pageContent = page.locator("div[class='tiptap ProseMirror']");
     const startingContentPage1 = await pageContent.innerHTML();
 
-    const page2Content = page2.locator("div[class='ProseMirror']");
+    const page2Content = page2.locator("div[class='tiptap ProseMirror']");
     const startingContentPage2 = await page2Content.innerHTML();
 
     expect(startingContentPage1.substring(0, 300)).toBe(
@@ -73,10 +73,10 @@ test.describe("Share links", () => {
 
     await delayForSeconds(3);
 
-    const pageContent = page.locator("div[class='ProseMirror']");
+    const pageContent = page.locator("div[class='tiptap ProseMirror']");
     const startingContentPage1 = await pageContent.innerHTML();
 
-    const page2Content = page2.locator("div[class='ProseMirror']");
+    const page2Content = page2.locator("div[class='tiptap ProseMirror']");
     const startingContentPage2 = await page2Content.innerHTML();
 
     expect(startingContentPage1.substring(0, 300)).toBe(
@@ -118,10 +118,14 @@ test.describe("Share links", () => {
 
     await delayForSeconds(3);
 
-    const pageContent = page.locator("div[class='ProseMirror']");
+    // const hmmmm = page.locator("div[root]");
+    // const hmm2 = await hmmmm.innerHTML();
+    // console.log(hmm2);
+
+    const pageContent = page.locator("div[class='tiptap ProseMirror']");
     const startingContentPage1 = await pageContent.innerHTML();
 
-    const page2Content = page2.locator("div[class='ProseMirror']");
+    const page2Content = page2.locator("div[class='tiptap ProseMirror']");
     const startingContentPage2 = await page2Content.innerHTML();
 
     expect(startingContentPage1.substring(0, 300)).toBe(
