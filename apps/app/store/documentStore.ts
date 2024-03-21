@@ -84,7 +84,8 @@ export const getLocalDocumentName = ({
   documentId: string;
 }) => {
   const document = getLocalDocument({ documentId });
-  return document && document.name ? document.name : "loading…";
+  // by default an empty string to now show loading on the SharePage
+  return document && document.name ? document.name : "";
 };
 
 const getLocalDocumentNameListeners: {
