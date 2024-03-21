@@ -1,5 +1,5 @@
 import { useNavigation, useRoute } from "@react-navigation/native";
-import { IconButton, tw, View } from "@serenity-tools/ui";
+import { IconButton, View, tw } from "@serenity-tools/ui";
 import { HStack } from "native-base";
 import { useWindowDimensions } from "react-native";
 
@@ -32,7 +32,9 @@ export function HeaderLeft({ canGoBack, navigateTo }: Props) {
               // behavior e.g. when going back on iOS you end up again in the open
               // drawer instead of the page where the drawer would close right away.
               route.name === "AccountSettings" &&
-              navigation.getState().routes[0].name.startsWith("AccountSettings")
+              navigation
+                .getState()
+                ?.routes[0].name.startsWith("AccountSettings")
             ) {
               navigation.navigate("Root");
             } else if (
@@ -48,7 +50,7 @@ export function HeaderLeft({ canGoBack, navigateTo }: Props) {
               route.name === "WorkspaceSettings" &&
               navigation
                 .getState()
-                .routes[0].name.startsWith("WorkspaceSettings")
+                ?.routes[0].name.startsWith("WorkspaceSettings")
             ) {
               navigation.navigate("Workspace", {
                 workspaceId,
