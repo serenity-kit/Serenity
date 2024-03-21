@@ -66,6 +66,7 @@ export default function Editor({
   editable,
   documentState,
   canComment,
+  documentShareLinkToken,
 }: EditorProps) {
   const [editorBottombarState, setEditorBottombarState] =
     useState<EditorBottombarState>(initialEditorBottombarState);
@@ -184,10 +185,10 @@ export default function Editor({
 
   const downloadAndDecryptFile = useMemo(() => {
     return createDownloadAndDecryptFileFunction({
-      workspaceId,
       documentId,
+      documentShareLinkToken,
     });
-  }, [workspaceId, documentId]);
+  }, [documentId, documentShareLinkToken]);
 
   if (!documentLoaded) {
     return <EditorLoading />;

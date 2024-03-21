@@ -95,6 +95,7 @@ export default function Editor({
   documentState,
   canComment,
   currentDeviceSigningPublicKey,
+  documentShareLinkToken,
 }: EditorProps) {
   const webViewRef = useRef<WebView>(null);
   // leveraging a ref here since the injectedJavaScriptBeforeContentLoaded
@@ -123,10 +124,10 @@ export default function Editor({
 
   const downloadAndDecryptFile = useMemo(() => {
     return createDownloadAndDecryptFileFunction({
-      workspaceId,
+      documentShareLinkToken,
       documentId,
     });
-  }, [workspaceId, documentId]);
+  }, [documentId, documentShareLinkToken]);
 
   const workspaceDevicesToUsernames = useWorkspaceMemberDevicesToUsernames({
     workspaceId,

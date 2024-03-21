@@ -1,5 +1,9 @@
-query fileUrl($fileId: ID!, $workspaceId: ID!, $documentId: ID!) {
-  fileUrl(fileId: $fileId, workspaceId: $workspaceId, documentId: $documentId) {
+query fileUrl($fileId: ID!, $documentId: ID!, $documentShareLinkToken: String) {
+  fileUrl(
+    fileId: $fileId
+    documentId: $documentId
+    documentShareLinkToken: $documentShareLinkToken
+  ) {
     id
     downloadUrl
   }

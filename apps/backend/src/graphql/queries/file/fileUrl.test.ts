@@ -37,7 +37,6 @@ beforeAll(async () => {
 type Props = {
   graphql: TestContext;
   fileId: string;
-  workspaceId: string;
   documentId: string;
   authorization: string;
 };
@@ -45,16 +44,11 @@ const getFileUrl = async ({
   graphql,
   fileId,
   documentId,
-  workspaceId,
   authorization,
 }: Props) => {
   const query = gql`
-    query fileUrl($fileId: ID!, $documentId: ID!, $workspaceId: ID!) {
-      fileUrl(
-        fileId: $fileId
-        documentId: $documentId
-        workspaceId: $workspaceId
-      ) {
+    query fileUrl($fileId: ID!, $documentId: ID!) {
+      fileUrl(fileId: $fileId, documentId: $documentId) {
         id
         downloadUrl
       }
@@ -62,7 +56,7 @@ const getFileUrl = async ({
   `;
   return graphql.client.request<any>(
     query,
-    { fileId, documentId, workspaceId },
+    { fileId, documentId },
     { authorization }
   );
 };
@@ -72,7 +66,6 @@ test("get file url", async () => {
     graphql,
     fileId: fileUploadData.fileId,
     documentId: userData.document.id,
-    workspaceId: userData.workspace.id,
     authorization: deriveSessionAuthorization({
       sessionKey: userData.sessionKey,
     }).authorization,
@@ -95,7 +88,6 @@ test("invalid access", async () => {
         graphql,
         fileId: fileUploadData.fileId,
         documentId: userData.document.id,
-        workspaceId: userData.workspace.id,
         authorization: deriveSessionAuthorization({
           sessionKey: otherUser.sessionKey,
         }).authorization,
@@ -110,7 +102,6 @@ test("Unauthenticated", async () => {
         graphql,
         fileId: fileUploadData.fileId,
         documentId: userData.document.id,
-        workspaceId: userData.workspace.id,
         authorization: "invalid-session-key",
       }))()
   ).rejects.toThrowError(/UNAUTHENTICATED/);
@@ -139,14 +130,13 @@ describe("Input errors", () => {
             input: {
               fileId: null,
               documentId: userData.document.id,
-              workspaceId: userData.workspace.id,
             },
           },
           { authorization: userData.sessionKey }
         ))()
     ).rejects.toThrowError();
   });
-  test("Invalid document id", async () => {
+  test("Invalid file id", async () => {
     const userData = await createUserWithWorkspace({
       username: `${generateId()}@example.com`,
       password,
@@ -157,8 +147,8 @@ describe("Input errors", () => {
           query,
           {
             input: {
+              fileId: null,
               documentId: userData.document.id,
-              workspaceId: null,
             },
           },
           { authorization: userData.sessionKey }

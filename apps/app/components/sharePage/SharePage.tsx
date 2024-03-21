@@ -346,6 +346,7 @@ export const SharePage: React.FC<Props> = ({
         currentDeviceSigningPublicKey={sodium.to_base64(
           signatureKeyPair.publicKey
         )}
+        documentShareLinkToken={token}
       />
     </>
   );

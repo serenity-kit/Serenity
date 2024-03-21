@@ -15,4 +15,5 @@ export type EditorProps = {
   documentState: DocumentState;
   canComment: boolean;
   currentDeviceSigningPublicKey: string;
+  documentShareLinkToken?: string;
 };

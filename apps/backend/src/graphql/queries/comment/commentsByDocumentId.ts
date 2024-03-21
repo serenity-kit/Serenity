@@ -13,9 +13,9 @@ export const commentsByDocumentIdQuery = queryField((t) => {
       documentShareLinkToken: stringArg(),
     },
     async nodes(root, args, context) {
-      if (args.first && args.first > 50) {
+      if (args.first && args.first > 200) {
         throw new UserInputError(
-          "Requested too many devices. First value exceeds 50."
+          "Requested too many comments. First value exceeds 200."
         );
       }
       if (!context.user && typeof args.documentShareLinkToken !== "string") {

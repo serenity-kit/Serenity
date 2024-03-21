@@ -2,8 +2,8 @@ import { runFileUrlQuery } from "../../generated/graphql";
 import { decryptFile } from "./decryptFile";
 
 type CreateDownloadAndDecryptFileFunctionProps = {
-  workspaceId: string;
   documentId: string;
+  documentShareLinkToken?: string;
 };
 
 export type Props = {
@@ -13,11 +13,11 @@ export type Props = {
 };
 export const createDownloadAndDecryptFileFunction = ({
   documentId,
-  workspaceId,
+  documentShareLinkToken,
 }: CreateDownloadAndDecryptFileFunctionProps) => {
   return async ({ fileId, publicNonce, key }: Props): Promise<string> => {
     const result = await runFileUrlQuery(
-      { fileId, documentId, workspaceId },
+      { fileId, documentId, documentShareLinkToken },
       {}
     );
     if (!result.data?.fileUrl?.downloadUrl) {

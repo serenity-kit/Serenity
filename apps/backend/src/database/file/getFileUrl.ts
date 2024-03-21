@@ -27,30 +27,48 @@ export type Props = {
   userId: string;
   fileId: string;
   documentId: string;
-  workspaceId: string;
+  documentShareLinkToken?: string | null | undefined;
 };
 
 export const getFileUrl = async ({
   userId,
   fileId,
   documentId,
-  workspaceId,
+  documentShareLinkToken,
 }: Props) => {
-  const user2Workspace = await prisma.usersToWorkspaces.findFirst({
-    where: { userId, workspaceId },
-    select: { role: true },
-  });
-  if (!user2Workspace) {
-    throw new ForbiddenError("Unauthorized");
-  }
+  // verify the document exists
   const document = await prisma.document.findFirst({
-    where: { id: documentId, workspaceId },
-    select: { id: true },
+    where: { id: documentId },
   });
   if (!document) {
-    throw new UserInputError("Invalid documentId");
+    throw new ForbiddenError("Unauthorized");
   }
-  const fileName = `${workspaceId}/${documentId}/${fileId}.blob`;
+  // if the user has a documentShareLinkToken, verify it
+  let documentShareLink: any = null;
+  if (documentShareLinkToken) {
+    documentShareLink = await prisma.documentShareLink.findFirst({
+      where: {
+        token: documentShareLinkToken,
+        documentId,
+      },
+    });
+    if (!documentShareLink) {
+      throw new UserInputError("Invalid documentShareLinkToken");
+    }
+  } else {
+    // if no documentShareLinkToken, the user must have access to the workspace
+    const user2Workspace = await prisma.usersToWorkspaces.findFirst({
+      where: {
+        userId,
+        workspaceId: document.workspaceId,
+      },
+    });
+    if (!user2Workspace) {
+      throw new ForbiddenError("Unauthorized");
+    }
+  }
+
+  const fileName = `${document.workspaceId}/${documentId}/${fileId}.blob`;
   const downloadUrl = await getSignedUrl(
     s3Client,
     new GetObjectCommand({
