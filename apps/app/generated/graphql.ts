@@ -967,8 +967,8 @@ export type QueryEncryptedWebDeviceArgs = {
 
 export type QueryFileUrlArgs = {
   documentId: Scalars['ID']['input'];
+  documentShareLinkToken?: InputMaybe<Scalars['String']['input']>;
   fileId: Scalars['ID']['input'];
-  workspaceId: Scalars['ID']['input'];
 };
 
 
@@ -1814,8 +1814,8 @@ export type EncryptedWebDeviceQuery = { __typename?: 'Query', encryptedWebDevice
 
 export type FileUrlQueryVariables = Exact<{
   fileId: Scalars['ID']['input'];
-  workspaceId: Scalars['ID']['input'];
   documentId: Scalars['ID']['input'];
+  documentShareLinkToken?: InputMaybe<Scalars['String']['input']>;
 }>;
 
 
@@ -2507,7 +2507,7 @@ export function useVerifyRegistrationMutation() {
   return Urql.useMutation<VerifyRegistrationMutation, VerifyRegistrationMutationVariables>(VerifyRegistrationDocument);
 };
 export const CommentsByDocumentIdDocument = gql`
-    query commentsByDocumentId($documentId: ID!, $documentShareLinkToken: String, $first: Int = 50, $after: String) {
+    query commentsByDocumentId($documentId: ID!, $documentShareLinkToken: String, $first: Int = 200, $after: String) {
   commentsByDocumentId(
     documentId: $documentId
     documentShareLinkToken: $documentShareLinkToken
@@ -2741,8 +2741,12 @@ export function useEncryptedWebDeviceQuery(options: Omit<Urql.UseQueryArgs<Encry
   return Urql.useQuery<EncryptedWebDeviceQuery, EncryptedWebDeviceQueryVariables>({ query: EncryptedWebDeviceDocument, ...options });
 };
 export const FileUrlDocument = gql`
-    query fileUrl($fileId: ID!, $workspaceId: ID!, $documentId: ID!) {
-  fileUrl(fileId: $fileId, workspaceId: $workspaceId, documentId: $documentId) {
+    query fileUrl($fileId: ID!, $documentId: ID!, $documentShareLinkToken: String) {
+  fileUrl(
+    fileId: $fileId
+    documentId: $documentId
+    documentShareLinkToken: $documentShareLinkToken
+  ) {
     id
     downloadUrl
   }

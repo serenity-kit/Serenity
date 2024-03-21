@@ -1,7 +1,7 @@
 query commentsByDocumentId(
   $documentId: ID!
   $documentShareLinkToken: String
-  $first: Int = 50
+  $first: Int = 200
   $after: String
 ) {
   commentsByDocumentId(

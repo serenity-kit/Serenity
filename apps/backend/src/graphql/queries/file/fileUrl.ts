@@ -1,5 +1,5 @@
 import { AuthenticationError } from "apollo-server-express";
-import { idArg, nonNull, queryField } from "nexus";
+import { idArg, nonNull, queryField, stringArg } from "nexus";
 import { getFileUrl } from "../../../database/file/getFileUrl";
 import { File } from "../../types/file";
 
@@ -9,17 +9,17 @@ export const fileUrlQuery = queryField((t) => {
     args: {
       fileId: nonNull(idArg()),
       documentId: nonNull(idArg()),
-      workspaceId: nonNull(idArg()),
+      documentShareLinkToken: stringArg(),
     },
     async resolve(root, args, context) {
-      if (!context.user) {
+      if (!context.user && typeof args.documentShareLinkToken !== "string") {
         throw new AuthenticationError("Not authenticated");
       }
       const downloadUrl = await getFileUrl({
-        userId: context.user.id,
+        userId: context.user?.id,
         fileId: args.fileId,
         documentId: args.documentId,
-        workspaceId: args.workspaceId,
+        documentShareLinkToken: args.documentShareLinkToken,
       });
       return {
         id: args.fileId,
