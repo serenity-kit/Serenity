@@ -119,6 +119,7 @@ const SharePageContainer: React.FC<SharePageContainerProps> = ({
           display: "none",
         }}
         drawerStyle={{
+          right: 0,
           width: commentsDrawerWidth,
           marginLeft: isPermanentLeftSidebar ? -commentsDrawerWidth : undefined,
           borderLeftWidth: 1,
