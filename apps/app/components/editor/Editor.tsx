@@ -173,25 +173,24 @@ export default function Editor({
       `);
     });
 
-    const onEventListener = (args) => {
-      let params: UpdateEditorParams | null = null;
-      if (args.type === "UNDO") {
-        params = { variant: "undo" };
-      } else if (args.type === "REDO") {
-        params = { variant: "redo" };
-      }
-      if (params) {
-        webViewRef.current?.injectJavaScript(`
+    const undoSubscription = editorToolbarService.on("UNDO", () => {
+      const params: UpdateEditorParams = { variant: "undo" };
+      webViewRef.current?.injectJavaScript(`
           window.updateEditor(\`${JSON.stringify(params)}\`);
           true;
         `);
-      }
-    };
+    });
+    const redoSubscription = editorToolbarService.on("REDO", () => {
+      const params: UpdateEditorParams = { variant: "redo" };
+      webViewRef.current?.injectJavaScript(`
+          window.updateEditor(\`${JSON.stringify(params)}\`);
+          true;
+        `);
+    });
 
-    editorToolbarService.onEvent(onEventListener);
-
-    commentsService.onChange((context) => {
-      const { decryptedComments, highlightedComment, isOpenSidebar } = context;
+    commentsService.subscribe((state) => {
+      const { decryptedComments, highlightedComment, isOpenSidebar } =
+        state.context;
 
       const commentsJson = JSON.stringify({
         variant: "update-comments",
@@ -219,7 +218,8 @@ export default function Editor({
       showSubscription.remove();
       hideSubscription.remove();
       store.removeAllSubscribers();
-      editorToolbarService.off(onEventListener);
+      undoSubscription.unsubscribe();
+      redoSubscription.unsubscribe();
     };
   }, [webviewLoaded]);
 
@@ -337,7 +337,8 @@ export default function Editor({
           }
           if (message.type === "update-editor-toolbar-state") {
             setEditorBottombarState(message.content);
-            editorToolbarService.send("updateToolbarState", {
+            editorToolbarService.send({
+              type: "updateToolbarState",
               toolbarState: message.content,
             });
           }

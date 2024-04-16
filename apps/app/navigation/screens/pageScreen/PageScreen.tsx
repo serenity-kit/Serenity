@@ -14,7 +14,7 @@ import { WorkspaceDrawerScreenProps } from "../../../types/navigationProps";
 import * as documentChain from "@serenity-kit/document-chain";
 import { LocalDevice } from "@serenity-tools/common";
 import { tw, useIsPermanentLeftSidebar } from "@serenity-tools/ui";
-import { useActor, useInterpret, useMachine } from "@xstate/react";
+import { useActorRef, useMachine, useSelector } from "@xstate/react";
 import { Drawer } from "react-native-drawer-layout";
 import sodium, { KeyPair } from "react-native-libsodium";
 import CommentsSidebar from "../../../components/commentsSidebar/CommentsSidebar";
@@ -58,23 +58,21 @@ const ActualPageScreen = (
   const [isNew] = useState(props.route.params.isNew || false);
 
   const [state] = useMachine(loadPageMachine, {
-    context: {
+    input: {
       workspaceId,
       documentId: pageId,
       navigation: props.navigation,
     },
   });
 
-  const commentsService = useInterpret(commentsMachine, {
-    context: {
-      params: {
-        workspaceId,
-        pageId: props.route.params.pageId,
-        activeDevice: activeDevice as LocalDevice,
-      },
+  const commentsService = useActorRef(commentsMachine, {
+    input: {
+      workspaceId,
+      pageId: props.route.params.pageId,
+      activeDevice: activeDevice as LocalDevice,
     },
   });
-  const [commentsState, send] = useActor(commentsService);
+  const commentsState = useSelector(commentsService, (state) => state);
   const isPermanentLeftSidebar = useIsPermanentLeftSidebar();
 
   const currentUserInfo = getCurrentUserInfo();
@@ -93,7 +91,7 @@ const ActualPageScreen = (
       headerRight: () => (
         <PageHeaderRight
           toggleCommentsDrawer={() => {
-            send({ type: "TOGGLE_SIDEBAR" });
+            commentsService.send({ type: "TOGGLE_SIDEBAR" });
           }}
           hasShareButton={canEditAndDocumentsFolders}
         />
@@ -101,7 +99,7 @@ const ActualPageScreen = (
       headerTitle: () => (
         <PageHeader
           toggleCommentsDrawer={() => {
-            send({ type: "TOGGLE_SIDEBAR" });
+            commentsService.send({ type: "TOGGLE_SIDEBAR" });
           }}
           isOpenSidebar={commentsState.context.isOpenSidebar}
           hasNewComment={false} // TODO
@@ -165,7 +163,7 @@ const ActualPageScreen = (
           pageId: props.route.params.pageId,
           commentsService,
           setActiveSnapshotAndCommentKeys: (params) => {
-            send({
+            commentsService.send({
               ...params,
               type: "SET_ACTIVE_SNAPSHOT_AND_COMMENT_KEYS",
               activeSnapshot: params.snapshot,
@@ -177,12 +175,12 @@ const ActualPageScreen = (
           open={commentsState.context.isOpenSidebar}
           onOpen={() => {
             if (!commentsState.context.isOpenSidebar) {
-              send({ type: "OPEN_SIDEBAR" });
+              commentsService.send({ type: "OPEN_SIDEBAR" });
             }
           }}
           onClose={() => {
             if (commentsState.context.isOpenSidebar) {
-              send({ type: "CLOSE_SIDEBAR" });
+              commentsService.send({ type: "CLOSE_SIDEBAR" });
             }
           }}
           renderDrawerContent={() => {

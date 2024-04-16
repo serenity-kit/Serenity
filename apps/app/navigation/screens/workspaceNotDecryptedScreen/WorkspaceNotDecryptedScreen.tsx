@@ -22,7 +22,7 @@ export default function WorkspaceNotDecryptedScreen({
   // TODO show error message in case there is network error
   // TODO communicate when the next check attempt is happening
   const [state] = useMachine(workspaceNotDecryptedScreenMachine, {
-    context: {
+    input: {
       workspaceId,
       navigation,
     },

@@ -12,7 +12,7 @@ export default function WorkspaceRootScreen(
   const { workspaceId } = useWorkspace();
 
   const [state] = useMachine(workspaceRootScreenMachine, {
-    context: {
+    input: {
       workspaceId,
       navigation: props.navigation,
     },

@@ -5,7 +5,6 @@ import {
   tw,
   View,
 } from "@serenity-tools/ui";
-import { useActor } from "@xstate/react";
 import { formatDistanceToNow, parseJSON } from "date-fns";
 import { HStack } from "native-base";
 import React from "react";
@@ -28,7 +27,6 @@ export default function CommentReply({
   naked = false,
 }: Props) {
   const { commentsService } = usePage();
-  const [, send] = useActor(commentsService);
   const [isHovered, setIsHovered] = React.useState(false);
 
   const replyCreator = getLocalUserByDeviceSigningPublicKey({
@@ -78,7 +76,7 @@ export default function CommentReply({
               commentId={commentId}
               commentReplyId={reply.id}
               onDeletePressed={() =>
-                send({
+                commentsService.send({
                   type: "DELETE_REPLY",
                   replyId: reply.id,
                 })

@@ -9,7 +9,7 @@ export default function WorkspaceSettingsMobileOverviewScreen(
 ) {
   const { workspaceId } = useWorkspace();
   useMachine(workspaceSettingsAccessMachine, {
-    context: {
+    input: {
       workspaceId,
       navigation: props.navigation,
     },

@@ -5,7 +5,7 @@ import {
   VerticalDivider,
   tw,
 } from "@serenity-tools/ui";
-import { useActor } from "@xstate/react";
+import { useSelector } from "@xstate/react";
 import { HStack } from "native-base";
 import React, { useRef } from "react";
 import { FlatList, StyleSheet } from "react-native";
@@ -53,45 +53,69 @@ type Props = {
 const CommentsSidebar: React.FC<Props> = ({ canComment }) => {
   const { commentsService } = usePage();
   const [meResult] = useMeQuery();
-  const [state] = useActor(commentsService);
+  const state = useSelector(commentsService, (state) => state);
   const comments = state.context.decryptedComments;
   const flatListRef = useRef<FlatList>(null);
 
-  commentsService.onTransition((state) => {
-    if (state.context.isOpenSidebar && flatListRef.current) {
-      if (
-        state.event.type === "HIGHLIGHT_COMMENT_FROM_EDITOR" &&
-        state.context.highlightedComment?.id
-      ) {
+  commentsService.on("HIGHLIGHT_COMMENT_FROM_EDITOR", (event) => {
+    const snapshot = commentsService.getSnapshot();
+    if (
+      snapshot.context.isOpenSidebar &&
+      state.context.highlightedComment?.id &&
+      flatListRef.current
+    ) {
+      const index = comments.findIndex(
+        (comment) => comment.id === state.context.highlightedComment?.id
+      );
+      if (index === -1) return; // in case the list isn't yet loaded
+      flatListRef.current.scrollToIndex({
+        index,
+        // in case sidebar opens and highlighted at the same time
+        // @ts-expect-error types are wrong
+        animated: !Boolean(event.openSidebar),
+        viewPosition: 0,
+      });
+    }
+  });
+
+  commentsService.on("OPEN_SIDEBAR", (event) => {
+    const snapshot = commentsService.getSnapshot();
+    if (snapshot.context.isOpenSidebar && flatListRef.current) {
+      // should alays immediately scroll to top once the scrollbar opens
+      // and now highlighted comment is set
+      if (state.context.highlightedComment?.id) {
         const index = comments.findIndex(
           (comment) => comment.id === state.context.highlightedComment?.id
         );
         if (index === -1) return; // in case the list isn't yet loaded
         flatListRef.current.scrollToIndex({
           index,
-          // in case sidebar opens and highlighted at the same time
-          animated: !Boolean(state.event.openSidebar),
+          animated: false,
           viewPosition: 0,
         });
-      } else if (
-        state.event.type === "OPEN_SIDEBAR" ||
-        state.event.type === "TOGGLE_SIDEBAR"
-      ) {
-        // should alays immediately scroll to top once the scrollbar opens
-        // and now highlighted comment is set
-        if (state.context.highlightedComment?.id) {
-          const index = comments.findIndex(
-            (comment) => comment.id === state.context.highlightedComment?.id
-          );
-          if (index === -1) return; // in case the list isn't yet loaded
-          flatListRef.current.scrollToIndex({
-            index,
-            animated: false,
-            viewPosition: 0,
-          });
-        } else {
-          flatListRef.current.scrollToOffset({ offset: 0, animated: false });
-        }
+      } else {
+        flatListRef.current.scrollToOffset({ offset: 0, animated: false });
+      }
+    }
+  });
+
+  commentsService.on("TOGGLE_SIDEBAR", (event) => {
+    const snapshot = commentsService.getSnapshot();
+    if (snapshot.context.isOpenSidebar && flatListRef.current) {
+      // should alays immediately scroll to top once the scrollbar opens
+      // and now highlighted comment is set
+      if (state.context.highlightedComment?.id) {
+        const index = comments.findIndex(
+          (comment) => comment.id === state.context.highlightedComment?.id
+        );
+        if (index === -1) return; // in case the list isn't yet loaded
+        flatListRef.current.scrollToIndex({
+          index,
+          animated: false,
+          viewPosition: 0,
+        });
+      } else {
+        flatListRef.current.scrollToOffset({ offset: 0, animated: false });
       }
     }
   });

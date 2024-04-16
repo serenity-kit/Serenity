@@ -12,7 +12,7 @@ import {
   tw,
 } from "@serenity-tools/ui";
 import { useMachine } from "@xstate/react";
-import { createMachine } from "xstate";
+import { fromPromise, setup } from "xstate";
 import { useDeleteDocumentsMutation } from "../../generated/graphql";
 import { showToast } from "../../utils/toast/showToast";
 
@@ -34,66 +34,20 @@ type Context = {
 
 const machine =
   /** @xstate-layout N4IgpgJg5mDOIC5SwJYTAIwIYCcAKWMAsmAHYCuAdOgDZgAuKpUAxBAPaliVMBu7Aa260GYAjESgADu1SNOkkAA9EANlUAOSgGYATAEZVAVn0B2AAxHT+3RoA0IAJ6J95gJyUALNbcbV280DTDVMAX1CHVHRsfEIwEgpqMDpGZhYwHBx2HEopGix6ADNsgFsklLE4xRk5FAUkZTVNHQNjM0trWwdnBH0rLyMjSzdPI21jI3CIkFJ2dHgGqMxccXiyKjQ6atkUeVJFFQQjDXNKc1MRv3NdXSNdbSNuxDvVSlMjN103TUH3t0npksYqsElQSuttrV6qBDn5PG91G5TOpgp8NPYnIhPOZtJRdKo3OZVO5xnpzPpwpE0MtYsR1uVREQ5lgaJDdnV9g1Dp5dE8ENokWd7iMvsjiTjKSAgSs4qCGakoGy9gdEA9cQTdKYbhrTFrPKo+fo+jpzDzVO9tJa-KpdJLpbS1okRPRIEqOSqEHCEQSxajbBiehp9JRfKbrBptOjUZ47dTgbKIQ0auzoY0EABaA2YjNGENufMFwv5i5TUJAA */
-  createMachine(
-    {
-      context: { navigation: null, documentId: "", workspaceId: "" } as Context,
-      tsTypes: {} as import("./SidebarPageMenu.typegen").Typegen0,
-      predictableActionArguments: true,
-      initial: "idle",
-      states: {
-        idle: {
-          on: {
-            openMenu: {
-              target: "menu",
-            },
-          },
-        },
-        menu: {
-          on: {
-            openDeleteModal: {
-              target: "deleteModal",
-            },
-            closeMenu: {
-              target: "idle",
-            },
-          },
-        },
-        deleteModal: {
-          on: {
-            cancelDelete: {
-              target: "menu",
-            },
-            confirmDelete: {
-              target: "deleting",
-            },
-          },
-        },
-        deleting: {
-          invoke: {
-            src: "deletePage",
-            id: "deletePage",
-            onDone: [
-              {
-                target: "deleted",
-              },
-            ],
-            onError: [
-              {
-                target: "menu",
-              },
-            ],
-          },
-        },
-        deleted: {
-          entry: "navigateToWorkspaceRoot",
-          type: "final",
-        },
-      },
-      id: "sidebarPageMenu",
+  setup({
+    types: {} as {
+      context: Context;
+      input: Context;
+      events:
+        | { type: "cancelDelete" }
+        | { type: "confirmDelete" }
+        | { type: "openDeleteModal" }
+        | { type: "openMenu" }
+        | { type: "closeMenu" };
     },
-    {
-      services: {
-        deletePage: async (context) => {
+    actors: {
+      deletePage: fromPromise(
+        async ({ input: context }: { input: Context }) => {
           try {
             const result = await context.deleteDocumentsMutation({
               input: {
@@ -114,25 +68,83 @@ const machine =
             );
             throw err;
           }
+        }
+      ),
+    },
+    actions: {
+      navigateToWorkspaceRoot: ({ context }) => {
+        showToast("Successfully deleted the page.");
+        context.navigation.navigate("Workspace", {
+          workspaceId: context.workspaceId,
+          screen: "WorkspaceRoot",
+        });
+      },
+    },
+  }).createMachine({
+    context: ({ input }) => {
+      return input;
+    },
+    initial: "idle",
+    states: {
+      idle: {
+        on: {
+          openMenu: {
+            target: "menu",
+          },
         },
       },
-      actions: {
-        navigateToWorkspaceRoot: (context) => {
-          showToast("Successfully deleted the page.");
-          context.navigation.navigate("Workspace", {
-            workspaceId: context.workspaceId,
-            screen: "WorkspaceRoot",
-          });
+      menu: {
+        on: {
+          openDeleteModal: {
+            target: "deleteModal",
+          },
+          closeMenu: {
+            target: "idle",
+          },
         },
       },
-    }
-  );
+      deleteModal: {
+        on: {
+          cancelDelete: {
+            target: "menu",
+          },
+          confirmDelete: {
+            target: "deleting",
+          },
+        },
+      },
+      deleting: {
+        invoke: {
+          src: "deletePage",
+          id: "deletePage",
+          input: ({ context }) => {
+            return context;
+          },
+          onDone: [
+            {
+              target: "deleted",
+            },
+          ],
+          onError: [
+            {
+              target: "menu",
+            },
+          ],
+        },
+      },
+      deleted: {
+        entry: "navigateToWorkspaceRoot",
+        type: "final",
+      },
+    },
+    id: "sidebarPageMenu",
+  });
 
 export default function SidebarPageMenu(props: Props) {
   const [, deleteDocumentsMutation] = useDeleteDocumentsMutation();
   const navigation = useNavigation();
   const [state, send] = useMachine(machine, {
-    context: {
+    input: {
       navigation,
       documentId: props.documentId,
       workspaceId: props.workspaceId,
@@ -155,9 +167,9 @@ export default function SidebarPageMenu(props: Props) {
         }}
         onChange={(isOpen) => {
           if (!isOpen) {
-            send("closeMenu");
+            send({ type: "closeMenu" });
           } else {
-            send("openMenu");
+            send({ type: "openMenu" });
           }
         }}
         trigger={
@@ -172,7 +184,7 @@ export default function SidebarPageMenu(props: Props) {
       >
         <MenuButton
           onPress={() => {
-            send("closeMenu");
+            send({ type: "closeMenu" });
             props.onUpdateNamePress();
           }}
           iconName="font-size-2"
@@ -183,7 +195,7 @@ export default function SidebarPageMenu(props: Props) {
         </MenuButton>
         <MenuButton
           onPress={() => {
-            send("openDeleteModal");
+            send({ type: "openDeleteModal" });
           }}
           iconName="delete-bin-line"
           danger
@@ -196,7 +208,7 @@ export default function SidebarPageMenu(props: Props) {
       <Modal
         isVisible={state.value === "deleteModal" || state.value === "deleting"}
         onBackdropPress={() => {
-          send("cancelDelete");
+          send({ type: "cancelDelete" });
         }}
       >
         <ModalHeader>Delete page</ModalHeader>
@@ -208,7 +220,7 @@ export default function SidebarPageMenu(props: Props) {
           confirm={
             <Button
               onPress={() => {
-                send("confirmDelete");
+                send({ type: "confirmDelete" });
               }}
               variant="danger"
               isLoading={state.value === "deleting"}
@@ -219,7 +231,7 @@ export default function SidebarPageMenu(props: Props) {
           cancel={
             <Button
               onPress={() => {
-                send("cancelDelete");
+                send({ type: "cancelDelete" });
               }}
               variant="secondary"
               disabled={state.value === "deleting"}

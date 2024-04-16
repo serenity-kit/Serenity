@@ -67,7 +67,7 @@ export default function WorkspaceSettingsMembersScreen(
   });
   const { activeDevice } = useAuthenticatedAppContext();
   const [state] = useMachine(workspaceSettingsLoadWorkspaceMachine, {
-    context: {
+    input: {
       workspaceId,
       navigation: props.navigation,
       activeDevice,
