@@ -3,7 +3,7 @@ import { formatWorkspaceMember } from "../../types/workspace";
 import { prisma } from "../prisma";
 
 type Cursor = {
-  userId?: string;
+  userId: string;
 };
 
 type Params = {

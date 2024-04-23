@@ -2,7 +2,7 @@ import { isDeviceWithUserId } from "../../utils/device/isDeviceWithUserId";
 import { prisma } from "../prisma";
 
 type Cursor = {
-  signingPublicKey?: string;
+  signingPublicKey: string;
 };
 
 type Params = {

@@ -2,7 +2,7 @@ import * as workspaceMemberDevicesProofUtil from "@serenity-kit/workspace-member
 import { prisma } from "../prisma";
 
 type Cursor = {
-  id?: string;
+  id: string;
 };
 
 type Params = {

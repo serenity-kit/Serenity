@@ -10,7 +10,7 @@
     "build:copy-externals": "mkdir node_modules/@serenity-kit && cp -r ../../node_modules/@serenity-kit/opaque ./node_modules/@serenity-kit/opaque",
     "build": "yarn && yarn clean && yarn prisma:prod:generate && yarn ncc build ./src/index.ts -o build --external @serenity-kit/opaque && yarn build:copy-externals",
     "deploy": "yarn build && fly launch",
-    "prisma:prod:migrate": "yarn global add prisma@4 && DATABASE_URL=$DATABASE_URL prisma migrate deploy",
+    "prisma:prod:migrate": "yarn global add prisma@5 && DATABASE_URL=$DATABASE_URL prisma migrate deploy",
     "prisma:prod:generate": "DATABASE_URL=$DATABASE_URL prisma generate",
     "prisma:prod:studio": "DATABASE_URL=$DATABASE_URL prisma studio",
     "prisma:test:studio": "DATABASE_URL=postgres://prisma:prisma@localhost:5432/serenity_test prisma studio",
@@ -26,7 +26,7 @@
   "dependencies": {
     "@aws-sdk/client-s3": "^3.477.0",
     "@aws-sdk/s3-request-presigner": "^3.477.0",
-    "@prisma/client": "^4.8.0",
+    "@prisma/client": "^5.13.0",
     "@serenity-kit/opaque": "^0.8.0",
     "@serenity-tools/common": "*",
     "@serenity-tools/secsync": "*",
@@ -51,7 +51,7 @@
     "eslint": "^8.24.0",
     "graphql-request": "^6.1.0",
     "jest": "^29.1.1",
-    "prisma": "^4.8.0",
+    "prisma": "^5.13.0",
     "ts-node": "10.9.2",
     "ts-node-dev": "^2.0.0"
   },
