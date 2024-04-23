@@ -7,7 +7,7 @@ import {
   tw,
   View,
 } from "@serenity-tools/ui";
-import { useActor } from "@xstate/react";
+import { useSelector } from "@xstate/react";
 import { formatDistanceToNow, parseJSON } from "date-fns";
 import { HStack } from "native-base";
 import React from "react";
@@ -28,7 +28,7 @@ type Props = {
 
 export default function Comment({ comment, meId, meName, canComment }: Props) {
   const { commentsService } = usePage();
-  const [state, send] = useActor(commentsService);
+  const state = useSelector(commentsService, (state) => state);
   const [isHovered, setIsHovered] = React.useState(false);
   const documentState = useEditorStore((state) => state.documentState);
 
@@ -66,7 +66,10 @@ export default function Comment({ comment, meId, meName, canComment }: Props) {
         { cursor: isActiveComment ? "default" : "pointer" },
       ]}
       onPress={() => {
-        send({ type: "HIGHLIGHT_COMMENT_FROM_SIDEBAR", commentId: comment.id });
+        commentsService.send({
+          type: "HIGHLIGHT_COMMENT_FROM_SIDEBAR",
+          commentId: comment.id,
+        });
       }}
       //@ts-expect-error native-base mismatch
       onMouseEnter={() => setIsHovered(true)}
@@ -111,7 +114,10 @@ export default function Comment({ comment, meId, meName, canComment }: Props) {
           <View style={tw`ml-auto`}>
             <CommentsMenu
               onDeletePressed={() =>
-                send({ type: "DELETE_COMMENT", commentId: comment.id })
+                commentsService.send({
+                  type: "DELETE_COMMENT",
+                  commentId: comment.id,
+                })
               }
               commentId={comment.id}
             />
@@ -158,7 +164,7 @@ export default function Comment({ comment, meId, meName, canComment }: Props) {
                 <ReplyArea
                   value={state.context.replyTexts[comment.id]}
                   onChangeText={(text) =>
-                    send({
+                    commentsService.send({
                       type: "UPDATE_REPLY_TEXT",
                       commentId: comment.id,
                       text,
@@ -166,7 +172,10 @@ export default function Comment({ comment, meId, meName, canComment }: Props) {
                   }
                   style={styles.textarea}
                   onSubmitPress={() =>
-                    send({ type: "CREATE_REPLY", commentId: comment.id })
+                    commentsService.send({
+                      type: "CREATE_REPLY",
+                      commentId: comment.id,
+                    })
                   }
                   testPrefix={`comment-${comment.id}`}
                 />

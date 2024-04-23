@@ -50,9 +50,7 @@ export default function AccountMenu({
   const navigation = useNavigation();
   const { activeDevice } = useAppContext();
   const [state, send] = useMachine(accountMenuMachine, {
-    context: {
-      params: { workspaceId, activeDevice },
-    },
+    input: { workspaceId, activeDevice },
   });
   const [isPasswordModalVisible, setIsPasswordModalVisible] = useState(false);
   const { workspaces } = workspaceStore.useLocalWorkspaces();
@@ -70,7 +68,7 @@ export default function AccountMenu({
   };
 
   const logoutPreflight = () => {
-    send("CLOSE");
+    send({ type: "CLOSE" });
     const mainDevice = getMainDevice();
     if (mainDevice) {
       logout();
@@ -177,7 +175,7 @@ export default function AccountMenu({
           if (activeDevice && isOpen) {
             workspaceStore.loadRemoteWorkspaces({ activeDevice });
           }
-          send(isOpen ? "OPEN" : "CLOSE");
+          send(isOpen ? { type: "OPEN" } : { type: "CLOSE" });
         }}
         trigger={
           <Pressable
@@ -221,7 +219,7 @@ export default function AccountMenu({
         <MenuLink
           to={{ screen: "AccountSettings" }}
           onPress={(event) => {
-            send("CLOSE");
+            send({ type: "CLOSE" });
             if (OS === "ios") {
               event.preventDefault();
               navigation.navigate("AccountSettings");
@@ -278,7 +276,7 @@ export default function AccountMenu({
           <View style={tw`pl-1.5 pr-3 py-1.5`}>
             <IconButton
               onPress={() => {
-                send("CLOSE");
+                send({ type: "CLOSE" });
                 openCreateWorkspace();
               }}
               name="plus"
@@ -289,7 +287,7 @@ export default function AccountMenu({
         ) : (
           <MenuButton
             onPress={() => {
-              send("CLOSE");
+              send({ type: "CLOSE" });
               openCreateWorkspace();
             }}
             iconName="plus"

@@ -51,7 +51,7 @@ export function PageHeaderLeft(props: any) {
                 color={"gray-900"}
                 disabled={!canUndo}
                 onPress={() => {
-                  editorToolbarService.send("UNDO");
+                  editorToolbarService.send({ type: "UNDO" });
                 }}
                 // @ts-expect-error
                 dataSet={{ editorButton: "true" }}
@@ -62,7 +62,7 @@ export function PageHeaderLeft(props: any) {
                 color={"gray-900"}
                 disabled={!canRedo}
                 onPress={() => {
-                  editorToolbarService.send("REDO");
+                  editorToolbarService.send({ type: "REDO" });
                 }}
                 // @ts-expect-error
                 dataSet={{ editorButton: "true" }}

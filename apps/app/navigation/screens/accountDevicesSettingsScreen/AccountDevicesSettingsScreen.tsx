@@ -41,7 +41,7 @@ export default function AccountDevicesSettingsScreen(
   props: RootStackScreenProps<"AccountSettingsDevices">
 ) {
   useMachine(loadMeAndVerifyMachine, {
-    context: {
+    input: {
       navigation: props.navigation,
     },
   });

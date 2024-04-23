@@ -10,12 +10,18 @@ import {
   verifyAndDecryptCommentReply,
 } from "@serenity-tools/common";
 import sodium from "react-native-libsodium";
-import { AnyActorRef, assign, createMachine, spawn } from "xstate";
+import {
+  AnyActorRef,
+  assertEvent,
+  assign,
+  fromPromise,
+  setup,
+  stopChild,
+} from "xstate";
 import * as Yjs from "yjs";
 import {
   CommentsByDocumentIdQueryResult,
   CommentsByDocumentIdQueryServiceEvent,
-  CommentsByDocumentIdQueryUpdateResultEvent,
   commentsByDocumentIdQueryService,
   runCreateCommentMutation,
   runCreateCommentReplyMutation,
@@ -29,7 +35,7 @@ import {
 import { isValidDeviceSigningPublicKey } from "../utils/isValidDeviceSigningPublicKey/isValidDeviceSigningPublicKey";
 import { showToast } from "../utils/toast/showToast";
 
-type Params = {
+type Input = {
   // these won't change
   workspaceId: string;
   pageId: string;
@@ -67,10 +73,10 @@ export type ActiveSnapshot = {
 };
 
 interface Context {
-  params: Params;
+  params: Input;
   commentsByDocumentIdQueryResult?: CommentsByDocumentIdQueryResult;
   commentsByDocumentIdQueryError: boolean;
-  commentsByDocumentIdQueryActor?: AnyActorRef;
+  commentsByDocumentIdQueryService?: AnyActorRef;
   decryptedComments: DecryptedComment[];
   replyTexts: Record<string, string>;
   highlightedComment: HighlightedComment | null;
@@ -82,332 +88,142 @@ interface Context {
 
 export const commentsMachine =
   /** @xstate-layout N4IgpgJg5mDOIC5QGMD2BbdYB2AXWAsgIbIAWAltmAMQDCGWesAQgJ4AiqyAro7gJIQAitzAAnVgDoAqgAV2AQQAqAUQD6AJRUBlaQBklAbQAMAXUSgADqljlc5VNgsgAHogDMANgAckgEyeAJwArD7Bwd4A7Mbu7gA0IKyI3sbGkt4AjH4ALMae7n7RfgEAviUJaJg4+MRklDT0VUxsnDx8giLiUioaGgDyGibmSCDWtvaOzm4IudnpxYXe2dnBfhkZ2QlJCJ6RvoF+7saRGZ4ZS96efmUVDNWEJBRU1HKKqpoqsnoAmmqqABpGMzOMZ2BxOEbTbK7SQHZaRHLGULRYJbRARdySTzZbyxQoBbIbDI3ECVPgPOrPAAS-AA4lS9HSqUo1LQ+gQCCoAHIsgBi-QIahU7H4SgGQxBNjBk0hiFynkkkS87gygRxB0CWVRiTl3l87iVwUC7lx2Xc2T8SJJZPutSeNBp9MZ9JZbI53L5ArU2n47BUzAUg2BI1BEwhoChxj8khiflCfhCARy3jRCHcxpjgT1wWyauKQUC1ruTDt9Wo2hULIUtCU-AAauptFyFLJtFS+lWuexWezOTy1ABpFTfbQSkNSsNTDwnSRmmLponrEKphORea5SLBSKBQLbqNFpo1R5lvqybne33+wNjqwT8FTmaBNIraIFbyBfJHTwrqOSHPG3FLk8VYfAPclS2eWg9D6CsLz9AMg2GW9xnvWUZkuLFVQyUIc0OHFPG-HUEAyY5-EiaFNWNAp8myMDbWPZ4xVpWk9EbS8EJvUY7xlCNdTSTJcXCKMzQOSJUyyOiSwYsBJAAdyIMFsCgXlUDEBRkHsAA3MBtGwIhLFgUhUFwctKzUatawbb1m1bdtO27N0+xZIcR040NUN4mYNhjdYTmTD9gJTIidzXYSjRSYxvDWApJKPSkZPICAABsGi0ZR1Ecj03O48NXEQK40liPEn1jaExKI1VgNhY5LSi5YUmCYlylJYs4vtSREpS6g-VY95Mp5bKUJ4vKdmKSQVWTDI9izdNyu2U4IkzTwo3cUJsVCdxYopdrOtSlR0o+L5vkG6VcumYDMXNSJgMREi9TmxBDlScbYhiUIswtAitoghLkpoHrK3ULQjpOyc0OA4JxoCBrzmuzIHuI4wDn8HcDROYI8g1b7pMkCAwBS+wlMaPhqAgRwEuwTTUAAaxkvGCbAYnqlBjyRsJOZjF8rJ1QIiJxNyNJ1mMbI-OAq4Rex+LcfxsBCagJm8FJ8mOspmm6Zl3BGdawwMiQrihrOuVvM5qbuffXmgvmxr9g+3Y4wiK1mptKSpfp2XKHl1rqHEMRVMkSwkqIXAADNVPQaWGYV3AWeGqFja5-yLfEnD5jjXENkOApCyd1rtvqCP3aUjQwAD1glaoFWqdpgvNeL0uY8NryOYTnnAvEjPJDNlVN3Ca7Ikl9q3bluukrLsmK8oKv1YZkfWB1vX3Njo3m9NxO24qgIMh8vwosicity3Af86Hj3Z+9sRfbEf3A5DsOa7AWeG4fdmfNX1u+Yqo411xV9IsJDGmq3EPHnCuyAxBgCDh7KO5cKZT0kGAiBmso5PzQi-E2fl36W0QFNUiBxsIXQamtI+oDwGQKJl7cesC1bwNIUg7WutJQG2fvHN+5t17zSigqFIapyKnGwpaYIxCZIILIZ7Q859L7XyDqHMQ4cRF0MPCgzyaCW5sI-hwpUWJYh9yinkTItEc7AJ+jQxBp8S6jxgZXah8iH7mLnsGZCp1mErwwWorBCBLTYUVAUTcqQIhPkEYY8CON5FmNLpYye1jaG2Prgw8cTDUEsNcQFdRj0+H+FWkcPhjULRCJMaIs+Ps-YB2kXfGxj8HH6ycYklxZsUnuOKJFGMRoWmFDnJtEk2BUB43gCMZ2bV6iMOqZ5AAtBkVMT5AiKk5rwt64R3x5PkopZSql1JaR0npAyRlcBDLBp5DYmI9QpBwWaXemwKqcymZqE4ap-54WzkA4JUtdq7NZtMd8a5yJrD2BaTIO53GnAKONXMAQjQJgmgYx59FXYayga1V5S8Zhrg-KtXYeDgLbnCPzA0sIny7AIqC5a3g8knyLnYhFjcdwo0yEaF8BQ8TiSRpiDY6dzjnCzHkPJoTyGHgpc-BGU0VjpBmZFTJXhAEtSMSE2hYTR58rQlmF60IViWh3puNYP4CKwlVRsQkxpoRlDKEAA */
-  createMachine(
-    {
-      schema: {
-        events: {} as
-          | CommentsByDocumentIdQueryServiceEvent
-          | { type: "CREATE_COMMENT"; text: string; from: number; to: number }
-          | { type: "DELETE_COMMENT"; commentId: string }
-          | { type: "UPDATE_REPLY_TEXT"; text: string; commentId: string }
-          | { type: "CREATE_REPLY"; commentId: string }
-          | { type: "DELETE_REPLY"; replyId: string }
-          | {
-              type: "HIGHLIGHT_COMMENT_FROM_EDITOR";
-              commentId: string | null;
-              openSidebar: boolean;
-            }
-          | { type: "HIGHLIGHT_COMMENT_FROM_SIDEBAR"; commentId: string | null }
-          | {
-              type: "SET_ACTIVE_SNAPSHOT_AND_COMMENT_KEYS";
-              activeSnapshot: ActiveSnapshot;
-              yCommentKeys: YCommentKeys;
-              yCommentReplyKeys: YCommentReplyKeys;
-            }
-          | { type: "OPEN_SIDEBAR" }
-          | { type: "CLOSE_SIDEBAR" }
-          | { type: "TOGGLE_SIDEBAR" },
-        context: {} as Context,
-      },
-      tsTypes: {} as import("./commentsMachine.typegen").Typegen0,
-      predictableActionArguments: true,
-      context: {
-        params: {
-          pageId: "",
-          activeDevice: null,
-          workspaceId: "",
-        },
-        commentsByDocumentIdQueryError: false,
-        decryptedComments: [],
-        replyTexts: {},
-        highlightedComment: null,
-        // just to fulfill the types
-        yCommentKeys: new Yjs.Doc().getMap<Uint8Array>("commentKeys"),
-        // just to fulfill the types
-        yCommentReplyKeys: new Yjs.Doc().getMap<Uint8Array>("commentReplyKeys"),
-        activeSnapshot: undefined,
-        isOpenSidebar: false,
-      },
-      initial: "waitingForActiveSnapshot",
-      on: {
-        "CommentsByDocumentIdQuery.UPDATE_RESULT": {
-          actions: [
-            assign((_, event: CommentsByDocumentIdQueryUpdateResultEvent) => {
-              return {
-                commentsByDocumentIdQueryError: false,
-                commentsByDocumentIdQueryResult: event.result,
-              };
-            }),
-          ],
-          target: "decryptingComments",
-        },
-        "CommentsByDocumentIdQuery.ERROR": {
-          actions: [
-            "showErrorToast",
-            assign({ commentsByDocumentIdQueryError: true }),
-          ],
-        },
-        UPDATE_REPLY_TEXT: {
-          actions: ["updateReplyText"],
-        },
-        HIGHLIGHT_COMMENT_FROM_EDITOR: {
-          actions: ["highlightComment"],
-        },
-        HIGHLIGHT_COMMENT_FROM_SIDEBAR: {
-          actions: ["highlightComment"],
-        },
-        SET_ACTIVE_SNAPSHOT_AND_COMMENT_KEYS: {
-          actions: ["setActiveSnapshotAndCommentAndReplyKeys"],
-        },
-        OPEN_SIDEBAR: {
-          actions: [assign({ isOpenSidebar: true })],
-        },
-        CLOSE_SIDEBAR: {
-          actions: [assign({ isOpenSidebar: false })],
-        },
-        TOGGLE_SIDEBAR: {
-          actions: [
-            assign((context) => {
-              if (context.isOpenSidebar) {
-                return {
-                  isOpenSidebar: false,
-                  highlightedComment: null,
-                };
-              }
-              return {
-                isOpenSidebar: true,
-              };
-            }),
-          ],
-        },
-      },
-      states: {
-        waitingForActiveSnapshot: {
-          on: {
-            SET_ACTIVE_SNAPSHOT_AND_COMMENT_KEYS: {
-              actions: ["setActiveSnapshotAndCommentAndReplyKeys"],
-              target: "startFetching",
-            },
-          },
-        },
-        startFetching: {
-          entry: ["spawnActors"],
-          always: {
-            target: "idle",
-          },
-        },
-        idle: {
-          on: {
-            CREATE_COMMENT: "creatingComment",
-            DELETE_COMMENT: "deletingComment",
-            CREATE_REPLY: "creatingReply",
-            DELETE_REPLY: "deletingReply",
-          },
-        },
-        decryptingComments: {
-          invoke: {
-            src: "verifyAndDecryptComments",
-            id: "verifyAndDecryptComments",
-            onDone: {
-              target: "idle",
-              actions: assign((context, event) => {
-                return {
-                  decryptedComments: event.data,
-                };
-              }),
-            },
-            onError: {
-              actions: ["showErrorToast"],
-              target: "idle",
-            },
-          },
-        },
-        deletingComment: {
-          invoke: {
-            src: "deleteComment",
-            id: "deleteComment",
-            onDone: [
-              {
-                actions: ["stopActors", "spawnActors"], // respawn to trigger a request,
-                cond: "hasNoNetworkError",
-                target: "idle",
-              },
-              {
-                target: "idle",
-              },
-            ],
-            onError: [
-              {
-                actions: ["showDeleteErrorToast"],
-                target: "idle",
-              },
-            ],
-          },
-        },
-        deletingReply: {
-          invoke: {
-            src: "deleteReply",
-            id: "deleteReply",
-            onDone: [
-              {
-                actions: ["stopActors", "spawnActors"], // respawn to trigger a request,
-                cond: "hasNoNetworkError",
-                target: "idle",
-              },
-              {
-                target: "idle",
-              },
-            ],
-            onError: [
-              {
-                actions: ["showDeleteErrorToast"],
-                target: "idle",
-              },
-            ],
-          },
-        },
-        creatingComment: {
-          invoke: {
-            src: "createComment",
-            id: "createComment",
-            onDone: [
-              {
-                actions: ["stopActors", "spawnActors"], // respawn to trigger a request,
-                cond: "hasNoNetworkError",
-                target: "idle",
-              },
-              {
-                target: "idle",
-              },
-            ],
-            onError: [
-              {
-                actions: ["showCreateErrorToast"],
-                target: "idle",
-              },
-            ],
-          },
-        },
-        creatingReply: {
-          invoke: {
-            src: "createReply",
-            id: "createReply",
-            onDone: [
-              {
-                actions: ["clearReplyText", "stopActors", "spawnActors"], // respawn to trigger a request,
-                cond: "hasNoNetworkError",
-                target: "idle",
-              },
-              {
-                target: "idle",
-              },
-            ],
-            onError: [
-              {
-                actions: ["showCreateErrorReplyToast"],
-                target: "idle",
-              },
-            ],
-          },
-        },
-      },
-      id: "commentsMachine",
-    },
-    {
-      actions: {
-        showErrorToast: (context) => {
-          // makes sure the error toast is only shown once
-          if (!context.commentsByDocumentIdQueryError) {
-            showToast("Failed to load comments.", "error");
+  setup({
+    types: {} as {
+      context: Context;
+      input: Input;
+      events:
+        | CommentsByDocumentIdQueryServiceEvent
+        | { type: "CREATE_COMMENT"; text: string; from: number; to: number }
+        | { type: "DELETE_COMMENT"; commentId: string }
+        | { type: "UPDATE_REPLY_TEXT"; text: string; commentId: string }
+        | { type: "CREATE_REPLY"; commentId: string }
+        | { type: "DELETE_REPLY"; replyId: string }
+        | {
+            type: "HIGHLIGHT_COMMENT_FROM_EDITOR";
+            commentId: string | null;
+            openSidebar: boolean;
           }
-        },
-        showCreateErrorToast: () => {
-          showToast("Failed to create the comment.", "error");
-        },
-        showCreateErrorReplyToast: () => {
-          showToast("Failed to create the reply.", "error");
-        },
-        showDeleteErrorToast: () => {
-          showToast("Failed to delete the comment.", "error");
-        },
-        spawnActors: assign((context) => {
-          return {
-            commentsByDocumentIdQueryActor: spawn(
-              commentsByDocumentIdQueryService(
-                {
+        | { type: "HIGHLIGHT_COMMENT_FROM_SIDEBAR"; commentId: string | null }
+        | {
+            type: "SET_ACTIVE_SNAPSHOT_AND_COMMENT_KEYS";
+            activeSnapshot: ActiveSnapshot;
+            yCommentKeys: YCommentKeys;
+            yCommentReplyKeys: YCommentReplyKeys;
+          }
+        | { type: "OPEN_SIDEBAR" }
+        | { type: "CLOSE_SIDEBAR" }
+        | { type: "TOGGLE_SIDEBAR" };
+      children: {
+        commentsByDocumentIdQueryService: "commentsByDocumentIdQueryService";
+      };
+    },
+    actions: {
+      showErrorToast: ({ context }) => {
+        // makes sure the error toast is only shown once
+        if (!context.commentsByDocumentIdQueryError) {
+          showToast("Failed to load comments.", "error");
+        }
+      },
+      showCreateErrorToast: () => {
+        showToast("Failed to create the comment.", "error");
+      },
+      showCreateErrorReplyToast: () => {
+        showToast("Failed to create the reply.", "error");
+      },
+      showDeleteErrorToast: () => {
+        showToast("Failed to delete the comment.", "error");
+      },
+      spawnActors: assign(({ context, spawn }) => {
+        return {
+          commentsByDocumentIdQueryService: spawn(
+            "commentsByDocumentIdQueryService",
+            {
+              id: "commentsByDocumentIdQueryService",
+              input: {
+                variables: {
                   documentId: context.params.pageId,
                   documentShareLinkToken: context.params.shareLinkToken,
                 },
-                10000 // poll only every 10 seconds
-              )
-            ),
+                intervalInMs: 10000, // poll only every 10 seconds
+              },
+            }
+          ),
+        };
+      }),
+      stopActors: ({ context }) => {
+        stopChild("commentsByDocumentIdQueryService");
+      },
+      updateReplyText: assign(({ context, event }) => {
+        assertEvent(event, "UPDATE_REPLY_TEXT");
+        return {
+          replyTexts: {
+            ...context.replyTexts,
+            [event.commentId]: event.text,
+          },
+        };
+      }),
+      highlightComment: assign(({ context, event }) => {
+        assertEvent(event, [
+          "HIGHLIGHT_COMMENT_FROM_EDITOR",
+          "HIGHLIGHT_COMMENT_FROM_SIDEBAR",
+        ]);
+
+        if (event.commentId) {
+          return {
+            isOpenSidebar:
+              event.type === "HIGHLIGHT_COMMENT_FROM_EDITOR" &&
+              event.openSidebar
+                ? true
+                : context.isOpenSidebar,
+            highlightedComment: {
+              id: event.commentId,
+              source: (event.type === "HIGHLIGHT_COMMENT_FROM_SIDEBAR"
+                ? "sidebar"
+                : "editor") as HighlightedCommentSource,
+            },
           };
-        }),
-        stopActors: (context) => {
-          if (context.commentsByDocumentIdQueryActor?.stop) {
-            context.commentsByDocumentIdQueryActor.stop();
-          }
-        },
-        updateReplyText: assign((context, event) => {
+        }
+        return {
+          highlightedComment: null,
+        };
+      }),
+      clearReplyText: assign(({ context, event }) => {
+        // @ts-expect-error event is not typed
+        if (event.output.data.createCommentReply.commentReply.commentId) {
           return {
             replyTexts: {
               ...context.replyTexts,
-              [event.commentId]: event.text,
+              // @ts-expect-error event is not typed
+              [event.output.data.createCommentReply.commentReply.commentId]: "",
             },
           };
-        }),
-        highlightComment: assign((context, event) => {
-          if (event.commentId) {
-            return {
-              isOpenSidebar:
-                event.type === "HIGHLIGHT_COMMENT_FROM_EDITOR" &&
-                event.openSidebar
-                  ? true
-                  : context.isOpenSidebar,
-              highlightedComment: {
-                id: event.commentId,
-                source: (event.type === "HIGHLIGHT_COMMENT_FROM_SIDEBAR"
-                  ? "sidebar"
-                  : "editor") as HighlightedCommentSource,
-              },
-            };
-          }
-          return {
-            highlightedComment: null,
-          };
-        }),
-        clearReplyText: assign((context, event: any) => {
-          if (event.data.data.createCommentReply.commentReply.commentId) {
-            return {
-              replyTexts: {
-                ...context.replyTexts,
-                [event.data.data.createCommentReply.commentReply.commentId]: "",
-              },
-            };
-          } else {
-            return {};
-          }
-        }),
-        setActiveSnapshotAndCommentAndReplyKeys: assign((context, event) => {
-          return {
-            activeSnapshot: event.activeSnapshot,
-            yCommentKeys: event.yCommentKeys,
-            yCommentReplyKeys: event.yCommentReplyKeys,
-          };
-        }),
-      },
-      services: {
-        verifyAndDecryptComments: async (context, event) => {
+        } else {
+          return {};
+        }
+      }),
+      setActiveSnapshotAndCommentAndReplyKeys: assign(({ event }) => {
+        assertEvent(event, "SET_ACTIVE_SNAPSHOT_AND_COMMENT_KEYS");
+        return {
+          activeSnapshot: event.activeSnapshot,
+          yCommentKeys: event.yCommentKeys,
+          yCommentReplyKeys: event.yCommentReplyKeys,
+        };
+      }),
+    },
+    actors: {
+      commentsByDocumentIdQueryService: commentsByDocumentIdQueryService,
+      verifyAndDecryptComments: fromPromise(
+        async ({ input: context }: { input: Context }) => {
+          let decryptedComments: DecryptedComment[] = [];
           const activeSnapshot = context.activeSnapshot;
-          if (!activeSnapshot) return {};
+          if (!activeSnapshot) return [];
 
           if (
             !context.commentsByDocumentIdQueryResult?.data?.commentsByDocumentId
               ?.nodes
           )
-            return {
-              decryptedComments: [],
-            };
+            return decryptedComments;
 
           // console.log("yCommentKeys", context.yCommentKeys.size);
           // context.yCommentKeys.forEach((key, commentId) => {
@@ -418,7 +234,7 @@ export const commentsMachine =
           //   console.log("commentReplyId", commentId, key);
           // });
 
-          const decryptedComments = await Promise.all(
+          decryptedComments = await Promise.all(
             context.commentsByDocumentIdQueryResult.data.commentsByDocumentId.nodes
               .filter(notNull)
               .map(async (encryptedComment) => {
@@ -596,8 +412,11 @@ export const commentsMachine =
           );
 
           return decryptedComments;
-        },
-        createComment: async (context, event) => {
+        }
+      ),
+      createComment: fromPromise(
+        async ({ input }: { input: { event: any; context: Context } }) => {
+          const { event, context } = input;
           try {
             const activeSnapshot = context.activeSnapshot;
             if (!activeSnapshot) return undefined;
@@ -649,8 +468,11 @@ export const commentsMachine =
             console.error(err);
             throw err;
           }
-        },
-        createReply: async (context, event) => {
+        }
+      ),
+      createReply: fromPromise(
+        async ({ input }: { input: { event: any; context: Context } }) => {
+          const { event, context } = input;
           const activeSnapshot = context.activeSnapshot;
           if (!activeSnapshot) return undefined;
           const activeDevice = context.params.activeDevice;
@@ -697,27 +519,250 @@ export const commentsMachine =
             sodium.from_base64(replyKey.key)
           );
           return createCommentReplyMutation;
-        },
-        deleteComment: async (context, event) => {
+        }
+      ),
+      deleteComment: fromPromise(
+        async ({ input }: { input: { event: any; context: Context } }) => {
+          const { event, context } = input;
           const deleteCommentsMutationResult = await runDeleteCommentsMutation({
             input: { commentIds: [event.commentId] },
           });
           context.yCommentKeys.delete(event.commentId);
           return deleteCommentsMutationResult;
-        },
-        deleteReply: async (context, event) => {
+        }
+      ),
+      deleteReply: fromPromise(
+        async ({ input }: { input: { event: any; context: Context } }) => {
+          const { event, context } = input;
           const deleteCommentReplyMutationResult =
             await runDeleteCommentRepliesMutation({
               input: { commentReplyIds: [event.replyId] },
             });
           context.yCommentReplyKeys.delete(event.replyId);
           return deleteCommentReplyMutationResult;
+        }
+      ),
+    },
+    guards: {
+      hasNoNetworkError: ({ event }) => {
+        // @ts-expect-error event is not typed
+        return !event.output?.error?.networkError;
+      },
+    },
+  }).createMachine({
+    context: ({ input }) => ({
+      params: {
+        pageId: input.pageId,
+        activeDevice: input.activeDevice,
+        workspaceId: input.workspaceId,
+        shareLinkToken: input.shareLinkToken,
+      },
+      commentsByDocumentIdQueryError: false,
+      decryptedComments: [],
+      replyTexts: {},
+      highlightedComment: null,
+      // just to fulfill the types
+      yCommentKeys: new Yjs.Doc().getMap<Uint8Array>("commentKeys"),
+      // just to fulfill the types
+      yCommentReplyKeys: new Yjs.Doc().getMap<Uint8Array>("commentReplyKeys"),
+      activeSnapshot: undefined,
+      isOpenSidebar: false,
+    }),
+    initial: "waitingForActiveSnapshot",
+    on: {
+      "CommentsByDocumentIdQuery.UPDATE_RESULT": {
+        actions: [
+          assign(({ event }) => {
+            return {
+              commentsByDocumentIdQueryError: false,
+              commentsByDocumentIdQueryResult: event.result,
+            };
+          }),
+        ],
+        target: ".decryptingComments",
+      },
+      "CommentsByDocumentIdQuery.ERROR": {
+        actions: [
+          "showErrorToast",
+          assign({ commentsByDocumentIdQueryError: true }),
+        ],
+      },
+      UPDATE_REPLY_TEXT: {
+        actions: ["updateReplyText"],
+      },
+      HIGHLIGHT_COMMENT_FROM_EDITOR: {
+        actions: ["highlightComment"],
+      },
+      HIGHLIGHT_COMMENT_FROM_SIDEBAR: {
+        actions: ["highlightComment"],
+      },
+      SET_ACTIVE_SNAPSHOT_AND_COMMENT_KEYS: {
+        actions: ["setActiveSnapshotAndCommentAndReplyKeys"],
+      },
+      OPEN_SIDEBAR: {
+        actions: [assign({ isOpenSidebar: true })],
+      },
+      CLOSE_SIDEBAR: {
+        actions: [assign({ isOpenSidebar: false })],
+      },
+      TOGGLE_SIDEBAR: {
+        actions: [
+          assign(({ context }) => {
+            if (context.isOpenSidebar) {
+              return {
+                isOpenSidebar: false,
+                highlightedComment: null,
+              };
+            }
+            return {
+              isOpenSidebar: true,
+            };
+          }),
+        ],
+      },
+    },
+    states: {
+      waitingForActiveSnapshot: {
+        on: {
+          SET_ACTIVE_SNAPSHOT_AND_COMMENT_KEYS: {
+            actions: ["setActiveSnapshotAndCommentAndReplyKeys"],
+            target: "startFetching",
+          },
         },
       },
-      guards: {
-        hasNoNetworkError: (context, event: { data: any }) => {
-          return !event.data?.error?.networkError;
+      startFetching: {
+        entry: ["spawnActors"],
+        always: {
+          target: "idle",
         },
       },
-    }
-  );
+      idle: {
+        on: {
+          CREATE_COMMENT: "creatingComment",
+          DELETE_COMMENT: "deletingComment",
+          CREATE_REPLY: "creatingReply",
+          DELETE_REPLY: "deletingReply",
+        },
+      },
+      decryptingComments: {
+        invoke: {
+          src: "verifyAndDecryptComments",
+          id: "verifyAndDecryptComments",
+          input: ({ context }) => context,
+          onDone: {
+            target: "idle",
+            actions: assign(({ event }) => {
+              return {
+                decryptedComments: event.output,
+              };
+            }),
+          },
+          onError: {
+            actions: ["showErrorToast"],
+            target: "idle",
+          },
+        },
+      },
+      deletingComment: {
+        invoke: {
+          src: "deleteComment",
+          id: "deleteComment",
+          input: ({ context, event }) => {
+            return { context, event };
+          },
+          onDone: [
+            {
+              actions: ["stopActors", "spawnActors"], // respawn to trigger a request,
+              guard: "hasNoNetworkError",
+              target: "idle",
+            },
+            {
+              target: "idle",
+            },
+          ],
+          onError: [
+            {
+              actions: ["showDeleteErrorToast"],
+              target: "idle",
+            },
+          ],
+        },
+      },
+      deletingReply: {
+        invoke: {
+          src: "deleteReply",
+          id: "deleteReply",
+          input: ({ context, event }) => {
+            return { context, event };
+          },
+          onDone: [
+            {
+              actions: ["stopActors", "spawnActors"], // respawn to trigger a request,
+              guard: "hasNoNetworkError",
+              target: "idle",
+            },
+            {
+              target: "idle",
+            },
+          ],
+          onError: [
+            {
+              actions: ["showDeleteErrorToast"],
+              target: "idle",
+            },
+          ],
+        },
+      },
+      creatingComment: {
+        invoke: {
+          src: "createComment",
+          id: "createComment",
+          input: ({ context, event }) => {
+            return { context, event };
+          },
+          onDone: [
+            {
+              actions: ["stopActors", "spawnActors"], // respawn to trigger a request,
+              guard: "hasNoNetworkError",
+              target: "idle",
+            },
+            {
+              target: "idle",
+            },
+          ],
+          onError: [
+            {
+              actions: ["showCreateErrorToast"],
+              target: "idle",
+            },
+          ],
+        },
+      },
+      creatingReply: {
+        invoke: {
+          src: "createReply",
+          id: "createReply",
+          input: ({ context, event }) => {
+            return { context, event };
+          },
+          onDone: [
+            {
+              actions: ["clearReplyText", "stopActors", "spawnActors"], // respawn to trigger a request,
+              guard: "hasNoNetworkError",
+              target: "idle",
+            },
+            {
+              target: "idle",
+            },
+          ],
+          onError: [
+            {
+              actions: ["showCreateErrorReplyToast"],
+              target: "idle",
+            },
+          ],
+        },
+      },
+    },
+    id: "commentsMachine",
+  });

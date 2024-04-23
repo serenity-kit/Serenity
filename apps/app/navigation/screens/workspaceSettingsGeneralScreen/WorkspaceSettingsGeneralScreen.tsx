@@ -42,7 +42,7 @@ export default function WorkspaceSettingsGeneralScreen(
   const { workspaceId } = useWorkspace();
   const { activeDevice } = useAuthenticatedAppContext();
   const [state] = useMachine(workspaceSettingsLoadWorkspaceMachine, {
-    context: {
+    input: {
       workspaceId: workspaceId,
       navigation: props.navigation,
       activeDevice,

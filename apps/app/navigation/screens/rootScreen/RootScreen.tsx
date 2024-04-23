@@ -8,16 +8,14 @@ import { rootScreenMachine } from "./rootScreenMachine";
 export default function RootScreen(props: RootStackScreenProps<"Root">) {
   useWindowDimensions(); // needed to ensure tw-breakpoints are triggered when resizing
   const [, send] = useMachine(rootScreenMachine, {
-    context: {
-      navigation: props.navigation,
-    },
+    input: { navigation: props.navigation },
   });
   console.log("ROOT");
 
   // react-navigation in certain situations does not unmount screens and therefor we need to trigger
   // a fresh start of the machine when the screen is focused again
   useFocusEffect(() => {
-    send("start");
+    send({ type: "start" });
   });
 
   return (

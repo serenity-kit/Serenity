@@ -60,18 +60,14 @@ export const useYjsSync = (config: YjsSyncMachineConfig) => {
   // related: https://github.com/statelyai/xstate/discussions/1825
   const [syncMachine1] = useState(() => createSyncMachine());
   const machine = useMachine(syncMachine1, {
-    context: {
+    input: {
       ...rest,
       applySnapshot: (decryptedSnapshotData) => {
-        Yjs.applyUpdateV2(
-          config.yDoc,
-          decryptedSnapshotData,
-          "sec-sync-remote"
-        );
+        Yjs.applyUpdateV2(config.yDoc, decryptedSnapshotData, "secsync-remote");
       },
       applyChanges: (decryptedChanges) => {
         decryptedChanges.map((change) => {
-          Yjs.applyUpdateV2(config.yDoc, change, "sec-sync-remote");
+          Yjs.applyUpdateV2(config.yDoc, change, "secsync-remote");
         });
       },
       applyEphemeralMessage: (ephemeralMessage, authorClientPublicKey) => {
@@ -97,19 +93,19 @@ export const useYjsSync = (config: YjsSyncMachineConfig) => {
         deserializeUint8ArrayUpdates(serialized, config.sodium),
     },
   });
-  const [state, send] = machine;
+  const [snapshot, send] = machine;
 
   useEffect(() => {
     // always listen to updates from the document itself
     const onUpdate = (update: any, origin: any) => {
-      if (origin?.key === "y-sync$" || origin === "mobile-webview") {
+      if (origin !== "secsync-remote") {
         send({ type: "ADD_CHANGES", data: [update] });
       }
     };
     yDoc.on("updateV2", onUpdate);
 
     // only connect the awareness after the document loaded
-    if (state.context._documentDecryptionState !== "complete") {
+    if (snapshot.context._documentDecryptionState !== "complete") {
       return;
     }
 
@@ -127,6 +123,7 @@ export const useYjsSync = (config: YjsSyncMachineConfig) => {
     yAwarenessRef.current.on("update", onAwarenessUpdate);
 
     // remove awareness state when closing the browser tab
+
     if (
       typeof window !== "undefined" &&
       typeof window.addEventListener === "function"
@@ -150,7 +147,7 @@ export const useYjsSync = (config: YjsSyncMachineConfig) => {
       yDoc.off("update", onUpdate);
     };
     // causes issues if ran multiple times e.g. awareness sharing to not work anymore
-  }, [state.context._documentDecryptionState]);
+  }, [snapshot.context._documentDecryptionState]);
 
   return appendAwareness(machine, yAwarenessRef.current);
 };

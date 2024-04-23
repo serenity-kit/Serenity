@@ -24,6 +24,7 @@ module.exports = {
       prepend: [
         "import { getUrqlClient } from '../utils/urqlClient/urqlClient';",
         "import canonicalize from 'canonicalize';",
+        "import { fromCallback } from 'xstate';",
       ],
       content: [
         ...visitorResult.definitions.filter(

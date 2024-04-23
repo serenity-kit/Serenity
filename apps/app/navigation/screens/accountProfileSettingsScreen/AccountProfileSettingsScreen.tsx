@@ -9,7 +9,7 @@ export default function AccountProfileSettingsScreen(
 ) {
   useWindowDimensions(); // needed to ensure tw-breakpoints are triggered when resizing
   useMachine(loadMeAndVerifyMachine, {
-    context: {
+    input: {
       navigation: props.navigation,
     },
   });

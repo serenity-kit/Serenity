@@ -3,12 +3,11 @@
   "version": "0.0.1",
   "main": "src/index",
   "scripts": {
-    "build": "rimraf -rf ./dist && yarn build:xstate-types && tsc -p tsconfig.build.json",
+    "build": "rimraf -rf ./dist && tsc -p tsconfig.build.json",
     "prepublishOnly": "yarn run build",
     "test": "jest",
     "ts:check": "yarn tsc --noEmit",
-    "lint": "eslint --ext .tsx --ext .ts ./",
-    "build:xstate-types": "xstate typegen \"./**/*.ts?(x)\""
+    "lint": "eslint --ext .tsx --ext .ts ./"
   },
   "dependencies": {
     "canonicalize": "^2.0.0",

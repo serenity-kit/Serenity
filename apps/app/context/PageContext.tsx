@@ -1,5 +1,5 @@
 import React, { useContext } from "react";
-import { InterpreterFrom } from "xstate";
+import { Actor } from "xstate";
 import {
   ActiveSnapshot,
   YCommentKeys,
@@ -9,7 +9,7 @@ import {
 
 type PageContext = {
   pageId: string;
-  commentsService: InterpreterFrom<typeof commentsMachine>;
+  commentsService: Actor<typeof commentsMachine>;
   setActiveSnapshotAndCommentKeys: (params: {
     snapshot: ActiveSnapshot;
     yCommentKeys: YCommentKeys;
@@ -19,7 +19,7 @@ type PageContext = {
 
 const pageContext = React.createContext<PageContext>({
   pageId: "",
-  commentsService: {} as InterpreterFrom<typeof commentsMachine>,
+  commentsService: {} as Actor<typeof commentsMachine>,
   setActiveSnapshotAndCommentKeys: () => {},
 });
 

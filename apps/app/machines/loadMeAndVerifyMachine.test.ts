@@ -4,17 +4,18 @@ jest.mock("../generated/graphql", () => ({
   // namedExport: jest.fn(),
 }));
 
-import { interpret } from "xstate";
+import { createActor, fromPromise } from "xstate";
 import { loadMeAndVerifyMachine } from "./loadMeAndVerifyMachine";
 
 it("should reach validSession", (done) => {
-  const machine = loadMeAndVerifyMachine.withConfig({
-    services: {
-      fetchMe: () => {
+  const machine = loadMeAndVerifyMachine.provide({
+    actors: {
+      fetchMe: fromPromise(() => {
         return new Promise((resolve) => {
           setTimeout(() => {
             resolve({
               data: {
+                // @ts-expect-error
                 me: {
                   id: "123",
                 },
@@ -22,11 +23,12 @@ it("should reach validSession", (done) => {
             });
           }, 1);
         });
-      },
+      }),
     },
   });
 
-  const service = interpret(machine).onTransition((state) => {
+  const service = createActor(machine, { input: { navigation: jest.fn() } });
+  service.subscribe((state) => {
     if (state.matches("validSession")) {
       expect(state.context.meQueryResult).toMatchInlineSnapshot(`
         {
@@ -47,11 +49,12 @@ it("should reach validSession", (done) => {
 it("should redirectToLogin if session is not valid", (done) => {
   const redirectToLogin = jest.fn();
 
-  const machine = loadMeAndVerifyMachine.withConfig({
-    services: {
-      fetchMe: () => {
+  const machine = loadMeAndVerifyMachine.provide({
+    actors: {
+      fetchMe: fromPromise(() => {
         return new Promise((resolve) => {
           setTimeout(() => {
+            // @ts-expect-error
             resolve({
               data: {
                 me: null,
@@ -59,14 +62,15 @@ it("should redirectToLogin if session is not valid", (done) => {
             });
           }, 1);
         });
-      },
+      }),
     },
     actions: {
       redirectToLogin,
     },
   });
 
-  const service = interpret(machine).onTransition((state) => {
+  const service = createActor(machine, { input: { navigation: jest.fn() } });
+  service.subscribe((state) => {
     if (state.matches("invalidSession")) {
       expect(redirectToLogin).toHaveBeenCalled();
       done();

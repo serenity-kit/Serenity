@@ -7,7 +7,7 @@ import {
 } from "@serenity-tools/editor";
 import { View, tw, useHasEditorSidebar } from "@serenity-tools/ui";
 import { Editor as TipTapEditor } from "@tiptap/core";
-import { useActor } from "@xstate/react";
+import { useSelector } from "@xstate/react";
 import { Packer } from "docx";
 import { DocxSerializer, defaultMarks, defaultNodes } from "prosemirror-docx";
 import { useEffect, useMemo, useRef, useState } from "react";
@@ -82,7 +82,7 @@ export default function Editor({
   const setExportWordDoc = useEditorStore((state) => state.setExportWordDoc);
 
   const { commentsService } = usePage();
-  const [commentsState, send] = useActor(commentsService);
+  const commentsState = useSelector(commentsService, (state) => state);
 
   const workspaceDevicesToUsernames = useWorkspaceMemberDevicesToUsernames({
     workspaceId,
@@ -121,19 +121,19 @@ export default function Editor({
     window.visualViewport.addEventListener("resize", showAndPositionToolbar);
     window.addEventListener("scroll", positionToolbar);
 
-    const onEventListener = (args) => {
-      let params: UpdateEditorParams | null = null;
-      if (args.type === "UNDO") {
-        params = { variant: "undo" };
-      } else if (args.type === "REDO") {
-        params = { variant: "redo" };
-      }
-      if (params && tipTapEditorRef.current) {
+    const undoSubscription = editorToolbarService.on("UNDO", () => {
+      const params: UpdateEditorParams = { variant: "undo" };
+      if (tipTapEditorRef.current) {
         updateEditor(tipTapEditorRef.current, params);
       }
-    };
+    });
+    const redoSubscription = editorToolbarService.on("REDO", () => {
+      const params: UpdateEditorParams = { variant: "redo" };
+      if (tipTapEditorRef.current) {
+        updateEditor(tipTapEditorRef.current, params);
+      }
+    });
 
-    editorToolbarService.onEvent(onEventListener);
     setExportWordDoc(async () => {
       if (!tipTapEditorRef.current) {
         return null;
@@ -172,7 +172,8 @@ export default function Editor({
         showAndPositionToolbar
       );
       window.removeEventListener("scroll", positionToolbar);
-      editorToolbarService.off(onEventListener);
+      undoSubscription.unsubscribe();
+      redoSubscription.unsubscribe();
     };
   }, []);
 
@@ -220,7 +221,7 @@ export default function Editor({
         comments={commentsState.context.decryptedComments}
         workspaceDevicesToUsernames={workspaceDevicesToUsernames}
         createComment={(comment) => {
-          send({
+          commentsService.send({
             type: "CREATE_COMMENT",
             text: comment.text,
             from: comment.from,
@@ -229,7 +230,7 @@ export default function Editor({
         }}
         highlightComment={(commentId, openSidebar) => {
           // necessary check to avoid an endless loop
-          send({
+          commentsService.send({
             type: "HIGHLIGHT_COMMENT_FROM_EDITOR",
             commentId: commentId === null ? "NONE" : commentId, // there is a bug with setting it to null
             openSidebar: openSidebar || false,
@@ -273,7 +274,10 @@ export default function Editor({
         onTransaction={(params) => {
           const toolbarState = getEditorBottombarStateFromEditor(params.editor);
           setEditorBottombarState(toolbarState);
-          editorToolbarService.send("updateToolbarState", { toolbarState });
+          editorToolbarService.send({
+            type: "updateToolbarState",
+            toolbarState,
+          });
         }}
         encryptAndUploadFile={encryptAndUploadFile}
         shareOrSaveFile={({

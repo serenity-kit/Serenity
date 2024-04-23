@@ -106,14 +106,15 @@ const trigger${operationName} = (variablesString: string, variables: ${operation
  * It also considers the variables passed to the service.
  */
 export const ${lowerCaseOperationName}Service =
-  (variables: ${operationVariablesTypes}, intervalInMs?: number) => (callback, onReceive) => {
+  fromCallback(({ sendBack, receive, input }: {sendBack: any, receive: any ,input: {variables: ${operationVariablesTypes}, intervalInMs?: number }}) => { 
+    const { variables, intervalInMs } = input;
     const variablesString = canonicalize(variables) as string;
     if (${lowerCaseOperationName}ServiceSubscribers[variablesString]) {
-      ${lowerCaseOperationName}ServiceSubscribers[variablesString].callbacks.push(callback);
+      ${lowerCaseOperationName}ServiceSubscribers[variablesString].callbacks.push(sendBack);
     } else {
       ${lowerCaseOperationName}ServiceSubscribers[variablesString] = {
         variables,
-        callbacks: [callback],
+        callbacks: [sendBack],
         intervalId: null,
       };
     }
@@ -140,7 +141,7 @@ export const ${lowerCaseOperationName}Service =
         ${lowerCaseOperationName}ServiceSubscribers[variablesString].intervalId = null;
       }
     };
-  };
+  });
 
 `;
   };

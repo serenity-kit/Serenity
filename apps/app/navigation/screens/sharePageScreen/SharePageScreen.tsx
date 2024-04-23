@@ -7,7 +7,7 @@ import {
   tw,
   useIsPermanentLeftSidebar,
 } from "@serenity-tools/ui";
-import { useActor, useInterpret, useMachine } from "@xstate/react";
+import { useActorRef, useMachine, useSelector } from "@xstate/react";
 import { useCallback, useLayoutEffect, useMemo, useState } from "react";
 import { Drawer } from "react-native-drawer-layout";
 import sodium, { KeyPair } from "react-native-libsodium";
@@ -49,17 +49,15 @@ const SharePageContainer: React.FC<SharePageContainerProps> = ({
     };
   }, [shareDevice]);
 
-  const commentsService = useInterpret(commentsMachine, {
-    context: {
-      params: {
-        workspaceId,
-        pageId: route.params.pageId,
-        shareLinkToken: route.params.token,
-        activeDevice: shareDevice,
-      },
+  const commentsService = useActorRef(commentsMachine, {
+    input: {
+      workspaceId,
+      pageId: route.params.pageId,
+      shareLinkToken: route.params.token,
+      activeDevice: shareDevice,
     },
   });
-  const [commentsState, send] = useActor(commentsService);
+  const commentsState = useSelector(commentsService, (state) => state);
   const isPermanentLeftSidebar = useIsPermanentLeftSidebar();
 
   useLayoutEffect(() => {
@@ -67,7 +65,7 @@ const SharePageContainer: React.FC<SharePageContainerProps> = ({
       headerRight: () => (
         <PageHeaderRight
           toggleCommentsDrawer={() => {
-            send({ type: "TOGGLE_SIDEBAR" });
+            commentsService.send({ type: "TOGGLE_SIDEBAR" });
           }}
           hasShareButton={false}
         />
@@ -75,7 +73,7 @@ const SharePageContainer: React.FC<SharePageContainerProps> = ({
       headerTitle: () => (
         <PageHeader
           toggleCommentsDrawer={() => {
-            send({ type: "TOGGLE_SIDEBAR" });
+            commentsService.send({ type: "TOGGLE_SIDEBAR" });
           }}
           isOpenSidebar={commentsState.context.isOpenSidebar}
           hasNewComment={false} // not active for share links
@@ -90,7 +88,7 @@ const SharePageContainer: React.FC<SharePageContainerProps> = ({
         pageId: route.params.pageId,
         commentsService,
         setActiveSnapshotAndCommentKeys: (params) => {
-          send({
+          commentsService.send({
             ...params,
             type: "SET_ACTIVE_SNAPSHOT_AND_COMMENT_KEYS",
             activeSnapshot: params.snapshot,
@@ -102,12 +100,12 @@ const SharePageContainer: React.FC<SharePageContainerProps> = ({
         open={commentsState.context.isOpenSidebar}
         onOpen={() => {
           if (!commentsState.context.isOpenSidebar) {
-            send({ type: "OPEN_SIDEBAR" });
+            commentsService.send({ type: "OPEN_SIDEBAR" });
           }
         }}
         onClose={() => {
           if (commentsState.context.isOpenSidebar) {
-            send({ type: "CLOSE_SIDEBAR" });
+            commentsService.send({ type: "CLOSE_SIDEBAR" });
           }
         }}
         renderDrawerContent={() => {
@@ -151,7 +149,7 @@ function ActualSharePageScreen(
 ) {
   const [key] = useState(window.location.hash.split("=")[1]);
   const [state, send] = useMachine(sharePageScreenMachine, {
-    context: {
+    input: {
       shareLinkDeviceKey: key,
       documentId: props.route.params.pageId,
       token: props.route.params.token,
@@ -159,7 +157,7 @@ function ActualSharePageScreen(
   });
 
   useFocusEffect(() => {
-    send("start");
+    send({ type: "start" });
   });
 
   if (state.value !== "done" && state.value !== "decryptDeviceFail") {

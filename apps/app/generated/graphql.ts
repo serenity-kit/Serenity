@@ -1,5 +1,6 @@
 import { getUrqlClient } from '../utils/urqlClient/urqlClient';
 import canonicalize from 'canonicalize';
+import { fromCallback } from 'xstate';
 import gql from 'graphql-tag';
 import * as Urql from 'urql';
 export type Maybe<T> = T | null;
@@ -3789,14 +3790,15 @@ const triggerCommentsByDocumentIdQuery = (variablesString: string, variables: Co
  * It also considers the variables passed to the service.
  */
 export const commentsByDocumentIdQueryService =
-  (variables: CommentsByDocumentIdQueryVariables, intervalInMs?: number) => (callback, onReceive) => {
+  fromCallback(({ sendBack, receive, input }: {sendBack: any, receive: any ,input: {variables: CommentsByDocumentIdQueryVariables, intervalInMs?: number }}) => { 
+    const { variables, intervalInMs } = input;
     const variablesString = canonicalize(variables) as string;
     if (commentsByDocumentIdQueryServiceSubscribers[variablesString]) {
-      commentsByDocumentIdQueryServiceSubscribers[variablesString].callbacks.push(callback);
+      commentsByDocumentIdQueryServiceSubscribers[variablesString].callbacks.push(sendBack);
     } else {
       commentsByDocumentIdQueryServiceSubscribers[variablesString] = {
         variables,
-        callbacks: [callback],
+        callbacks: [sendBack],
         intervalId: null,
       };
     }
@@ -3823,7 +3825,7 @@ export const commentsByDocumentIdQueryService =
         commentsByDocumentIdQueryServiceSubscribers[variablesString].intervalId = null;
       }
     };
-  };
+  });
 
 
 
@@ -3893,14 +3895,15 @@ const triggerDevicesQuery = (variablesString: string, variables: DevicesQueryVar
  * It also considers the variables passed to the service.
  */
 export const devicesQueryService =
-  (variables: DevicesQueryVariables, intervalInMs?: number) => (callback, onReceive) => {
+  fromCallback(({ sendBack, receive, input }: {sendBack: any, receive: any ,input: {variables: DevicesQueryVariables, intervalInMs?: number }}) => { 
+    const { variables, intervalInMs } = input;
     const variablesString = canonicalize(variables) as string;
     if (devicesQueryServiceSubscribers[variablesString]) {
-      devicesQueryServiceSubscribers[variablesString].callbacks.push(callback);
+      devicesQueryServiceSubscribers[variablesString].callbacks.push(sendBack);
     } else {
       devicesQueryServiceSubscribers[variablesString] = {
         variables,
-        callbacks: [callback],
+        callbacks: [sendBack],
         intervalId: null,
       };
     }
@@ -3927,7 +3930,7 @@ export const devicesQueryService =
         devicesQueryServiceSubscribers[variablesString].intervalId = null;
       }
     };
-  };
+  });
 
 
 
@@ -3997,14 +4000,15 @@ const triggerDocumentQuery = (variablesString: string, variables: DocumentQueryV
  * It also considers the variables passed to the service.
  */
 export const documentQueryService =
-  (variables: DocumentQueryVariables, intervalInMs?: number) => (callback, onReceive) => {
+  fromCallback(({ sendBack, receive, input }: {sendBack: any, receive: any ,input: {variables: DocumentQueryVariables, intervalInMs?: number }}) => { 
+    const { variables, intervalInMs } = input;
     const variablesString = canonicalize(variables) as string;
     if (documentQueryServiceSubscribers[variablesString]) {
-      documentQueryServiceSubscribers[variablesString].callbacks.push(callback);
+      documentQueryServiceSubscribers[variablesString].callbacks.push(sendBack);
     } else {
       documentQueryServiceSubscribers[variablesString] = {
         variables,
-        callbacks: [callback],
+        callbacks: [sendBack],
         intervalId: null,
       };
     }
@@ -4031,7 +4035,7 @@ export const documentQueryService =
         documentQueryServiceSubscribers[variablesString].intervalId = null;
       }
     };
-  };
+  });
 
 
 
@@ -4101,14 +4105,15 @@ const triggerDocumentChainQuery = (variablesString: string, variables: DocumentC
  * It also considers the variables passed to the service.
  */
 export const documentChainQueryService =
-  (variables: DocumentChainQueryVariables, intervalInMs?: number) => (callback, onReceive) => {
+  fromCallback(({ sendBack, receive, input }: {sendBack: any, receive: any ,input: {variables: DocumentChainQueryVariables, intervalInMs?: number }}) => { 
+    const { variables, intervalInMs } = input;
     const variablesString = canonicalize(variables) as string;
     if (documentChainQueryServiceSubscribers[variablesString]) {
-      documentChainQueryServiceSubscribers[variablesString].callbacks.push(callback);
+      documentChainQueryServiceSubscribers[variablesString].callbacks.push(sendBack);
     } else {
       documentChainQueryServiceSubscribers[variablesString] = {
         variables,
-        callbacks: [callback],
+        callbacks: [sendBack],
         intervalId: null,
       };
     }
@@ -4135,7 +4140,7 @@ export const documentChainQueryService =
         documentChainQueryServiceSubscribers[variablesString].intervalId = null;
       }
     };
-  };
+  });
 
 
 
@@ -4205,14 +4210,15 @@ const triggerDocumentPathQuery = (variablesString: string, variables: DocumentPa
  * It also considers the variables passed to the service.
  */
 export const documentPathQueryService =
-  (variables: DocumentPathQueryVariables, intervalInMs?: number) => (callback, onReceive) => {
+  fromCallback(({ sendBack, receive, input }: {sendBack: any, receive: any ,input: {variables: DocumentPathQueryVariables, intervalInMs?: number }}) => { 
+    const { variables, intervalInMs } = input;
     const variablesString = canonicalize(variables) as string;
     if (documentPathQueryServiceSubscribers[variablesString]) {
-      documentPathQueryServiceSubscribers[variablesString].callbacks.push(callback);
+      documentPathQueryServiceSubscribers[variablesString].callbacks.push(sendBack);
     } else {
       documentPathQueryServiceSubscribers[variablesString] = {
         variables,
-        callbacks: [callback],
+        callbacks: [sendBack],
         intervalId: null,
       };
     }
@@ -4239,7 +4245,7 @@ export const documentPathQueryService =
         documentPathQueryServiceSubscribers[variablesString].intervalId = null;
       }
     };
-  };
+  });
 
 
 
@@ -4309,14 +4315,15 @@ const triggerDocumentShareLinkQuery = (variablesString: string, variables: Docum
  * It also considers the variables passed to the service.
  */
 export const documentShareLinkQueryService =
-  (variables: DocumentShareLinkQueryVariables, intervalInMs?: number) => (callback, onReceive) => {
+  fromCallback(({ sendBack, receive, input }: {sendBack: any, receive: any ,input: {variables: DocumentShareLinkQueryVariables, intervalInMs?: number }}) => { 
+    const { variables, intervalInMs } = input;
     const variablesString = canonicalize(variables) as string;
     if (documentShareLinkQueryServiceSubscribers[variablesString]) {
-      documentShareLinkQueryServiceSubscribers[variablesString].callbacks.push(callback);
+      documentShareLinkQueryServiceSubscribers[variablesString].callbacks.push(sendBack);
     } else {
       documentShareLinkQueryServiceSubscribers[variablesString] = {
         variables,
-        callbacks: [callback],
+        callbacks: [sendBack],
         intervalId: null,
       };
     }
@@ -4343,7 +4350,7 @@ export const documentShareLinkQueryService =
         documentShareLinkQueryServiceSubscribers[variablesString].intervalId = null;
       }
     };
-  };
+  });
 
 
 
@@ -4413,14 +4420,15 @@ const triggerDocumentShareLinkSnapshotKeyBoxQuery = (variablesString: string, va
  * It also considers the variables passed to the service.
  */
 export const documentShareLinkSnapshotKeyBoxQueryService =
-  (variables: DocumentShareLinkSnapshotKeyBoxQueryVariables, intervalInMs?: number) => (callback, onReceive) => {
+  fromCallback(({ sendBack, receive, input }: {sendBack: any, receive: any ,input: {variables: DocumentShareLinkSnapshotKeyBoxQueryVariables, intervalInMs?: number }}) => { 
+    const { variables, intervalInMs } = input;
     const variablesString = canonicalize(variables) as string;
     if (documentShareLinkSnapshotKeyBoxQueryServiceSubscribers[variablesString]) {
-      documentShareLinkSnapshotKeyBoxQueryServiceSubscribers[variablesString].callbacks.push(callback);
+      documentShareLinkSnapshotKeyBoxQueryServiceSubscribers[variablesString].callbacks.push(sendBack);
     } else {
       documentShareLinkSnapshotKeyBoxQueryServiceSubscribers[variablesString] = {
         variables,
-        callbacks: [callback],
+        callbacks: [sendBack],
         intervalId: null,
       };
     }
@@ -4447,7 +4455,7 @@ export const documentShareLinkSnapshotKeyBoxQueryService =
         documentShareLinkSnapshotKeyBoxQueryServiceSubscribers[variablesString].intervalId = null;
       }
     };
-  };
+  });
 
 
 
@@ -4517,14 +4525,15 @@ const triggerDocumentShareLinksQuery = (variablesString: string, variables: Docu
  * It also considers the variables passed to the service.
  */
 export const documentShareLinksQueryService =
-  (variables: DocumentShareLinksQueryVariables, intervalInMs?: number) => (callback, onReceive) => {
+  fromCallback(({ sendBack, receive, input }: {sendBack: any, receive: any ,input: {variables: DocumentShareLinksQueryVariables, intervalInMs?: number }}) => { 
+    const { variables, intervalInMs } = input;
     const variablesString = canonicalize(variables) as string;
     if (documentShareLinksQueryServiceSubscribers[variablesString]) {
-      documentShareLinksQueryServiceSubscribers[variablesString].callbacks.push(callback);
+      documentShareLinksQueryServiceSubscribers[variablesString].callbacks.push(sendBack);
     } else {
       documentShareLinksQueryServiceSubscribers[variablesString] = {
         variables,
-        callbacks: [callback],
+        callbacks: [sendBack],
         intervalId: null,
       };
     }
@@ -4551,7 +4560,7 @@ export const documentShareLinksQueryService =
         documentShareLinksQueryServiceSubscribers[variablesString].intervalId = null;
       }
     };
-  };
+  });
 
 
 
@@ -4621,14 +4630,15 @@ const triggerDocumentsQuery = (variablesString: string, variables: DocumentsQuer
  * It also considers the variables passed to the service.
  */
 export const documentsQueryService =
-  (variables: DocumentsQueryVariables, intervalInMs?: number) => (callback, onReceive) => {
+  fromCallback(({ sendBack, receive, input }: {sendBack: any, receive: any ,input: {variables: DocumentsQueryVariables, intervalInMs?: number }}) => { 
+    const { variables, intervalInMs } = input;
     const variablesString = canonicalize(variables) as string;
     if (documentsQueryServiceSubscribers[variablesString]) {
-      documentsQueryServiceSubscribers[variablesString].callbacks.push(callback);
+      documentsQueryServiceSubscribers[variablesString].callbacks.push(sendBack);
     } else {
       documentsQueryServiceSubscribers[variablesString] = {
         variables,
-        callbacks: [callback],
+        callbacks: [sendBack],
         intervalId: null,
       };
     }
@@ -4655,7 +4665,7 @@ export const documentsQueryService =
         documentsQueryServiceSubscribers[variablesString].intervalId = null;
       }
     };
-  };
+  });
 
 
 
@@ -4725,14 +4735,15 @@ const triggerEncryptedWebDeviceQuery = (variablesString: string, variables: Encr
  * It also considers the variables passed to the service.
  */
 export const encryptedWebDeviceQueryService =
-  (variables: EncryptedWebDeviceQueryVariables, intervalInMs?: number) => (callback, onReceive) => {
+  fromCallback(({ sendBack, receive, input }: {sendBack: any, receive: any ,input: {variables: EncryptedWebDeviceQueryVariables, intervalInMs?: number }}) => { 
+    const { variables, intervalInMs } = input;
     const variablesString = canonicalize(variables) as string;
     if (encryptedWebDeviceQueryServiceSubscribers[variablesString]) {
-      encryptedWebDeviceQueryServiceSubscribers[variablesString].callbacks.push(callback);
+      encryptedWebDeviceQueryServiceSubscribers[variablesString].callbacks.push(sendBack);
     } else {
       encryptedWebDeviceQueryServiceSubscribers[variablesString] = {
         variables,
-        callbacks: [callback],
+        callbacks: [sendBack],
         intervalId: null,
       };
     }
@@ -4759,7 +4770,7 @@ export const encryptedWebDeviceQueryService =
         encryptedWebDeviceQueryServiceSubscribers[variablesString].intervalId = null;
       }
     };
-  };
+  });
 
 
 
@@ -4829,14 +4840,15 @@ const triggerFileUrlQuery = (variablesString: string, variables: FileUrlQueryVar
  * It also considers the variables passed to the service.
  */
 export const fileUrlQueryService =
-  (variables: FileUrlQueryVariables, intervalInMs?: number) => (callback, onReceive) => {
+  fromCallback(({ sendBack, receive, input }: {sendBack: any, receive: any ,input: {variables: FileUrlQueryVariables, intervalInMs?: number }}) => { 
+    const { variables, intervalInMs } = input;
     const variablesString = canonicalize(variables) as string;
     if (fileUrlQueryServiceSubscribers[variablesString]) {
-      fileUrlQueryServiceSubscribers[variablesString].callbacks.push(callback);
+      fileUrlQueryServiceSubscribers[variablesString].callbacks.push(sendBack);
     } else {
       fileUrlQueryServiceSubscribers[variablesString] = {
         variables,
-        callbacks: [callback],
+        callbacks: [sendBack],
         intervalId: null,
       };
     }
@@ -4863,7 +4875,7 @@ export const fileUrlQueryService =
         fileUrlQueryServiceSubscribers[variablesString].intervalId = null;
       }
     };
-  };
+  });
 
 
 
@@ -4933,14 +4945,15 @@ const triggerFirstDocumentQuery = (variablesString: string, variables: FirstDocu
  * It also considers the variables passed to the service.
  */
 export const firstDocumentQueryService =
-  (variables: FirstDocumentQueryVariables, intervalInMs?: number) => (callback, onReceive) => {
+  fromCallback(({ sendBack, receive, input }: {sendBack: any, receive: any ,input: {variables: FirstDocumentQueryVariables, intervalInMs?: number }}) => { 
+    const { variables, intervalInMs } = input;
     const variablesString = canonicalize(variables) as string;
     if (firstDocumentQueryServiceSubscribers[variablesString]) {
-      firstDocumentQueryServiceSubscribers[variablesString].callbacks.push(callback);
+      firstDocumentQueryServiceSubscribers[variablesString].callbacks.push(sendBack);
     } else {
       firstDocumentQueryServiceSubscribers[variablesString] = {
         variables,
-        callbacks: [callback],
+        callbacks: [sendBack],
         intervalId: null,
       };
     }
@@ -4967,7 +4980,7 @@ export const firstDocumentQueryService =
         firstDocumentQueryServiceSubscribers[variablesString].intervalId = null;
       }
     };
-  };
+  });
 
 
 
@@ -5037,14 +5050,15 @@ const triggerFolderQuery = (variablesString: string, variables: FolderQueryVaria
  * It also considers the variables passed to the service.
  */
 export const folderQueryService =
-  (variables: FolderQueryVariables, intervalInMs?: number) => (callback, onReceive) => {
+  fromCallback(({ sendBack, receive, input }: {sendBack: any, receive: any ,input: {variables: FolderQueryVariables, intervalInMs?: number }}) => { 
+    const { variables, intervalInMs } = input;
     const variablesString = canonicalize(variables) as string;
     if (folderQueryServiceSubscribers[variablesString]) {
-      folderQueryServiceSubscribers[variablesString].callbacks.push(callback);
+      folderQueryServiceSubscribers[variablesString].callbacks.push(sendBack);
     } else {
       folderQueryServiceSubscribers[variablesString] = {
         variables,
-        callbacks: [callback],
+        callbacks: [sendBack],
         intervalId: null,
       };
     }
@@ -5071,7 +5085,7 @@ export const folderQueryService =
         folderQueryServiceSubscribers[variablesString].intervalId = null;
       }
     };
-  };
+  });
 
 
 
@@ -5141,14 +5155,15 @@ const triggerFolderTraceQuery = (variablesString: string, variables: FolderTrace
  * It also considers the variables passed to the service.
  */
 export const folderTraceQueryService =
-  (variables: FolderTraceQueryVariables, intervalInMs?: number) => (callback, onReceive) => {
+  fromCallback(({ sendBack, receive, input }: {sendBack: any, receive: any ,input: {variables: FolderTraceQueryVariables, intervalInMs?: number }}) => { 
+    const { variables, intervalInMs } = input;
     const variablesString = canonicalize(variables) as string;
     if (folderTraceQueryServiceSubscribers[variablesString]) {
-      folderTraceQueryServiceSubscribers[variablesString].callbacks.push(callback);
+      folderTraceQueryServiceSubscribers[variablesString].callbacks.push(sendBack);
     } else {
       folderTraceQueryServiceSubscribers[variablesString] = {
         variables,
-        callbacks: [callback],
+        callbacks: [sendBack],
         intervalId: null,
       };
     }
@@ -5175,7 +5190,7 @@ export const folderTraceQueryService =
         folderTraceQueryServiceSubscribers[variablesString].intervalId = null;
       }
     };
-  };
+  });
 
 
 
@@ -5245,14 +5260,15 @@ const triggerFoldersQuery = (variablesString: string, variables: FoldersQueryVar
  * It also considers the variables passed to the service.
  */
 export const foldersQueryService =
-  (variables: FoldersQueryVariables, intervalInMs?: number) => (callback, onReceive) => {
+  fromCallback(({ sendBack, receive, input }: {sendBack: any, receive: any ,input: {variables: FoldersQueryVariables, intervalInMs?: number }}) => { 
+    const { variables, intervalInMs } = input;
     const variablesString = canonicalize(variables) as string;
     if (foldersQueryServiceSubscribers[variablesString]) {
-      foldersQueryServiceSubscribers[variablesString].callbacks.push(callback);
+      foldersQueryServiceSubscribers[variablesString].callbacks.push(sendBack);
     } else {
       foldersQueryServiceSubscribers[variablesString] = {
         variables,
-        callbacks: [callback],
+        callbacks: [sendBack],
         intervalId: null,
       };
     }
@@ -5279,7 +5295,7 @@ export const foldersQueryService =
         foldersQueryServiceSubscribers[variablesString].intervalId = null;
       }
     };
-  };
+  });
 
 
 
@@ -5349,14 +5365,15 @@ const triggerMainDeviceQuery = (variablesString: string, variables: MainDeviceQu
  * It also considers the variables passed to the service.
  */
 export const mainDeviceQueryService =
-  (variables: MainDeviceQueryVariables, intervalInMs?: number) => (callback, onReceive) => {
+  fromCallback(({ sendBack, receive, input }: {sendBack: any, receive: any ,input: {variables: MainDeviceQueryVariables, intervalInMs?: number }}) => { 
+    const { variables, intervalInMs } = input;
     const variablesString = canonicalize(variables) as string;
     if (mainDeviceQueryServiceSubscribers[variablesString]) {
-      mainDeviceQueryServiceSubscribers[variablesString].callbacks.push(callback);
+      mainDeviceQueryServiceSubscribers[variablesString].callbacks.push(sendBack);
     } else {
       mainDeviceQueryServiceSubscribers[variablesString] = {
         variables,
-        callbacks: [callback],
+        callbacks: [sendBack],
         intervalId: null,
       };
     }
@@ -5383,7 +5400,7 @@ export const mainDeviceQueryService =
         mainDeviceQueryServiceSubscribers[variablesString].intervalId = null;
       }
     };
-  };
+  });
 
 
 
@@ -5453,14 +5470,15 @@ const triggerMeQuery = (variablesString: string, variables: MeQueryVariables) =>
  * It also considers the variables passed to the service.
  */
 export const meQueryService =
-  (variables: MeQueryVariables, intervalInMs?: number) => (callback, onReceive) => {
+  fromCallback(({ sendBack, receive, input }: {sendBack: any, receive: any ,input: {variables: MeQueryVariables, intervalInMs?: number }}) => { 
+    const { variables, intervalInMs } = input;
     const variablesString = canonicalize(variables) as string;
     if (meQueryServiceSubscribers[variablesString]) {
-      meQueryServiceSubscribers[variablesString].callbacks.push(callback);
+      meQueryServiceSubscribers[variablesString].callbacks.push(sendBack);
     } else {
       meQueryServiceSubscribers[variablesString] = {
         variables,
-        callbacks: [callback],
+        callbacks: [sendBack],
         intervalId: null,
       };
     }
@@ -5487,7 +5505,7 @@ export const meQueryService =
         meQueryServiceSubscribers[variablesString].intervalId = null;
       }
     };
-  };
+  });
 
 
 
@@ -5557,14 +5575,15 @@ const triggerMeWithWorkspaceLoadingInfoQuery = (variablesString: string, variabl
  * It also considers the variables passed to the service.
  */
 export const meWithWorkspaceLoadingInfoQueryService =
-  (variables: MeWithWorkspaceLoadingInfoQueryVariables, intervalInMs?: number) => (callback, onReceive) => {
+  fromCallback(({ sendBack, receive, input }: {sendBack: any, receive: any ,input: {variables: MeWithWorkspaceLoadingInfoQueryVariables, intervalInMs?: number }}) => { 
+    const { variables, intervalInMs } = input;
     const variablesString = canonicalize(variables) as string;
     if (meWithWorkspaceLoadingInfoQueryServiceSubscribers[variablesString]) {
-      meWithWorkspaceLoadingInfoQueryServiceSubscribers[variablesString].callbacks.push(callback);
+      meWithWorkspaceLoadingInfoQueryServiceSubscribers[variablesString].callbacks.push(sendBack);
     } else {
       meWithWorkspaceLoadingInfoQueryServiceSubscribers[variablesString] = {
         variables,
-        callbacks: [callback],
+        callbacks: [sendBack],
         intervalId: null,
       };
     }
@@ -5591,7 +5610,7 @@ export const meWithWorkspaceLoadingInfoQueryService =
         meWithWorkspaceLoadingInfoQueryServiceSubscribers[variablesString].intervalId = null;
       }
     };
-  };
+  });
 
 
 
@@ -5661,14 +5680,15 @@ const triggerPendingWorkspaceInvitationQuery = (variablesString: string, variabl
  * It also considers the variables passed to the service.
  */
 export const pendingWorkspaceInvitationQueryService =
-  (variables: PendingWorkspaceInvitationQueryVariables, intervalInMs?: number) => (callback, onReceive) => {
+  fromCallback(({ sendBack, receive, input }: {sendBack: any, receive: any ,input: {variables: PendingWorkspaceInvitationQueryVariables, intervalInMs?: number }}) => { 
+    const { variables, intervalInMs } = input;
     const variablesString = canonicalize(variables) as string;
     if (pendingWorkspaceInvitationQueryServiceSubscribers[variablesString]) {
-      pendingWorkspaceInvitationQueryServiceSubscribers[variablesString].callbacks.push(callback);
+      pendingWorkspaceInvitationQueryServiceSubscribers[variablesString].callbacks.push(sendBack);
     } else {
       pendingWorkspaceInvitationQueryServiceSubscribers[variablesString] = {
         variables,
-        callbacks: [callback],
+        callbacks: [sendBack],
         intervalId: null,
       };
     }
@@ -5695,7 +5715,7 @@ export const pendingWorkspaceInvitationQueryService =
         pendingWorkspaceInvitationQueryServiceSubscribers[variablesString].intervalId = null;
       }
     };
-  };
+  });
 
 
 
@@ -5765,14 +5785,15 @@ const triggerRootFoldersQuery = (variablesString: string, variables: RootFolders
  * It also considers the variables passed to the service.
  */
 export const rootFoldersQueryService =
-  (variables: RootFoldersQueryVariables, intervalInMs?: number) => (callback, onReceive) => {
+  fromCallback(({ sendBack, receive, input }: {sendBack: any, receive: any ,input: {variables: RootFoldersQueryVariables, intervalInMs?: number }}) => { 
+    const { variables, intervalInMs } = input;
     const variablesString = canonicalize(variables) as string;
     if (rootFoldersQueryServiceSubscribers[variablesString]) {
-      rootFoldersQueryServiceSubscribers[variablesString].callbacks.push(callback);
+      rootFoldersQueryServiceSubscribers[variablesString].callbacks.push(sendBack);
     } else {
       rootFoldersQueryServiceSubscribers[variablesString] = {
         variables,
-        callbacks: [callback],
+        callbacks: [sendBack],
         intervalId: null,
       };
     }
@@ -5799,7 +5820,7 @@ export const rootFoldersQueryService =
         rootFoldersQueryServiceSubscribers[variablesString].intervalId = null;
       }
     };
-  };
+  });
 
 
 
@@ -5869,14 +5890,15 @@ const triggerSnapshotQuery = (variablesString: string, variables: SnapshotQueryV
  * It also considers the variables passed to the service.
  */
 export const snapshotQueryService =
-  (variables: SnapshotQueryVariables, intervalInMs?: number) => (callback, onReceive) => {
+  fromCallback(({ sendBack, receive, input }: {sendBack: any, receive: any ,input: {variables: SnapshotQueryVariables, intervalInMs?: number }}) => { 
+    const { variables, intervalInMs } = input;
     const variablesString = canonicalize(variables) as string;
     if (snapshotQueryServiceSubscribers[variablesString]) {
-      snapshotQueryServiceSubscribers[variablesString].callbacks.push(callback);
+      snapshotQueryServiceSubscribers[variablesString].callbacks.push(sendBack);
     } else {
       snapshotQueryServiceSubscribers[variablesString] = {
         variables,
-        callbacks: [callback],
+        callbacks: [sendBack],
         intervalId: null,
       };
     }
@@ -5903,7 +5925,7 @@ export const snapshotQueryService =
         snapshotQueryServiceSubscribers[variablesString].intervalId = null;
       }
     };
-  };
+  });
 
 
 
@@ -5973,14 +5995,15 @@ const triggerUnauthorizedMemberQuery = (variablesString: string, variables: Unau
  * It also considers the variables passed to the service.
  */
 export const unauthorizedMemberQueryService =
-  (variables: UnauthorizedMemberQueryVariables, intervalInMs?: number) => (callback, onReceive) => {
+  fromCallback(({ sendBack, receive, input }: {sendBack: any, receive: any ,input: {variables: UnauthorizedMemberQueryVariables, intervalInMs?: number }}) => { 
+    const { variables, intervalInMs } = input;
     const variablesString = canonicalize(variables) as string;
     if (unauthorizedMemberQueryServiceSubscribers[variablesString]) {
-      unauthorizedMemberQueryServiceSubscribers[variablesString].callbacks.push(callback);
+      unauthorizedMemberQueryServiceSubscribers[variablesString].callbacks.push(sendBack);
     } else {
       unauthorizedMemberQueryServiceSubscribers[variablesString] = {
         variables,
-        callbacks: [callback],
+        callbacks: [sendBack],
         intervalId: null,
       };
     }
@@ -6007,7 +6030,7 @@ export const unauthorizedMemberQueryService =
         unauthorizedMemberQueryServiceSubscribers[variablesString].intervalId = null;
       }
     };
-  };
+  });
 
 
 
@@ -6077,14 +6100,15 @@ const triggerUserChainQuery = (variablesString: string, variables: UserChainQuer
  * It also considers the variables passed to the service.
  */
 export const userChainQueryService =
-  (variables: UserChainQueryVariables, intervalInMs?: number) => (callback, onReceive) => {
+  fromCallback(({ sendBack, receive, input }: {sendBack: any, receive: any ,input: {variables: UserChainQueryVariables, intervalInMs?: number }}) => { 
+    const { variables, intervalInMs } = input;
     const variablesString = canonicalize(variables) as string;
     if (userChainQueryServiceSubscribers[variablesString]) {
-      userChainQueryServiceSubscribers[variablesString].callbacks.push(callback);
+      userChainQueryServiceSubscribers[variablesString].callbacks.push(sendBack);
     } else {
       userChainQueryServiceSubscribers[variablesString] = {
         variables,
-        callbacks: [callback],
+        callbacks: [sendBack],
         intervalId: null,
       };
     }
@@ -6111,7 +6135,7 @@ export const userChainQueryService =
         userChainQueryServiceSubscribers[variablesString].intervalId = null;
       }
     };
-  };
+  });
 
 
 
@@ -6181,14 +6205,15 @@ const triggerUserIdFromUsernameQuery = (variablesString: string, variables: User
  * It also considers the variables passed to the service.
  */
 export const userIdFromUsernameQueryService =
-  (variables: UserIdFromUsernameQueryVariables, intervalInMs?: number) => (callback, onReceive) => {
+  fromCallback(({ sendBack, receive, input }: {sendBack: any, receive: any ,input: {variables: UserIdFromUsernameQueryVariables, intervalInMs?: number }}) => { 
+    const { variables, intervalInMs } = input;
     const variablesString = canonicalize(variables) as string;
     if (userIdFromUsernameQueryServiceSubscribers[variablesString]) {
-      userIdFromUsernameQueryServiceSubscribers[variablesString].callbacks.push(callback);
+      userIdFromUsernameQueryServiceSubscribers[variablesString].callbacks.push(sendBack);
     } else {
       userIdFromUsernameQueryServiceSubscribers[variablesString] = {
         variables,
-        callbacks: [callback],
+        callbacks: [sendBack],
         intervalId: null,
       };
     }
@@ -6215,7 +6240,7 @@ export const userIdFromUsernameQueryService =
         userIdFromUsernameQueryServiceSubscribers[variablesString].intervalId = null;
       }
     };
-  };
+  });
 
 
 
@@ -6285,14 +6310,15 @@ const triggerWorkspaceQuery = (variablesString: string, variables: WorkspaceQuer
  * It also considers the variables passed to the service.
  */
 export const workspaceQueryService =
-  (variables: WorkspaceQueryVariables, intervalInMs?: number) => (callback, onReceive) => {
+  fromCallback(({ sendBack, receive, input }: {sendBack: any, receive: any ,input: {variables: WorkspaceQueryVariables, intervalInMs?: number }}) => { 
+    const { variables, intervalInMs } = input;
     const variablesString = canonicalize(variables) as string;
     if (workspaceQueryServiceSubscribers[variablesString]) {
-      workspaceQueryServiceSubscribers[variablesString].callbacks.push(callback);
+      workspaceQueryServiceSubscribers[variablesString].callbacks.push(sendBack);
     } else {
       workspaceQueryServiceSubscribers[variablesString] = {
         variables,
-        callbacks: [callback],
+        callbacks: [sendBack],
         intervalId: null,
       };
     }
@@ -6319,7 +6345,7 @@ export const workspaceQueryService =
         workspaceQueryServiceSubscribers[variablesString].intervalId = null;
       }
     };
-  };
+  });
 
 
 
@@ -6389,14 +6415,15 @@ const triggerWorkspaceChainQuery = (variablesString: string, variables: Workspac
  * It also considers the variables passed to the service.
  */
 export const workspaceChainQueryService =
-  (variables: WorkspaceChainQueryVariables, intervalInMs?: number) => (callback, onReceive) => {
+  fromCallback(({ sendBack, receive, input }: {sendBack: any, receive: any ,input: {variables: WorkspaceChainQueryVariables, intervalInMs?: number }}) => { 
+    const { variables, intervalInMs } = input;
     const variablesString = canonicalize(variables) as string;
     if (workspaceChainQueryServiceSubscribers[variablesString]) {
-      workspaceChainQueryServiceSubscribers[variablesString].callbacks.push(callback);
+      workspaceChainQueryServiceSubscribers[variablesString].callbacks.push(sendBack);
     } else {
       workspaceChainQueryServiceSubscribers[variablesString] = {
         variables,
-        callbacks: [callback],
+        callbacks: [sendBack],
         intervalId: null,
       };
     }
@@ -6423,7 +6450,7 @@ export const workspaceChainQueryService =
         workspaceChainQueryServiceSubscribers[variablesString].intervalId = null;
       }
     };
-  };
+  });
 
 
 
@@ -6493,14 +6520,15 @@ const triggerWorkspaceChainByInvitationIdQuery = (variablesString: string, varia
  * It also considers the variables passed to the service.
  */
 export const workspaceChainByInvitationIdQueryService =
-  (variables: WorkspaceChainByInvitationIdQueryVariables, intervalInMs?: number) => (callback, onReceive) => {
+  fromCallback(({ sendBack, receive, input }: {sendBack: any, receive: any ,input: {variables: WorkspaceChainByInvitationIdQueryVariables, intervalInMs?: number }}) => { 
+    const { variables, intervalInMs } = input;
     const variablesString = canonicalize(variables) as string;
     if (workspaceChainByInvitationIdQueryServiceSubscribers[variablesString]) {
-      workspaceChainByInvitationIdQueryServiceSubscribers[variablesString].callbacks.push(callback);
+      workspaceChainByInvitationIdQueryServiceSubscribers[variablesString].callbacks.push(sendBack);
     } else {
       workspaceChainByInvitationIdQueryServiceSubscribers[variablesString] = {
         variables,
-        callbacks: [callback],
+        callbacks: [sendBack],
         intervalId: null,
       };
     }
@@ -6527,7 +6555,7 @@ export const workspaceChainByInvitationIdQueryService =
         workspaceChainByInvitationIdQueryServiceSubscribers[variablesString].intervalId = null;
       }
     };
-  };
+  });
 
 
 
@@ -6597,14 +6625,15 @@ const triggerWorkspaceInvitationQuery = (variablesString: string, variables: Wor
  * It also considers the variables passed to the service.
  */
 export const workspaceInvitationQueryService =
-  (variables: WorkspaceInvitationQueryVariables, intervalInMs?: number) => (callback, onReceive) => {
+  fromCallback(({ sendBack, receive, input }: {sendBack: any, receive: any ,input: {variables: WorkspaceInvitationQueryVariables, intervalInMs?: number }}) => { 
+    const { variables, intervalInMs } = input;
     const variablesString = canonicalize(variables) as string;
     if (workspaceInvitationQueryServiceSubscribers[variablesString]) {
-      workspaceInvitationQueryServiceSubscribers[variablesString].callbacks.push(callback);
+      workspaceInvitationQueryServiceSubscribers[variablesString].callbacks.push(sendBack);
     } else {
       workspaceInvitationQueryServiceSubscribers[variablesString] = {
         variables,
-        callbacks: [callback],
+        callbacks: [sendBack],
         intervalId: null,
       };
     }
@@ -6631,7 +6660,7 @@ export const workspaceInvitationQueryService =
         workspaceInvitationQueryServiceSubscribers[variablesString].intervalId = null;
       }
     };
-  };
+  });
 
 
 
@@ -6701,14 +6730,15 @@ const triggerWorkspaceInvitationsQuery = (variablesString: string, variables: Wo
  * It also considers the variables passed to the service.
  */
 export const workspaceInvitationsQueryService =
-  (variables: WorkspaceInvitationsQueryVariables, intervalInMs?: number) => (callback, onReceive) => {
+  fromCallback(({ sendBack, receive, input }: {sendBack: any, receive: any ,input: {variables: WorkspaceInvitationsQueryVariables, intervalInMs?: number }}) => { 
+    const { variables, intervalInMs } = input;
     const variablesString = canonicalize(variables) as string;
     if (workspaceInvitationsQueryServiceSubscribers[variablesString]) {
-      workspaceInvitationsQueryServiceSubscribers[variablesString].callbacks.push(callback);
+      workspaceInvitationsQueryServiceSubscribers[variablesString].callbacks.push(sendBack);
     } else {
       workspaceInvitationsQueryServiceSubscribers[variablesString] = {
         variables,
-        callbacks: [callback],
+        callbacks: [sendBack],
         intervalId: null,
       };
     }
@@ -6735,7 +6765,7 @@ export const workspaceInvitationsQueryService =
         workspaceInvitationsQueryServiceSubscribers[variablesString].intervalId = null;
       }
     };
-  };
+  });
 
 
 
@@ -6805,14 +6835,15 @@ const triggerWorkspaceMemberDevicesProofQuery = (variablesString: string, variab
  * It also considers the variables passed to the service.
  */
 export const workspaceMemberDevicesProofQueryService =
-  (variables: WorkspaceMemberDevicesProofQueryVariables, intervalInMs?: number) => (callback, onReceive) => {
+  fromCallback(({ sendBack, receive, input }: {sendBack: any, receive: any ,input: {variables: WorkspaceMemberDevicesProofQueryVariables, intervalInMs?: number }}) => { 
+    const { variables, intervalInMs } = input;
     const variablesString = canonicalize(variables) as string;
     if (workspaceMemberDevicesProofQueryServiceSubscribers[variablesString]) {
-      workspaceMemberDevicesProofQueryServiceSubscribers[variablesString].callbacks.push(callback);
+      workspaceMemberDevicesProofQueryServiceSubscribers[variablesString].callbacks.push(sendBack);
     } else {
       workspaceMemberDevicesProofQueryServiceSubscribers[variablesString] = {
         variables,
-        callbacks: [callback],
+        callbacks: [sendBack],
         intervalId: null,
       };
     }
@@ -6839,7 +6870,7 @@ export const workspaceMemberDevicesProofQueryService =
         workspaceMemberDevicesProofQueryServiceSubscribers[variablesString].intervalId = null;
       }
     };
-  };
+  });
 
 
 
@@ -6909,14 +6940,15 @@ const triggerWorkspaceMemberDevicesProofsQuery = (variablesString: string, varia
  * It also considers the variables passed to the service.
  */
 export const workspaceMemberDevicesProofsQueryService =
-  (variables: WorkspaceMemberDevicesProofsQueryVariables, intervalInMs?: number) => (callback, onReceive) => {
+  fromCallback(({ sendBack, receive, input }: {sendBack: any, receive: any ,input: {variables: WorkspaceMemberDevicesProofsQueryVariables, intervalInMs?: number }}) => { 
+    const { variables, intervalInMs } = input;
     const variablesString = canonicalize(variables) as string;
     if (workspaceMemberDevicesProofsQueryServiceSubscribers[variablesString]) {
-      workspaceMemberDevicesProofsQueryServiceSubscribers[variablesString].callbacks.push(callback);
+      workspaceMemberDevicesProofsQueryServiceSubscribers[variablesString].callbacks.push(sendBack);
     } else {
       workspaceMemberDevicesProofsQueryServiceSubscribers[variablesString] = {
         variables,
-        callbacks: [callback],
+        callbacks: [sendBack],
         intervalId: null,
       };
     }
@@ -6943,7 +6975,7 @@ export const workspaceMemberDevicesProofsQueryService =
         workspaceMemberDevicesProofsQueryServiceSubscribers[variablesString].intervalId = null;
       }
     };
-  };
+  });
 
 
 
@@ -7013,14 +7045,15 @@ const triggerWorkspaceMembersQuery = (variablesString: string, variables: Worksp
  * It also considers the variables passed to the service.
  */
 export const workspaceMembersQueryService =
-  (variables: WorkspaceMembersQueryVariables, intervalInMs?: number) => (callback, onReceive) => {
+  fromCallback(({ sendBack, receive, input }: {sendBack: any, receive: any ,input: {variables: WorkspaceMembersQueryVariables, intervalInMs?: number }}) => { 
+    const { variables, intervalInMs } = input;
     const variablesString = canonicalize(variables) as string;
     if (workspaceMembersQueryServiceSubscribers[variablesString]) {
-      workspaceMembersQueryServiceSubscribers[variablesString].callbacks.push(callback);
+      workspaceMembersQueryServiceSubscribers[variablesString].callbacks.push(sendBack);
     } else {
       workspaceMembersQueryServiceSubscribers[variablesString] = {
         variables,
-        callbacks: [callback],
+        callbacks: [sendBack],
         intervalId: null,
       };
     }
@@ -7047,7 +7080,7 @@ export const workspaceMembersQueryService =
         workspaceMembersQueryServiceSubscribers[variablesString].intervalId = null;
       }
     };
-  };
+  });
 
 
 
@@ -7117,14 +7150,15 @@ const triggerWorkspaceMembersByMainDeviceSigningPublicKeyQuery = (variablesStrin
  * It also considers the variables passed to the service.
  */
 export const workspaceMembersByMainDeviceSigningPublicKeyQueryService =
-  (variables: WorkspaceMembersByMainDeviceSigningPublicKeyQueryVariables, intervalInMs?: number) => (callback, onReceive) => {
+  fromCallback(({ sendBack, receive, input }: {sendBack: any, receive: any ,input: {variables: WorkspaceMembersByMainDeviceSigningPublicKeyQueryVariables, intervalInMs?: number }}) => { 
+    const { variables, intervalInMs } = input;
     const variablesString = canonicalize(variables) as string;
     if (workspaceMembersByMainDeviceSigningPublicKeyQueryServiceSubscribers[variablesString]) {
-      workspaceMembersByMainDeviceSigningPublicKeyQueryServiceSubscribers[variablesString].callbacks.push(callback);
+      workspaceMembersByMainDeviceSigningPublicKeyQueryServiceSubscribers[variablesString].callbacks.push(sendBack);
     } else {
       workspaceMembersByMainDeviceSigningPublicKeyQueryServiceSubscribers[variablesString] = {
         variables,
-        callbacks: [callback],
+        callbacks: [sendBack],
         intervalId: null,
       };
     }
@@ -7151,7 +7185,7 @@ export const workspaceMembersByMainDeviceSigningPublicKeyQueryService =
         workspaceMembersByMainDeviceSigningPublicKeyQueryServiceSubscribers[variablesString].intervalId = null;
       }
     };
-  };
+  });
 
 
 
@@ -7221,14 +7255,15 @@ const triggerWorkspacesQuery = (variablesString: string, variables: WorkspacesQu
  * It also considers the variables passed to the service.
  */
 export const workspacesQueryService =
-  (variables: WorkspacesQueryVariables, intervalInMs?: number) => (callback, onReceive) => {
+  fromCallback(({ sendBack, receive, input }: {sendBack: any, receive: any ,input: {variables: WorkspacesQueryVariables, intervalInMs?: number }}) => { 
+    const { variables, intervalInMs } = input;
     const variablesString = canonicalize(variables) as string;
     if (workspacesQueryServiceSubscribers[variablesString]) {
-      workspacesQueryServiceSubscribers[variablesString].callbacks.push(callback);
+      workspacesQueryServiceSubscribers[variablesString].callbacks.push(sendBack);
     } else {
       workspacesQueryServiceSubscribers[variablesString] = {
         variables,
-        callbacks: [callback],
+        callbacks: [sendBack],
         intervalId: null,
       };
     }
@@ -7255,5 +7290,5 @@ export const workspacesQueryService =
         workspacesQueryServiceSubscribers[variablesString].intervalId = null;
       }
     };
-  };
+  });
 
