@@ -244,7 +244,7 @@ export default function Editor({
   // }, []);
 
   yDocRef.current.on("updateV2", (update: any, origin: string) => {
-    if (origin === "sec-sync-remote") {
+    if (origin === "secsync-remote") {
       // TODO investigate if the scripts need to be cleaned up to avoid polluting
       // the document with a lot of script tags
       // send to webview
