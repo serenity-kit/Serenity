@@ -2,7 +2,7 @@ import { ForbiddenError, UserInputError } from "apollo-server-express";
 import { prisma } from "../prisma";
 
 type Cursor = {
-  id?: string;
+  id: string;
 };
 
 type Params = {

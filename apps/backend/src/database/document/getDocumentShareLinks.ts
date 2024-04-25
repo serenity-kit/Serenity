@@ -3,7 +3,7 @@ import { Prisma } from "../../../prisma/generated/output";
 import { prisma } from "../prisma";
 
 type Cursor = {
-  token?: string;
+  token: string;
 };
 
 type Params = {

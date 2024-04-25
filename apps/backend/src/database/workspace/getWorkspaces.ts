@@ -2,7 +2,7 @@ import { formatWorkspace } from "../../types/workspace";
 import { prisma } from "../prisma";
 
 type Cursor = {
-  id?: string;
+  id: string;
 };
 
 type Params = {
