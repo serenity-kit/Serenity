@@ -3,7 +3,7 @@
     "details": [
       {
         "appIDs": [
-          "RYZ8QY8L2A.page.serenityapp.app",
+          "5YV6NBWY7Y.page.serenityapp.ios",
           "page.serenityapp.desktop-app"
         ],
         "components": [
@@ -17,13 +17,13 @@
   },
   "activitycontinuation": {
     "apps": [
-      "RYZ8QY8L2A.page.serenityapp.app",
+      "5YV6NBWY7Y.page.serenityapp.ios",
       "page.serenityapp.desktop-app"
     ]
   },
   "webcredentials": {
     "apps": [
-      "RYZ8QY8L2A.page.serenityapp.app",
+      "5YV6NBWY7Y.page.serenityapp.ios",
       "page.serenityapp.desktop-app"
     ]
   }
