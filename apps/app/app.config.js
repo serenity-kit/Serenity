@@ -1,7 +1,7 @@
 export default {
   expo: {
     name: "Serenity",
-    owner: "serenity-app",
+    owner: "naisho-gmbh",
     slug: "serenity",
     version: "0.0.6",
     orientation: "portrait",
@@ -21,11 +21,11 @@ export default {
     assetBundlePatterns: ["**/*"],
     ios: {
       supportsTablet: true,
-      bundleIdentifier: "page.serenityapp.app",
+      bundleIdentifier: "page.serenityapp.ios",
       associatedDomains: ["applinks:serenity.li"],
     },
     android: {
-      package: "page.serenityapp.app",
+      package: "page.serenityapp.ios",
       adaptiveIcon: {
         foregroundImage: "./assets/images/logo_serenity_android.png",
         backgroundColor: "#FFF",
