@@ -3,7 +3,7 @@ export default {
     name: "Serenity",
     owner: "naisho-gmbh",
     slug: "serenity",
-    version: "0.0.6",
+    version: "0.0.7",
     orientation: "portrait",
     plugins: ["expo-font", "expo-secure-store", ["react-native-libsodium", {}]],
     icon: "./assets/images/icon.png",
@@ -23,6 +23,7 @@ export default {
       supportsTablet: true,
       bundleIdentifier: "page.serenityapp.ios",
       associatedDomains: ["applinks:serenity.li"],
+      companyName: "Naisho GmbH",
     },
     android: {
       package: "page.serenityapp.ios",
