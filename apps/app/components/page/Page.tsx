@@ -131,7 +131,7 @@ export default function Page({
     yDoc: yDocRef.current,
     documentId: docId,
     signatureKeyPair,
-    websocketHost: websocketOrigin,
+    websocketEndpoint: websocketOrigin,
     websocketSessionKey: deriveSessionAuthorization({ sessionKey })
       .authorization,
     onDocumentUpdated: ({ type, knownSnapshotInfo }) => {

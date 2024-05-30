@@ -86,7 +86,7 @@ export const SharePage: React.FC<Props> = ({
     yDoc: yDocRef.current,
     documentId: docId,
     signatureKeyPair,
-    websocketHost: websocketOrigin,
+    websocketEndpoint: websocketOrigin,
     websocketSessionKey,
     getNewSnapshotData: async () => {
       // share page user can't create new snapshots
