@@ -105,6 +105,15 @@ const createWindow = async () => {
     mainWindow.loadURL(`${scheme}://${root}`);
     // mainWindow.webContents.openDevTools();
   }
+
+  console.log("LLLLKKK", app.setUserActivity, typeof app.setUserActivity);
+  setTimeout(() => {
+    console.log("PPPP");
+    app.setUserActivity("NSUserActivityTypeBrowsingWeb", {
+      type: "com.serenityapp.desktop",
+      userInfo: { test: "test" },
+    });
+  }, 3000);
 };
 
 // this method will be called when Electron has finished
@@ -283,3 +292,19 @@ app.on("activate", () => {
     createWindow();
   }
 });
+
+app.on("continue-activity", (event, type, userInfo) => {
+  console.log(`TTTTTT Continuing activity of type ${type}`, event, userInfo);
+  const debugPath = path.join(userDataPath, "debug.txt");
+  fs.writeFileSync(debugPath, JSON.stringify({ type, event, userInfo }));
+});
+
+// // handoff support for macOS
+// app.on('continue-activity', function(e, type, userInfo, details) {
+//   if (type === 'NSUserActivityTypeBrowsingWeb' && details.webpageURL) {
+//     e.preventDefault()
+//     sendIPCToWindow(windows.getCurrent(), 'addTab', {
+//       url: details.webpageURL
+//     })
+//   }
+// })
